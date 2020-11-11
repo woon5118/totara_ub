@@ -242,6 +242,11 @@ class core_string_manager_standard implements core_string_manager {
                 if (file_exists($filename)) {
                     $content .= "\n". file_get_contents($filename);
                 }
+                // Totara: Hack for rb_sources.
+                $filename = $plugindir.'/rb_sources/lang/en/deprecated.txt';
+                if (file_exists($filename)) {
+                    $content .= "\n". file_get_contents($filename);
+                }
             }
         }
 

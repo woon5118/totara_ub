@@ -1166,7 +1166,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     function test_reportbuilder_get_filters_select() {
-        $rb = $this->rb;
+        $rb = reportbuilder::create_embedded($this->shortname);
         $options = $rb->get_filters_select();
         // should return an array
         $this->assertTrue((bool)is_array($options));
@@ -1177,7 +1177,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     function test_reportbuilder_get_columns_select() {
-        $rb = $this->rb;
+        $rb = reportbuilder::create_embedded($this->shortname);
         $options = $rb->get_columns_select();
         // should return an array
         $this->assertTrue((bool)is_array($options));
@@ -1431,20 +1431,30 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_search_columns_select() {
-        $report1 = reportbuilder::create($this->rb->_id);
+        $report1 = reportbuilder::create_embedded($this->shortname);
         $cols1 = $report1->get_search_columns_select();
         // Current test report has at least three groups. Check some items inside aswell.
         $this->assertGreaterThanOrEqual(3, count($cols1));
-        $compevidstr = get_string('type_competency_evidence', 'rb_source_competency_evidence');
-        $compstr = get_string('type_competency', 'rb_source_dp_competency');
-        $userstr = get_string('type_user', 'totara_reportbuilder');
-        $this->assertArrayHasKey($compevidstr, $cols1);
-        $this->assertArrayHasKey($compstr, $cols1);
-        $this->assertArrayHasKey($userstr, $cols1);
 
-        $this->assertArrayHasKey('competency_evidence-organisation', $cols1[$compevidstr]);
-        $this->assertArrayHasKey('competency-fullname', $cols1[$compstr]);
-        $this->assertArrayHasKey('user-fullname', $cols1[$userstr]);
+        $type_header1 = get_string('type_plan', 'rb_source_dp_competency');
+        $type_header2 = get_string('type_template', 'rb_source_dp_competency');
+        $type_header3 = get_string('type_competency', 'rb_source_dp_competency');
+
+        $this->assertArrayHasKey($type_header1, $cols1);
+        $this->assertArrayHasKey($type_header2, $cols1);
+        $this->assertArrayHasKey($type_header3, $cols1);
+
+        $this->assertArrayHasKey('plan-name', $cols1[$type_header1]);
+        $this->assertArrayHasKey('template-name', $cols1[$type_header2]);
+        $this->assertArrayHasKey('competency-fullname', $cols1[$type_header3]);
+
+        $column_header1 = get_string('planname', 'rb_source_dp_competency');
+        $column_header2 = get_string('templatename', 'rb_source_dp_competency');
+        $column_header3 = get_string('competencyname', 'rb_source_dp_competency');
+
+        $this->assertEquals($column_header1, $cols1[$type_header1]['plan-name']);
+        $this->assertEquals($column_header2, $cols1[$type_header2]['template-name']);
+        $this->assertEquals($column_header3, $cols1[$type_header3]['competency-fullname']);
     }
 
     /**
@@ -1502,23 +1512,32 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_filters_select() {
-        $report = reportbuilder::create($this->rb->_id);
+        $report = reportbuilder::create_embedded($this->shortname);
         $filters = $report->get_filters_select();
 
-        $compevidstr = get_string('type_competency_evidence', 'rb_source_competency_evidence');
-        $compstr = get_string('type_competency', 'rb_source_dp_competency');
-        $userstr = get_string('type_user', 'totara_reportbuilder');
-        $this->assertArrayHasKey($compevidstr, $filters);
-        $this->assertArrayHasKey($compstr, $filters);
-        $this->assertArrayHasKey($userstr, $filters);
+        $type_header1 = get_string('type_plan', 'rb_source_dp_competency');
+        $type_header2 = get_string('type_user', 'totara_reportbuilder');
+        $type_header3 = get_string('type_competency', 'rb_source_dp_competency');
 
-        $this->assertArrayHasKey('competency_evidence-timemodified', $filters[$compevidstr]);
-        $this->assertArrayHasKey('competency-fullname', $filters[$compstr]);
-        $this->assertArrayHasKey('user-fullname', $filters[$userstr]);
+        $this->assertArrayHasKey($type_header1, $filters);
+        $this->assertArrayHasKey($type_header2, $filters);
+        $this->assertArrayHasKey($type_header3, $filters);
+
+        $this->assertArrayHasKey('plan-name', $filters[$type_header1]);
+        $this->assertArrayHasKey('user-firstname', $filters[$type_header2]);
+        $this->assertArrayHasKey('competency-fullname', $filters[$type_header3]);
+
+        $column_header1 = get_string('planname', 'rb_source_dp_competency');
+        $column_header2 = get_string('userfirstname', 'totara_reportbuilder');
+        $column_header3 = get_string('competencyname', 'rb_source_dp_competency');
+
+        $this->assertEquals($column_header1, $filters[$type_header1]['plan-name']);
+        $this->assertEquals($column_header2, $filters[$type_header2]['user-firstname']);
+        $this->assertEquals($column_header3, $filters[$type_header3]['competency-fullname']);
     }
 
     public function test_get_all_filters_select() {
-        $report1 = reportbuilder::create($this->rb->_id);
+        $report1 = reportbuilder::create_embedded($this->shortname);
         $filters = $report1->get_all_filters_select();
 
         $this->assertArrayHasKey('allstandardfilters', $filters);
@@ -1530,7 +1549,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
         // Check couple filters that should be in every category.
         $userstr = get_string('type_user', 'totara_reportbuilder');
-        $compevidstr = get_string('type_competency_evidence', 'rb_source_competency_evidence');
+        $compevidstr = get_string('type_competency', 'rb_source_dp_competency');
         foreach ($filters as $key => $filter) {
             if (strpos($key, 'unused') === false) {
                 $this->assertArrayHasKey($compevidstr, $filter);

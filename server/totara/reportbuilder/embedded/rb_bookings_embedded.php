@@ -53,17 +53,17 @@ class rb_bookings_embedded extends rb_base_embedded {
             array(
                 'type' => 'date',
                 'value' => 'sessionstartdate',
-                'heading' => get_string('sessdate', 'rb_source_facetoface_sessions'),
+                'heading' => get_string('sessstartdatetime', 'rb_source_facetoface_sessions'),
             ),
             array(
                 'type' => 'date',
                 'value' => 'timestart',
-                'heading' => get_string('sessstart', 'rb_source_facetoface_sessions'),
+                'heading' => get_string('sessstarttime', 'rb_source_facetoface_sessions'),
             ),
             array(
                 'type' => 'date',
                 'value' => 'timefinish',
-                'heading' => get_string('sessfinish', 'rb_source_facetoface_sessions'),
+                'heading' => get_string('sessfinishtime', 'rb_source_facetoface_sessions'),
             ),
             array(
                 'type' => 'status',

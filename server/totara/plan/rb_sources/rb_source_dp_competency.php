@@ -471,7 +471,7 @@ class rb_source_dp_competency extends rb_base_source {
         $columnoptions[] = new rb_column_option(
             'competency',
             'proficiency',
-            get_string('competencyproficiency', 'rb_source_dp_competency'),
+            'Competency proficiency',
             // source of proficiency depends on plan status
             // take 'live' value for active plans and static
             // stored value for completed plans

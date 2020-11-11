@@ -324,7 +324,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         $filteroptions[] = new rb_filter_option(
             'date',
             'sessionstartdate',
-            get_string('sessdate', 'rb_source_facetoface_sessions'),
+            get_string('sessstartdatetime', 'rb_source_facetoface_sessions'),
             'date'
         );
     }

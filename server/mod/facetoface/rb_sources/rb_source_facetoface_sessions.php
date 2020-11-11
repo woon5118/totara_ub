@@ -565,14 +565,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_filter_option(
                 'date',
                 'timestart',
-                get_string('sessstart', 'rb_source_facetoface_sessions'),
+                get_string('sessstarttime', 'rb_source_facetoface_sessions'),
                 'date',
                 array('includetime' => true)
             ),
             new rb_filter_option(
                 'date',
                 'timefinish',
-                get_string('sessfinish', 'rb_source_facetoface_sessions'),
+                get_string('sessfinishtime', 'rb_source_facetoface_sessions'),
                 'date',
                 array('includetime' => true)
             ),
