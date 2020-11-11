@@ -36,13 +36,7 @@ $rawjson = file_get_contents('php://input');
 
 $requests = json_decode($rawjson, true);
 if ($requests === null) {
-    if (function_exists('json_last_error_msg')) {
-        $lasterror = json_last_error_msg();
-    } else {
-        // Fall back to numeric error for older PHP version.
-        $lasterror = json_last_error();
-    }
-    throw new coding_exception('Invalid json in request: ' . $lasterror);
+    throw new moodle_exception('serviceerror', 'debug');
 }
 $responses = array();
 

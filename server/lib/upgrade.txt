@@ -15,6 +15,7 @@ information provided here is intended especially for developers.
 * core\entities\tenant has been moved to core\entity\tenant
 * core\entities\user has been moved to core\entity\user
 * core\entities\user_repository has been moved to core\entity\user_repository
+* Removed the output of parsing errors when handling invalid requests in ajax/service.php
 
 === 13.1 ===
 
