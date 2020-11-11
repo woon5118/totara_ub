@@ -140,6 +140,7 @@ export default {
       type: Boolean,
       default: false,
     },
+    fromLibrary: Boolean,
   },
 
   data() {
@@ -150,8 +151,16 @@ export default {
   computed: {
     countResource() {
       if (this.totalCards === 1)
-        return this.$str('resourcecountone', 'totara_engage', this.totalCards);
-      return this.$str('resourcecount', 'totara_engage', this.totalCards);
+        return this.$str(
+          this.fromLibrary ? 'itemscountone' : 'resourcecountone',
+          'totara_engage',
+          this.totalCards
+        );
+      return this.$str(
+        this.fromLibrary ? 'itemscount' : 'resourcecount',
+        'totara_engage',
+        this.totalCards
+      );
     },
   },
   watch: {
@@ -176,7 +185,9 @@ export default {
   "totara_engage": [
     "resourcecount",
     "resourcecountone",
-    "emptycontent"
+    "emptycontent",
+    "itemscount",
+    "itemscountone"
   ],
   "engage_article":[
     "loadmore",

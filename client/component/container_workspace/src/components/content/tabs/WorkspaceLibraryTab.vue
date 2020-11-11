@@ -28,6 +28,7 @@
       :grid-direction="gridDirection"
       :show-footnotes="includeFootnotes"
       :is-load-more-visible="isLoadMoreVisible"
+      :from-library="true"
       @scrolled-to-bottom="scrolledToBottom"
       @load-more="loadMore"
     >
