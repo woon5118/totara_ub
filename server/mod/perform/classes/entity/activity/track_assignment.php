@@ -17,7 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kunle Odusan <kunle.odusan@totaralearning.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package mod_perform
  */
 
 namespace mod_perform\entity\activity;
