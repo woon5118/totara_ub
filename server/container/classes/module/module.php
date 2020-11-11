@@ -651,7 +651,7 @@ abstract class module {
      * Moving this very section to the new section, that is specified by $sectionnumber.
      *
      * @param int       $sectionnumber  The number of section, not id
-     * @param int|null  $beforemod
+     * @param int|null  $beforemod      The id of the module to move this module in front of.
      *
      * @return bool
      */
@@ -664,8 +664,8 @@ abstract class module {
         }
 
         $newsectionid = $newsection->get_id();
-        if ($this->entity->section == $newsectionid) {
-            // No moving happened. As the module is already within that very section.
+        if ($this->entity->section == $newsectionid && (empty($beforemod) || $beforemod == $this->entity->id)) {
+            // No moving happens as the module is in the same section and no $beforemod was provided.
             return false;
         }
 

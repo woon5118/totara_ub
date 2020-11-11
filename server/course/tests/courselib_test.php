@@ -1696,6 +1696,12 @@ class core_course_courselib_testcase extends advanced_testcase {
         $this->assertEquals($section->id, $forumcm->section);
         $this->assertEquals($section->id, $pagecm->section);
 
+        // Update the section visible to zero - so that when new modules get in, it will become visible zero.
+        $section_record = new stdClass();
+        $section_record->id = $section->id;
+        $section_record->visible = 0;
+
+        $DB->update_record('course_sections', $section_record);
 
         // Move the page inside the hidden section. Make sure it is hidden.
         $this->assertEquals(0, moveto_module($pagecm, $section, $forumcm));
