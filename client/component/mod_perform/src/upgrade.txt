@@ -7,7 +7,7 @@ information provided here is intended especially for developers.
         * PerformAdminCustomElement.vue
     * Added a new wrapper component for edit forms of custom elements
         * PerformAdminCustomElementEdit.vue
-    * Removed the following 
+    * Removed the following
         * ElementAdminDisplay.vue
         * ElementAdminForm.vue
         * admin_form/ActionButtons.vue
@@ -19,6 +19,10 @@ information provided here is intended especially for developers.
         * Template & SCSS changes
 * Deprecated the method createNotificationIfNotExists() from NotificationsTab.vue as notifications now always exist.
   See server/mod/perform/upgrade.txt for more detail.
+* Updated Sections.vue to remove css referenced in another component; ".tui-performUserActivityDateSummary" referenced in Activities.vue
+  * SCSS changes
+* Updated Activities.vue to fix print button position and size
+  * Template and SCSS changes
 
 === 13.1 ===
 * Updated manageActivity.vue page to be using a core layout

@@ -1183,7 +1183,7 @@ class behat_mod_perform extends behat_base {
      * @param string $due_date
      * @return void
      */
-    public function subject_instances_for_track_are_due(string $track_description,string $due_date): void {
+    public function subject_instances_for_track_are_due(string $track_description, string $due_date): void {
         $track = track::repository()
             ->where('description', $track_description)
             ->select('id')

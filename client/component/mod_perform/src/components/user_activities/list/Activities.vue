@@ -70,7 +70,7 @@
               )
             "
             :styleclass="{ transparent: true }"
-            class="tui-performUserActivityList__select-relationship-link"
+            class="tui-performUserActivityList__selectRelationshipLink"
             :text="subjectInstance.subject.activity.name"
             @click.prevent="showRelationshipSelector(subjectInstance)"
           />
@@ -166,55 +166,60 @@
         </Cell>
       </template>
       <template v-slot:expand-content="{ row: subjectInstance }">
-        <p class="tui-performUserActivityDateSummary">
-          {{
-            $str(
-              'user_activities_created_at',
-              'mod_perform',
-              subjectInstance.subject.created_at
-            )
-          }}
-          <span v-if="subjectInstance.subject.due_date">
+        <div class="tui-performUserActivityList__expandedRow">
+          <p class="tui-performUserActivityList__expandedRow-dateSummary">
             {{
               $str(
-                'user_activities_complete_before',
+                'user_activities_created_at',
                 'mod_perform',
-                subjectInstance.subject.due_date
+                subjectInstance.subject.created_at
               )
             }}
-          </span>
-          <span
-            v-if="isSingleSectionViewOnly(subjectInstance.subject.activity.id)"
-          >
-            {{
-              $str(
-                'user_activities_single_section_view_only_activity',
-                'mod_perform'
-              )
-            }}
-          </span>
-        </p>
+            <span v-if="subjectInstance.subject.due_date">
+              {{
+                $str(
+                  'user_activities_complete_before',
+                  'mod_perform',
+                  subjectInstance.subject.due_date
+                )
+              }}
+            </span>
+            <span
+              v-if="
+                isSingleSectionViewOnly(subjectInstance.subject.activity.id)
+              "
+            >
+              {{
+                $str(
+                  'user_activities_single_section_view_only_activity',
+                  'mod_perform'
+                )
+              }}
+            </span>
+          </p>
 
-        <Button
-          class="tui-performUserActivityList__button"
-          :text="$str('print_activity', 'mod_perform')"
-          @click.prevent="printActivity(subjectInstance)"
-        />
+          <SectionsList
+            :activity-id="subjectInstance.subject.activity.id"
+            :subject-sections="subjectInstance.sections"
+            :is-multi-section-active="
+              subjectInstance.subject.activity.settings.multisection
+            "
+            :view-url="viewUrl"
+            :current-user-id="currentUserId"
+            :subject-user="subjectInstance.subject.subject_user"
+            :anonymous-responses="
+              subjectInstance.subject.activity.anonymous_responses
+            "
+            @single-section-view-only="flagActivitySingleSectionViewOnly"
+          />
 
-        <SectionsList
-          :activity-id="subjectInstance.subject.activity.id"
-          :subject-sections="subjectInstance.sections"
-          :is-multi-section-active="
-            subjectInstance.subject.activity.settings.multisection
-          "
-          :view-url="viewUrl"
-          :current-user-id="currentUserId"
-          :subject-user="subjectInstance.subject.subject_user"
-          :anonymous-responses="
-            subjectInstance.subject.activity.anonymous_responses
-          "
-          @single-section-view-only="flagActivitySingleSectionViewOnly"
-        />
+          <Button
+            class="tui-performUserActivityList__button"
+            :text="$str('print_activity', 'mod_perform')"
+            :styleclass="{ small: true }"
+            @click="printActivity(subjectInstance)"
+          />
+        </div>
       </template>
     </Table>
     <div v-if="showLoadMore" class="tui-performUserActivityList__loadMore">
@@ -419,7 +424,7 @@ export default {
      * Open the relationship selector modal.
      *
      * @param {Object} selectedSubjectInstance
-     * @param {Boolean} isForPrint
+     * @param {Boolean=undefined} isForPrint
      */
     showRelationshipSelector(selectedSubjectInstance, isForPrint) {
       this.selectedSubjectUser = selectedSubjectInstance.subject.subject_user;
@@ -711,9 +716,26 @@ export default {
 
 <style lang="scss">
 .tui-performUserActivityList {
+  &__selectRelationshipLink {
+    text-align: left;
+    @include tui-font-link();
+  }
+
   &__loadMore {
     margin-top: var(--gap-2);
     text-align: center;
+  }
+
+  &__expandedRow {
+    padding: var(--gap-6) var(--gap-4);
+
+    & > * + * {
+      margin-top: var(--gap-6);
+    }
+
+    &-dateSummary {
+      color: var(--color-neutral-6);
+    }
   }
 }
 </style>

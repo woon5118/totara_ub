@@ -408,13 +408,13 @@ Feature: Viewing the section list in the user activities view and navigating to 
 
     When I toggle expanding row "1" of the tui datatable
     # Display subject instance created date only.
-    Then I should see the subject instance was created "##today##j F Y##" in the ".tui-performUserActivityDateSummary" "css_element"
-    And I should not see "Complete before" in the ".tui-performUserActivityDateSummary" "css_element"
+    Then I should see the subject instance was created "##today##j F Y##" in the ".tui-performUserActivityList__expandedRow-dateSummary" "css_element"
+    And I should not see "Complete before" in the ".tui-performUserActivityList__expandedRow-dateSummary" "css_element"
     When I toggle expanding row "1" of the tui datatable
     When I toggle expanding row "2" of the tui datatable
     # Subject instance created date and due date display.
-    Then I should see the subject instance was created "##today##j F Y##" in the ".tui-performUserActivityDateSummary" "css_element"
-    And I should see the subject instance should be completed before "##+ 1 day##j F Y, g:##" in the ".tui-performUserActivityDateSummary" "css_element"
+    Then I should see the subject instance was created "##today##j F Y##" in the ".tui-performUserActivityList__expandedRow-dateSummary" "css_element"
+    And I should see the subject instance should be completed before "##+ 1 day##j F Y, g:##" in the ".tui-performUserActivityList__expandedRow-dateSummary" "css_element"
 
     # Complete Single section activity
     And I click on "Single section Activity" "link_or_button_exact"
