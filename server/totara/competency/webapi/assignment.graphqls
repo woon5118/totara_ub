@@ -30,7 +30,7 @@ type totara_competency_assignment {
   """
   optional: Boolean
   """
-  Assignment status code matching one of the totara_competency\entities\assignment STATUS_ constants (e.g. 0 => 'draft', 1 => 'active', 2 => 'archived')
+  Assignment status code matching one of the totara_competency\entity\assignment STATUS_ constants (e.g. 0 => 'draft', 1 => 'active', 2 => 'archived')
   """
   status: Int!
   """
