@@ -80,6 +80,7 @@
                   :section-component="getSectionComponent(sectionElement)"
                   :section-element="sectionElement"
                   :section-id="sectionId"
+                  :activity-context-id="activityContextId"
                   @update="update(sectionElement, $event, index)"
                   @edit="edit(sectionElement)"
                   @display="display(sectionElement)"
@@ -252,6 +253,10 @@ export default {
     },
     goBackLink: {
       type: Object,
+      required: true,
+    },
+    activityContextId: {
+      type: Number,
       required: true,
     },
   },

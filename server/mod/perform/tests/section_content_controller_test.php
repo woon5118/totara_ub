@@ -95,6 +95,7 @@ class section_content_controller_testcase extends advanced_testcase {
                 'url' => "https://www.example.com/moodle/mod/perform/manage/activity/edit.php?activity_id={$activity->id}",
                 'text' => "Content ({$activity->name})",
             ],
+            'activity-context-id' => $activity->context_id,
         ];
     }
 

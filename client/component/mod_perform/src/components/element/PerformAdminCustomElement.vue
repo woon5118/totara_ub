@@ -126,6 +126,7 @@
         :section-id="sectionId"
         :settings="sectionComponent.settings"
         :title="sectionElement.element.title"
+        :activity-context-id="activityContextId"
         @display="$emit('display', sectionElement)"
         @display-read="$emit('display-read', sectionElement)"
         @update="$emit('update', $event)"
@@ -184,6 +185,7 @@ export default {
     sectionComponent: Object,
     sectionElement: Object,
     sectionId: String,
+    activityContextId: [Number, String],
   },
 
   computed: {

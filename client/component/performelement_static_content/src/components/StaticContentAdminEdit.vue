@@ -40,6 +40,7 @@
           <Weka
             :id="id"
             :instance-id="elementId"
+            :context-id="activityContextId"
             :value="value"
             component="performelement_static_content"
             area="content"
@@ -83,6 +84,7 @@ export default {
     rawTitle: String,
     sectionId: [Number, String],
     settings: Object,
+    activityContextId: [Number, String],
   },
 
   data() {
