@@ -161,16 +161,41 @@ abstract class restore_ui_independent_stage {
      * @return stored_file|null
      */
     protected function get_backup_file() {
-        global $DB;
+        global $SESSION, $USER, $DB;
 
         // NOTE: the access control must match /backup/restorefile.php logic!
-
         $context = context::instance_by_id($this->contextid);
+        $usercontext = context_user::instance($USER->id);
         require_capability('moodle/restore:restorefile', $context);
 
-        $backupfileid = optional_param('backupfileid', null, PARAM_INT);
-        if (!$backupfileid) {
-            return null;
+        if ($backupfileid = optional_param('backupfileid', null, PARAM_INT)) {
+            confirm_sesskey();
+        } else {
+            if (empty($SESSION->backupdraftids)) {
+                return null;
+            } else {
+                // Incase there is more than one somehow, take the first.
+                $draftid = array_shift($SESSION->backupdraftids);
+
+                // Remove this variable if we're done with it.
+                if (empty($SESSION->backupdraftids)) {
+                    unset($SESSION->backupdraftids);
+                }
+
+                $fs = get_file_storage();
+                $files = $fs->get_area_files($usercontext->id, 'user' ,'draft', $draftid, 'id DESC', false);
+                if ($files) {
+                    $file = reset($files);
+                    $backupfileid = $file->get_id();
+                }
+
+                // If we can't get this file, return back to the restorefile page
+                if (empty($files) || empty($backupfileid)) {
+                    $returnurl = new moodle_url('/backup/restorefile.php', array('contextid' => $this->contextid));
+                    \core\notification::error(get_string('errorcopyingbackupfile', 'backup'));
+                    redirect($returnurl);
+                }
+            }
         }
 
         $filerecord = $DB->get_record('files', array('id' => $backupfileid));

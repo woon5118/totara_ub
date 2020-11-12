@@ -41,7 +41,11 @@ $PAGE->set_context($context);
 
 require_login($course, null, $cm);
 require_capability('moodle/restore:restorefile', $context);
-require_sesskey();
+
+// In the first stage confirm the sesskey when the file is fetched.
+if ($stage != restore_ui::STAGE_CONFIRM) {
+    require_sesskey();
+}
 
 // Totara: This has to come after require_login(), which sets page layout to course.
 if (!$stage) {

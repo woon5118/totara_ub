@@ -106,14 +106,16 @@ if (has_capability('moodle/restore:restorefile', $context) and has_capability('m
     if ($form->get_data()) {
         $fs = get_file_storage();
         $draftid = file_get_submitted_draft_itemid('backupfile');
-        $files = $fs->get_area_files($usercontext->id, 'user' ,'draft', $draftid, 'id DESC', false);
-        if ($files) {
-            $file = reset($files);
-            // NOTE: sesskey in URL is not good, luckily we now have the referrer turned off in decent browsers,
-            //       otherwise we would have to reimplement the form in ajaxy Totara forms...
-            $restoreurl = new moodle_url('/backup/restore.php', array('contextid' => $contextid, 'backupfileid' => $file->get_id(), 'sesskey' => sesskey()));
-            redirect($restoreurl);
+
+        // Note: Slight hack to keep some partial session check without passing the sesskey through a get request.
+        if (!isset($SESSION->backupfileids)) {
+            $SESSION->backupdraftids = [$draftid];
+        } else {
+            $SESSION->backupdraftids[] = $draftid;
         }
+
+        $restoreurl = new moodle_url('/backup/restore.php', array('contextid' => $contextid));
+        redirect($restoreurl);
     }
 }
 
