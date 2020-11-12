@@ -32,7 +32,7 @@
       >
         <FormNumber
           name="lowValue"
-          :validations="v => [v.required(), v.number(), v.min(0)]"
+          :validations="v => [v.required(), v.number()]"
           char-length="10"
         />
       </FormRow>
