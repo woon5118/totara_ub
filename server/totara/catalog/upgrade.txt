@@ -1,6 +1,10 @@
 List of upgrade and API changes in Totara catalog,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* updated totara_catalog/results_share template removing invalid href attribute on share button
+
 === 13.0 ===
 
 * added a redirecturl setting to totara_catalog/item_wide for when the details popup is disabled
