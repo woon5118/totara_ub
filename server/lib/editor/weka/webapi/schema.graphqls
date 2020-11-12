@@ -45,6 +45,19 @@ type editor_weka_editor {
     """
     item_id: param_integer
   ): [editor_weka_file!]!
+    @deprecated(
+      reason: "The files field got deprecated in favour of draft_files"
+    )
+
+  """
+  The current draft files within weka editor. If there are any.
+  """
+  draft_files(
+    """
+    The id of the draft area
+    """
+    draft_item_id: param_integer
+  ): [editor_weka_file!]!
 }
 
 type editor_weka_file {

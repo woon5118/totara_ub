@@ -221,9 +221,9 @@ export default {
     /**
      * @return {Promise}
      */
-    async getCurrentFiles() {
+    async getCurrentDraftFiles() {
       await this.setupOptions();
-      return this.finalOptions.files || [];
+      return this.finalOptions.draft_files || [];
     },
 
     async createEditor() {
@@ -243,7 +243,7 @@ export default {
         fileStorage.setRepositoryData(repositoryData);
       }
 
-      let files = await this.getCurrentFiles();
+      let files = await this.getCurrentDraftFiles();
       Array.prototype.forEach.call(files, ({ filename, url, file_size }) => {
         fileStorage.addFile({
           file: filename,

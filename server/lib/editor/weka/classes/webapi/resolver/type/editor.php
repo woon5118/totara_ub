@@ -61,15 +61,16 @@ final class editor implements type_resolver {
                 return $source->show_toolbar($component, $area);
 
             case 'files':
-                $component = $args['component'] ?? null;
-                $file_area = $args['file_area'] ?? null;
-                $item_id  = $args['item_id'] ?? null;
+                $item_id = $args['item_id'] ?? null;
+                // Keep files working but use draft_files instead
 
-                if (empty($component) || empty($file_area) || empty($item_id)) {
+            case 'draft_files':
+                $item_id = $item_id ?? $args['draft_item_id'] ?? null;
+                if (empty($item_id)) {
                     return [];
                 }
 
-                return $source->get_files($component, $file_area, $item_id);
+                return $source->get_draft_files($item_id);
 
             case 'repository_data':
                 $context_id = $source->get_contextid();

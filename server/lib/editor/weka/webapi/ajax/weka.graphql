@@ -29,12 +29,7 @@ query editor_weka_weka(
       url
     }
 
-    files(
-      # List of files will only served the draft files - not the area files.
-      component: "user"
-      file_area: "draft"
-      item_id: $draft_id
-    ) {
+    draft_files(draft_item_id: $draft_id) {
       __typename
       file_size
       filename
