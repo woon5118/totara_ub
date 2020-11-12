@@ -64,4 +64,10 @@ query totara_engage_user_contribution_cards(
       url(source: $source, search: $search)
     }
   }
+
+  count: totara_engage_user_contributions_count(
+    user_id: $user_id
+    component: $component
+    area: $area
+  )
 }
