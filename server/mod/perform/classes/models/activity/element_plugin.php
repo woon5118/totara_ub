@@ -186,6 +186,15 @@ abstract class element_plugin {
     }
 
     /**
+     * This method return element's print vue component name
+     *
+     * @return string
+     */
+    public function get_participant_print_component(): string {
+        return $this->get_component_path('ParticipantPrint');
+    }
+
+    /**
      * This method return element's user form vue component name
      * @return string
      */

@@ -165,6 +165,11 @@ type mod_perform_element_plugin {
   participant_response_component: String
 
   """
+  Name of the vue component used to display a response in print preview
+  """
+  participant_print_component: String
+
+  """
   Value indicating which group of elements this element is under (1 for question elements, 2 for other non-respondable elements)
   """
   group: String!
