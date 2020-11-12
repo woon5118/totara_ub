@@ -383,6 +383,14 @@ export default {
   width: 100%;
   height: 100%;
 
+  @media (max-width: $tui-screen-sm) {
+    display: block;
+    &__buttons {
+      margin-bottom: var(--gap-12);
+      padding-bottom: var(--gap-12);
+    }
+  }
+
   &__heading {
     @include tui-font-heading-small();
     margin-bottom: var(--gap-4);
