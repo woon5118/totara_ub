@@ -16,9 +16,10 @@ Feature: Activity general information supports multi-lang filters
     Given I navigate to the manage perform activities page
     And I click on "Add activity" "button"
     And I set the following fields to these values:
-      | Title | <span lang="en" class="multilang">it's an English title</span><span lang="de" class="multilang">deutscher Titel</span>              |
-      | Description    | <span lang="en" class="multilang">it's an English description </span><span lang="de" class="multilang">deutsche Beschreibung</span> |
-      | Type  | Feedback                                                                                                                            |
+      | Title       | <span lang="en" class="multilang">it's an English title</span><span lang="de" class="multilang">deutscher Titel</span>              |
+      | Description | <span lang="en" class="multilang">it's an English description </span><span lang="de" class="multilang">deutsche Beschreibung</span> |
+    # Set the 'Type' field to 'Feedback'
+    And I set the field with css ".tui-modalContent .tui-formRow:last-child select" to "Feedback"
 
     When I press "Create"
     Then I should see "it's an English title"

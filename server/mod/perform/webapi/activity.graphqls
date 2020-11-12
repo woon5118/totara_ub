@@ -34,6 +34,7 @@ type mod_perform_activity {
   name(format: core_format = PLAIN): String!
   type: mod_perform_activity_type!
   description(format: core_format = PLAIN): String
+  created_at(format: core_date_format = TIMESTAMP): core_date
   updated_at(format: core_date_format = TIMESTAMP): core_date
   """
   Whether the current user can view the participation tracking for the activity
@@ -549,6 +550,14 @@ input mod_perform_activity_page_input {
   Pagination input
   """
   pagination: mod_perform_activity_pagination_input!
+  """
+  Filters input
+  """
+  filters: mod_perform_activity_filters_input
+  """
+  Sort by input
+  """
+  sort_by: String
 }
 
 """
@@ -563,6 +572,24 @@ input mod_perform_activity_pagination_input {
   Number of activities to fetch
   """
   limit: param_integer
+}
+
+"""
+Filters input for paginated activity list.
+"""
+input mod_perform_activity_filters_input {
+  """
+  Activity  ID to filter by.
+  """
+  type: Int
+  """
+  Activity status state name to filter by.
+  """
+  status: mod_perform_activity_state_enums
+  """
+  Activity name to filter by.
+  """
+  name: String
 }
 
 extend type Query {

@@ -100,7 +100,6 @@ import Textarea from 'tui/components/form/Textarea';
 import { ACTIVITY_NAME_MAX_LENGTH } from 'mod_perform/constants';
 
 //GraphQL
-import activityTypesQuery from 'mod_perform/graphql/activity_types';
 import createActivityMutation from 'mod_perform/graphql/create_activity';
 
 export default {
@@ -117,6 +116,10 @@ export default {
     Textarea,
   },
 
+  props: {
+    types: Array,
+  },
+
   data() {
     return {
       form: {
@@ -129,7 +132,7 @@ export default {
           id: 0,
           label: this.$str('create_activity_select_placeholder', 'mod_perform'),
         },
-      ],
+      ].concat(this.types),
       isSaving: false,
       mutationError: null,
     };
@@ -157,29 +160,6 @@ export default {
 
   created() {
     this.ACTIVITY_NAME_MAX_LENGTH = ACTIVITY_NAME_MAX_LENGTH;
-  },
-
-  apollo: {
-    activityTypes: {
-      query: activityTypesQuery,
-      variables() {
-        return [];
-      },
-      update({ mod_perform_activity_types: types }) {
-        const options = types
-          .map(type => {
-            return { id: type.id, label: type.display_name };
-          })
-          .sort((a, b) => a.label.localeCompare(b.label));
-
-        //show 'select type'
-        options.unshift({
-          id: 0,
-          label: this.$str('create_activity_select_placeholder', 'mod_perform'),
-        });
-        return options;
-      },
-    },
   },
 
   methods: {

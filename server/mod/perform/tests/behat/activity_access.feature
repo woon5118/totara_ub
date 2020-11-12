@@ -38,7 +38,7 @@ Feature: Checking access to performance activities in different situations
     Given I log in as "harry"
     When I navigate to the manage perform activities page
     Then I should see "Manage performance activities"
-    And I should see "No items to display"
+    And I should see "No activities have been created yet."
     And I should see "Add activity"
     When I click on "Add activity" "button"
     And I set the following fields to these values:

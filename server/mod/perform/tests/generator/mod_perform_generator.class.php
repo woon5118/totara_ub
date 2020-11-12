@@ -156,6 +156,14 @@ class mod_perform_generator extends component_generator_base {
                 $this->create_manual_relationships_for_activity($activity->id, $data['manual_relationships']);
             }
 
+            if (isset($data['created_at'])) {
+                activity_entity::repository()->update_record([
+                    'id' => $activity->id,
+                    'created_at' => strtotime($data['created_at']),
+                ]);
+                $activity->refresh();
+            }
+
             return $activity;
         });
     }

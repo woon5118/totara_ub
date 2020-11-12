@@ -41,6 +41,7 @@ class activity extends entity_model_formatter {
             'type' => null,
             'description' => string_field_formatter::class,
             'anonymous_responses' => null,
+            'created_at' => date_field_formatter::class,
             'updated_at' => date_field_formatter::class,
             'sections' => null,
             'manual_relationships' => null,

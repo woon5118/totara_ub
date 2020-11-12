@@ -27,6 +27,10 @@ information provided here is intended especially for developers.
 * Moved editing of activity content elements (formerly on a sheet modal) to a separate page
     * Removed components/manage_activity/content/EditSectionContentModal.vue
     * Added pages/SectionContent.vue
+* Updated Activities.vue page to be using a core layout, and added support for filtering and pagination.
+    * Template & SCSS changes
+* Updated Activities.vue page to support filtering and pagination of activities.
+* Moved the activity_types apollo query from CreateActivityForm.vue into Activities.vue
 
 === 13.1 ===
 * Updated manageActivity.vue page to be using a core layout

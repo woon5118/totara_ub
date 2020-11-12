@@ -8,6 +8,7 @@ query mod_perform_paginated_activities(
       type {
         display_name
       }
+      created_at(format: DATE)
       updated_at
       can_view_participation_reporting
       can_potentially_activate

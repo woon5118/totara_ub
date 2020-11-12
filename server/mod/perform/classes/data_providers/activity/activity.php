@@ -32,6 +32,8 @@ use mod_perform\data_providers\cursor_paginator_trait;
 use mod_perform\data_providers\provider;
 use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\state\activity\activity_state;
+use mod_perform\state\state_helper;
 use totara_core\access;
 
 /**
@@ -44,6 +46,8 @@ use totara_core\access;
 class activity extends provider {
 
     use cursor_paginator_trait;
+
+    public const DEFAULT_SORTING = 'creation_date';
 
     /**
      * @inheritDoc
@@ -80,8 +84,7 @@ class activity extends provider {
                     $repository->with('section_relationships.core_relationship')
                         ->with('section_elements.element');
                 }
-            ])
-            ->order_by('id');
+            ]);
     }
 
     /**
@@ -98,6 +101,49 @@ class activity extends provider {
      */
     protected function filter_query_by_id(repository $repository, int $activity_id): void {
         $repository->where('id', $activity_id);
+    }
+
+    /**
+     * @param repository $repository
+     * @param int $type_id
+     */
+    protected function filter_query_by_type(repository $repository, int $type_id): void {
+        $repository->where('type_id', $type_id);
+    }
+
+    /**
+     * @param repository $repository
+     * @param string $status_name State status
+     */
+    protected function filter_query_by_status(repository $repository, string $status_name): void {
+        $status = state_helper::from_name($status_name, 'activity', activity_state::get_type());
+        $repository->where('status', $status::get_code());
+    }
+
+    /**
+     * @param repository $repository
+     * @param string $name
+     */
+    protected function filter_query_by_name(repository $repository, string $name): void {
+        if (trim($name) === '') {
+            return;
+        }
+
+        $repository->where('name', 'ILIKE', $name);
+    }
+
+    /**
+     * @param repository $repository
+     */
+    protected function sort_query_by_name(repository $repository): void {
+        $repository->order_by('name');
+    }
+
+    /**
+     * @param repository $repository
+     */
+    protected function sort_query_by_creation_date(repository $repository): void {
+        $repository->order_by('created_at', 'DESC');
     }
 
     /**

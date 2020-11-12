@@ -21,6 +21,8 @@
  * @package mod_perform
  */
 
+use mod_perform\entity\activity\activity_type;
+use mod_perform\state\activity\active;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -34,30 +36,117 @@ class mod_perform_webapi_resolver_query_paginated_activities_testcase extends ad
 
     use webapi_phpunit_helper;
 
-    public function test_get_paginated_activities() {
-        $names = ['Mid year performance', 'End year performance'];
-        $this->create_test_data($names);
+    public function test_get_paginated_activities_with_filters_and_sorting(): void {
+        $activities = [
+            [
+                'activity_name' => 'Team morale survey',
+                'activity_type' => 'check-in',
+                'activity_status' => 'ACTIVE',
+                'created_at' => '2018-01-01',
+            ],
+            [
+                'activity_name' => 'End year performance',
+                'activity_type' => 'feedback',
+                'activity_status' => 'ACTIVE',
+                'created_at' => '2019-01-01',
+            ],
+            [
+                'activity_name' => "Now that's what I call an appraisal!",
+                'activity_type' => 'appraisal',
+                'activity_status' => 'DRAFT',
+                'created_at' => '2020-01-01',
+            ],
+            [
+                'activity_name' => 'Confidential feedback',
+                'activity_type' => 'feedback',
+                'activity_status' => 'DRAFT',
+                'created_at' => '2021-01-01',
+            ],
+        ];
+        $this->create_test_data($activities);
 
-        $query_params = $this->get_query_options(null, 1);
 
-        /** @var array $activities */
-        $result = $this->resolve_graphql_query(self::QUERY, $query_params);
-        $page_1_activities = array_column($result['items'], 'name');
+        // Test without filters applied
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
+        // Default sorting is created_by, with newer activities first.
+        $this->assertEquals(
+            array_reverse(
+                array_column($activities, 'activity_name')
+            ),
+            array_column($result['items'], 'name')
+        );
 
-        $this->assertCount(1, $page_1_activities);
-        $this->assertEquals(count($names), $result['total']);
-        $this->assertNotNull($result['next_cursor']);
-        $this->assertEquals($names[0], $page_1_activities[0]);
 
-        //page 2.
-        $query_params = $this->get_query_options($result['next_cursor'], 5);
-        $result = $this->resolve_graphql_query(self::QUERY, $query_params);
-        $page_2_activities = array_column($result['items'], 'name');
+        // Test with sort_by = name, with pagination
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options(null, 3, null, 'name'));
+        $this->assertEquals(
+            [
+                'Confidential feedback',
+                'End year performance',
+                "Now that's what I call an appraisal!",
+            ],
+            array_column($result['items'], 'name')
+        );
+        // next page
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options($result['next_cursor'], null, null, 'name'));
+        $this->assertEquals(
+            ['Team morale survey'],
+            array_column($result['items'], 'name')
+        );
 
-        $this->assertCount(1, $page_2_activities);
-        $this->assertEquals(count($names), $result['total']);
-        $this->assertEmpty($result['next_cursor']);
-        $this->assertEquals($names[1], $page_2_activities[0]);
+
+        // Filter by type, with pagination
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options(null, 1, [
+            'type' => activity_type::repository()->where('name', 'feedback')->one()->id,
+        ]));
+        $this->assertEquals(
+            ['Confidential feedback'],
+            array_column($result['items'], 'name')
+        );
+        // next page
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options($result['next_cursor'], null, [
+            'type' => activity_type::repository()->where('name', 'feedback')->one()->id,
+        ]));
+        $this->assertEquals(
+            ['End year performance'],
+            array_column($result['items'], 'name')
+        );
+
+
+        // Filter by status, with pagination & sorting
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options(null, 1, [
+            'status' => active::get_name(),
+        ], 'name'));
+        $this->assertEquals(
+            ['End year performance'],
+            array_column($result['items'], 'name')
+        );
+        // next page.
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options($result['next_cursor'], null, [
+            'status' => active::get_name(),
+        ], 'name'));
+        $this->assertEquals(
+            ['Team morale survey'],
+            array_column($result['items'], 'name')
+        );
+
+
+        // Filter by name (case insensitive)
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options(null, null, [
+            'name' => "That's",
+        ]));
+        $this->assertEquals(
+            ["Now that's what I call an appraisal!"],
+            array_column($result['items'], 'name')
+        );
+
+
+        // Multiple filters
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options(null, null, [
+            'status' => active::get_name(),
+            'name' => "That's",
+        ]));
+        $this->assertEmpty($result['items']);
     }
 
     public function test_user_needs_view_manage_activities_capability() {
@@ -92,33 +181,36 @@ class mod_perform_webapi_resolver_query_paginated_activities_testcase extends ad
         $user2 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
 
-        $names = ['Mid year performance', 'End year performance'];
-        $this->create_test_data($names);
+        $activities = [
+            ['activity_name' => 'Mid year performance'],
+            ['activity_name' => 'End year performance'],
+        ];
+        $this->create_test_data($activities);
 
         $user_role = $DB->get_record('role', ['shortname' => 'user']);
         assign_capability('mod/perform:view_manage_activities', CAP_ALLOW, $user_role->id, SYSCONTEXTID, true);
 
         /** @var array $activities */
-        $activities = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
 
-        $this->assertCount(count($names), $activities['items']);
+        $this->assertCount(count($activities), $result['items']);
         // Users who created activities can always manage and view reporting
-        foreach ($activities['items'] as $activity) {
+        foreach ($result['items'] as $activity) {
             $this->assertTrue($activity->can_manage());
             $this->assertTrue($activity->can_view_participation_reporting());
         }
 
         $this->setUser($user2);
 
-        $activities = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
-        $this->assertEmpty($activities['items']);
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
+        $this->assertEmpty($result['items']);
 
         // Let the other user manage only
         assign_capability('mod/perform:manage_activity', CAP_ALLOW, $user_role->id, SYSCONTEXTID, true);
 
-        $activities = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
 
-        foreach ($activities['items'] as $activity) {
+        foreach ($result['items'] as $activity) {
             $this->assertTrue($activity->can_manage());
             $this->assertFalse($activity->can_view_participation_reporting());
         }
@@ -126,9 +218,9 @@ class mod_perform_webapi_resolver_query_paginated_activities_testcase extends ad
         // Let the user also see view the reports
         assign_capability('mod/perform:view_participation_reporting', CAP_ALLOW, $user_role->id, SYSCONTEXTID, true);
 
-        $activities = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
+        $result = $this->resolve_graphql_query(self::QUERY, $this->get_query_options());
 
-        foreach ($activities['items'] as $activity) {
+        foreach ($result['items'] as $activity) {
             $this->assertTrue($activity->can_manage());
             $this->assertTrue($activity->can_view_participation_reporting());
         }
@@ -136,7 +228,7 @@ class mod_perform_webapi_resolver_query_paginated_activities_testcase extends ad
         // Let the user just view reports
         unassign_capability('mod/perform:manage_activity', $user_role->id, SYSCONTEXTID);
 
-        foreach ($activities['items'] as $activity) {
+        foreach ($result['items'] as $activity) {
             $this->assertFalse($activity->can_manage());
             $this->assertTrue($activity->can_view_participation_reporting());
         }
@@ -159,8 +251,11 @@ class mod_perform_webapi_resolver_query_paginated_activities_testcase extends ad
     }
 
     public function test_ajax_query() {
-        $names = ['Mid year performance', 'End year performance'];
-        $this->create_test_data($names);
+        $activities = [
+            ['activity_name' => 'Mid year performance'],
+            ['activity_name' => 'End year performance'],
+        ];
+        $this->create_test_data($activities);
 
         $result = $this->parsed_graphql_operation(self::QUERY,
             [
@@ -169,10 +264,10 @@ class mod_perform_webapi_resolver_query_paginated_activities_testcase extends ad
         );
         $this->assert_webapi_operation_successful($result);
 
-        $activities = $this->get_webapi_operation_data($result);
-        $this->assertCount(count($names), $activities['items'], 'wrong count');
-        $this->assertEmpty($activities['next_cursor']);
-        $this->assertEquals(count($names), $activities['total']);
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertCount(count($activities), $result['items'], 'wrong count');
+        $this->assertEmpty($result['next_cursor']);
+        $this->assertEquals(count($activities), $result['total']);
     }
 
     public function test_failed_ajax_query(): void {
@@ -187,8 +282,8 @@ class mod_perform_webapi_resolver_query_paginated_activities_testcase extends ad
         advanced_feature::enable($feature);
     }
 
-    private function get_query_options($cursor = null, $limit = 10): array {
-        return [
+    private function get_query_options($cursor = null, $limit = 10, $filters = null, $sort_by = null): array {
+        $options = [
             'query_options' => [
                 'pagination' => [
                     'limit' => $limit,
@@ -196,15 +291,22 @@ class mod_perform_webapi_resolver_query_paginated_activities_testcase extends ad
                 ],
             ]
         ];
+        if (isset($filters)) {
+            $options['query_options']['filters'] = $filters;
+        }
+        if (isset($sort_by)) {
+            $options['query_options']['sort_by'] = $sort_by;
+        }
+        return $options;
     }
 
-    private function create_test_data(array $activity_names) {
+    private function create_test_data(array $activities) {
         $this->setAdminUser();
 
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        foreach ($activity_names as $name) {
-            $perform_generator->create_activity_in_container(['activity_name' => $name]);
+        foreach ($activities as $activity) {
+            $perform_generator->create_activity_in_container($activity);
         }
     }
 }

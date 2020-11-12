@@ -43,8 +43,13 @@ class paginated_activities implements query_resolver, has_middleware {
         require_capability('mod/perform:view_manage_activities', $context);
         $cursor = $args['query_options']['pagination']['cursor'] ?? null;
         $limit =  $args['query_options']['pagination']['limit'] ?? base_paginator::DEFAULT_ITEMS_PER_PAGE;
+        $filters = $args['query_options']['filters'] ?? [];
+        $sort_by = $args['query_options']['sort_by'] ?? activity_data_provider::DEFAULT_SORTING;
 
-        return (new activity_data_provider())->get_activities_page($cursor, $limit);
+        return (new activity_data_provider())
+            ->add_filters($filters)
+            ->sort_by($sort_by)
+            ->get_activities_page($cursor, $limit);
     }
 
     /**

@@ -43,6 +43,7 @@ trait cursor_paginator_trait {
     public function get_next(cursor $cursor, bool $include_total = false): cursor_paginator {
         $query = $this->build_query();
         $this->apply_query_filters($query);
+        $this->apply_query_sorting($query);
     
         $paginator = new cursor_paginator($query, $cursor, $include_total);
         $paginator->get();

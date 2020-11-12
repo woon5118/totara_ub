@@ -41,6 +41,13 @@ abstract class provider {
     protected $filters = [];
 
     /**
+     * Name of the function to sort by.
+     *
+     * @var string
+     */
+    protected $sort_by;
+
+    /**
      * Return whether data has been fetched
      *
      * @var bool
@@ -77,6 +84,17 @@ abstract class provider {
     }
 
     /**
+     * Sort the results in a specific way.
+     *
+     * @param string $sort_type
+     * @return $this
+     */
+    final public function sort_by(string $sort_type): self {
+        $this->sort_by = $sort_type;
+        return $this;
+    }
+
+    /**
      * Apply filters to a given repository before it is fetched from the database.
      *
      * To add a query filter, define a method like:
@@ -104,6 +122,38 @@ abstract class provider {
     }
 
     /**
+     * Apply sorting to a given repository before it is fetched from the database.
+     *
+     * To add a query filter, define a method like:
+     * ```php
+     *     protected function sort_query_by_SORTNAME(repository $repository): void { ... }
+     * ```
+     *
+     * @param repository $repository Repository to apply sorting to
+     * @return $this
+     */
+    protected function apply_query_sorting(repository $repository): self {
+        if ($this->fetched) {
+            throw new \coding_exception('Must call apply_query_sorting() before fetching.');
+        }
+
+        if (isset($this->sort_by)) {
+            if (!method_exists($this, 'sort_query_by_' . $this->sort_by)) {
+                throw new \coding_exception("Sorting by '{$this->sort_by}' is not supported");
+            }
+
+            $this->{'sort_query_by_' . $this->sort_by}($repository);
+        }
+
+        if (!$repository->has_order_by()) {
+            // If no order is set, then fallback to id to prevent random unit test failures (due to unpredictable sorting)
+            $repository->order_by('id');
+        }
+
+        return $this;
+    }
+
+    /**
      * (Optionally) augment the fetched items before returning them with get().
      *
      * @return collection
@@ -117,8 +167,11 @@ abstract class provider {
      * Run the ORM query and mark the data provider as already fetched.
      */
     public function fetch(): self {
+        $this->fetched = false;
+
         $query = $this->build_query();
         $this->apply_query_filters($query);
+        $this->apply_query_sorting($query);
 
         $this->items = $query->get();
         $this->fetched = true;

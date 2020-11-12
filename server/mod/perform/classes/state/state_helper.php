@@ -92,4 +92,26 @@ class state_helper {
         }
         throw new coding_exception("Cannot find state with code: $code");
     }
+
+    /**
+     * Get state class from the name.
+     *
+     * @param string $name The name to create a state of.
+     * @param string $object_type
+     * @param string $state_type The status type. e.g progress, availability.
+     * @return string|state
+     */
+    public static function from_name(string $name, string $object_type, string $state_type): string {
+        $all_states = static::get_all($object_type);
+        foreach ($all_states as $state_class) {
+            if ($state_class::get_type() !== $state_type) {
+                continue;
+            }
+            if ($state_class::get_name() === $name) {
+                return $state_class;
+            }
+        }
+        throw new coding_exception("Cannot find state with name: $name");
+    }
+
 }
