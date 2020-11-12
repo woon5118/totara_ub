@@ -113,7 +113,7 @@
 }
 
 .loginbox {
-  padding-bottom: var(--gap-4);
+  margin: var(--gap-4) 0;
 
   &.onecolumn {
     @include make-sm-column(6);
