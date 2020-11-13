@@ -36,6 +36,7 @@ Feature: Numeric rating scale response validation
       | lowValue     | 1                    |
       | defaultValue | 2                    |
       | highValue    | 3                    |
+    And I click on the "responseRequired" tui checkbox
     And I save the activity content element
     And I follow "Content (Activity One)"
 

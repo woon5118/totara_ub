@@ -28,7 +28,7 @@
         :validations="validations"
       />
       <div class="tui-elementEditNumericRatingScaleParticipantForm__input">
-        <FormNumber name="response" :min="min" :max="max" />
+        <FormNumber name="response" :min="min" :max="max" char-length="5" />
       </div>
     </div>
   </FormScope>

@@ -80,13 +80,6 @@ Feature: I can create and use performance activities with any and every custom e
 
     When I click on "One of every element" "link"
     And I click on "Save as draft" "button"
-
-    # Numeric rating scale must be required, it can not be configured to be optional.
-    And I click on "Submit" "button"
-    And I should see "Numeric rating scale" has the validation error "Required"
-
-    # Click the numeric rating scale range to fill it in.
-    And I click on ".tui-range__input" "css_element"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Section submitted" in the tui success notification toast

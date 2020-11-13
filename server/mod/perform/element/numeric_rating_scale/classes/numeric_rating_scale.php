@@ -66,7 +66,7 @@ class numeric_rating_scale extends respondable_element_plugin {
      * @param element $element
      * @param collection $errors
      */
-    protected function validate_value(int $answer_value, element $element, collection $errors): void {
+    protected function validate_value(?int $answer_value, element $element, collection $errors): void {
         $data = json_decode($element->data, true);
 
         // If element does not have any data then we have a problem.
@@ -78,7 +78,7 @@ class numeric_rating_scale extends respondable_element_plugin {
         $high = $data['highValue'];
 
         // Confirm that the response value is in valid range.
-        if ($answer_value < $low || $answer_value > $high) {
+        if (!is_null($answer_value) && ($answer_value < $low || $answer_value > $high)) {
             $errors->append(new answer_invalid_error());
         }
     }
@@ -94,6 +94,6 @@ class numeric_rating_scale extends respondable_element_plugin {
      * @inheritDoc
      */
     public function is_response_required_enabled(): bool {
-        return false;
+        return true;
     }
 }

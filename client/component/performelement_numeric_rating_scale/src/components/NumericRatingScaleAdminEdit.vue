@@ -90,6 +90,7 @@ export default {
   props: {
     data: Object,
     identifier: String,
+    isRequired: Boolean,
     rawTitle: String,
     settings: Object,
   },
@@ -104,7 +105,7 @@ export default {
         identifier: this.identifier,
         lowValue: this.data && this.data.lowValue ? this.data.lowValue : null,
         rawTitle: this.rawTitle,
-        responseRequired: true,
+        responseRequired: this.isRequired,
       },
 
       lowValue: this.data && this.data.lowValue ? this.data.lowValue : '0',
