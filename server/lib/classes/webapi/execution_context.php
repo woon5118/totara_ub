@@ -47,6 +47,11 @@ class execution_context {
     private $relevantcontext;
 
     /**
+     * @var array
+     */
+    private $deprecation_warnings = [];
+
+    /**
      * Constructor.
      *
      * @param string $type type of end point, see TYPE_* constants in \totara_webapi\graphql class
@@ -144,6 +149,26 @@ class execution_context {
      */
     final public function has_relevant_context(): bool {
         return isset($this->relevantcontext);
+    }
+
+    /**
+     * Adds deprecation warning for later processing
+     *
+     * @param string $type_name the graphql type name
+     * @param string $field_name the graphql field name
+     * @param string $message the deprecation message
+     */
+    public function add_deprecation_warning(string $type_name, string $field_name, string $message): void {
+        $this->deprecation_warnings[$type_name][$field_name] = $message;
+    }
+
+    /**
+     * Get all deprecation warning triggered in request
+     *
+     * @return array
+     */
+    public function get_deprecation_warnings(): array {
+        return $this->deprecation_warnings;
     }
 
     // === Utility functions for resolvers ===

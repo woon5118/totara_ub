@@ -61,7 +61,7 @@ class totara_reportedcontent_webapi_review_resolver_testcase extends advanced_te
         $this->review->do_review(review::DECISION_APPROVE, $reviewer->id);
 
         $fields = $this->get_fields();
-        $fields['standard']['reviewer'] = $reviewer;
+        $fields['reviewer'] = $reviewer;
         $this->check_fields($fields);
     }
 
@@ -74,7 +74,7 @@ class totara_reportedcontent_webapi_review_resolver_testcase extends advanced_te
         $this->review->do_review(review::DECISION_REMOVE, $reviewer->id);
 
         $fields = $this->get_fields();
-        $fields['standard']['reviewer'] = $reviewer;
+        $fields['reviewer'] = $reviewer;
         $this->check_fields($fields);
     }
 
@@ -128,7 +128,7 @@ class totara_reportedcontent_webapi_review_resolver_testcase extends advanced_te
         $review = $this->review;
         $comment = $this->comment;
 
-        $standard = [
+        return [
             'id' => $review->get_id(),
             'url' => $review->get_url(),
             'approved' => $review->get_status() === review::DECISION_APPROVE,
@@ -144,19 +144,16 @@ class totara_reportedcontent_webapi_review_resolver_testcase extends advanced_te
             'target_user' => $comment->get_user(),
             'complainer' => $review->get_complainer(),
             'reviewer' => null,
+            // This field is deprecated
+            'time_reviewed' => $review->get_time_reviewed(),
         ];
-        $deprecated = [
-            'time_reviewed' => [$review->get_time_reviewed(), '"time_reviewed" is deprecated, use "time_reviewed_description" instead.'],
-        ];
-
-        return compact('standard', 'deprecated');
     }
 
     /**
      * @param array $fields
      */
     protected function check_fields(array $fields): void {
-        foreach ($fields['standard'] as $field => $expected_value) {
+        foreach ($fields as $field => $expected_value) {
             $variables = [];
             if (is_array($expected_value)) {
                 $variables = $expected_value[1];
@@ -175,22 +172,12 @@ class totara_reportedcontent_webapi_review_resolver_testcase extends advanced_te
                 $this->assertObjectHasAttribute('id', $expected_value);
                 $this->assertEquals($actual_value->id, $expected_value->id);
             } else {
-                $this->assertEquals($expected_value, $actual_value);
+                $this->assertEquals(
+                    $expected_value,
+                    $actual_value,
+                    "'$field' field does not have expected value '$expected_value', instead has '$actual_value'"
+                );
             }
-            $this->assertDebuggingNotCalled();
-        }
-
-        foreach ($fields['deprecated'] as $field => $expected) {
-            $value = $expected[0];
-            $deprecated_message = $expected[1];
-
-            $actual_value = $this->resolve_graphql_type(
-                'totara_reportedcontent_review',
-                $field,
-                $this->review
-            );
-            $this->assertDebuggingCalled([$deprecated_message]);
-            $this->assertEquals($value, $actual_value);
         }
     }
 }

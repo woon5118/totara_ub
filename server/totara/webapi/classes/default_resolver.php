@@ -82,6 +82,8 @@ class default_resolver {
         // Regular data type.
         $parts = explode('_', $info->parentType->name);
         if (!$this->is_introspection_type($info->parentType->name) && count($parts) > 1) {
+            $this->check_for_deprecation_messages($ec, $info);
+
             [$component, $name] = $this->split_type_name($info->parentType->name);
             if (empty($name)) {
                 throw new \coding_exception('Type resolvers must be named as component_name, e.g. totara_job_job');
@@ -234,6 +236,30 @@ class default_resolver {
         }
 
         return $middleware_chain;
+    }
+
+    /**
+     * Check for deprecation messages and if found add them to the execution context
+     *
+     * @param execution_context $execution_context
+     * @param ResolveInfo $info
+     */
+    private function check_for_deprecation_messages(execution_context $execution_context, ResolveInfo $info): void {
+        // phpcs:disable Totara.NamingConventions.ValidVariableName.LowerCaseUnderscores
+
+        if ($info->schema) {
+            $type = $info->schema->getType($info->parentType->name);
+            if ($type) {
+                $field = $type->getField($info->fieldName);
+                if (!empty($field->deprecationReason)) {
+                    $execution_context->add_deprecation_warning(
+                        $info->parentType->name,
+                        $info->fieldName,
+                        $field->deprecationReason
+                    );
+                }
+            }
+        }
     }
 
 }

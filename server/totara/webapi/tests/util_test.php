@@ -41,9 +41,10 @@ class totara_webapi_util_testcase extends advanced_testcase {
         // Test folder with some test files in it
         $files = util::get_files_from_dir(__DIR__.'/fixtures/webapi', 'graphqls');
         $this->assertIsArray($files);
-        $this->assertCount(4, $files);
+        $this->assertCount(5, $files);
         $this->assertEqualsCanonicalizing(
             [
+                __DIR__.'/fixtures/webapi/test_deprecation.graphqls',
                 __DIR__.'/fixtures/webapi/test_schema_1.graphqls',
                 __DIR__.'/fixtures/webapi/test_schema_2.graphqls',
                 __DIR__.'/fixtures/webapi/test_schema_3.graphqls',

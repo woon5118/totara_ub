@@ -44,24 +44,6 @@ class element_plugin implements type_resolver {
             throw new \coding_exception('Expected element plugin model subclass');
         }
 
-        // deprecated admin_form_component field
-        // @deprecated since Totara 13.2
-        if ($field == 'admin_form_component') {
-            debugging('"admin_form_component" is deprecated, use "admin_edit_component" instead.', DEBUG_DEVELOPER);
-        }
-
-        // deprecated admin_read_only_display_component field
-        // @deprecated since Totara 13.2
-        if ($field == 'admin_display_component') {
-            debugging('"admin_display_component" is deprecated, use "admin_view_component" instead.', DEBUG_DEVELOPER);
-        }
-
-        // deprecated admin_read_only_display_component field
-        // @deprecated since Totara 13.2
-        if ($field == 'admin_read_only_display_component') {
-            debugging('"admin_read_only_display_component" is deprecated, use "admin_summary_component" instead.', DEBUG_DEVELOPER);
-        }
-
         $format = $args['format'] ?? format::FORMAT_HTML;
         $context = $ec->has_relevant_context() ? $ec->get_relevant_context() : \context_system::instance();
         $formatter = new element_plugin_formatter($element_plugin, $context);

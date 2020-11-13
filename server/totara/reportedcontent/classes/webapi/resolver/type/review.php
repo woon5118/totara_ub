@@ -48,10 +48,6 @@ final class review implements type_resolver {
             );
         }
 
-        if ($field === 'time_reviewed') {
-            debugging('"time_reviewed" is deprecated, use "time_reviewed_description" instead.', DEBUG_DEVELOPER);
-        }
-
         $formatter = new review_formatter($source);
 
         $format = null;

@@ -147,6 +147,8 @@ class server {
             $this->add_performance_data_to_result($result);
         }
 
+        $this->process_deprecation_warnings($result);
+
         return $result;
     }
 
@@ -250,6 +252,41 @@ class server {
             }
         } else if ($results instanceof ExecutionResult) {
             $results->extensions['performance_data'] = $performance_data;
+        }
+    }
+
+    /**
+     * Process deprecation warnings for field triggered during the request
+     * 1. Throws debugging messages for each one
+     * 2. Appends all messages to the extensions
+     *
+     * @param ExecutionResult|ExecutionResult[] $results
+     */
+    private function process_deprecation_warnings($results) {
+        global $CFG;
+
+        $deprecation_warnings = $this->execution_context->get_deprecation_warnings();
+        if (!empty($deprecation_warnings)) {
+            foreach ($deprecation_warnings as $type => $warnings) {
+                foreach ($warnings as $field => $message) {
+                    debugging(
+                        "Field '{$field}' of type '{$type}' is marked as deprecated: {$message}",
+                        DEBUG_DEVELOPER
+                    );
+                }
+            }
+
+            if ($CFG->debugdeveloper) {
+                // If this is a batched queries we will have multiple results
+                // so go through them and add the deprecation warnings to them
+                if (is_array($results)) {
+                    foreach ($results as $result) {
+                        $result->extensions['deprecation_warnings'] = $deprecation_warnings;
+                    }
+                } else if ($results instanceof ExecutionResult) {
+                    $results->extensions['deprecation_warnings'] = $deprecation_warnings;
+                }
+            }
         }
     }
 
