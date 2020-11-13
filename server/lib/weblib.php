@@ -2222,6 +2222,26 @@ function purify_uri($uri, $httponly = false, $requirescheme = false) {
 }
 
 /**
+ * Uses HTMLPurifier to sanitise CSS colours.
+ *
+ * @since Totara 13.2
+ *
+ * @param string $color
+ * @return bool|string false if color invalid
+ */
+function purify_css_color(string $color) {
+    require_once __DIR__ . '/htmlpurifier/locallib.php';
+
+    static $config;
+    if (!$config) {
+        $config = HTMLPurifier_Config::createDefault();
+    }
+
+    $validator = new \HTMLPurifier_AttrDef_CSS_Color();
+    return $validator->validate($color, $config, new HTMLPurifier_Context());
+}
+
+/**
  * Given plain text, makes it into HTML as nicely as possible.
  *
  * May contain HTML tags already.
