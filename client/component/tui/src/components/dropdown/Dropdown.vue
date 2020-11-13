@@ -24,6 +24,7 @@
       'tui-dropdown--open': isOpen,
       'tui-dropdown--disabled': disabled,
       'tui-dropdown--flexibleWidth': matchWidth,
+      'tui-dropdown--fixedHeight': fixedHeight,
     }"
   >
     <div
@@ -118,6 +119,7 @@ export default {
     matchWidth: Boolean,
     /** Show the menu inline (rather than as a popover/overlay) */
     inlineMenu: Boolean,
+    fixedHeight: Boolean,
   },
 
   data() {
@@ -145,10 +147,10 @@ export default {
       handler() {
         if (this.isOpen) {
           document.addEventListener('keydown', this.$_keyPress);
-          document.addEventListener('click', this.$_clickedOutside);
+          document.addEventListener('click', this.$_clickedOutside, true);
         } else {
           document.removeEventListener('keydown', this.$_keyPress);
-          document.removeEventListener('click', this.$_clickedOutside);
+          document.removeEventListener('click', this.$_clickedOutside, true);
           this.activeNodeIndex = null;
         }
       },
@@ -325,6 +327,17 @@ export default {
     &--separator > * + * {
       border-top: var(--border-width-thin) solid
         var(--dropdown-menu-border-color);
+    }
+  }
+
+  &--fixedHeight {
+    .tui-dropdown__content {
+      height: 100%;
+    }
+
+    .tui-dropdown__menu {
+      height: 38vh;
+      overflow-y: visible;
     }
   }
 

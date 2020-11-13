@@ -92,6 +92,11 @@ export default {
       required: true,
     },
 
+    useRole: {
+      type: Boolean,
+      default: true,
+    },
+
     /**
      * data loading state
      */
@@ -528,7 +533,7 @@ export default {
           overflowY: !this.pageMode && 'auto',
         },
         attrs: {
-          role: 'feed',
+          role: this.useRole && 'feed',
           'aria-label': this.ariaLabel,
           'aria-busy': this.isLoading,
         },

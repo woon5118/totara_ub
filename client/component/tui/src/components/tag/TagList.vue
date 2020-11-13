@@ -17,7 +17,12 @@
 -->
 
 <template>
-  <Dropdown :close-on-click="false" :separator="separator" match-width>
+  <Dropdown
+    :close-on-click="false"
+    :separator="separator"
+    match-width
+    :fixed-height="!!virtualScrollOptions"
+  >
     <template v-slot:trigger="{ toggle, isOpen }">
       <div class="tui-tagList" @click="handleClick(toggle, isOpen)">
         <div class="tui-tagList__tags">
@@ -94,7 +99,33 @@
         </ButtonIcon>
       </div>
     </template>
-    <template v-for="(item, index) in items">
+    <template v-if="virtualScrollOptions">
+      <VirtualScroll
+        :data-key="virtualScrollOptions.dataKey"
+        :data-list="items"
+        :aria-label="virtualScrollOptions.ariaLabel"
+        :is-loading="virtualScrollOptions.isLoading || false"
+        :start="virtualScrollOptions.start"
+        :offset="virtualScrollOptions.offset"
+        :top-threshold="virtualScrollOptions.topThreshold"
+        :bottom-threshold="virtualScrollOptions.bottomThreshold"
+        :use-role="false"
+        @scrolltop="onScrollToTop"
+        @scrollbottom="onScrollToBottom"
+      >
+        <template v-slot:item="{ item, index }">
+          <DropdownItem :key="index" @click="dropdownItemClicked(item, index)">
+            <slot name="item" :item="item" :index="index" />
+          </DropdownItem>
+        </template>
+        <template v-slot:footer>
+          <div class="loader-wrapper">
+            <Loader :loading="virtualScrollOptions.isLoading" />
+          </div>
+        </template>
+      </VirtualScroll>
+    </template>
+    <template v-for="(item, index) in items" v-else>
       <DropdownItem :key="index" @click="dropdownItemClicked(item, index)">
         <slot name="item" :item="item" :index="index" />
       </DropdownItem>
@@ -111,6 +142,9 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Close from 'tui/components/icons/Close';
 import Tag from 'tui/components/tag/Tag';
 import OverflowDetector from 'tui/components/util/OverflowDetector';
+import VirtualScroll from 'tui/components/virtualscroll/VirtualScroll';
+import { validatePropObject } from 'tui/vue_util';
+import Loader from 'tui/components/loading/Loader';
 
 export default {
   components: {
@@ -122,6 +156,8 @@ export default {
     Close,
     Tag,
     OverflowDetector,
+    VirtualScroll,
+    Loader,
   },
   props: {
     disabled: {
@@ -134,6 +170,30 @@ export default {
     separator: {
       type: Boolean,
       default: false,
+    },
+
+    // Virtual scroll will be enabled when minimum options
+    // are passed (dataKey, ariaLabel)
+    virtualScrollOptions: {
+      type: Object,
+      validator: options => {
+        if (!options) {
+          return true;
+        }
+
+        const required = ['dataKey', 'ariaLabel'];
+        const properties = {
+          dataKey: 'string',
+          ariaLabel: 'string',
+          start: 'number',
+          offset: 'number',
+          topThreshold: 'number',
+          bottomThreshold: 'number',
+          isLoading: 'boolean',
+        };
+
+        return validatePropObject({ options, properties, required });
+      },
     },
   },
 
@@ -155,6 +215,7 @@ export default {
       }
     },
   },
+
   methods: {
     overflowChanged({ visible }) {
       this.visible = visible;
@@ -201,6 +262,14 @@ export default {
           this.$refs[this.inputRef].$el.focus();
         });
       });
+    },
+
+    onScrollToTop() {
+      this.$emit('scrolltop');
+    },
+
+    onScrollToBottom() {
+      this.$emit('scrollbottom');
     },
   },
 };

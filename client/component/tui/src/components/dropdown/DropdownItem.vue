@@ -68,6 +68,7 @@ export default {
 <style lang="scss">
 .tui-dropdownItem {
   @include tui-font-body();
+  display: block;
   width: 100%;
   padding: var(--gap-2) var(--gap-4);
   overflow: hidden;

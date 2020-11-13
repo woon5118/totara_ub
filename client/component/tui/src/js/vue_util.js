@@ -114,3 +114,47 @@ export const createImmutablePropWatcher = (
     );
   }
 };
+
+/**
+ * Validate if required properties in the object exist and
+ * validate if are there any properties in the object that are not allowed
+ *
+ * @param {object} options
+ * @param {array} properties List of properties that are allowed in the object
+ * @param {array} required
+ * @returns {boolean}
+ */
+
+export const validatePropObject = ({ options, properties, required }) => {
+  for (let i = 0; i < required.length; i++) {
+    const requiredProp = required[i];
+    if (!options[requiredProp]) {
+      console.error(
+        `${requiredProp} is a required property on this option object`
+      );
+      return false;
+    }
+  }
+
+  return Object.keys(options).every(prop => {
+    if (!properties[prop]) {
+      console.error(`property name ${prop} not allowed on this option object`);
+      return false;
+    }
+    if (
+      typeof properties[prop] === 'function' &&
+      !properties[prop](options[prop])
+    ) {
+      console.error(`${prop} failed call ${properties[prop].name}`);
+      return false;
+    } else if (
+      typeof properties[prop] === 'string' &&
+      typeof options[prop] !== properties[prop]
+    ) {
+      console.error(`${prop} is not a ${properties[prop]}`);
+      return false;
+    }
+
+    return true;
+  });
+};
