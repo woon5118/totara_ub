@@ -24,6 +24,8 @@ require(__DIR__ . '/../../../../../config.php');
 
 use totara_tui\output\component;
 
+global $USER;
+
 $displaydebugging = false;
 if (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING) {
     if (debugging()) {
@@ -35,14 +37,14 @@ if (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING) {
 $title = 'Weka Basic';
 
 require_login();
-$context = context_system::instance();
+$context = context_user::instance($USER->id);
 require_capability('moodle/site:config', $context);
 $PAGE->set_context($context);
 $PAGE->set_url('/lib/editor/weka/tests/fixtures/weka_basic.php');
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_title($title);
 
-$tui = new component('editor_weka/pages/fixtures/WekaBasic');
+$tui = new component('editor_weka/pages/fixtures/WekaBasic', ['contextId' => $context->id]);
 $tui->register($PAGE);
 
 echo $OUTPUT->header();

@@ -18,7 +18,7 @@
 
 <template>
   <div class="tui-fixture-wekaBasic">
-    <Weka component="editor_weka" area="behat" />
+    <Weka component="editor_weka" area="behat" :context-id="contextId" />
   </div>
 </template>
 
@@ -28,6 +28,10 @@ import Weka from 'editor_weka/components/Weka';
 export default {
   components: {
     Weka,
+  },
+
+  props: {
+    contextId: [Number, String],
   },
 };
 </script>
