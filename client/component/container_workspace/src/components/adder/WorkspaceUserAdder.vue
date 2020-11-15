@@ -25,6 +25,7 @@
   <Adder
     :open="open"
     :title="$str('add_members_to_space', 'container_workspace')"
+    :custom-selected="x => $str('people_selected', 'container_workspace', x)"
     :loading="$apollo.loading"
     :show-load-more="users.cursor.next"
     class="tui-workspaceUserAdder"
@@ -267,7 +268,8 @@ export default {
 {
   "container_workspace": [
     "add_members_to_space",
-    "filter_users"
+    "filter_users",
+    "people_selected"
   ],
 
   "totara_core": [

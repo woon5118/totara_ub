@@ -132,6 +132,7 @@ $string['no_discussion_result'] = "No results found.";
 $string['one_member'] = '1 member';
 $string['or'] = 'Or';
 $string['owner'] = 'Owner';
+$string['people_selected'] = 'People selected: {$a}';
 $string['pinned_post'] = 'Pinned post';
 $string['pluginname'] = 'Workspace';
 $string['private'] = 'Private';

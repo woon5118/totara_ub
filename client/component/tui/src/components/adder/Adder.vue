@@ -80,7 +80,12 @@
           <!-- Footer (count & action buttons) -->
           <div class="tui-adder__footer">
             <div :id="$id('items-added')" class="tui-adder__summary">
-              {{ $str('itemsselected', 'totara_core', count) }}
+              <template v-if="customSelected">
+                {{ customSelected(count) }}
+              </template>
+              <template v-else>
+                {{ $str('itemsselected', 'totara_core', count) }}
+              </template>
             </div>
             <div class="tui-adder__actions">
               <ButtonGroup>
@@ -127,6 +132,8 @@ export default {
   },
 
   props: {
+    // Customized item-selected context
+    customSelected: Function,
     // Pre-selected items
     existingItems: {
       type: Array,

@@ -5,8 +5,10 @@ Feature: View library
     And I set the site theme to "ventura"
 
     And the following "users" exist:
-      | username | firstname | lastname | email           |
-      | user_one | User      | One      | one@example.com |
+      | username   | firstname | lastname | email               |
+      | user_one   | User      | One      | one@example.com     |
+      | user_two   | User      | Two      | two@example.com     |
+      | user_three | User      | Three    | three@example.com   |
 
     And the following "topics" exist in "totara_topic" plugin:
       | name   |
@@ -40,3 +42,17 @@ Feature: View library
       | Test Article 1 | user_one    | blah    | PUBLIC  | Topic1 |
     When I click on "Your Library" in the totara menu
     Then I should see "1 resource" in the ".tui-contributionBaseContent__counter" "css_element"
+
+  Scenario: View member adder on workspace
+    Given I log in as "user_one"
+    And I click on "Your Workspaces" in the totara menu
+    And I follow "Workspace 101"
+    When I click on "Owner" "button"
+    Then I should see "Add members"
+    And I should see "Edit workspace"
+    And I should see "Transfer ownership"
+    And I should see "Delete workspace"
+    When I click on "Add members" "link"
+    Then I should see "People selected: 0" in the ".tui-adder__summary" "css_element"
+    When I click the select all checkbox in the tui datatable
+    Then I should see "People selected: 3" in the ".tui-adder__summary" "css_element"
