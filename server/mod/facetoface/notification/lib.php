@@ -2055,7 +2055,7 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                         $partial = html_writer::link($url, $attachment->get_name(), ['title' => get_string("{$attachment_type}details", 'mod_facetoface')]);
                         if ($attachment_type == 'room') {
                             if (!empty($attachment->get_url())) {
-                                $virtual_room_link = html_writer::link($attachment->get_url(), get_string('virtualroomurl', 'mod_facetoface'));
+                                $virtual_room_link = html_writer::link($attachment->get_url(), get_string('roomurl', 'mod_facetoface'));
                                 $partial .= "\n<br> " . $virtual_room_link;
                             }
 
