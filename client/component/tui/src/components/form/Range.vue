@@ -121,6 +121,8 @@ export default {
   background: var(--color-neutral-4);
   border-radius: var(--border-radius-small);
   cursor: pointer;
+  -webkit-print-color-adjust: exact;
+  color-adjust: exact;
 }
 @mixin tui-range-thumb() {
   width: var(--form-range-thumb-size);
@@ -181,6 +183,8 @@ export default {
     }
     &:focus::-webkit-slider-runnable-track {
       background: var(--color-neutral-4);
+      -webkit-print-color-adjust: exact;
+      color-adjust: exact;
     }
     &::-moz-range-track {
       @include tui-range-track();

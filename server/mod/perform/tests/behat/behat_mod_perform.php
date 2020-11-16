@@ -59,6 +59,10 @@ class behat_mod_perform extends behat_base {
     public const LONG_TEXT_RESPONSE_LOCATOR = 'textarea';
     public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
     public const DATE_PICKER_RESPONSE_LOCATOR = '.tui-dateSelector';
+    public const MULTI_CHOICE_MULTI_RESPONSE_LOCATOR = 'input';
+    public const MULTI_CHOICE_SINGLE_RESPONSE_LOCATOR = 'input';
+    public const CUSTOM_RATING_SCALE_RESPONSE_LOCATOR = 'input';
+    public const NUMERIC_RATING_SCALE_RESPONSE_LOCATOR = 'input[type=number]';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses .tui-formLabel';
     public const TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR = '.tui-otherParticipantResponses__anonymousResponse-participant';
@@ -187,10 +191,12 @@ class behat_mod_perform extends behat_base {
         $this->wait_for_pending_js();
 
         $question = $this->find_question_from_text($question_text, true);
-
-        $notepad_lines = $question->find('css', self::TUI_NOTEPAD_LINES);
-        if ($notepad_lines === null) {
-            $this->fail('Question was not unanswered, notepad lines were not present');
+        $is_inline_element_type = in_array($element_type, ['short text', 'long text', 'date picker']);
+        if ($is_inline_element_type) {
+            $notepad_lines = $question->find('css', self::TUI_NOTEPAD_LINES);
+            if ($notepad_lines === null) {
+                $this->fail('Question was not unanswered, notepad lines were not present');
+            }
         }
 
         $printed_todo_icon = $question->find('css', self::TUI_PARTICIPANT_CONTENT_PRINT_PRINTED_TODO);
@@ -198,10 +204,12 @@ class behat_mod_perform extends behat_base {
             $this->fail('Question was not unanswered, printed todo icon was not present');
         }
 
-        $response_locator = $this->get_response_element_response_locator($element_type);
-        $form_response = $question->find('css', $response_locator);
-        if ($form_response !== null) {
-            $this->fail('Question was not unanswered, it had a response');
+        if ($is_inline_element_type) {
+            $response_locator = $this->get_response_element_response_locator($element_type);
+            $form_response = $question->find('css', $response_locator);
+            if ($form_response !== null) {
+                $this->fail('Question was not unanswered, it had a response');
+            }
         }
     }
 
@@ -695,13 +703,28 @@ class behat_mod_perform extends behat_base {
 
         $response = $this->find_question_response($element_type, $question_text);
 
-        if ($element_type === 'Date picker') {
-            /** @var behat_totara_tui $behat_totara_tui */
-            $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
-            $name = $response->getAttribute('name');
-            $behat_totara_tui->i_set_the_tui_date_selector_to($name, $new_answer);
-        } else {
-            $response->setValue($new_answer);
+        switch ($element_type) {
+            case 'date picker':
+                /** @var behat_totara_tui $behat_totara_tui */
+                $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
+                $name = $response->getAttribute('name');
+                $behat_totara_tui->i_set_the_tui_date_selector_to($name, $new_answer);
+                break;
+            case 'multi choice single':
+            case 'custom rating scale':
+                /** @var behat_totara_tui $behat_totara_tui */
+                $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
+                $name = $response->getAttribute('name');
+                $behat_totara_tui->i_click_the_tui_radio_in_the($new_answer, $name);
+                break;
+            case 'multi choice multi':
+                /** @var behat_totara_tui $behat_totara_tui */
+                $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
+                $name = $response->getAttribute('name');
+                $behat_totara_tui->i_click_the_tui_checkbox($name);
+                break;
+            default:
+                $response->setValue($new_answer);
         }
     }
 
@@ -988,8 +1011,11 @@ class behat_mod_perform extends behat_base {
         $map = [
             'short text' => self::SHORT_TEXT_RESPONSE_LOCATOR,
             'long text' => self::LONG_TEXT_RESPONSE_LOCATOR,
-            'multi choice' => self::MULTI_CHOICE_RESPONSE_LOCATOR,
-            'Date picker' => self::DATE_PICKER_RESPONSE_LOCATOR,
+            'date picker' => self::DATE_PICKER_RESPONSE_LOCATOR,
+            'multi choice multi' => self::MULTI_CHOICE_MULTI_RESPONSE_LOCATOR,
+            'multi choice single' => self::MULTI_CHOICE_SINGLE_RESPONSE_LOCATOR,
+            'custom rating scale' => self::CUSTOM_RATING_SCALE_RESPONSE_LOCATOR,
+            'numeric rating scale' => self::NUMERIC_RATING_SCALE_RESPONSE_LOCATOR,
         ];
 
         $locator =  $map[$element_type] ?? null;
@@ -1057,7 +1083,7 @@ class behat_mod_perform extends behat_base {
 
             return $question;
         }
-        
+
 
         throw new ExpectationException("Required Question not found with text {$question_text}", $this->getSession());
     }

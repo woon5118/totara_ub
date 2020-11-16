@@ -1,5 +1,8 @@
 This file describes API changes for 'theme_legacy'.
 
+=== 13.2 ===
+* Dropped !important background pseudo reset style on print media query from bootstrap _print.scss
+
 === 13.0 (changes from roots/basis) ===
 
 * "secure" page layout now uses layout/secure.php

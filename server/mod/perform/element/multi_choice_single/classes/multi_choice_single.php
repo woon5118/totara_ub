@@ -54,6 +54,13 @@ class multi_choice_single extends respondable_element_plugin {
     /**
      * @inheritDoc
      */
+    public function get_participant_print_component(): string {
+        return $this->get_participant_form_component();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function get_sortorder(): int {
         return 30;
     }

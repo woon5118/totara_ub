@@ -12,21 +12,32 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
-  @module performelement_short_text
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @package performelement_numeric_rating_scale
 -->
 <template>
-  <div class="tui-shortTextParticipantPrint">
-    <div v-if="hasBeenAnswered">{{ responseLines[0] }}</div>
-    <NotepadLines v-else />
+  <div class="tui-numericRatingScalePrint">
+    <Range
+      name="response"
+      :value="activeRange"
+      :default-value="element.data.defaultValue"
+      :show-labels="false"
+      :min="min"
+      :max="max"
+    />
+    <div class="tui-numericRatingScalePrint__value">
+      <NotepadLines :char-length="10"  />
+    </div>
   </div>
 </template>
 
 <script>
+import Range from 'tui/components/form/Range';
 import NotepadLines from 'tui/components/form/NotepadLines';
 
 export default {
   components: {
+    Range,
     NotepadLines,
   },
   props: {
@@ -34,15 +45,39 @@ export default {
       type: Array,
       required: true,
     },
+    element: {
+      type: Object,
+      required: true,
+    },
   },
   computed: {
+    /**
+     * The minimum value that can be selected.
+     *
+     * @return {number}
+     */
+    min() {
+      return parseInt(this.element.data.lowValue, 10);
+    },
+    /**
+     * The maximum value that can be selected.
+     *
+     * @return {number}
+     */
+    max() {
+      return parseInt(this.element.data.highValue, 10);
+    },
+
     /**
      * Has this question been answered.
      *
      * @return {boolean}
      */
-    hasBeenAnswered() {
-      return this.responseLines.length > 0;
+    activeRange() {
+      if (this.responseLines.length > 0) {
+        return this.responseLines[0];
+      }
+      return null;
     },
   },
 };

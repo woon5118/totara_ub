@@ -197,4 +197,23 @@ export default {
     opacity: 1;
   }
 }
+
+@media print {
+  .tui-radio {
+    &__input ~ &__label::after {
+      -webkit-print-color-adjust: exact;
+      color-adjust: exact;
+    }
+  }
+
+  // IE11 & Edge support
+  .ie,
+  .msedge {
+    .tui-radio {
+      &__input ~ .tui-radio__label::after {
+        border: 4px solid var(--form-radio-dot-color);
+      }
+    }
+  }
+}
 </style>

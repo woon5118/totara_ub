@@ -35,10 +35,15 @@ Feature: Print view of a single-section user activity
       | track_description | assignment_type | assignment_name |
       | track 1           | cohort          | aud1            |
     And the following "section elements" exist in "mod_perform" plugin:
-      | section_name   | element_name | title                |
-      | Single section | short_text   | Short text question  |
-      | Single section | long_text    | Long text question   |
-      | Single section | date_picker  | Date picker question |
+      | section_name   | element_name         | title                        | data                                                                                                                                                                           |
+      | Single section | short_text           | Short text question          | {}                                                                                                                                                                             |
+      | Single section | long_text            | Long text question           | {}                                                                                                                                                                             |
+      | Single section | date_picker          | Date picker question         | {}                                                                                                                                                                             |
+      | Single section | multi_choice_single  | Multi choice single question | {"options":[{"name":"option_1","value":"A"},{"name":"option_2","value":"B"}]}                                                                                                  |
+      | Single section | multi_choice_multi   | Multi choice multi question  | {"max":"2","min":"0","options":[{"name":"option_1","value":"A"},{"name":"option_2","value":"B"},{"name":"option_3","value":"C"}]}                                              |
+      | Single section | custom_rating_scale  | Custom rating scale question | {"options":[{"name":"option_1","value":{"text":"A","score":"1"}},{"name":"option_2","value":{"text":"B","score":"5"}},{"name":"option_3","value":{"text":"C","score":"10"}}]}  |
+      | Single section | numeric_rating_scale | Numeric rating scale question| {"defaultValue":"3","highValue":"5","lowValue":"1"}                                                                                                                            |
+
     Given the following "section relationships" exist in "mod_perform" plugin:
       | section_name   | relationship | can_view | can_answer |
       | Single section | subject      | yes      | yes        |
@@ -69,7 +74,11 @@ Feature: Print view of a single-section user activity
     # Empty print components should be displayed.
     And I should see perform "short text" question "Short text question" is unanswered in print view
     And I should see perform "long text" question "Long text question" is unanswered in print view
-    And I should see perform "Date picker" question "Date picker question" is unanswered in print view
+    And I should see perform "date picker" question "Date picker question" is unanswered in print view
+    And I should see perform "multi choice single" question "Multi choice single question" is unanswered in print view
+    And I should see perform "multi choice multi" question "Multi choice multi question" is unanswered in print view
+    And I should see perform "custom rating scale" question "Custom rating scale question" is unanswered in print view
+    And I should see perform "numeric rating scale" question "Numeric rating scale question" is unanswered in print view
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
@@ -81,7 +90,12 @@ Feature: Print view of a single-section user activity
     And I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Short text question" with "David short text answer one"
     And I answer "long text" question "Long text question" with "David long text answer one"
-    And I answer "Date picker" question "Date picker question" with "1 January 2020"
+    And I answer "date picker" question "Date picker question" with "1 January 2020"
+    And I answer "multi choice single" question "Multi choice single question" with "A"
+    And I answer "multi choice multi" question "Multi choice multi question" with "A"
+    And I answer "custom rating scale" question "Custom rating scale question" with "A (score: 1)"
+    And I answer "numeric rating scale" question "Numeric rating scale question" with "3"
+
     When I click on "Save as draft" "button"
     Then I should see "Draft saved" in the tui success notification toast
 
@@ -100,6 +114,7 @@ Feature: Print view of a single-section user activity
     # Filled in, but not "closed" responses should be shown.
     And I should see "David short text answer one" in the ".tui-shortTextParticipantPrint" "css_element"
     And I should see "David long text answer one" in the ".tui-longTextParticipantPrint" "css_element"
+    And I should see "1 January 2020" in the ".tui-datePickerParticipantPrint" "css_element"
     And I should see "1 January 2020" in the ".tui-datePickerParticipantPrint" "css_element"
 
     When I navigate to the outstanding perform activities list page

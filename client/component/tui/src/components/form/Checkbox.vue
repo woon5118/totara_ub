@@ -229,4 +229,24 @@ export default {
     opacity: 1;
   }
 }
+
+@media print {
+  .tui-checkbox {
+    &__input:checked ~ &__label::before {
+      -webkit-print-color-adjust: exact;
+      color-adjust: exact;
+    }
+  }
+
+  // IE11 & Edge support
+  .ie,
+  .msedge {
+    .tui-checkbox {
+      &__input:checked ~ .tui-checkbox__label::before {
+        border: solid var(--form-checkbox-bg-color-active);
+        border-width: 0 var(--form-checkbox-size) 0 0;
+      }
+    }
+  }
+}
 </style>
