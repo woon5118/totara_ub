@@ -138,7 +138,9 @@ final class interactor {
     }
 
     /**
-     * Like manage, but across the whole category/site. Super admin privilege
+     * Like manage, but across the whole category/site. Super admin privilege.
+     * Note that this does not check the workplace status intentionally.
+     *
      * @return bool
      */
     public function can_administrate(): bool {

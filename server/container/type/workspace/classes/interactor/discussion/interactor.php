@@ -142,6 +142,10 @@ final class interactor {
         $workspace = $this->discussion->get_workspace();
         $workspace_interactor = new workspace_interactor($workspace, $this->actor_id);
 
+        if ($workspace_interactor->can_administrate()) {
+            return true;
+        }
+
         if (!$workspace_interactor->is_joined()) {
             return false;
         }
@@ -265,7 +269,6 @@ final class interactor {
     /**
      * Super capability to manage discussions. Held by workspace owner & admin typically
      * @return bool
-     * @throws \coding_exception
      */
     private function can_manage(): bool {
         if ($this->is_workspace_deleted()) {
