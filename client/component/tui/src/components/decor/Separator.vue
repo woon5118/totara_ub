@@ -79,7 +79,7 @@ export default {
   &-rule {
     height: var(--border-width-thin);
     line-height: var(--border-width-thin);
-    background-color: var(--color-primary);
+    background-color: var(--color-neutral-5);
     border: none;
 
     &.tui-separator--thick {
@@ -106,7 +106,7 @@ export default {
       width: 50%;
       height: var(--border-width-thin);
       line-height: var(--border-width-thin);
-      background-color: var(--color-primary);
+      background-color: var(--color-neutral-5);
       content: '';
     }
 

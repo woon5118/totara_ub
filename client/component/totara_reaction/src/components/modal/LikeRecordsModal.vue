@@ -127,7 +127,7 @@ export default {
     @include tui-font-heading-x-small();
     margin: 0;
     padding-bottom: var(--gap-2);
-    border-bottom: var(--border-width-thin) solid var(--color-primary);
+    border-bottom: var(--border-width-normal) solid var(--color-neutral-5);
   }
 
   &__content {

@@ -94,7 +94,7 @@ export default {
     padding: 0;
     padding-bottom: var(--gap-2);
     font-size: var(--font-size-14);
-    border-bottom: var(--border-width-thin) solid var(--color-primary);
+    border-bottom: var(--border-width-normal) solid var(--color-neutral-5);
   }
 
   &__box {
@@ -127,7 +127,7 @@ export default {
 
       &__commentForm {
         padding-top: var(--gap-4);
-        border-top: var(--border-width-thin) solid var(--color-primary);
+        border-top: var(--border-width-normal) solid var(--color-neutral-5);
       }
     }
   }
