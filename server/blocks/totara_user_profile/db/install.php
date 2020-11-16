@@ -51,6 +51,11 @@ function xmldb_block_totara_user_profile_install() {
             'defaultregion' => 'side-post',
             'defaultweight' => 3,
         ],
+        [
+            'category' => 'badges',
+            'defaultregion' => 'side-pre',
+            'defaultweight' => 1,
+        ],
     ];
     $page = new moodle_page();
     $page->set_context(context_system::instance());

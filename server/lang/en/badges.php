@@ -460,7 +460,6 @@ $string['openbadgesv1'] = 'Open Badges v1.0';
 $string['openbadgesv2'] = 'Open Badges v2.0';
 $string['openbadgesv2p1'] = 'Open Badges v2.1';
 $string['potentialrecipients'] = 'Potential badge recipients';
-$string['preferences'] = 'Badge preferences';
 $string['recipients'] = 'Badge recipients';
 $string['recipientdetails'] = 'Recipient details';
 $string['recipientidentificationproblem'] = 'Cannot find a recipient of this badge among the existing users.';
@@ -540,5 +539,6 @@ $string['error:nogroups'] = '<p>There are no public collections of badges availa
 $string['localbadges'] = 'My badges from {$a} web site';
 $string['nobackpackbadges'] = 'There are no badges in the collections you have selected. <a href="mybackpack.php">Add more collections</a>.';
 $string['nobackpackcollections'] = 'No badge collections have been selected. <a href="mybackpack.php">Add collections</a>.';
+$string['preferences'] = 'Badge preferences';
 $string['sitebackpackverify'] = 'Backpack connection';
 $string['editsettings'] = 'Edit settings';

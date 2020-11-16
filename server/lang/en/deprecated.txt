@@ -72,3 +72,4 @@ yahooid,core
 msnid,core
 sitebackpackverify,core_badges
 editsettings,core_badges
+preferences,core_badges

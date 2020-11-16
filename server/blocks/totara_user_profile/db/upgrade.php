@@ -30,5 +30,45 @@ function xmldb_block_totara_user_profile_upgrade($oldversion, $block) {
 
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2020100101) {
+        // Does the user profile currently show badges?
+        $badgesshown = false;
+        $blockinsts = $DB->get_records('block_instances', ['blockname' => 'totara_user_profile', 'pagetypepattern' => 'user-profile']);
+        foreach ($blockinsts as $blockinst) {
+            $block = block_instance('totara_user_profile', $blockinst);
+            if ($block->config->category == 'badges') {
+                $badgesshown = true;
+                break;
+            }
+        }
+
+        // Badges not currently shown so add then to the profile.
+        if (!$badgesshown) {
+            $blockinfo = [
+                'category' => 'badges',
+                'defaultregion' => 'side-pre',
+                'defaultweight' => '1',
+            ];
+            $page = new moodle_page();
+            $page->set_context(context_system::instance());
+            $page->set_pagelayout('mypublic');
+            $page->set_pagetype('user-profile');
+
+            $blockconfig = new stdClass();
+            $blockconfig->category = $blockinfo['category'];
+            $page->blocks->add_region($blockinfo['defaultregion'], false);
+            $page->blocks->add_block(
+                'totara_user_profile',
+                $blockinfo['defaultregion'],
+                $blockinfo['defaultweight'],
+                0,
+                'user-profile',
+                1,
+                $blockconfig);
+        }
+
+        upgrade_plugin_savepoint(true, 2020100101, 'block', 'totara_user_profile');
+    }
+
     return true;
 }
