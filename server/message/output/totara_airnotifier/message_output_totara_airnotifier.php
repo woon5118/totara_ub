@@ -22,6 +22,7 @@
  */
 
 use message_totara_airnotifier\hook\airnotifier_device_discovery;
+use message_totara_airnotifier\hook\airnotifier_message_count_discovery;
 use message_totara_airnotifier\event\push_notification_sent;
 use message_totara_airnotifier\airnotifier_client;
 
@@ -57,6 +58,10 @@ class message_output_totara_airnotifier extends message_output {
             }
         }
 
+        // use hook to find unread messages count
+        $badge_hook = new airnotifier_message_count_discovery($eventdata->userto);
+        $badge_hook->execute();
+
         // use hook to find device id(s)
         $hook = new airnotifier_device_discovery($eventdata->userto);
         $hook->execute();
@@ -67,6 +72,9 @@ class message_output_totara_airnotifier extends message_output {
             $message = new stdClass();
             $message->title = $eventdata->subject;
             $message->body = $eventdata->smallmessage;
+            // The unread message count from message_popup does not yet include this message, so add 1 for this message.
+            // Why? Because message processors are loaded in reverse alphabetical order, see get_message_processors().
+            $message->badge_count = $badge_hook->get_count() + 1;
             $sent = airnotifier_client::push($hook->get_device_keys(), $message);
         }
 

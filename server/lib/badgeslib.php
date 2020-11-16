@@ -202,7 +202,7 @@ function badges_notify_badge_award(badge $badge, $userid, $issued, $filepathhash
         $creatorsubject = get_string('creatorsubject', 'badges', $badge->name);
 
         $eventdata = new \core\message\message();
-        $eventdata->courseid          = $badge->courseid;
+        $eventdata->courseid          = is_null($badge->courseid) ? SITEID : $badge->courseid; // Profile/site come with no courseid.
         $eventdata->component         = 'moodle';
         $eventdata->name              = 'badgecreatornotice';
         $eventdata->userfrom          = $userfrom;

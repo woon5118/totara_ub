@@ -26,14 +26,14 @@ namespace message_totara_airnotifier\hook;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * AirNotifier device discovery hook
+ * AirNotifier message count hook
  *
- * This hook is called by the AirNotifier message output plugin, and allows other plugins to determine which
- * device keys should receive a message, based on the message recipient.
+ * This hook is called by the AirNotifier message output plugin, and allows other plugins to set the number
+ * of unread messages which a user should see as an app badge on their device.
  *
  * @package message_totara_airnotifier\hook
  */
-class airnotifier_device_discovery extends \totara_core\hook\base {
+class airnotifier_message_count_discovery extends \totara_core\hook\base {
 
     /**
      * Recipient user
@@ -43,24 +43,24 @@ class airnotifier_device_discovery extends \totara_core\hook\base {
     private $recipient;
 
     /**
-     * Device keys belonging to recipient
+     * Total count of unread messages for badge display
      *
-     * @var array of strings
+     * @var int
      */
-    private $device_keys;
+    private $count;
 
     /**
-     * The airnotifier_device_discovery hook constructor.
+     * The airnotifier_message_count_discovery hook constructor.
      *
      * @param \stdClass $recipient user record
      */
     public function __construct(\stdClass $recipient) {
         $this->recipient = $recipient;
-        $this->device_keys = [];
+        $this->count = 0;
     }
 
     /**
-     * Gets the user for discovering device keys
+     * Gets the user for checking messages
      *
      * @return \stdClass user record
      */
@@ -69,29 +69,20 @@ class airnotifier_device_discovery extends \totara_core\hook\base {
     }
 
     /**
-     * Indicates whether any devices have been discovered for the user
+     * Gets the total count of unread messages reported for the user
      *
-     * @return bool
+     * @return int
      */
-    public function has_devices(): bool {
-        return (bool) count($this->device_keys);
+    public function get_count(): int {
+        return $this->count;
     }
 
     /**
-     * Gets a list of discovered device keys
+     * Adds a number of unread messages to the total count
      *
-     * @return array
+     * @param int $number
      */
-    public function get_device_keys(): array {
-        return $this->device_keys;
-    }
-
-    /**
-     * Adds keys to the list of discovered device keys
-     *
-     * @param array $keys
-     */
-    public function add_device_keys(array $keys): void {
-        $this->device_keys = array_merge($this->device_keys, array_values($keys));
+    public function add_to_count(int $number): void {
+        $this->count += $number;
     }
 }

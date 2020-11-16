@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Chris Snyder <chris.snyder@totaralearning.com>
- * @package totara_mobile
+ * @package message_popup
  */
 
-namespace totara_mobile\watcher;
+namespace message_popup\watcher;
 
-use message_totara_airnotifier\hook\airnotifier_device_discovery;
-use core\orm\query\builder;
+use message_totara_airnotifier\hook\airnotifier_message_count_discovery;
+use message_popup\api;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -33,30 +33,18 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class message_totara_airnotifier_watcher {
     /**
-     * A watcher to discover a user's devices.
+     * A watcher to discover unread message count for pushing as app badge.
      *
-     * @param airnotifier_device_discovery $hook
+     * @param airnotifier_message_count_discovery $hook
      * @return void
      */
-    public static function discover_mobile_devices(airnotifier_device_discovery $hook): void {
-        // Do nothing if the mobile app is disabled.
-        if (!get_config('totara_mobile', 'enable')) {
-            return;
-        }
+    public static function discover_message_count(airnotifier_message_count_discovery $hook): void {
 
         $user = $hook->get_user();
 
-        // Find all of the user's FCM tokens, and add them to the hook.
-        $devices = builder::table('totara_mobile_devices')
-            ->where_not_null('fcmtoken')
-            ->where('userid', $user->id)
-            ->fetch();
-
-        $tokens = [];
-        foreach ($devices as $device) {
-            $tokens[$device->fcmtoken] = $device->fcmtoken;
+        $message_count = api::count_unread_popup_notifications($user->id);
+        if (is_numeric($message_count) && $message_count > 0) {
+            $hook->add_to_count($message_count);
         }
-
-        $hook->add_device_keys($tokens);
     }
 }

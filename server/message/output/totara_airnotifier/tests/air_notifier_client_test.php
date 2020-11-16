@@ -59,6 +59,7 @@ class air_notifier_client_testcase extends advanced_testcase {
         $device_id = '';
         $message = new \stdClass();
         $message->title = 'Hi!';
+        $message->badge_count = 1;
         $result = airnotifier_client::push([$device_id], $message);
         $this->assertFalse($result);
 
@@ -66,6 +67,7 @@ class air_notifier_client_testcase extends advanced_testcase {
         $device_id = sha1('Kia ora');
         $message = new \stdClass();
         $message->title = '';
+        $message->badge_count = 1;
         $result = airnotifier_client::push([$device_id], $message);
         $this->assertFalse($result);
 
@@ -73,6 +75,7 @@ class air_notifier_client_testcase extends advanced_testcase {
         $device_id = sha1('Kia ora');
         $message = new \stdClass();
         $message->title = 'Hi!';
+        $message->badge_count = 1;
         $result = airnotifier_client::push([$device_id], $message);
         $this->assertTrue($result);
     }

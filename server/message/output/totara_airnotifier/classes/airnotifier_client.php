@@ -189,7 +189,15 @@ class airnotifier_client {
         $data->alert->body = $message->title;
         $data->fcm = new \stdClass();
         $data->fcm->data = new \stdClass();
+        // This is a payload for the mobile app to consume.
         $data->fcm->data->notification = 1;
+        // Add badge counts for android and apple.
+        $data->fcm->notification = new \stdClass();
+        $data->fcm->notification->notification_count = $message->badge_count;
+        $data->fcm->apns = new \stdClass();
+        $data->fcm->apns->payload = new \stdClass();
+        $data->fcm->apns->payload->aps = new \stdClass();
+        $data->fcm->apns->payload->aps->badge = $message->badge_count;
 
         $ch = new curl();
         $options = [];
