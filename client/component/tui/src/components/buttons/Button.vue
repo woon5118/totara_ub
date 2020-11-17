@@ -161,7 +161,7 @@ export default {
   max-width: 100%;
   min-height: var(--btn-min-height);
   // prettier-ignore
-  padding: calc((3.6rem - var(--form-input-font-size) * 1.2) / 2 - var(--form-input-border-size)) var(--gap-4);
+  padding: calc((var(--btn-min-height) - var(--form-input-font-size) * 1.2) / 2 - var(--form-input-border-size)) var(--gap-4);
 
   color: var(--btn-text-color);
   font-size: var(--form-input-font-size);
