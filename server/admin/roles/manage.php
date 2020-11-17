@@ -55,17 +55,25 @@ admin_externalpage_setup('defineroles');
 // Get some basic data we are going to need.
 $roles = role_fix_names(get_all_roles(), $systemcontext, ROLENAME_ORIGINAL);
 
-$undeletableroles = array();
-$undeletableroles[$CFG->notloggedinroleid] = 1;
-$undeletableroles[$CFG->guestroleid] = 1;
-$undeletableroles[$CFG->defaultuserroleid] = 1;
+
+// Check all assigned roles under User Policies.
+$hook = new \core_role\hook\discover_undeletable_roles(
+    core_role_user_policies::get_roles()
+);
+$hook->execute();
 
 // Process submitted data.
 $confirmed = (optional_param('confirm', false, PARAM_BOOL) && data_submitted() && confirm_sesskey());
 switch ($action) {
     case 'delete':
-        if (isset($undeletableroles[$roleid])) {
-            print_error('cannotdeletethisrole', '', $baseurl);
+        $count = $DB->count_records_select('role_assignments', 'roleid = ?', array($roleid), 'COUNT(DISTINCT userid)');
+        if ($hook->is_role_undeletable($roleid) || $count > 0) {
+            redirect(
+                new moodle_url($baseurl),
+                get_string('cannotdeletethisrole', 'error'),
+                null,
+                \core\notification::ERROR
+            );
         }
         if (!$confirmed) {
             // Show confirmation.
@@ -75,8 +83,7 @@ switch ($action) {
             $a->id = $roleid;
             $a->name = $roles[$roleid]->name;
             $a->shortname = $roles[$roleid]->shortname;
-            $a->count = $DB->count_records_select('role_assignments',
-                'roleid = ?', array($roleid), 'COUNT(DISTINCT userid)');
+            $a->count = $count;
 
             $formcontinue = new single_button(new moodle_url($baseurl, $optionsyes), get_string('yes'));
             $formcancel = new single_button(new moodle_url($baseurl), get_string('no'), 'get');
@@ -86,7 +93,12 @@ switch ($action) {
         }
         if (!delete_role($roleid)) {
             // The delete failed.
-            print_error('cannotdeleterolewithid', 'error', $baseurl, $roleid);
+            redirect(
+                new moodle_url($baseurl),
+                get_string('cannotdeleterolewithid', 'error', $baseurl, $roleid),
+                null,
+                \core\notification::ERROR
+            );
         }
         // Deleted a role sitewide...
         redirect($baseurl);
@@ -179,6 +191,13 @@ foreach ($roles as $role) {
         new \moodle_url('/admin/roles/define.php', ['action' => 'view', 'roleid' => $role->id]),
         $role->localname . $warn
     );
+    if ($hook->is_role_undeletable($role->id)) {
+        $rolenamelink .= \html_writer::empty_tag('br');
+        $rolenamelink .= \html_writer::span(
+            $hook->get_undeletable_role_label($role->id),
+            'user-policies-title'
+        );
+    }
     $row = [$rolenamelink, role_get_description($role), s($role->shortname), ''];
 
     // Move up.
@@ -197,16 +216,16 @@ foreach ($roles as $role) {
     $row[3] .= get_action_icon($defineurl . '?action=edit&amp;roleid=' . $role->id,
             'edit', $stredit, get_string('editxrole', 'core_role', $role->localname));
     // Delete.
-    if (isset($undeletableroles[$role->id])) {
+    $role_assignment_count = $DB->count_records('role_assignments', array('roleid' => $role->id));
+    if ($hook->is_role_undeletable($role->id) || $role_assignment_count > 0) {
         $row[3] .= get_spacer();
     } else {
         $row[3] .= get_action_icon($baseurl . '?action=delete&amp;roleid=' . $role->id,
               'delete', $strdelete, get_string('deletexrole', 'core_role', $role->localname));
     }
-
     // Totara: show number of users.
     $row[4] = $row[3];
-    $row[3] = $DB->count_records('role_assignments', array('roleid' => $role->id));
+    $row[3] = $role_assignment_count;
 
     $table->data[] = $row;
 }
@@ -226,5 +245,5 @@ function get_action_icon($url, $icon, $alt, $tooltip) {
 }
 function get_spacer() {
     global $OUTPUT;
-    return $OUTPUT->flex_icon('spacer') . '</a> ';
+    return $OUTPUT->flex_icon('spacer');
 }

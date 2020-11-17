@@ -914,3 +914,13 @@ img.iconsmall {
 #page-admin-register #fitem_id_componentusage .fstatic {
   word-break: break-all;
 }
+
+#roles {
+  .user-policies-title {
+    @include tui-font-body-x-small();
+  }
+
+  .lastcol {
+    width: 10%;
+  }
+}

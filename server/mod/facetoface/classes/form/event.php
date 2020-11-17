@@ -28,6 +28,10 @@ namespace mod_facetoface\form;
 
 global $CFG;
 
+use core\notification;
+use mod_facetoface\seminar;
+use mod_facetoface\trainer_helper;
+use mod_facetoface\seminar_event;
 use mod_facetoface\attendees_helper;
 use mod_facetoface\signup\state\{booked, waitlisted};
 use mod_facetoface\facilitator;
@@ -73,6 +77,7 @@ class event extends \moodleform {
         $this->facetoface = $this->_customdata['facetoface'];
         $this->editoroptions = $this->_customdata['editoroptions'];
         $sessiondata = $this->_customdata['sessiondata'];
+        $seminar = new seminar($this->_customdata['f']);
         $this->context = \context_module::instance($this->_customdata['cm']->id);
         if ($this->_customdata['backtoallsessions']) {
             $this->returnurl = new \moodle_url('/mod/facetoface/view.php', array('f' => $this->facetoface->id));
@@ -181,24 +186,22 @@ class event extends \moodleform {
         $mform->addHelpButton('details_editor', 'details', 'facetoface');
 
         // Choose users for trainer roles
-        $roles = \mod_facetoface\trainer_helper::get_trainer_roles($this->context);
-
+        $roles = trainer_helper::get_trainer_roles($this->context);
         if ($roles) {
-            $trainerhelper = new \mod_facetoface\trainer_helper(new \mod_facetoface\seminar_event($this->_customdata['s']));
+            $mform->addElement('header', 'trainerroles', get_string('sessionroles', 'mod_facetoface'));
+            $mform->addElement('static', 'roleapprovalerror');
 
+            $trainerhelper = new trainer_helper(new seminar_event($this->_customdata['s']));
             // Get current trainers
             $current_trainers = $trainerhelper->get_trainers();
             // Get course context and roles
             $rolenames = role_get_names($this->context);
             // Loop through all selected roles
-            $header_shown = false;
+            $selected_roles = [];
             foreach ($roles as $role) {
-                $rolename = $rolenames[$role->id]->localname;
-
                 // Attempt to load users with this role in this context.
                 $usernamefields = get_all_user_name_fields(true, 'u');
                 $rs = get_role_users($role->id, $this->context, true, "u.id, {$usernamefields}", 'u.id ASC');
-
                 if (!$rs) {
                     continue;
                 }
@@ -207,33 +210,26 @@ class event extends \moodleform {
                 foreach ($rs as $roleuser) {
                     $choices[$roleuser->id] = fullname($roleuser);
                 }
-
-                // Show header (if haven't already)
-                if ($choices && !$header_shown) {
-                    $mform->addElement('header', 'trainerroles', get_string('sessionroles', 'facetoface'));
-                    $mform->addElement('static', 'roleapprovalerror');
-                    $header_shown = true;
-                }
-
                 // If only a few, use checkboxes
+                $rolename = $rolenames[$role->id]->localname;
                 if (count($choices) < 4) {
                     $role_shown = false;
                     foreach ($choices as $cid => $choice) {
+                        $roledisplay = '';
                         // Only display the role title for the first checkbox for each role
                         if (!$role_shown) {
                             $roledisplay = $rolename;
                             $role_shown = true;
-                        } else {
-                            $roledisplay = '';
                         }
-
-                        $mform->addElement('advcheckbox', 'trainerrole['.$role->id.']['.$cid.']', $roledisplay, $choice, null, array('', $cid));
-                        $mform->setType('trainerrole['.$role->id.']['.$cid.']', PARAM_INT);
+                        $elementname = 'trainerrole[' . $role->id . '][' . $cid . ']';
+                        $mform->addElement('advcheckbox', $elementname, $roledisplay, $choice, null, ['', $cid]);
+                        $mform->setType($elementname, PARAM_INT);
                     }
                 } else {
-                    $choices = array(0 => get_string('none', 'facetoface')) + $choices;
-                    $mform->addElement('select', 'trainerrole['.$role->id.']', $rolename, $choices, array('multiple' => 'multiple'));
-                    $mform->setType('trainerrole['.$role->id.']', PARAM_SEQUENCE);
+                    $elementname = 'trainerrole[' . $role->id . ']';
+                    $choices = array(0 => get_string('none', 'mod_facetoface')) + $choices;
+                    $mform->addElement('select', $elementname, $rolename, $choices, ['multiple' => 'multiple']);
+                    $mform->setType($elementname, PARAM_SEQUENCE);
                 }
 
                 // Select current trainers
@@ -242,12 +238,23 @@ class event extends \moodleform {
                         $t = array();
                         foreach ($trainers as $trainer) {
                             $t[] = $trainer->id;
-                            $mform->setDefault('trainerrole['.$roleid.']['.$trainer->id.']', $trainer->id);
+                            $elementname = 'trainerrole[' . $roleid . '][' . $trainer->id . ']';
+                            $mform->setDefault($elementname, $trainer->id);
                         }
-
-                        $mform->setDefault('trainerrole['.$roleid.']', implode(',', $t));
+                        $elementname = 'trainerrole[' . $roleid . ']';
+                        $mform->setDefault($elementname, implode(',', $t));
                     }
                 }
+                $selected_roles[] = $choices;
+            }
+            if (empty($selected_roles) && !empty($rolenames) && !$this->is_cancelled()) {
+                notification::error(
+                    get_string(
+                        'error:rolerequired',
+                        'mod_facetoface',
+                        $rolenames[$seminar->get_approvalrole()]->localname
+                    )
+                );
             }
         }
 

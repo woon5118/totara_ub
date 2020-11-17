@@ -1,5 +1,11 @@
 This files describes API changes in /admin/*.
 
+=== 13.3 ===
+
+* Added more role ids (managerroleid, learnerroleid, assessorroleid, performanceactivitycreatornewroleid, creatornewroleid, restorernewroleid)
+  which can't be removed if they are assigned under User Policies.
+  Changed the logic for deleting the roles if the users are assigned to these roles.
+
 === 13.0 ===
 
 * Shortname for a new role will accept the alphanumeric characters only and fails for the hyphen and underscore characters
