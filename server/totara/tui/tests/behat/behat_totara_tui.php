@@ -44,7 +44,7 @@ class behat_totara_tui extends behat_base {
     private const DATA_TABLE_ROW_LOCATOR = '.tui-dataTableRow';
     private const DATA_TABLE_CELL_LOCATOR = '.tui-dataTableCell';
     private const DATA_TABLE_CELL_CONTENT_LOCATOR = '.tui-dataTableCell__content';
-    private const DATA_TABLE_EXPAND_CLOSE_LOCATOR = '.tui-dataTableExpandableRow__close';
+    private const DATA_TABLE_EXPAND_CLOSE_LOCATOR = '.tui-dataTableRow--expanded .tui-dataTableExpandCell > button';
     private const DATA_TABLE_SELECT_ALL_CHECKBOX_LOCATOR = '.tui-dataTableSelectVisibleRowsCell label';
 
     private const MULTI_SELECT_FILTER_LOCATOR = '.tui-multiSelectFilter';
