@@ -101,10 +101,6 @@ Feature: tool_monitor_subscriptions
   Scenario: Receiving notification on site level
     Given I log in as "admin"
     And I follow "Preferences" in the user menu
-    And I click on "Notification preferences" "link" in the "#page-content" "css_element"
-    And I click on "//td[@data-processor-name='popup']//label[@class='preference-state']" "xpath_element" in the "Notifications of rule subscriptions" "table_row"
-    And I wait until the page is ready
-    And I follow "Preferences" in the user menu
     And I follow "Event monitoring"
     And I set the field "Select a course" to "Acceptance test site"
     And I follow "Subscribe to rule \"New rule site level\""
@@ -121,10 +117,6 @@ Feature: tool_monitor_subscriptions
   @_bug_phantomjs
   Scenario: Receiving notification on course level
     Given I log in as "teacher1"
-    And I follow "Preferences" in the user menu
-    And I click on "Notification preferences" "link" in the "#page-content" "css_element"
-    And I click on "//td[@data-processor-name='popup']//label[@class='preference-state']" "xpath_element" in the "Notifications of rule subscriptions" "table_row"
-    And I wait until the page is ready
     And I follow "Preferences" in the user menu
     And I follow "Event monitoring"
     And I set the field "Select a course" to "Course 1"
