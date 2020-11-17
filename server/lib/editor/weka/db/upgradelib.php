@@ -57,3 +57,67 @@ function editor_weka_add_weka_to_texteditors(): void {
         }
     }
 }
+
+/**
+ * Fix empty url in attachments in the weka document.
+ *
+ * @param string $weka_doc_json the json encoded weka string
+ * @return null|string returns null if nothing changed or the updated json string
+ */
+function editor_weka_fix_attachments_with_empty_url(string $weka_doc_json): ?string {
+    $weka_doc = json_decode($weka_doc_json, true);
+
+    $updated = editor_weka_fix_attachments_with_empty_url_recursively($weka_doc);
+    if ($updated) {
+        return json_encode($weka_doc, JSON_UNESCAPED_SLASHES);
+    }
+
+    return null;
+}
+
+/**
+ * This will go through the weka doc structure recursively, change the original document
+ * and will return true if anything got changed.
+ *
+ * @param array|null $weka_doc
+ * @return bool
+ */
+function editor_weka_fix_attachments_with_empty_url_recursively(?array & $weka_doc): bool {
+    if (!$weka_doc || !isset($weka_doc['content'])) {
+        return false;
+    }
+
+    $updated = false;
+
+    foreach ($weka_doc['content'] as & $content) {
+        if ($content['type'] === 'attachments') {
+            foreach ($content['content'] as & $attachment) {
+                if ($attachment['type'] !== 'attachment') {
+                    // Not an attachment, skipping
+                    continue;
+                }
+
+                if ($attachment['attrs']['url'] !== null) {
+                    // All looks good here, skipping
+                    continue;
+                }
+
+                $updated = true;
+                $filename = $attachment['attrs']['filename'];
+                $attachment['attrs']['url'] = sprintf(
+                    '@@PLUGINFILE@@/%s?forcedownload=1',
+                    rawurlencode($filename)
+                );
+            }
+        } else if (isset($content['content'])) {
+            foreach ($content['content'] as & $content_recursive) {
+                $updated_recursively = editor_weka_fix_attachments_with_empty_url_recursively($content_recursive);
+                if ($updated || $updated_recursively) {
+                    $updated = true;
+                }
+            }
+        }
+    }
+
+    return $updated;
+}
