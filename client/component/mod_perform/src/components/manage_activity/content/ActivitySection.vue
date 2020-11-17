@@ -66,6 +66,7 @@
       </Grid>
       <InputText
         v-if="!autoSave && editMode"
+        ref="titleInput"
         :value="title"
         :placeholder="$str('untitled_section', 'mod_perform')"
         :aria-label="$str('section_title', 'mod_perform')"
@@ -440,6 +441,24 @@ export default {
     },
   },
 
+  watch: {
+    // Focus on title input when activating edit mode.
+    editMode(newValue, oldValue) {
+      if (newValue && !oldValue) {
+        this.$nextTick(() => {
+          this.focusTitleInput();
+        });
+      }
+    },
+  },
+
+  mounted() {
+    // Focus on title input when mounted in edit mode.
+    if (this.editMode) {
+      this.focusTitleInput();
+    }
+  },
+
   updated() {
     this.$emit('has-unsaved-changes');
   },
@@ -648,6 +667,13 @@ export default {
       }
 
       this.closeDeleteSectionModal();
+    },
+
+    /**
+     * Focus on title input field
+     */
+    focusTitleInput() {
+      this.$refs.titleInput.$el.focus();
     },
   },
 };

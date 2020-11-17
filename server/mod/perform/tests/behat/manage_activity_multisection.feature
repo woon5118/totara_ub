@@ -17,7 +17,8 @@ Feature: Managing an activity with multiple sections
     # Note already in multi-section mode because the generator created multiple sections.
     When I navigate to the edit perform activities page for activity "Multiple section Activity"
     And I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
-    And I click the add responding participant button in "1" activity section
+    Then the focused element is "Section title" "field"
+    When I click the add responding participant button in "1" activity section
     Then the following fields match these values:
       | Subject   | 0 |
       | Manager   | 0 |
@@ -32,7 +33,8 @@ Feature: Managing an activity with multiple sections
 
     # Edit relationships for second section.
     When I click on ".tui-performActivitySection__action-edit" "css_element" in the "2" activity section
-    And I click the add responding participant button in "2" activity section
+    Then the focused element is "Section title" "field"
+    When I click the add responding participant button in "2" activity section
     And I click on the "Manager" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(2) .tui-popoverFrame__content" "css_element"
     And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(2) .tui-popoverFrame__content" "css_element"
     And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "2" activity section
@@ -87,7 +89,8 @@ Feature: Managing an activity with multiple sections
 
     When I click on ".tui-dropdown" "css_element" in the "1" activity section
     And I click on "Add section above" "link" in the "1" activity section
-    And I set the title of activity section "1" to "Section #2"
+    Then the focused element is "Section title" "field"
+    When I set the title of activity section "1" to "Section #2"
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
     And I close the tui notification toast
     And I navigate to manage perform activity content page of "1" activity section
@@ -127,7 +130,8 @@ Feature: Managing an activity with multiple sections
     When I follow "Content (Participant set up test)"
     And I click on the "Multiple sections" tui toggle button
     And I confirm the tui confirmation modal
-    And I close the tui notification toast
+    Then the focused element is "Section title" "field"
+    When I close the tui notification toast
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
     And I close the tui notification toast
     Then I should see "Untitled section"
@@ -153,6 +157,7 @@ Feature: Managing an activity with multiple sections
     # Now the second one exists and is in edit mode - form is displayed
     Then activity section "1" should exist
     And activity section "2" should exist
+    And the focused element is ".tui-performActivitySection:nth-of-type(2) [aria-label='Section title']" "css_element"
     # Reload page
     When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
     And I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
@@ -172,6 +177,7 @@ Feature: Managing an activity with multiple sections
     And "Section title" "field" in the "1" activity section should not exist
     And "Section title" "field" in the "2" activity section should not exist
     And "Section title" "field" in the "3" activity section should exist
+    And the focused element is "Section title" "field"
     # Titles should be displayed
     And I should see "Untitled section" in the "1" activity section
     And I should see "Untitled section" in the "2" activity section
@@ -216,6 +222,7 @@ Feature: Managing an activity with multiple sections
     # One more section is there
     # The first is now editable which we take as proof that it was added above the previous first one
     Then activity section "4" should exist
+    And the focused element is ".tui-performActivitySection:nth-of-type(1) [aria-label='Section title']" "css_element"
     And "Section title" "field" in the "1" activity section should exist
     When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
     And I click on ".tui-dropdown" "css_element" in the "2" activity section
@@ -223,6 +230,7 @@ Feature: Managing an activity with multiple sections
     # One more section is there
     # The third is now editable which we take as proof that it was added below the previous second
     Then activity section "5" should exist
+    And the focused element is ".tui-performActivitySection:nth-of-type(3) [aria-label='Section title']" "css_element"
     And "Section title" "field" in the "3" activity section should exist
     When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "3" activity section
     # The last section should not have two dropdown options
