@@ -35,6 +35,8 @@
         :href="profileUrl"
         :aria-describedby="ariaDescribedby"
         class="tui-miniProfileCard__avatar"
+        :aria-hidden="avatarAlt === ''"
+        :tabindex="avatarAlt === '' ? '-1' : ''"
       >
         <Avatar :src="avatarSrc" :alt="avatarAlt" size="xsmall" />
       </a>
@@ -224,7 +226,7 @@ export default {
 
     profileUrl() {
       if (!this.display.profile_url) {
-        return '#';
+        return false;
       }
 
       return this.display.profile_url;
