@@ -98,6 +98,7 @@ class user_with_components_links extends base {
         $appraisalstr = get_string('appraisals', 'totara_appraisal');
         $feedback360str = get_string('feedback360_legacy', 'totara_feedback360');
         $goalstr = get_string('goalplural', 'totara_hierarchy');
+        $competency_profile_str = get_string('competency_profile', 'totara_competency');
         $evidencestr = get_string('evidence', 'totara_evidence');
         $performance_data = get_string('user_components_performance_data', 'mod_perform');
 
@@ -110,6 +111,9 @@ class user_with_components_links extends base {
         $appraisal_link = \html_writer::link("{$CFG->wwwroot}/totara/appraisal/index.php?subjectid={$userid}", $appraisalstr);
         $feedback_link = \html_writer::link("{$CFG->wwwroot}/totara/feedback360/index.php?userid={$userid}", $feedback360str);
         $goal_link = \html_writer::link("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$userid}", $goalstr);
+        $competency_profile_link = \html_writer::link(
+            new \moodle_url('/totara/competency/profile/index.php', ['user_id' => $userid]), $competency_profile_str
+        );
         $evidence_link = \html_writer::link(new \moodle_url('/totara/evidence/index.php', ['user_id' => $userid]), $evidencestr);
         $perform_response_reporting_link = \html_writer::link(
             new \moodle_url('/mod/perform/reporting/performance/user.php', ['subject_user_id' => $userid]), $performance_data
@@ -142,6 +146,12 @@ class user_with_components_links extends base {
 
         if ((advanced_feature::is_enabled('programs') || advanced_feature::is_enabled('certifications')) && prog_can_view_users_required_learning($userid)) {
             $links .= \html_writer::tag('li', $required_link);
+        }
+
+        if (advanced_feature::is_enabled('competency_assignment') &&
+            class_exists('\totara_competency\helpers\capability_helper') &&
+            \totara_competency\helpers\capability_helper::can_view_profile($userid)) {
+            $links .= \html_writer::tag('li', $competency_profile_link);
         }
 
         if (advanced_feature::is_enabled('evidence') &&
