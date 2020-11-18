@@ -61,11 +61,11 @@ class theme_settings extends controller {
         global $CFG, $USER;
 
         // Get the theme name from parameter.
-        $this->theme = $this->get_required_param('theme', PARAM_COMPONENT);
+        $this->theme = $this->get_required_param('theme_name', PARAM_COMPONENT);
         $this->tenant_id = $this->get_optional_param('tenant_id', null, PARAM_INT);
 
         require_login(null, false);
-        $url = new moodle_url('/totara/tui/theme_settings.php', ['theme' => $this->theme]);
+        $url = new moodle_url('/totara/tui/theme_settings.php', ['theme_name' => $this->theme]);
         if (!empty($this->tenant_id)) {
             $url->param('tenant_id', $this->tenant_id);
         }
@@ -106,7 +106,7 @@ class theme_settings extends controller {
         // 2. Tenant ID is set and user belongs to the tenancy.
         require_once($CFG->libdir.'/adminlib.php');
         admin_externalpage_setup(
-            'ventura_editor',
+            "{$this->theme}_editor",
             '', // not used
             ['theme' => $this->theme],
             '',

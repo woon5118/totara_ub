@@ -105,7 +105,7 @@ export default {
   data() {
     return {
       configLink: this.$url('/totara/tui/theme_settings.php', {
-        theme: this.theme,
+        theme_name: this.theme,
       }),
     };
   },
@@ -113,7 +113,7 @@ export default {
   methods: {
     tenantLink(tenant_id) {
       return this.$url('/totara/tui/theme_settings.php', {
-        theme: this.theme,
+        theme_name: this.theme,
         tenant_id: tenant_id,
       });
     },

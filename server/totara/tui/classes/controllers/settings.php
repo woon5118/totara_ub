@@ -67,10 +67,10 @@ class settings extends admin_controller {
 
         // If multi-tenancy is enabled then we display tenants otherwise go straight to settings.
         if (!empty($CFG->tenantsenabled)) {
-            $tenants_url = new \moodle_url("/totara/tui/theme_tenants.php", ['theme' => $this->theme]);
+            $tenants_url = new \moodle_url("/totara/tui/theme_tenants.php", ['theme_name' => $this->theme]);
             redirect($tenants_url->out());
         } else {
-            $settings_url = new \moodle_url("/totara/tui/theme_settings.php", ['theme' => $this->theme]);
+            $settings_url = new \moodle_url("/totara/tui/theme_settings.php", ['theme_name' => $this->theme]);
             redirect($settings_url->out());
         }
     }

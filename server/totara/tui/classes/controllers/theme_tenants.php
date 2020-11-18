@@ -56,9 +56,9 @@ class theme_tenants extends admin_controller {
      */
     public function process(string $action = '') {
         // Get the theme name from parameter.
-        $this->theme = $this->get_required_param('theme', PARAM_COMPONENT);
+        $this->theme = $this->get_required_param('theme_name', PARAM_COMPONENT);
         $this->admin_external_page_name = "{$this->theme}_editor";
-        $this->set_url(new \moodle_url('/totara/tui/theme_tenants.php', ['theme' => $this->theme]));
+        $this->set_url(new \moodle_url('/totara/tui/theme_tenants.php', ['theme_name' => $this->theme]));
         parent::process($action);
     }
 
@@ -70,7 +70,7 @@ class theme_tenants extends admin_controller {
 
         // Redirect to settings if tenants disabled.
         if (empty($CFG->tenantsenabled)) {
-            $settings_url = new \moodle_url("/totara/tui/theme_settings.php", ['theme' => $this->theme]);
+            $settings_url = new \moodle_url("/totara/tui/theme_settings.php", ['theme_name' => $this->theme]);
             redirect($settings_url->out());
         }
 
