@@ -17,14 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package modules
- * @subpackage facetoface
+ * @author Alastair Munro <alastair.munro@totaralms.com>
+ * @package mod_facetoface
  */
 
 use mod_facetoface\dashboard\filter_list;
-use mod_facetoface\event_time;
-use mod_facetoface\output\show_previous_events;
-use mod_facetoface\dashboard\render_session_option;
+use mod_facetoface\seminar;
 use mod_facetoface\output\seminarevent_dashboard;
 
 require_once '../../config.php';
@@ -43,9 +41,9 @@ if ($id) {
     if (!$cm = get_coursemodule_from_id('facetoface', $id)) {
         print_error('error:incorrectcoursemoduleid', 'facetoface');
     }
-    $seminar = new \mod_facetoface\seminar($cm->instance);
+    $seminar = new seminar($cm->instance);
 } else if ($f) {
-    $seminar = new \mod_facetoface\seminar($f);
+    $seminar = new seminar($f);
     $cm = $seminar->get_coursemodule();
 } else {
     print_error('error:mustspecifycoursemodulefacetoface', 'facetoface');
@@ -85,8 +83,6 @@ $title = $course->shortname . ': ' . format_string($seminar->get_name());
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
 
-$pagetitle = format_string($seminar->get_name());
-
 /** @var mod_facetoface_renderer $f2f_renderer */
 $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
 $f2f_renderer->setcontext($context);
@@ -105,5 +101,4 @@ echo $f2f_renderer->render_from_template(
     seminarevent_dashboard::create($seminar, $context, $cm, $course, $filters, $debug)->export_for_template($f2f_renderer)
 );
 
-echo $OUTPUT->footer($course);
-
+echo $OUTPUT->footer();

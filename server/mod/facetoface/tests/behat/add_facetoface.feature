@@ -42,3 +42,24 @@ Feature: Add a seminar event and session
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I should see date "1 Jan next year" formatted "%d %B %Y"
+
+  @javascript
+  Scenario: Add a seminar activity with multi language support
+    Given I log in as "admin"
+        # Enabling multi-language filters for headings and content.
+    And I navigate to "Manage filters" node in "Site administration > Plugins > Filters"
+    And I set the field with xpath "//table[@id='filterssetting']//form[@id='activemultilang']//select[@name='newstate']" to "1"
+    And I set the field with xpath "//table[@id='filterssetting']//form[@id='applytomultilang']//select[@name='stringstoo']" to "1"
+    And I log out
+
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | <span lang="de" class="multilang">German seminar name</span><span lang="en" class="multilang">English seminar name</span> |
+      | Description | <span lang="de" class="multilang">German seminar description</span><span lang="en" class="multilang">English seminar description</span> |
+    When I follow "View all events"
+    Then I should see "English seminar name"
+    And I should not see "German seminar name"
+    And I should see "English seminar description"
+    And I should not see "German seminar description"
+

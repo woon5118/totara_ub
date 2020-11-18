@@ -118,7 +118,7 @@ final class seminarevent_dashboard implements templatable {
     public function export_for_template(renderer_base $output) {
         $data = array();
 
-        $data['title'] = $this->seminar->get_name();
+        $data['title'] = format_string($this->seminar->get_name());
         $data['actions'] = self::get_action_bar_data($this->seminar, $this->context);
         $data['selfcompletionform']  = self_completion_form($this->cm, $this->course);
 
