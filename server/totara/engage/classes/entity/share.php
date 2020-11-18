@@ -34,6 +34,8 @@ use totara_engage\repository\share_repository;
  * @property int        $ownerid
  * @property int        $timecreated
  * @property int        $timemodified
+ *
+ * @method static share_repository repository()
  */
 final class share extends entity {
     /**

@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\mutation;
 
+use container_workspace\event\member_leave;
 use container_workspace\member\member;
 use container_workspace\webapi\middleware\require_login_workspace;
 use container_workspace\webapi\middleware\workspace_availability_check;
@@ -52,6 +53,10 @@ final class leave implements mutation_resolver, has_middleware {
 
         $member = member::from_user($USER->id, $workspace->get_id());
         $member->leave($USER->id);
+
+        // Trigger event.
+        $event = member_leave::from_member($member);
+        $event->trigger();
 
         return $member;
     }

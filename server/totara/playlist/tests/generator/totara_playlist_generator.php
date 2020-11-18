@@ -320,4 +320,17 @@ final class totara_playlist_generator extends component_generator_base {
 
         return new mock_playlist_image_processor();
     }
+
+    /**
+     * @param array $parameters
+     * @return playlist
+     */
+    public function create_restricted_playlist($parameters = []): playlist {
+        if (is_object($parameters)) {
+            $parameters = (array) $parameters;
+        }
+
+        $parameters['access'] = access::RESTRICTED;
+        return $this->create_playlist($parameters);
+    }
 }

@@ -24,7 +24,7 @@
         :avatar-image-src="user.profileimageurl"
         :submitting="submitting"
         :workspace-context-id="workspaceContextId"
-        :avatar-image-url="$url('/user/profile', { id: user.id })"
+        :avatar-image-url="$url('/user/profile.php', { id: user.id })"
         @submit="submit"
       />
 

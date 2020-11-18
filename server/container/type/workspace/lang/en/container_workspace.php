@@ -103,6 +103,7 @@ $string['last_updated'] = 'Last updated';
 $string['leave'] = 'Leave';
 $string['leave_workspace'] = 'Leave workspace';
 $string['leave_workspace_message'] = 'Are you sure you want to leave this workspace?';
+$string['leave_workspace_message_not_public'] = "Are you sure you want to leave this workspace? You may lose access to content with limited visibility, including any you've saved to your library.";
 $string['library_tab_label'] = 'Library';
 $string['like_discussion'] = 'Like discussion';
 $string['loadmore'] = 'Load more';

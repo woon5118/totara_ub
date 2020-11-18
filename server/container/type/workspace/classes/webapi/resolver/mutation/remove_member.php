@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\mutation;
 
+use container_workspace\event\removed_member;
 use container_workspace\member\member;
 use container_workspace\webapi\middleware\require_login_workspace;
 use container_workspace\webapi\middleware\workspace_availability_check;
@@ -52,6 +53,9 @@ final class remove_member implements mutation_resolver, has_middleware {
 
         $member = member::from_user($args['user_id'], $workspace->get_id());
         $member->removed_from_workspace($USER->id);
+
+        $event = removed_member::from_member($member, $USER->id);
+        $event->trigger();
 
         return $member->is_suspended();
     }

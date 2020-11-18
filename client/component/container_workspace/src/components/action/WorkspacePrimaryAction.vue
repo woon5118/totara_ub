@@ -29,9 +29,7 @@
     >
       <WorkspaceWarningModal
         :title="$str('delete_warning_title', 'container_workspace')"
-        :message-content="
-          $str('leave_workspace_message', 'container_workspace')
-        "
+        :message-content="getContentMessage"
         :confirm-button-text="$str('leave', 'container_workspace')"
         @confirm="leaveWorkspace"
       />
@@ -260,6 +258,7 @@ import cancelMemberRequest from 'container_workspace/graphql/cancel_member_reque
 import addMembers from 'container_workspace/graphql/add_members';
 import muteWorkspace from 'container_workspace/graphql/mute_workspace';
 import unmuteWorkspace from 'container_workspace/graphql/unmute_workspace';
+import { PUBLIC, PRIVATE, HIDDEN } from 'container_workspace/access';
 
 export default {
   components: {
@@ -284,6 +283,14 @@ export default {
     workspaceName: {
       type: String,
       required: true,
+    },
+
+    workspaceAccess: {
+      type: String,
+      required: true,
+      validator(prop) {
+        return [PUBLIC, HIDDEN, PRIVATE].includes(prop);
+      },
     },
   },
 
@@ -312,6 +319,16 @@ export default {
     };
   },
 
+  computed: {
+    getContentMessage() {
+      return this.workspaceAccess === PUBLIC
+        ? this.$str('leave_workspace_message', 'container_workspace')
+        : this.$str(
+            'leave_workspace_message_not_public',
+            'container_workspace'
+          );
+    },
+  },
   methods: {
     async joinWorkspace() {
       if (this.innerSubmitting) {
@@ -347,7 +364,9 @@ export default {
       this.innerSubmitting = true;
 
       try {
-        await this.$apollo.mutate({
+        const {
+          data: { member },
+        } = await this.$apollo.mutate({
           mutation: leaveWorkspace,
           refetchAll: true,
           variables: {
@@ -357,6 +376,14 @@ export default {
 
         this.modal.leaveConfirm = false;
         this.$emit('leave-workspace');
+        if (member) {
+          if (this.workspaceAccess !== PUBLIC) {
+            document.location.href = this.$url(
+              '/container/type/workspace/workspace.php',
+              { id: this.workspaceId }
+            );
+          }
+        }
       } catch (e) {
         await notify({
           message: this.$str('error:leave_workspace', 'container_workspace'),
@@ -598,6 +625,7 @@ export default {
     "delete_warning_title",
     "leave_workspace",
     "leave_workspace_message",
+    "leave_workspace_message_not_public",
     "error:join_space",
     "error:leave_space",
     "owner",

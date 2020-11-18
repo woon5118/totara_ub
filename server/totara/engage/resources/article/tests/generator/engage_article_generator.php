@@ -112,6 +112,20 @@ final class engage_article_generator extends component_generator_base {
         return $this->create_article($parameters);
     }
 
+
+    /**
+     * @param array|stdClass $parameters
+     * @return article
+     */
+    public function create_restricted_article($parameters = []): article {
+        if (is_object($parameters)) {
+            $parameters = (array) $parameters;
+        }
+
+        $parameters['access'] = access::RESTRICTED;
+        return $this->create_article($parameters);
+    }
+
     /**
      * @return string
      */

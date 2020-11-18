@@ -210,4 +210,20 @@ final class share_repository extends repository {
             ->where('id', $id)
             ->delete();
     }
+
+    /**
+     * @param int $recipient_id
+     * @param string $component
+     * @param string $area
+     * @return array
+     */
+    public function get_shares_by_recipient(int $recipient_id, string $component, string $area): array {
+        return builder::table(share::TABLE, 's')
+            ->join([share_recipient::TABLE, 'sr'], 'id', '=', 'shareid')
+            ->map_to(share::class)
+            ->where('sr.instanceid', $recipient_id)
+            ->where('sr.area', $area)
+            ->where('sr.component', $component)
+            ->fetch();
+    }
 }
