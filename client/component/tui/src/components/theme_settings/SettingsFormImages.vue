@@ -83,7 +83,7 @@
       </Collapsible>
 
       <Collapsible
-        v-if="flavoursData.learn"
+        v-if="flavoursData.learn && !selectedTenantId"
         :label="$str('formimages_group_learn', 'totara_tui')"
         :initial-state="true"
       >
@@ -168,7 +168,8 @@
       <Collapsible
         v-if="
           flavoursData.engage &&
-            (fileData.engageresource || fileData.engageworkspace)
+            (fileData.engageresource || fileData.engageworkspace) &&
+            !selectedTenantId
         "
         :label="$str('formimages_group_engage', 'totara_tui')"
         :initial-state="true"
@@ -287,34 +288,47 @@ export default {
   mixins: [FileMixin],
 
   props: {
-    // Array of Objects, each describing the properties for fields that are part
-    // of this Form. There is only an Object present in this Array if it came
-    // from the server as it was previously saved
+    /**
+     * Array of Objects, each describing the properties for fields that are part
+     * of this Form. There is only an Object present in this Array if it came
+     * from the server as it was previously saved
+     */
     savedFormFieldData: {
       type: Array,
       default: function() {
         return [];
       },
     },
-    // Object with keys present for each 'Flavour' of Totara possible on the
-    // site, each key value is a Boolean representing whether that Flavour is
-    // currently enabled. We use this to determine whether to show various
-    // settings related to a given Flavour
+    /**
+     * Object with keys present for each 'Flavour' of Totara possible on the
+     * site, each key value is a Boolean representing whether that Flavour is
+     * currently enabled. We use this to determine whether to show various
+     * settings related to a given Flavour
+     */
     flavoursData: {
       type: Object,
       default: function() {
         return {};
       },
     },
-    // Saving state, controlled by parent component GraphQl mutation handling
+    /**
+     * Saving state, controlled by parent component GraphQl mutation handling
+     */
     isSaving: {
       type: Boolean,
       default: function() {
         return false;
       },
     },
-    // Context ID.
+    /**
+     * Context ID.
+     */
     contextId: [Number, String],
+
+    /**
+     * Tenant ID or null if global/multi-tenancy not enabled.
+     */
+    selectedTenantId: Number,
   },
 
   data() {

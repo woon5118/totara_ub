@@ -105,4 +105,21 @@ final class helper {
         return \context_system::instance();
     }
 
+    /**
+     * Discover whether there is a pre-login tenant id that should be used for theming purposes.
+     *
+     * @return int
+     */
+    public static function get_prelogin_tenantid(): int {
+        global $CFG, $SESSION;
+        if (!empty($CFG->tenantsenabled) && !empty($CFG->allowprelogintenanttheme)) {
+            if (!isloggedin() || isguestuser()) {
+                if (!empty($SESSION->themetenantid) && !empty($SESSION->themetenantidnumber)) {
+                    return $SESSION->themetenantid;
+                }
+            }
+        }
+        return 0;
+    }
+
 }

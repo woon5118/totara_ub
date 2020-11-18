@@ -21,6 +21,8 @@
  * @package totara_tenant
  */
 
+$string['allowprelogintenanttheme'] = 'Enable pre-login tenant themes';
+$string['allowprelogintenanttheme_desc'] = 'If enabled then "?tenanttheme=tenantidentifier" can be added to any URL to specify tenant theming should be applied before user logs in. Current tenant theme is be also retained after tenant user logs out.';
 $string['cannotdisable'] = 'All tenants must be deleted before multitenancy can be disabled.';
 $string['categoryname'] = 'Tenant category name';
 $string['cohortname'] = 'Tenant participants audience name';

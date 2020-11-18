@@ -92,7 +92,6 @@
               />
             </Tab>
             <Tab
-              v-if="!selectedTenantId"
               :id="'themesettings-tab-2'"
               :name="$str('tabimages', 'totara_tui')"
               :always-render="true"
@@ -104,6 +103,7 @@
                 :file-form-field-data="embeddedFormData.fileData"
                 :is-saving="isSaving"
                 :context-id="embeddedFormData.contextId"
+                :selected-tenant-id="selectedTenantId"
                 @submit="submit"
               />
             </Tab>

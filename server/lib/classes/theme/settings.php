@@ -261,7 +261,8 @@ final class settings {
 
             // Make copy of customizable files not yet customized for the tenant
             foreach ($instances as $instance_key => $instance) {
-                if ($this->is_tenant_customizable_category($instance->get_ui_category())) {
+                if ($this->is_tenant_customizable_category($instance->get_ui_category())
+                    && $this->is_tenant_customizable_image($instance->get_area())) {
                     $instance->copy_site_file_to_tenant();
                 }
             }
@@ -498,6 +499,14 @@ final class settings {
      * @return bool
      */
     private function is_tenant_customizable_category(string $name): bool {
-        return in_array($name, ['brand', 'colours', 'tenant']);
+        return in_array($name, ['brand', 'colours', 'images', 'tenant']);
+    }
+
+    /**
+     * @param string $area
+     * @return bool
+     */
+    private function is_tenant_customizable_image(string $area): bool {
+        return in_array($area, ['logo', 'favicon', 'loginimage']);
     }
 }

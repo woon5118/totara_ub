@@ -1107,6 +1107,52 @@ class core_theme_settings_testcase extends advanced_testcase {
         return reset($rows);
     }
 
+    public function test_helper_get_prelogin_tenantid() {
+        global $SESSION;
+
+        $generator = $this->getDataGenerator();
+        $user1 = $generator->create_user();
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        // Default - unconfigured not set
+        self::assertEquals(0, helper::get_prelogin_tenantid());
+
+        // Configured and set
+        set_config('allowprelogintenanttheme', '1');
+        $SESSION->themetenantid = $tenant2->id;
+        $SESSION->themetenantidnumber = $tenant2->idnumber;
+        self::assertEquals($tenant2->id, helper::get_prelogin_tenantid());
+
+        // Configured not set
+        set_config('allowprelogintenanttheme', '1');
+        unset($SESSION->themetenantid);
+        unset($SESSION->themetenantidnumber);
+        self::assertEquals(0, helper::get_prelogin_tenantid());
+
+        // Unconfigured and set
+        set_config('allowprelogintenanttheme', '0');
+        $SESSION->themetenantid = $tenant2->id;
+        $SESSION->themetenantidnumber = $tenant2->idnumber;
+        self::assertEquals(0, helper::get_prelogin_tenantid());
+
+        // Configured and set guest user
+        set_config('allowprelogintenanttheme', '1');
+        $this->setGuestUser();
+        $SESSION->themetenantid = $tenant2->id;
+        $SESSION->themetenantidnumber = $tenant2->idnumber;
+        self::assertEquals($tenant2->id, helper::get_prelogin_tenantid());
+
+        // Configured and set authenticated user
+        set_config('allowprelogintenanttheme', '1');
+        $this->setUser($user1->id);
+        $SESSION->themetenantid = $tenant2->id;
+        $SESSION->themetenantidnumber = $tenant2->idnumber;
+        self::assertEquals(0, helper::get_prelogin_tenantid());
+    }
+
     private function skip_if_build_not_present() {
         if (!file_exists(bundle::get_vendors_file())) {
             $this->markTestSkipped('Tui build files must exist for this test to complete.');

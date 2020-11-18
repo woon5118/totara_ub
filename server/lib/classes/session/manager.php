@@ -667,7 +667,7 @@ class manager {
      * @return void
      */
     public static function terminate_current() {
-        global $DB;
+        global $DB, $CFG;
 
         if (!self::$sessionactive) {
             self::init_empty_session();
@@ -680,6 +680,8 @@ class manager {
         } catch (\Exception $ignored) {
             // Probably install/upgrade - ignore this problem.
         }
+
+        $prevtenant = $GLOBALS['USER']->tenantid ?? 0;
 
         \totara_core\persistent_login::kill(session_id());
 
@@ -696,6 +698,18 @@ class manager {
         $DB->delete_records('sessions', array('sid'=>$sid));
         self::init_empty_session();
         self::add_session_record($_SESSION['USER']->id); // Do not use $USER here because it may not be set up yet.
+
+        // Carry over tenant theme if enabled.
+        if (!empty($CFG->tenantsenabled) && !empty($CFG->allowprelogintenanttheme)) {
+            if ($prevtenant) {
+                $themedtenant = $DB->get_record('tenant', ['id' => $prevtenant]);
+                if ($themedtenant) {
+                    $GLOBALS['SESSION']->themetenantid = $themedtenant->id;
+                    $GLOBALS['SESSION']->themetenantidnumber = $themedtenant->idnumber;
+                }
+            }
+        }
+
         session_write_close();
         self::$sessionactive = false;
 

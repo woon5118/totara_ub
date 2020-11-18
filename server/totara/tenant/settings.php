@@ -30,7 +30,15 @@ $ADMIN->add('root', new admin_category('tenants', new lang_string('tenants', 'to
 $ADMIN->add('tenants', new admin_externalpage('tenantsmanage', get_string('tenantsmanage', 'totara_tenant'),
     $CFG->wwwroot . '/totara/tenant/index.php', 'totara/tenant:view', $tenantsdisabled));
 
+$temp = new admin_settingpage('tenantsettings', new lang_string('settings', 'totara_tenant'), 'totara/core:appearance', $tenantsdisabled);
+$ADMIN->add('tenants', $temp);
+
 if ($ADMIN->fulltree) {
+    $setting = new admin_setting_configcheckbox('allowprelogintenanttheme',
+        new lang_string('allowprelogintenanttheme', 'totara_tenant'),
+        new lang_string('allowprelogintenanttheme_desc', 'totara_tenant'), 1);
+    $temp->add($setting);
+
     $temp = $ADMIN->locate('experimentalsettings');
     if ($temp) {
         $setting = new admin_setting_configcheckbox('tenantsisolated',

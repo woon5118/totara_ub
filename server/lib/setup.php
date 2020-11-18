@@ -552,6 +552,22 @@ if (!empty($CFG->allowthemechangeonurl) and !empty($_GET['theme'])) {
     }
 }
 unset($urlthemename);
+// Pre-login tenant themes.
+if (!empty($CFG->tenantsenabled) && !empty($CFG->allowprelogintenanttheme)) {
+    if (!isloggedin() || isguestuser()) {
+        if (isset($_GET['tenanttheme'])) {
+            $themedtenant = $DB->get_record('tenant', ['idnumber' => clean_param($_GET['tenanttheme'], PARAM_RAW)]);
+            if ($themedtenant) {
+                $SESSION->themetenantid = $themedtenant->id;
+                $SESSION->themetenantidnumber = $themedtenant->idnumber;
+            } else {
+                unset($SESSION->themetenantid);
+                unset($SESSION->themetenantidnumber);
+            }
+            unset($themedtenant);
+        }
+    }
+}
 
 // Ensure a valid theme is set.
 if (!isset($CFG->theme)) {

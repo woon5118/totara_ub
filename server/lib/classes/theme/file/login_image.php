@@ -141,20 +141,12 @@ class login_image extends theme_file {
      * @return string
      */
     public function get_alt_text(): string {
-        $settings = new settings($this->theme_config, 0);
+        $settings = new settings($this->theme_config, $this->tenant_id);
         $property = $settings->get_property('images', 'formimages_field_loginalttext');
         if (!empty($property)) {
             return $property['value'];
         }
         return get_string('totaralogin', 'totara_core');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function get_default_context(?int $tenant_id = null): ?context {
-        // This item is only configurable on the system level at the moment
-        return \context_system::instance();
     }
 
 }

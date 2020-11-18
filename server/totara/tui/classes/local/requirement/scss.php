@@ -71,12 +71,15 @@ final class scss extends requirement {
      * @return moodle_url
      */
     private function make_tui_scss_url(string $component, string $theme): moodle_url {
-        global $CFG, $USER;
+        global $CFG, $USER, $SESSION;
 
         $rev = bundle::get_css_rev();
         $suffix = bundle::get_css_suffix_for_url();
         $direction = right_to_left() ? 'rtl' : 'ltr';
         $tenant = (!isloggedin() || empty($USER->tenantid)) ? 0 : $USER->tenantid;
+        if ((!isloggedin() || isguestuser()) && !empty($SESSION->themetenantid)) {
+            $tenant = $SESSION->themetenantid;
+        }
         $tenant = ($tenant === 0) ? 'notenant' : 'tenant_' . $tenant;
 
         $arguments = [

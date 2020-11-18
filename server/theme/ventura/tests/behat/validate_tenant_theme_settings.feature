@@ -43,7 +43,7 @@ Feature: Theme settings basic validations for tenants
     When I click on the "Custom tenant branding" tui toggle button
     Then "Brand" "link" should exist in the ".tui-tabs__tabs" "css_element"
     And "Colours" "link" should exist in the ".tui-tabs__tabs" "css_element"
-    And "Images" "link" should not exist in the ".tui-tabs__tabs" "css_element"
+    And "Images" "link" should exist in the ".tui-tabs__tabs" "css_element"
     And "Custom" "link" should not exist in the ".tui-tabs__tabs" "css_element"
     And I should see "Logo" in the ".tui-tabContent" "css_element"
     And the URL for image nested in ".tui-tabs .tui-form .tui-formRow:nth-child(1)" should match "/theme\/image.php\/ventura\/totara_core\/[0-9]+\/logo/"
@@ -57,6 +57,13 @@ Feature: Theme settings basic validations for tenants
     And the field "Header background colour" matches value "#ffffff"
     And the field "Header text colour" matches value "#262626"
     And the field "Page text colour" matches value "#262626"
+
+    When I click on "Images" "link" in the ".tui-tabs__tabs" "css_element"
+    Then the field "Display login page image" matches value "1"
+    And the field "Login alternative text" matches value "Totara Login"
+    And the URL for image nested in "#tabpanel-uid-6 .tui-collapsible:nth-child(1) .tui-formRow:nth-child(2)" should match "/theme\/image.php\/ventura\/totara_core\/[0-9]+\/default_login/"
+    And I should not see "Learn" in the ".tui-collapsible__header" "css_element"
+    And I should not see "Engage" in the ".tui-collapsible__header" "css_element"
 
   Scenario: Edit tenant settings
     When I click on "Edit settings for First Tenant" "link"

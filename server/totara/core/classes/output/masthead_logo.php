@@ -58,7 +58,12 @@ class masthead_logo implements \renderable, \templatable {
         }
 
         $logo = new logo_image();
-        $logo->set_tenant_id($USER->tenantid ?? 0);
+        $logotenantid = $USER->tenantid ?? 0;
+        // If not logged in, there may still be a tenant theme in play...
+        if (!$logotenantid && (!isloggedin() || isguestuser())) {
+            $logotenantid = \core\theme\helper::get_prelogin_tenantid();
+        }
+        $logo->set_tenant_id($logotenantid);
         $logo_url = $logo->get_current_url();
 
         $favicon = new favicon_image();

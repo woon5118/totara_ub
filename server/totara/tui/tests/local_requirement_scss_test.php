@@ -54,7 +54,7 @@ class totara_tui_requirement_local_scss_testcase extends advanced_testcase {
     }
 
     public function test_get_url() {
-        global $CFG;
+        global $CFG, $SESSION, $USER;
         $requirement = new scss('totara_tui');
         $theme = 'ventura';
         $direction = get_string('thisdirection', 'langconfig');
@@ -76,6 +76,59 @@ class totara_tui_requirement_local_scss_testcase extends advanced_testcase {
 
         $CFG->slasharguments = true;
 
+        $url = new \moodle_url('/totara/tui/styles.php');
+        $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui/notenant');
+        $expected = $url->out(false);
+        $actual = $requirement->get_url($options)->out(false);
+        self::assertSame($expected, $actual);
+
+        // Test multitentanancy CSS URLs
+
+        // Not logged in, session theme
+        $id = 5;
+        $SESSION->themetenantid = $id;
+        $url = new \moodle_url('/totara/tui/styles.php');
+        $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui/tenant_' . $id);
+        $expected = $url->out(false);
+        $actual = $requirement->get_url($options)->out(false);
+        self::assertSame($expected, $actual);
+
+        // Guest user, with tenant id, session theme
+        $USER->id = 1;
+        $USER->tenantid = 6;
+        $url = new \moodle_url('/totara/tui/styles.php');
+        $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui/tenant_' . $SESSION->themetenantid);
+        $expected = $url->out(false);
+        $actual = $requirement->get_url($options)->out(false);
+        self::assertSame($expected, $actual);
+
+        // Authenticated user, with tenant, session theme
+        $USER->id = 2;
+        $USER->tenantid = 6;
+        $url = new \moodle_url('/totara/tui/styles.php');
+        $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui/tenant_' . $USER->tenantid);
+        $expected = $url->out(false);
+        $actual = $requirement->get_url($options)->out(false);
+        self::assertSame($expected, $actual);
+
+        // Authenticated user, with tenant, no session theme
+        unset($SESSION->themetenantid);
+        $url = new \moodle_url('/totara/tui/styles.php');
+        $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui/tenant_' . $USER->tenantid);
+        $expected = $url->out(false);
+        $actual = $requirement->get_url($options)->out(false);
+        self::assertSame($expected, $actual);
+
+        // Authenticated user, no tenant, no session theme
+        unset($USER->tenantid);
+        $url = new \moodle_url('/totara/tui/styles.php');
+        $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui/notenant');
+        $expected = $url->out(false);
+        $actual = $requirement->get_url($options)->out(false);
+        self::assertSame($expected, $actual);
+
+        // Authenticated user, no tenant, session theme
+        $SESSION->themetenantid = $id;
         $url = new \moodle_url('/totara/tui/styles.php');
         $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui/notenant');
         $expected = $url->out(false);

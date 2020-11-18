@@ -333,8 +333,8 @@ function totara_core_pluginfile($course, $cm, $context, $filearea, $args, $force
     }
 
     if (in_array($filearea, $theme_file_areas)) {
-        // If it's not defined on the system level it's not public
-        if ($context->contextlevel !== CONTEXT_SYSTEM) {
+        // If it's not defined on the system or tenant level it's not public
+        if ($context->contextlevel !== CONTEXT_SYSTEM && $context->contextlevel !== CONTEXT_TENANT) {
             require_login();
 
             if ($context->is_user_access_prevented()) {
