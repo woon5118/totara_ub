@@ -905,6 +905,9 @@ class rb_source_competency_assignment_users extends rb_base_source {
     }
 
     public function rb_filter_competency_frameworks() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
+
         $comp = new competency();
         $records = $comp->get_frameworks();
         $frameworks = [];
