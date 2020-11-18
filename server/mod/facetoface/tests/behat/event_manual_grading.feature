@@ -152,15 +152,9 @@ Feature: Event manual grading
     And I should not see "Six Sechs" in the "#user-grades" "css_element"
 
   Scenario: Take attendance and manually fill invalid event grades
-    Given I navigate to "Language packs" node in "Site administration > Localisation"
-    And I set the field "Available language packs" to "de"
-    And I press "Install selected language pack(s)"
-
-    And I navigate to "Manage filters" node in "Site administration > Plugins > Filters"
-    And I set the field with xpath "//table[@id='filterssetting']//form[@id='activemultilang']//select[@name='newstate']" to "1"
-    And I set the field with xpath "//table[@id='filterssetting']//form[@id='applytomultilang']//select[@name='stringstoo']" to "1"
-
-    And I follow "Deutsch" in the user menu
+    Given the following "language customisation" exist in "tool_customlang" plugin:
+      | component       | id     | string |
+      | core_langconfig | decsep | ● |
 
     And I am on "seminar 1" seminar homepage
     And I click on "Take event attendance" "link"
@@ -170,18 +164,17 @@ Feature: Event manual grading
     And I set the field "Three Toru's event grade" to "999"
     And I set the field "Four Wha's event grade" to "五十六"
     And I set the field "Five Cinq's event grade" to "２４"
-    When I click on "Teilnahme speichern" "button"
+    When I click on "Save attendance" "button"
 
     And I should see "Event grade value \"forty-two\" has to be between 0 and 100" in the ".alert-danger" "css_element"
     And I should see "Event grade value \"-1\" has to be between 0 and 100" in the ".alert-danger" "css_element"
     And I should see "Event grade value \"999\" has to be between 0 and 100" in the ".alert-danger" "css_element"
     And I should see "Event grade value \"五十六\" has to be between 0 and 100" in the ".alert-danger" "css_element"
     And I should see "Event grade value \"２４\" has to be between 0 and 100" in the ".alert-danger" "css_element"
-    And I click on "Schließen" "button" in the ".alert-danger" "css_element"
 
-    When I click on "Teilnahme speichern" "button"
-    Then I should see "Teilnahme erfolgreich aktualisiert" in the ".alert-success" "css_element"
-    And I click on "Schließen" "button" in the ".alert-success" "css_element"
+    When I click on "Save attendance" "button"
+    Then I should see "Successfully updated attendance" in the ".alert-success" "css_element"
+    And I click on "Close" "button" in the ".alert-success" "css_element"
 
   @_file_upload
   Scenario: Take attendance via CSV file with valid and invalid data
