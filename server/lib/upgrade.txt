@@ -16,6 +16,7 @@ information provided here is intended especially for developers.
 * core\entities\user has been moved to core\entity\user
 * core\entities\user_repository has been moved to core\entity\user_repository
 * Removed the output of parsing errors when handling invalid requests in ajax/service.php
+* Added "action" field to input type "core_theme_file_input" in GraphQL
 
 === 13.1 ===
 

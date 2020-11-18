@@ -2145,10 +2145,12 @@ class renderer_base {
      *
      * @param string $imagename the pathname of the image
      * @param string $component full plugin name (aka component) or 'theme'
+     * @param bool|null $use_override
+     *
      * @return moodle_url
      */
-    public function image_url($imagename, $component = 'moodle') {
-        return $this->page->theme->image_url($imagename, $component);
+    public function image_url($imagename, $component = 'moodle', ?bool $use_override = true) {
+        return $this->page->theme->image_url($imagename, $component, $use_override);
     }
 }
 
@@ -2277,15 +2279,17 @@ class bootstrap_renderer extends renderer_base {
      *
      * @param $imagename
      * @param string $component
+     * @param bool|null $use_override
+     *
      * @return moodle_url
      */
-    public function image_url($imagename, $component = 'moodle') {
+    public function image_url($imagename, $component = 'moodle', ?bool $use_override = true) {
         global $OUTPUT, $PAGE;
 
         // If lib/outputlib.php has been loaded, call it.
         if (!empty($PAGE) and !empty($OUTPUT)) {
             $PAGE->initialise_theme_and_output();
-            return $OUTPUT->image_url($imagename, $component);
+            return $OUTPUT->image_url($imagename, $component, $use_override);
         }
 
         throw new coding_exception('Attempt to start output before enough information is known to initialise the theme.');

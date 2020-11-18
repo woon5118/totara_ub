@@ -55,9 +55,10 @@ interface file_type {
      * @param string $component
      * @param string $area
      * @param int $item_id
+     * @param bool $use_override
      *
      * @return moodle_url
      */
-    public function create_url(string $theme, string $component, string $area, int $item_id): moodle_url;
+    public function create_url(string $theme, string $component, string $area, int $item_id, bool $use_override): moodle_url;
 
 }

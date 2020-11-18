@@ -37,5 +37,6 @@ mutation core_update_theme_settings(
         url
       }
     }
+    context_id
   }
 }

@@ -254,11 +254,40 @@ final class settings {
         foreach ($files as $file) {
             foreach ($instances as $instance) {
                 if ($instance->get_ui_key() === $file['ui_key']) {
-                    $instance->save_files($file['draft_id']);
+                    if (empty($file['action']) || $file['action'] === 'SAVE') {
+                        // If draft ID is set we need to save it.
+                        $instance->save_files($file['draft_id']);
+                    } else if (!empty($file['action']) && $file['action'] === 'RESET') {
+                        // If draft ID is not set and current URL is empty we need to delete the
+                        // current stored file and restore the theme file to its default.
+                        $instance->delete();
+                    }
+
                     continue 2;
                 }
             }
         }
+    }
+
+    /**
+     * Delete the current stored file for a specific theme file so that it defaults
+     * back to the default setting or site setting if removed for a tenant.
+     *
+     * @param array $file
+     *
+     * @return theme_file|null
+     */
+    public function delete_file(array $file): ?theme_file {
+        $instances = $this->get_file_instances();
+
+        foreach ($instances as $instance) {
+            if ($instance->get_ui_key() === $file['ui_key']) {
+                $instance->delete();
+                return $instance;
+            }
+        }
+
+        return null;
     }
 
     /**

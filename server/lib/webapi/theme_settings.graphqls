@@ -87,11 +87,26 @@ input core_theme_category_input {
 }
 
 """
+Available actions to take on files.
+"""
+enum core_theme_file_input_action {
+  """
+  Save current file.
+  """
+  SAVE
+  """
+  Reset to default file.
+  """
+  RESET
+}
+
+"""
 File input type.
 """
 input core_theme_file_input {
   ui_key: param_alphanumext!
   draft_id: Int!
+  action: core_theme_file_input_action!
 }
 
 extend type Mutation {

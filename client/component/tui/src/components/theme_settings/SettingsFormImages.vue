@@ -47,6 +47,7 @@
             :is-stacked="true"
           >
             <ImageUploadSetting
+              :key="key"
               :metadata="fileData.sitelogin"
               :aria-label-extension="
                 $str(
@@ -57,6 +58,9 @@
               "
               :aria-describedby="$id('formimages-login-details')"
               :context-id="contextId"
+              :show-delete="showDelete(fileData.sitelogin)"
+              @update="saveImage"
+              @delete="resetImage"
             />
             <FormRowDetails :id="$id('formimages-login-details')">
               {{ $str('formimages_details_login', 'totara_tui') }}
@@ -89,6 +93,7 @@
             :is-stacked="true"
           >
             <ImageUploadSetting
+              :key="key"
               :metadata="fileData.learncourse"
               :aria-label-extension="
                 $str(
@@ -99,6 +104,9 @@
               "
               :aria-describedby="$id('formimages-course-details')"
               :context-id="contextId"
+              :show-delete="showDelete(fileData.learncourse)"
+              @update="saveImage"
+              @delete="resetImage"
             />
             <FormRowDetails :id="$id('formimages-course-details')">
               {{ $str('formimages_details_course', 'totara_tui') }}
@@ -110,6 +118,7 @@
             :is-stacked="true"
           >
             <ImageUploadSetting
+              :key="key"
               :metadata="fileData.learnprogram"
               :aria-label-extension="
                 $str(
@@ -120,6 +129,9 @@
               "
               :aria-describedby="$id('formimages-program-details')"
               :context-id="contextId"
+              :show-delete="showDelete(fileData.learnprogram)"
+              @update="saveImage"
+              @delete="resetImage"
             />
             <FormRowDetails :id="$id('formimages-program-details')">
               {{ $str('formimages_details_program', 'totara_tui') }}
@@ -131,6 +143,7 @@
             :is-stacked="true"
           >
             <ImageUploadSetting
+              :key="key"
               :metadata="fileData.learncert"
               :aria-label-extension="
                 $str(
@@ -141,6 +154,9 @@
               "
               :aria-describedby="$id('formimages-cert-details')"
               :context-id="contextId"
+              :show-delete="showDelete(fileData.learncert)"
+              @update="saveImage"
+              @delete="resetImage"
             />
             <FormRowDetails :id="$id('formimages-cert-details')">
               {{ $str('formimages_details_cert', 'totara_tui') }}
@@ -164,6 +180,7 @@
             :is-stacked="true"
           >
             <ImageUploadSetting
+              :key="key"
               :metadata="fileData.engageresource"
               :aria-label-extension="
                 $str(
@@ -174,6 +191,9 @@
               "
               :aria-describedby="$id('formimages-resource-details')"
               :context-id="contextId"
+              :show-delete="showDelete(fileData.engageresource)"
+              @update="saveImage"
+              @delete="resetImage"
             />
             <FormRowDetails :id="$id('formimages-resource-details')">
               {{ $str('formimages_details_resource', 'totara_tui') }}
@@ -185,6 +205,7 @@
             :is-stacked="true"
           >
             <ImageUploadSetting
+              :key="key"
               :metadata="fileData.engageworkspace"
               :aria-label-extension="
                 $str(
@@ -195,6 +216,9 @@
               "
               :aria-describedby="$id('formimages-workspace-details')"
               :context-id="contextId"
+              :show-delete="showDelete(fileData.engageworkspace)"
+              @update="saveImage"
+              @delete="resetImage"
             />
             <FormRowDetails :id="$id('formimages-workspace-details')">
               {{ $str('formimages_details_workspace', 'totara_tui') }}
@@ -242,6 +266,9 @@ import FormRowStack from 'tui/components/form/FormRowStack';
 import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 
+// Mixins
+import FileMixin from 'tui/mixins/settings_form_file_mixin';
+
 export default {
   components: {
     Collapsible,
@@ -257,19 +284,13 @@ export default {
     ButtonGroup,
   },
 
+  mixins: [FileMixin],
+
   props: {
     // Array of Objects, each describing the properties for fields that are part
     // of this Form. There is only an Object present in this Array if it came
     // from the server as it was previously saved
     savedFormFieldData: {
-      type: Array,
-      default: function() {
-        return [];
-      },
-    },
-    // Array of Objects, each describing the properties required to send back
-    // file data for storage
-    fileFormFieldData: {
       type: Array,
       default: function() {
         return [];
@@ -339,15 +360,6 @@ export default {
     this.initialValues = this.theme_settings.getResolvedInitialValues(
       mergedFormData
     );
-
-    // handle fileuploader setup
-    for (let i = 0; i < this.fileFormFieldData.length; i++) {
-      let fileData = this.fileFormFieldData[i];
-      if (typeof this.fileData[fileData.ui_key] !== 'undefined') {
-        this.fileData[fileData.ui_key] = fileData;
-      }
-    }
-
     this.initialValuesSet = true;
   },
 

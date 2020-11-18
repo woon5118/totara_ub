@@ -31,10 +31,14 @@
         :is-stacked="true"
       >
         <ImageUploadSetting
+          :key="key"
           :metadata="fileData.sitelogo"
           :aria-describedby="$id('formbrand-logo-details')"
           :aria-label-extension="$str('formbrand_label_logo', 'totara_tui')"
           :context-id="contextId"
+          :show-delete="showDelete(fileData.sitelogo)"
+          @update="saveImage"
+          @delete="resetImage"
         />
         <FormRowDetails :id="$id('formbrand-logo-details')">
           {{ $str('formbrand_details_logo', 'totara_tui') }}
@@ -60,10 +64,14 @@
         :is-stacked="true"
       >
         <ImageUploadSetting
+          :key="key"
           :metadata="fileData.sitefavicon"
           :aria-describedby="$id('formbrand-favicon-details')"
           :aria-label-extension="$str('formbrand_label_favicon', 'totara_tui')"
           :context-id="contextId"
+          :show-delete="showDelete(fileData.sitefavicon)"
+          @update="saveImage"
+          @delete="resetImage"
         />
         <FormRowDetails :id="$id('formbrand-favicon-details')">
           {{ $str('formbrand_details_favicon', 'totara_tui') }}
@@ -106,6 +114,9 @@ import FormRowDetails from 'tui/components/form/FormRowDetails';
 import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 
+// Mixins
+import FileMixin from 'tui/mixins/settings_form_file_mixin';
+
 export default {
   components: {
     Uniform,
@@ -118,19 +129,13 @@ export default {
     ButtonGroup,
   },
 
+  mixins: [FileMixin],
+
   props: {
     // Array of Objects, each describing the properties for fields that are part
     // of this Form. There is only an Object present in this Array if it came
     // from the server as it was previously saved
     savedFormFieldData: {
-      type: Array,
-      default: function() {
-        return [];
-      },
-    },
-    // Array of Objects, each describing the properties for specifically file
-    // upload fields that are part of this Form.
-    fileFormFieldData: {
       type: Array,
       default: function() {
         return [];
@@ -182,17 +187,6 @@ export default {
     this.initialValues = this.theme_settings.getResolvedInitialValues(
       mergedFormData
     );
-
-    // handle fileuploader setup independently of Uniform and initialValues
-    // because file uploading doesn't really work in a way that Uniform can
-    // fully support
-    for (let i = 0; i < this.fileFormFieldData.length; i++) {
-      let fileData = this.fileFormFieldData[i];
-      if (typeof this.fileData[fileData.ui_key] !== 'undefined') {
-        this.fileData[fileData.ui_key] = fileData;
-      }
-    }
-
     this.initialValuesSet = true;
   },
 
@@ -221,6 +215,7 @@ export default {
       this.resultForm = currentValues;
 
       let dataToMutate = this.formatDataForMutation(currentValues);
+
       this.$emit('submit', dataToMutate);
     },
 

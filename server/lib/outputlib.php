@@ -1838,9 +1838,11 @@ class theme_config {
      *
      * @param string $imagename the name of the icon.
      * @param string $component specification of one plugin like in get_string()
+     * @param bool|null $use_override If true, check for any theme file override.
+     *
      * @return moodle_url
      */
-    public function image_url($imagename, $component) {
+    public function image_url($imagename, $component, ?bool $use_override = true) {
         global $CFG;
 
         $params = array('theme'=>$this->name);
@@ -1851,9 +1853,11 @@ class theme_config {
         }
 
         // If this is a theme file then see if an override exists.
-        $url = $this->get_overridden_image_url($params['component'], $imagename);
-        if (!empty($url)) {
-            return $url;
+        if ($use_override) {
+            $url = $this->get_overridden_image_url($params['component'], $imagename);
+            if (!empty($url)) {
+                return $url;
+            }
         }
 
         $svg = $this->use_svg_icons();

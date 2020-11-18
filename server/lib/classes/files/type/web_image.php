@@ -51,9 +51,9 @@ class web_image implements file_type {
     /**
      * @inheritDoc
      */
-    public function create_url(string $theme, string $component, string $filename, int $item_id): moodle_url {
+    public function create_url(string $theme, string $component, string $filename, int $item_id, bool $use_override): moodle_url {
         global $OUTPUT;
-        return $OUTPUT->image_url($filename, $component);
+        return $OUTPUT->image_url($filename, $component, $use_override);
     }
 
 }

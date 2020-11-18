@@ -277,7 +277,8 @@ abstract class theme_file {
                 $this->theme_config->name,
                 $parts[0],
                 $parts[1],
-                theme_get_revision()
+                theme_get_revision(),
+                false
             );
         }
         return null;
@@ -393,7 +394,8 @@ abstract class theme_file {
     }
 
     /**
-     * Delete stored file and clean up configuration.
+     * Delete the current stored file associated with this theme file
+     * and clean up configuration.
      */
     public function delete(): void {
         if ($current_file = $this->get_current_file()) {

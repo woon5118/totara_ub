@@ -338,18 +338,20 @@ export default {
       }
 
       // merge all theme CSS variable data in the theme inheritance chain
-      let mergedDefaultThemeVariableData = this.theme_settings.mergeCSSVariableData(
-        fetchData
-      );
+      if (fetchData) {
+        let mergedDefaultThemeVariableData = this.theme_settings.mergeCSSVariableData(
+          fetchData
+        );
 
-      let mergedProcessedCSSVariableData = this.theme_settings.processCSSVariableData(
-        mergedDefaultThemeVariableData
-      );
+        let mergedProcessedCSSVariableData = this.theme_settings.processCSSVariableData(
+          mergedDefaultThemeVariableData
+        );
 
-      // finally set the merged and value-resolved CSS Variable data, ready for
-      // passing as a prop to Forms that need it
-      this.embeddedFormData.mergedDefaultCSSVariableData = mergedDefaultThemeVariableData;
-      this.embeddedFormData.mergedProcessedCSSVariableData = mergedProcessedCSSVariableData;
+        // finally set the merged and value-resolved CSS Variable data, ready for
+        // passing as a prop to Forms that need it
+        this.embeddedFormData.mergedDefaultCSSVariableData = mergedDefaultThemeVariableData;
+        this.embeddedFormData.mergedProcessedCSSVariableData = mergedProcessedCSSVariableData;
+      }
 
       // we're ready to go
       this.dataIsReady = true;
@@ -431,6 +433,7 @@ export default {
           return {
             ui_key: file.ui_key,
             draft_id: file.file_area.draft_id,
+            action: file.action || 'SAVE',
           };
         });
       }
@@ -445,6 +448,22 @@ export default {
             tenant_id: this.selectedTenantId,
             categories: categoryData,
             files: fileData,
+          },
+          update: (cache, { data }) => {
+            cache.writeQuery({
+              query: tuiQueryThemeSettings,
+              variables: {
+                theme: this.theme,
+                tenant_id: this.selectedTenantId,
+              },
+              data: {
+                core_get_theme_settings: data.core_update_theme_settings,
+              },
+            });
+            this.transformQueryAndFetchData(
+              data.core_update_theme_settings,
+              null
+            );
           },
         });
 
@@ -463,6 +482,7 @@ export default {
       this.isSaving = false;
     },
   },
+
   apollo: {
     core_get_theme_settings: {
       query: tuiQueryThemeSettings,
