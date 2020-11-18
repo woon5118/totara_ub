@@ -194,6 +194,7 @@
                         v-else
                         :is-draft="isDraft"
                         :element="sectionElement.element"
+                        :aria-labelledby="labelId"
                         :path="['sectionElements', sectionElement.id]"
                         :error="errors && errors[sectionElement.id]"
                         :aria-labelledby="labelId"

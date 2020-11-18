@@ -17,24 +17,28 @@
 -->
 <template>
   <FormScope :path="path" :process="process">
-    <FormDateSelector
-      name="response"
-      :years-midrange="midrangeYear"
-      :years-before-midrange="midrangeYearBefore"
-      :years-after-midrange="midrangeYearAfter"
-      :validations="validations"
-    />
+    <FieldGroup :aria-labelledby="ariaLabelledby">
+      <FormDateSelector
+        name="response"
+        :years-midrange="midrangeYear"
+        :years-before-midrange="midrangeYearBefore"
+        :years-after-midrange="midrangeYearAfter"
+        :validations="validations"
+      />
+    </FieldGroup>
   </FormScope>
 </template>
 
 <script>
 import { FormDateSelector, FormScope } from 'tui/components/uniform';
+import FieldGroup from 'tui/components/form/FieldGroup';
 import { v as validation } from 'tui/validation';
 
 export default {
   components: {
     FormScope,
     FormDateSelector,
+    FieldGroup,
   },
 
   props: {
@@ -42,6 +46,7 @@ export default {
     element: Object,
     isDraft: Boolean,
     error: String,
+    ariaLabelledby: String,
   },
   data() {
     return {
