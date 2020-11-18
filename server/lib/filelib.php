@@ -1543,6 +1543,7 @@ function totara_tweak_file_sending(&$mimetype, &$forcedownload, array &$options,
             'audio/mp3',
             'audio/ogg',
             'audio/wav',
+            'application/pdf'
             // NOTE: do not add SVG here yet, there is a high risk of XSS when accessing it directly!
         ];
 
