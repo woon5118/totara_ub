@@ -2043,8 +2043,11 @@ class totara_cohort_course_cohorts
         $row = array();
         $delete = '';
         if (!$readonly) {
-            $delete = html_writer::link('#', $OUTPUT->pix_icon('t/delete', get_string('delete')),
-                      array('title' => get_string('delete'), 'class'=>'coursecohortdeletelink'));
+            $delete = html_writer::link(
+                '#',
+                $OUTPUT->pix_icon('t/delete', get_string('delete')),
+                array('title' => get_string('delete'), 'class' => 'coursecohortdeletelink', 'role' => 'button')
+            );
         }
         $row[] = html_writer::start_tag('div', array('id' => 'cohort-item-'.$item->id, 'class' => 'item')) .
                  format_string($item->fullname) . $delete . html_writer::end_tag('div');
@@ -2097,7 +2100,7 @@ class totara_cohort_course_cohorts
     function display($return = false, $type = 'enrolled') {
         $html = '<div id="course-cohort-assignments">
             <div id="assignment_categories">
-            <fieldset class="assignment_category cohorts">';
+            <div class="assignment_category cohorts">';
 
         $table = new html_table();
         $table->attributes = array('class' => 'generaltable');
@@ -2109,7 +2112,7 @@ class totara_cohort_course_cohorts
         }
 
         $html .= html_writer::table($table);
-        $html .= '</fieldset></div></div>';
+        $html .= '</div></div></div>';
 
         if ($return) {
             return $html;
