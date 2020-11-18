@@ -40,7 +40,10 @@ final class course implements query_resolver, has_middleware {
         $course = get_course($args['courseid']);
         $course->image = course_get_image($course);
 
-        $ec->set_relevant_context(context_course::instance($course->id));
+        $context = context_course::instance($course->id);
+        $ec->set_relevant_context($context);
+        // Trigger course viewed event.
+        course_view($context);
 
         return (object)$course;
     }

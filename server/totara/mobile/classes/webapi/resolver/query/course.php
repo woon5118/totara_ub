@@ -41,7 +41,10 @@ final class course implements query_resolver, has_middleware {
         $course->image = course_get_image($course);
 
         // Set execution context context.
-        $ec->set_relevant_context(context_course::instance($course->id));
+        $context = context_course::instance($course->id);
+        $ec->set_relevant_context($context);
+        // Trigger course viewed event.
+        course_view($context);
 
         // Get mobile compatibility.
         $mobile_coursecompat = false;
