@@ -18,46 +18,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package mod_perform
+ * @package performelement_static_content
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Database upgrade script
  *
  * @param integer $oldversion Current (pre-upgrade) local db version timestamp
  * @return bool
- *
  */
-defined('MOODLE_INTERNAL') || die();
-
 function xmldb_performelement_static_content_upgrade($oldversion) {
     global $DB, $CFG;
+    require_once $CFG->dirroot . '/mod/perform/element/static_content/db/upgradelib.php';
 
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2020100101) {
-        $upgrade_lib_file = $CFG->dirroot . '/lib/editor/weka/db/upgradelib.php';
-        // As we depend on the weka editor plugin being installed skip this if the lib file is not there
-        if (file_exists($upgrade_lib_file)) {
-            require_once($upgrade_lib_file);
-
-            $records = $DB->get_records('perform_element', ['plugin_name' => 'static_content']);
-            foreach ($records as $record) {
-                $data = json_decode($record->data, true);
-                if ($data === null) {
-                    // Unexpected data structure, let's skip this one
-                    continue;
-                }
-
-                $updated_weka_doc = editor_weka_fix_attachments_with_empty_url($data['wekaDoc']);
-                if ($updated_weka_doc) {
-                    $data['wekaDoc'] = $updated_weka_doc;
-                    $record->data = json_encode($data);
-
-                    $DB->update_record('perform_element', $record);
-                }
-            }
-        }
+        performelement_static_content_fix_broken_elements();
 
         // Perform savepoint reached.
         upgrade_plugin_savepoint(true, 2020100101, 'performelement', 'static_content');
