@@ -32,4 +32,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class repository_upload_generator extends testing_repository_generator {
+    protected function prepare_type_record(array $record) {
+        $record = parent::prepare_type_record($record);
+        if (!isset($record['mimetype_whitelist'])) {
+            $record['mimetype_whitelist'] = '';
+        }
+        return $record;
+    }
 }

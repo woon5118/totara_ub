@@ -35,7 +35,6 @@ require_once($CFG->dirroot . '/repository/lib.php');
  */
 
 class repository_upload extends repository {
-    private $mimetypes = array();
 
     /**
      * Print a upload form
@@ -64,6 +63,92 @@ class repository_upload extends repository {
     }
 
     /**
+     * Prepares a whitelist from the whitelist repository option and a given array of desired types.
+     *
+     * @param string[] $desired_types
+     * @return string[]
+     */
+    public function prepare_mimetype_whitelist(array $desired_types = []): array {
+        $mimetype_whitelist = [];
+
+        $config = get_config('upload', 'mimetype_whitelist');
+        if (!empty(trim($config))) {
+            $mimetype_whitelist = array_map('trim', explode("\n", $config));
+        }
+
+        if (!empty($desired_types)) {
+            if (!empty($mimetype_whitelist)) {
+                // We want to reduce the mimetype_whitelist just to those types that have been desired.
+                // If there is a desired type that is not in the mimetype whitelist then it is unusable.
+                $reduction = [];
+                foreach ($mimetype_whitelist as $mimetype) {
+                    if (in_array($mimetype, $desired_types, true)) {
+                        $reduction[] = $mimetype;
+                    }
+                }
+
+                if (empty($reduction)) {
+                    // The situation here is that there is no cross over between whitelisted mimetypes and
+                    // the desired types. They will not be able to upload any files, they will need to use another repository.
+                    $reduction[] = 'upload/notsupported';
+                }
+
+                $mimetype_whitelist = $reduction;
+            } else {
+                $mimetype_whitelist = array_map('trim', $desired_types);
+            }
+        }
+
+        $mimetype_whitelist = array_unique($mimetype_whitelist);
+        $mimetype_whitelist = array_filter($mimetype_whitelist);
+
+        return array_values($mimetype_whitelist);
+    }
+
+    /**
+     * Normalise accepted extensions to mimetypes
+     *
+     * Required because the API has a sloppy type definition that must be manipulated to make it workable.
+     *
+     * @param array|string|mixed $extensions
+     * @return string[]
+     */
+    public static function normalise_accepted_extensions_to_mimetypes($extensions) {
+        // Normalise types to a meaningful array.
+        if ($extensions === '*') {
+            $extensions = [];
+        } else if (!is_array($extensions)) {
+            $extensions = [$extensions];
+        } else if (in_array('*', $extensions)) {
+            $extensions = [];
+        }
+
+        // Remove empty records and duplicate records.
+        $extensions = array_map('trim', $extensions);
+        $extensions = array_unique($extensions);
+        $extensions = array_filter($extensions);
+
+        // This array contains extensions, normalise to mimetypes.
+        $mimetypes = array_map(
+            function ($extension) {
+                return mimeinfo('type', $extension);
+            },
+            $extensions
+        );
+
+        // Things like .jpeg and .jpg both resolve to image/jpeg, remove duplicates mimetypes.
+        $mimetypes = array_unique($mimetypes);
+
+        // Remove document/unknown, that is the default and is non-specific.
+        $unknown = array_search('document/unknown', $mimetypes);
+        if ($unknown !== false) {
+            unset($mimetypes[$unknown]);
+        }
+
+        return $mimetypes;
+    }
+
+    /**
      * Do the actual processing of the uploaded file
      * @param string $saveas_filename name to give to the file
      * @param int $maxbytes maximum file size
@@ -80,13 +165,8 @@ class repository_upload extends repository {
             $license = null, $author = '', $overwriteexisting = false, $areamaxbytes = FILE_AREA_MAX_BYTES_UNLIMITED) {
         global $USER, $CFG;
 
-        if ((is_array($types) and in_array('*', $types)) or $types == '*') {
-            $this->mimetypes = '*';
-        } else {
-            foreach ($types as $type) {
-                $this->mimetypes[] = mimeinfo('type', $type);
-            }
-        }
+        $desired_mimetypes = $this::normalise_accepted_extensions_to_mimetypes($types);
+        $mimetype_whitelist = $this->prepare_mimetype_whitelist($desired_mimetypes);
 
         if ($license == null) {
             $license = $CFG->sitedefaultlicense;
@@ -178,10 +258,10 @@ class repository_upload extends repository {
             throw new moodle_exception('upload_error_invalid_file', 'repository_upload', '', $record->filename);
         }
 
-        if ($this->mimetypes != '*') {
+        if (!empty($mimetype_whitelist)) {
             // check filetype
             $filemimetype = file_storage::mimetype($_FILES[$elname]['tmp_name'], $record->filename);
-            if (!in_array($filemimetype, $this->mimetypes)) {
+            if (!in_array($filemimetype, $mimetype_whitelist)) {
                 throw new moodle_exception('invalidfiletype', 'repository', '', get_mimetype_description(array('filename' => $_FILES[$elname]['name'])));
             }
         }
@@ -294,5 +374,85 @@ class repository_upload extends repository {
      */
     public function contains_private_data() {
         return false;
+    }
+
+    /**
+     * Return names of the general options.
+     * By default: no general option name
+     *
+     * @return array
+     */
+    public static function get_type_option_names() {
+        $options = parent::get_type_option_names();
+        $options[] = 'mimetype_whitelist';
+        return $options;
+    }
+
+    /**
+     * Extend the respository form with the inputs we require.
+     *
+     * @param MoodleQuickForm $mform
+     * @param string $classname
+     */
+    public static function type_config_form($mform, $classname = 'repository') {
+        parent::type_config_form($mform, $classname);
+        $mform->addElement('textarea', 'mimetype_whitelist', get_string('mimetype_whitelist', 'repository_upload'));
+        $mform->addHelpButton('mimetype_whitelist', 'mimetype_whitelist', 'repository_upload');
+        $mform->setType('mimetype_whitelist', PARAM_RAW);
+    }
+
+    /**
+     * Validate Admin Settings Moodle form
+     *
+     * @param MoodleQuickForm $mform Moodle form (passed by reference)
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $errors array of ("fieldname"=>errormessage) of errors
+     * @return array array of errors
+     */
+    public static function type_form_validation($mform, $data, $errors) {
+
+        $name = 'mimetype_whitelist';
+        if (!empty($errors[$name])) {
+            // There is already an error there, no need to check further.
+            return $errors;
+        }
+        if (!empty($data[$name])) {
+            $mimetype_errors = [];
+            $mimetypes = explode("\n", trim($data[$name]));
+            $count_initial = count($mimetypes);
+            $mimetypes = array_map('trim', $mimetypes);
+            $mimetypes = array_filter($mimetypes);
+            if (count($mimetypes) !== $count_initial) {
+                $mimetype_errors[] = get_string($name.'_validation_empties', 'repository_upload');
+            }
+            $mimetypes = array_unique($mimetypes);
+            if (count($mimetypes) !== $count_initial) {
+                $mimetype_errors[] = get_string($name.'_validation_duplicates', 'repository_upload');
+            }
+            foreach ($mimetypes as $mimetype) {
+                if (!self::validate_mimetype($mimetype)) {
+                    $mimetype_errors[] = get_string($name.'_validation_invalid_type', 'repository_upload', $mimetype);
+                }
+            }
+            if (!empty($mimetype_errors)) {
+                $errors[$name] = get_string(
+                    $name.'_validation_errors',
+                    'repository_upload',
+                    "\n * " . join("\n * ", $mimetype_errors)
+                );
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validates the given argument as a mimetype that appears valid.
+     * @param string $type
+     * @return bool
+     */
+    public static function validate_mimetype($type) {
+        $regex = '#^[^/]+/[^/;]+(;.*)?$#';
+        return (bool)preg_match($regex, $type);
     }
 }

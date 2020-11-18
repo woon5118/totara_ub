@@ -2407,7 +2407,7 @@ abstract class repository implements cacheable_object {
     /**
      * Edit/Create Admin Settings Moodle form
      *
-     * @param moodleform $mform Moodle form (passed by reference)
+     * @param MoodleQuickForm $mform Moodle form (passed by reference)
      * @param string $classname repository class name
      */
     public static function type_config_form($mform, $classname = 'repository') {

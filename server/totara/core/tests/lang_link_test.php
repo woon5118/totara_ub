@@ -281,6 +281,9 @@ class totara_core_lang_link_testcase extends database_driver_testcase {
             'tool_oauth2' => [
                 'issueralloweddomains_link',
             ],
+            'repository_upload' => [
+                'mimetype_whitelist_link',
+            ],
         ];
     }
 }
