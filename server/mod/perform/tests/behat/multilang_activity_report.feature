@@ -7,8 +7,10 @@ Feature: Test Performance activity support multi language
     | <span lang="de" class="multilang">German Activity</span><span lang="en" class="multilang">English Activity</span> | My Test Activity | feedback      |
 
   Scenario: I can see performance activity name in English and Germany
+    Given remote langimport tests are enabled
     Given I log in as "admin"
     Given I navigate to "Language packs" node in "Site administration > Localisation"
+    Given language pack installation succeeds
     And I set the field "Available language packs" to "de"
     And I press "Install selected language pack(s)"
 

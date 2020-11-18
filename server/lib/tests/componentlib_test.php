@@ -45,7 +45,11 @@ class core_componentlib_testcase extends advanced_testcase {
         @unlink($destpath.'/'.'test.jpg');
         @rmdir($destpath);
 
-        $this->assertSame(COMPONENT_NEEDUPDATE, $ci->need_upgrade());
+        $result = $ci->need_upgrade();
+        if ($result === COMPONENT_ERROR && $ci->errorstring == 'remotedownloaderror') {
+            $this->markTestSkipped('The testing server is not working at the moment.');
+        }
+        $this->assertSame(COMPONENT_NEEDUPDATE, $result);
 
         $status = $ci->install();
         $this->assertSame(COMPONENT_INSTALLED, $status);

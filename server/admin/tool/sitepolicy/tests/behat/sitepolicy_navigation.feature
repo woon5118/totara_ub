@@ -107,12 +107,14 @@ Feature: Sitepolicy version navigation
 
 
   Scenario: I test navigation from the versionlist page
+    Given remote langimport tests are enabled
     Given the following "multiversionpolicies" exist in "tool_sitepolicy" plugin:
       | hasdraft | numpublished | allarchived | title       | languages | langprefix | statement             | numoptions | consentstatement     | providetext | withholdtext | mandatory |
       | 1        | 0            | 0           | Draft 1     | en        |            | Draft 1 statement     | 2          | d1-Consent statement | Yes         | No           | first     |
       | 1        | 2            | 0           | All multi   | nl,en     | nl,en      | All multi statement   | 2          | am-Consent statement | Yes         | No           | first     |
     And I log in as "admin"
     And I navigate to "Language packs" node in "Site administration > Localisation"
+    Given language pack installation succeeds
     And I set the field "Available language packs" to "nl"
     And I press "Install selected language pack(s)"
     And I wait until "Language pack 'nl' was successfully installed" "text" exists

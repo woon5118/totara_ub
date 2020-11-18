@@ -10,8 +10,10 @@ Feature: Manage language packs
   # The pirate language pack is used for testing because its small to download.
 
   Scenario: Install language pack
+    Given remote langimport tests are enabled
     Given I log in as "admin"
     And I navigate to "Language packs" node in "Site administration > Localisation"
+    Given language pack installation succeeds
     When I set the field "Available language packs" to "en_ar"
     And I press "Install selected language pack(s)"
     Then I should see "Language pack 'en_ar' was successfully installed"
@@ -35,6 +37,7 @@ Feature: Manage language packs
     Given outdated langpack 'en_ar' is installed
     And I log in as "admin"
     And I navigate to "Language packs" node in "Site administration > Localisation"
+    Given language pack installation succeeds
     When I press "Update all installed language packs"
     Then I should see "Language pack 'en_ar' was successfully updated"
     And I should see "Language pack update completed"
@@ -45,6 +48,7 @@ Feature: Manage language packs
   Scenario: Try to uninstall language pack
     Given I log in as "admin"
     And I navigate to "Language packs" node in "Site administration > Localisation"
+    Given language pack installation succeeds
     And I set the field "Available language packs" to "en_ar"
     And I press "Install selected language pack(s)"
     When I set the field "Installed language packs" to "en_ar"
@@ -61,6 +65,7 @@ Feature: Manage language packs
   Scenario: Try to uninstall English language pack
     Given I log in as "admin"
     And I navigate to "Language packs" node in "Site administration > Localisation"
+    Given language pack installation succeeds
     When I set the field "Installed language packs" to "en"
     And I press "Uninstall selected language pack(s)"
     Then I should see "The English language pack cannot be uninstalled."

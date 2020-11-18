@@ -27,6 +27,7 @@
 
 require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
 
+use Behat\Mink\Exception\ExpectationException;
 use Moodle\BehatExtension\Exception\SkippedException;
 
 /**
@@ -69,7 +70,7 @@ class behat_tool_langimport extends behat_base {
         $result = $installer->run();
 
         if ($result[$langcode] !== lang_installer::RESULT_INSTALLED) {
-            throw new coding_exception("Failed to install langpack '$langcode'");
+            throw new SkippedException("Failed to install langpack '$langcode'");
         }
 
         $path = "$dir/$langcode/$langcode.md5";
@@ -78,5 +79,16 @@ class behat_tool_langimport extends behat_base {
             throw new coding_exception("Failed to find '$langcode' checksum");
         }
         file_put_contents($path, '000000');
+    }
+
+    /**
+     * @Given /^language pack installation succeeds$/
+     */
+    public function language_pack_installation_succeeds() {
+        try {
+            $this->execute('behat_general::assert_page_not_contains_text', $this->escape('Because Totara can not connect to download.totaralms.com, we are unable to do language pack installation automatically'));
+        } catch (ExpectationException $ex) {
+            throw new SkippedException('Skip the test because the language pack installation did not succeed.');
+        }
     }
 }

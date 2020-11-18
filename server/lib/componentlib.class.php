@@ -301,7 +301,7 @@ class component_installer {
 
         $zipfile= $CFG->tempdir.'/'.$this->zipfilename;
 
-        if($contents = download_file_content($source)) {
+        if($contents = self::download_file_content($source)) {
             if ($file = fopen($zipfile, 'w')) {
                 if (!fwrite($file, $contents)) {
                     fclose($file);
@@ -512,7 +512,7 @@ class component_installer {
         /// Not downloaded, let's do it now
             $availablecomponents = array();
 
-            if ($contents = download_file_content($source)) {
+            if ($contents = self::download_file_content($source)) {
             /// Split text into lines
                 $lines=preg_split('/\r?\n/',$contents);
             /// Each line will be one component
@@ -575,6 +575,26 @@ class component_installer {
      */
     function get_extra_md5_field() {
         return $this->extramd5info;
+    }
+
+    /**
+     * Wrap download_file_content() for behat
+     *
+     * @param string $url file url starting with http(s)://
+     * @return string|false the file content as a string or false if request failed
+     * @since Totara 13.2
+     */
+    public static function download_file_content(string $url) {
+        $response = \download_file_content($url, null, null, true);
+        if ($response->status === 200) {
+            return $response->results;
+        } else {
+            // Do not dump a debugging message under behat.
+            if ((!defined('BEHAT_UTIL') || !BEHAT_UTIL) && (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING)) {
+                debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
+            }
+            return false;
+        }
     }
 
 } /// End of component_installer class
@@ -715,7 +735,7 @@ class lang_installer {
         $source = DOWNLOAD_BASE . '/' . $this->version . '/languages_tgz.md5';
         $availablelangs = array();
 
-        if ($content = download_file_content($source)) {
+        if ($content = component_installer::download_file_content($source)) {
             $alllines = explode("\n", $content);
             foreach($alllines as $line) {
                 if (!empty($line)){
