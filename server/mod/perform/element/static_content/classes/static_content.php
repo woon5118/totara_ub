@@ -46,7 +46,7 @@ class static_content extends element_plugin {
     /**
      * @inheritDoc
      */
-    public function get_print_component(): string {
+    public function get_participant_print_component(): string {
         return $this->get_participant_form_component();
     }
 

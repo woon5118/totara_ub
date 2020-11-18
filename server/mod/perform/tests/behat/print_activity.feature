@@ -35,8 +35,9 @@ Feature: Print view of a single-section user activity
       | track_description | assignment_type | assignment_name |
       | track 1           | cohort          | aud1            |
     And the following "section elements" exist in "mod_perform" plugin:
-      | section_name   | element_name | title      |
-      | Single section | short_text   | Question 1 |
+      | section_name   | element_name | title               |
+      | Single section | short_text   | Short text question |
+      | Single section | long_text    | Long text question  |
     Given the following "section relationships" exist in "mod_perform" plugin:
       | section_name   | relationship | can_view | can_answer |
       | Single section | subject      | yes      | yes        |
@@ -53,25 +54,30 @@ Feature: Print view of a single-section user activity
     And I should see perform activity relationship to user "yourself"
     And I should see "Appraisal"
     And I should see "Single section activity"
-    And I should see "Question 1"
+    And I should see "Short text question"
     And I should see "Your response"
-    # Empty form field should be displayed for logged in user when no response has been given yet.
-    And ".tui-formField" "css_element" should exist in the ".tui-performElementResponse" "css_element"
+
+    # Empty print components should be displayed.
+    And ".tui-notepadLines" "css_element" should exist in the ".tui-shortTextParticipantPrint" "css_element"
+    And ".tui-notepadLines" "css_element" should exist in the ".tui-longTextParticipantPrint" "css_element"
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
     And I should not see "Appraiser response"
+
     # Add a response as the subject.
     When I navigate to the outstanding perform activities list page
     And I click on "Single section activity" "link"
     And I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
-    And I answer "short text" question "Question 1" with "David answer one"
+    And I answer "short text" question "Short text question" with "David short text answer one"
+    And I answer "long text" question "Long text question" with "David long text answer one"
     When I click on "Save as draft" "button"
     Then I should see "Draft saved" in the tui success notification toast
 
     When I click on "Cancel" "button"
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "david" is the participant
-    Then the field with xpath "//*[@name='sectionElements[1][response]']" matches value "David answer one"
+    Then I should see "David short text answer one" in the ".tui-shortTextParticipantPrint" "css_element"
+    And I should see "David long text answer one" in the ".tui-longTextParticipantPrint" "css_element"
 
     When I navigate to the outstanding perform activities list page
     And I click on "Single section activity" "link"
@@ -79,12 +85,18 @@ Feature: Print view of a single-section user activity
     And I confirm the tui confirmation modal
     And I should see "Section submitted and closed." in the tui success notification toast
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "david" is the participant
-    # No form field should be displayed any more.
-    Then ".tui-formField" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
-    # Instead response version of the question element should be shown.
-    And ".tui-participantFormResponseDisplay" "css_element" should exist in the ".tui-participantContentPrint" "css_element"
 
-    And I should see "David answer one"
+    # No print components should be displayed any more.
+    Then ".tui-shortTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+    And ".tui-longTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+
+    # Instead response version of the question element should be shown
+    # ...FormResponseDisplay for most components and ...HtmlFormResponseDisplay for long text
+    And ".tui-participantFormResponseDisplay" "css_element" should exist in the ".tui-participantContentPrint" "css_element"
+    And ".tui-participantFormHtmlResponseDisplay" "css_element" should exist in the ".tui-participantContentPrint" "css_element"
+
+    And I should see "David short text answer one"
+    And I should see "David long text answer one"
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
@@ -95,10 +107,12 @@ Feature: Print view of a single-section user activity
     And I log in as "john"
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "john" is the participant
     Then I should see perform activity relationship to user "Manager"
-    And I should not see "David answer one"
+    And I should not see "David short text answer one"
     And I should see "Your response"
-    # Empty form field should be displayed.
-    And ".tui-formField" "css_element" should exist in the ".tui-performElementResponse" "css_element"
+
+    # Empty print components should be displayed.
+    And ".tui-notepadLines" "css_element" should exist in the ".tui-shortTextParticipantPrint" "css_element"
+    And ".tui-notepadLines" "css_element" should exist in the ".tui-longTextParticipantPrint" "css_element"
     And I should not see "Appraiser Four"
 
     # Check appraiser's view (view only)
@@ -108,7 +122,8 @@ Feature: Print view of a single-section user activity
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "appraiser" is the participant
     Then I should see perform activity relationship to user "Appraiser"
     And I should not see "Your response"
-    And I should see "David answer one"
+    And I should see "David short text answer one"
+    And I should see "David long text answer one"
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
@@ -119,7 +134,7 @@ Feature: Print view of a single-section user activity
     And I navigate to the outstanding perform activities list page
     And I click on "Single section activity" "link"
     And I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
-    And I answer "short text" question "Question 1" with "John answer one"
+    And I answer "short text" question "Short text question" with "John answer one"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I should see "Section submitted and closed." in the tui success notification toast
@@ -136,8 +151,10 @@ Feature: Print view of a single-section user activity
     When I click on the "Manager (Not yet started)" tui radio
     And I click on "Continue" "button"
     Then I should see "Your response"
-    # Empty form field should be displayed for logged in user when no response has been given yet.
-    And ".tui-formField" "css_element" should exist in the ".tui-performElementResponse" "css_element"
+
+    # Empty print components should be displayed.
+    And ".tui-notepadLines" "css_element" should exist in the ".tui-shortTextParticipantPrint" "css_element"
+    And ".tui-notepadLines" "css_element" should exist in the ".tui-longTextParticipantPrint" "css_element"
     And I should not see "Subject response"
     And I should not see "Appraiser response"
 

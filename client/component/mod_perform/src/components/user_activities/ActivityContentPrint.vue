@@ -56,6 +56,7 @@
         >
           <Uniform
             v-if="sectionResponse.id in initialUniformValues"
+            input-width="full"
             :initial-values="initialUniformValues[sectionResponse.id]"
           >
             <div class="tui-participantContentPrint__sectionHeading">
@@ -105,20 +106,18 @@
                       "
                     />
                     <component
-                      :is="elementResponse.formComponent"
+                      :is="elementResponse.printComponent"
                       v-else
                       class="tui-participantContentPrint__element"
                       :element="elementResponse.element"
                       :path="['sectionElements', elementResponse.id]"
+                      :data="elementResponse.response_data"
+                      :response-lines="
+                        elementResponse.response_data_formatted_lines
+                      "
                     />
                   </template>
                 </ElementParticipantForm>
-                <component
-                  :is="elementResponse.formComponent"
-                  v-else-if="!elementResponse.is_respondable"
-                  :element="elementResponse.element"
-                  :path="['sectionElements', elementResponse.id]"
-                />
                 <OtherParticipantResponses
                   :view-only="false"
                   :section-element="elementResponse"
@@ -241,9 +240,9 @@ export default {
             return {
               id: sectionElementResponse.section_element_id,
               clientId: uniqueId(),
-              formComponent: tui.asyncComponent(
+              printComponent: tui.asyncComponent(
                 sectionElementResponse.element.element_plugin
-                  .participant_form_component
+                  .participant_print_component
               ),
               responseDisplayComponent: tui.asyncComponent(
                 sectionElementResponse.element.element_plugin

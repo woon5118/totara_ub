@@ -23,7 +23,7 @@ query mod_perform_participant_sections_for_print(
       section_element_id
       element {
         element_plugin {
-          participant_form_component
+          participant_print_component
           participant_response_component
         }
         title
