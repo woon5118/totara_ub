@@ -975,6 +975,7 @@ $string['searchprograms'] = 'Search programs';
 $string['select'] = 'Select';
 $string['selectcompetency'] = 'Select a competency...';
 $string['selectcourse'] = 'Select a course...';
+$string['select_name'] = 'Select {$a}';
 $string['sendmessagestask'] = 'Send messages related to programs';
 $string['searchprogramassignments'] = 'Search assignments';
 $string['setcompletion'] = 'Set completion';

@@ -661,11 +661,20 @@ if (!$programs) {
             $abletomoveprograms = true;
         }
 
-        $table->data[] = new html_table_row(array(
-                        new html_table_cell($programname),
-                        new html_table_cell(join('', $icons)),
-                        new html_table_cell(html_writer::empty_tag('input', array('type' => 'checkbox', 'name' => 'c'.$aprogram->id)))
-        ));
+        $table->data[] = new html_table_row([
+            new html_table_cell($programname),
+            new html_table_cell(join('', $icons)),
+            new html_table_cell(
+                html_writer::empty_tag(
+                    'input',
+                    [
+                        'type' => 'checkbox',
+                        'name' => 'c'.$aprogram->id,
+                        'aria-label' => get_string('select_name', 'totara_program', $aprogram->fullname)
+                    ]
+                )
+            )
+        ]);
 
         if (!empty($searchcriteria)) {
             // add 'Category' column
