@@ -63,7 +63,11 @@ class participant_instance_repository extends repository {
             ->join([activity::TABLE, 'a'], 't.activity_id', 'id')
             ->where('participant_id', $viewing_user_id)
             ->where('participant_source', participant_source::INTERNAL)
-            ->where('a.anonymous_responses', 0)
+            ->where(function (builder $builder) use ($target_user_id) {
+                // Not anonymous activity OR the target is the subject of the activity that the viewer is a participant in.
+                return $builder->where('a.anonymous_responses', 0)
+                    ->or_where('si.subject_user_id', $target_user_id);
+            })
             ->where(function (builder $builder) use ($shared_subject_instance, $participant_in_subject_about_target) {
                 return $builder->where_exists($shared_subject_instance)
                     ->or_where_exists($participant_in_subject_about_target);

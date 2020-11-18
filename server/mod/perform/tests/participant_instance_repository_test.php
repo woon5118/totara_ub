@@ -130,8 +130,36 @@ class mod_perform_participant_instance_repository_testcase extends advanced_test
         $other_participant_instance->progress = not_started::get_code();
         $other_participant_instance->save();
 
+        // Both participants can see the subject user profile data, even though the activity is anonymous.
+        $can_view = participant_instance::repository()
+            ->user_can_view_other_users_profile($main_user->id, $subject_user->id);
+
+        self::assertTrue($can_view);
+
+        $can_view = participant_instance::repository()
+            ->user_can_view_other_users_profile($other_user->id, $subject_user->id);
+
+        self::assertTrue($can_view);
+
+        // The participants can't see each other.
         $can_view = participant_instance::repository()
             ->user_can_view_other_users_profile($main_user->id, $other_user->id);
+
+        self::assertFalse($can_view);
+
+        $can_view = participant_instance::repository()
+            ->user_can_view_other_users_profile($other_user->id, $main_user->id);
+
+        self::assertFalse($can_view);
+
+        // The subject user cannot view the participants.
+        $can_view = participant_instance::repository()
+            ->user_can_view_other_users_profile($subject_user->id, $main_user->id);
+
+        self::assertFalse($can_view);
+
+        $can_view = participant_instance::repository()
+            ->user_can_view_other_users_profile($subject_user->id, $other_user->id);
 
         self::assertFalse($can_view);
     }
