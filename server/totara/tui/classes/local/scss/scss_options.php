@@ -66,6 +66,11 @@ class scss_options {
      */
     private $skip_compile = false;
 
+    /**
+     * @var \core\theme\settings Theme settings instance.
+     */
+    private $theme_settings;
+
     public function __construct() {
         $this->compiler = new compiler();
         $this->cssvars = new cssvars();
@@ -175,5 +180,19 @@ class scss_options {
      */
     public function get_skip_compile() {
         return $this->skip_compile;
+    }
+
+    /**
+     * Set theme settings instance.
+     */
+    public function set_theme_settings(\core\theme\settings $theme_settings) {
+        $this->theme_settings = $theme_settings;
+    }
+
+    /**
+     * Get theme settings instance.
+     */
+    public function get_theme_settings(): ?\core\theme\settings {
+        return $this->theme_settings;
     }
 }

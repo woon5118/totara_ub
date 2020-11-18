@@ -73,8 +73,13 @@ final class theme_config extends \theme_config {
      * @param string $component
      * @return string
      */
-    public function get_component_sha(string $component): string {
-        $tui_scss = $this->get_tui_scss_instance();
+    public function get_component_sha(string $component, int $tenant_id = null): string {
+        $tui_scss = $this->get_tui_scss_instance($tenant_id);
+        $theme_settings = $tui_scss->get_options()->get_theme_settings();
+        $settings_css = '';
+        if ($theme_settings) {
+            $settings_css = $theme_settings->get_css_variables();
+        }
         $shas = join(
             "\n",
             array_map(
@@ -87,6 +92,7 @@ final class theme_config extends \theme_config {
                 $tui_scss->get_loaded_files($component)
             )
         );
+        $shas .= "\n" . sha1($settings_css);
         return sha1($shas);
     }
 
@@ -105,19 +111,24 @@ final class theme_config extends \theme_config {
      * @return string Compiled CSS
      */
     private function get_tui_css_content(string $component, int $tenant_id): string {
-        $tui_scss = $this->get_tui_scss_instance();
-        return $tui_scss->get_compiled_css($component, $this, $tenant_id);
+        $tui_scss = $this->get_tui_scss_instance($tenant_id);
+        return $tui_scss->get_compiled_css($component);
     }
 
     /**
      * Return an scss instance for this theme.
      * @return scss
      */
-    private function get_tui_scss_instance(): scss {
+    private function get_tui_scss_instance(int $tenant_id = null): scss {
         $scss_options = new scss_options();
+
         $scss_options->set_themes($this->get_tui_theme_chain());
         $scss_options->set_legacy($this->legacybrowser);
         $scss_options->set_sourcemap_enabled(false);
+
+        if (!during_initial_install() && isset($tenant_id)) {
+            $scss_options->set_theme_settings(new \core\theme\settings($this, $tenant_id));
+        }
 
         if ($this->skip_scss_compilation) {
             $scss_options->set_skip_compile(true);

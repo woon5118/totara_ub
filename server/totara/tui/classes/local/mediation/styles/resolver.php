@@ -157,7 +157,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
      */
     protected function get_sha_for_etag_comparison(): string {
         $theme = $this->get_theme();
-        return $theme->get_component_sha($this->component);
+        return $theme->get_component_sha($this->component, $this->tenant);
     }
 
     /**

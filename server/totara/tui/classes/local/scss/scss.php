@@ -71,16 +71,13 @@ class scss {
      * Compile SCSS for the provided Totara component.
      *
      * @param string $component Component to build CSS for.
-     * @param theme_config|null $theme_config $theme_config
-     * @param int|null $tenant_id
      * @return string
      */
-    public function get_compiled_css(string $component, ?theme_config $theme_config = null, ?int $tenant_id = null): string {
+    public function get_compiled_css(string $component): string {
         // Include any content that might have been changed by theme settings.
         $settings_css = '';
-        if (!during_initial_install() && isset($theme_config) && isset($tenant_id)) {
-            $theme_settings = new \core\theme\settings($theme_config, $tenant_id);
-            $settings_css = $theme_settings->get_css_variables();
+        if (!during_initial_install() && $this->options->get_theme_settings()) {
+            $settings_css = $this->options->get_theme_settings()->get_css_variables();
         }
 
         $import_data = $this->get_imports($component);

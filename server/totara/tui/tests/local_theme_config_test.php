@@ -51,6 +51,7 @@ class totara_tui_local_theme_config_testcase extends advanced_testcase {
                 $shas[] = $file;
             }
         }
+        $shas[] = sha1('');
         $expected = sha1(join("\n", $shas));
         $actual = $theme->get_component_sha('samples/pages/samples');
         self::assertSame($expected, $actual);
