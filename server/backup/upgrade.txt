@@ -1,6 +1,10 @@
 This files describes API changes in /backup/*,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* \core_backup_renderer::backup_detail_pair() changed label tag to span tag and added aria-label.
+
 === 13 ===
 
 * Fixed missing closing <div> tag in core_backup_renderer::course_selector_new(),

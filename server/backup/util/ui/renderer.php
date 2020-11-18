@@ -559,8 +559,8 @@ class core_backup_renderer extends plugin_renderer_base {
         static $count = 0;
         $count ++;
         $html  = html_writer::start_tag('div', array('class' => 'detail-pair'));
-        $html .= html_writer::tag('label', $label, array('class' => 'detail-pair-label', 'for' => 'detail-pair-value-'.$count));
-        $html .= html_writer::tag('div', $value, array('class' => 'detail-pair-value', 'name' => 'detail-pair-value-'.$count));
+        $html .= html_writer::tag('span', $label, array('class' => 'detail-pair-label'));
+        $html .= html_writer::tag('div', $value, array('class' => 'detail-pair-value'));
         $html .= html_writer::end_tag('div');
         return $html;
     }
@@ -940,7 +940,7 @@ class core_backup_renderer extends plugin_renderer_base {
                     $row->attributes['class'] .= ' dimmed';
                 }
                 $row->cells = array(
-                    html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'importid', 'value' => $course->id)),
+                    html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'importid', 'value' => $course->id, 'aria-label' => get_string('importdatafrom', 'backup', $course->fullname))),
                     format_string($course->shortname, true, array('context' => context_course::instance($course->id))),
                     format_string($course->fullname, true, array('context' => context_course::instance($course->id)))
                 );

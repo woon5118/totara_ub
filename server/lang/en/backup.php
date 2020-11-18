@@ -165,6 +165,7 @@ $string['generalsettings'] = 'General backup settings';
 $string['generaluserscompletion'] = 'Include user completion information';
 $string['generalusers'] = 'Include users';
 $string['hidetypes'] = 'Hide type options';
+$string['importdatafrom'] = 'Import data from: {$a}';
 $string['importgeneralsettings'] = 'General import defaults';
 $string['importgeneralmaxresults'] = 'Maximum number of courses listed for import';
 $string['importgeneralmaxresults_desc'] = 'This controls the number of courses that are listed during the first step of the import process';
