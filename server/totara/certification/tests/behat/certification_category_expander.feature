@@ -36,7 +36,6 @@ Feature: Find learning certificate category management
     And I should not see "c1ac1"
     And I should not see "c1bc1"
     And I should not see "c1bc2"
-
-    When I click on "[data-categoryid=2] .categoryname" "css_element"
+    When I click on "//a[contains(text(), 'Category 1')]/../.." "xpath_element"
     Then I should see "c1c2"
     And I should not see "top2"
