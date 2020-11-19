@@ -101,6 +101,16 @@ class appraisal {
     public $description = '';
 
     /**
+     * @var array Cache map of User ID => Whether they can view their own appraisal.
+     */
+    private static $permissions_view_own_cache = [];
+
+    /**
+     * @var array Cache map of User ID => Whether they can view their staffs' appraisal.
+     */
+    private static $permissions_view_staff_cache = [];
+
+    /**
      * Create instance of appraisal
      *
      * @param int $id
@@ -1633,9 +1643,8 @@ class appraisal {
             $userid = $USER->id;
         }
 
-        static $cache = array();
-        if (!$forcereload && isset($cache[$userid])) {
-            return $cache[$userid];
+        if (!$forcereload && isset(self::$permissions_view_staff_cache[$userid])) {
+            return self::$permissions_view_staff_cache[$userid];
         }
 
         $sql = "SELECT COUNT(ara.id)
@@ -1648,8 +1657,8 @@ class appraisal {
                    AND ara.userid = ?";
         $count = $DB->count_records_sql($sql, array(self::STATUS_DRAFT, $userid));
 
-        $cache[$userid] = ($count > 0);
-        return $cache[$userid];
+        self::$permissions_view_staff_cache[$userid] = ($count > 0);
+        return self::$permissions_view_staff_cache[$userid];
     }
 
 
@@ -1671,9 +1680,8 @@ class appraisal {
             $userid = $USER->id;
         }
 
-        static $cache = array();
-        if (!$forcereload && isset($cache[$userid])) {
-            return $cache[$userid];
+        if (!$forcereload && isset(self::$permissions_view_own_cache[$userid])) {
+            return self::$permissions_view_own_cache[$userid];
         }
 
         $sql = "SELECT COUNT(aua.id)
@@ -1688,8 +1696,8 @@ class appraisal {
                    AND ara.appraisalrole = ?";
         $count = $DB->count_records_sql($sql, array(self::STATUS_DRAFT, $userid, $userid, self::ROLE_LEARNER));
 
-        $cache[$userid] = ($count > 0);
-        return $cache[$userid];
+        self::$permissions_view_own_cache[$userid] = ($count > 0);
+        return self::$permissions_view_own_cache[$userid];
     }
 
 
@@ -2228,6 +2236,14 @@ class appraisal {
                 $event->send_user_specific_message($uevent->userid);
             }
         }
+    }
+
+    /**
+     * Clear permissions cache in order to prevent issues when running tests.
+     */
+    public static function clear_permissions_cache(): void {
+        self::$permissions_view_own_cache = [];
+        self::$permissions_view_staff_cache = [];
     }
 }
 

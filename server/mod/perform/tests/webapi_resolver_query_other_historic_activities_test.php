@@ -29,6 +29,9 @@ global $CFG;
 require_once($CFG->dirroot.'/totara/appraisal/lib.php');
 require_once($CFG->dirroot.'/totara/appraisal/tests/appraisal_testcase.php');
 
+/**
+ * @group perform
+ */
 class webapi_resolver_query_other_historic_activities_testcase extends appraisal_testcase {
 
     private const QUERY = "mod_perform_other_historic_activities";
@@ -36,6 +39,8 @@ class webapi_resolver_query_other_historic_activities_testcase extends appraisal
     use webapi_phpunit_helper;
 
     public function test_other_historic_activities() {
+        appraisal::clear_permissions_cache();
+
         [$appraisal, $user] = $this->create_data();
         advanced_feature::enable('performance_activities');
         $result = $this->resolve_graphql_query(self::QUERY);

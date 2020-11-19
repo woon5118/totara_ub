@@ -26,8 +26,6 @@ namespace mod_perform\data_providers\activity;
 use appraisal;
 use coding_exception;
 use core\orm\query\builder;
-use core\orm\query\sql\query as sql_query;
-use core\orm\query\table;
 use dml_exception;
 use feedback360;
 use moodle_exception;
@@ -45,6 +43,10 @@ class other_historic_activities {
      * @throws moodle_exception
      */
     public static function get_appraisals(int $userid): array {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+        require_once($CFG->dirroot . '/totara/feedback360/lib.php');
+
         $data = [];
         if (advanced_feature::is_disabled('appraisals') ||
             !(appraisal::can_view_own_appraisals($userid) || appraisal::can_view_staff_appraisals($userid))) {
@@ -86,7 +88,9 @@ class other_historic_activities {
      * @throws moodle_exception
      */
     public static function get_feedbacks(int $userid): array {
-        global $DB;
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+        require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 
         $data = [];
         if (advanced_feature::is_disabled('feedback360') || !feedback360::can_view_feedback360s($userid)) {

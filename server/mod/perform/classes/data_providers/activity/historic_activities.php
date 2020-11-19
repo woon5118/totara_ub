@@ -42,6 +42,10 @@ class historic_activities {
      * @throws moodle_exception
      */
     public static function get_appraisals(int $user_id): array {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+        require_once($CFG->dirroot . '/totara/feedback360/lib.php');
+
         $data = [];
 
         if (advanced_feature::is_disabled('appraisals') || !appraisal::can_view_own_appraisals($user_id)) {
@@ -77,6 +81,10 @@ class historic_activities {
      * @throws moodle_exception
      */
     public static function get_feedbacks(int $user_id): array {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+        require_once($CFG->dirroot . '/totara/feedback360/lib.php');
+
         $data = [];
 
         if (advanced_feature::is_disabled('feedback360') || !feedback360::can_view_feedback360s($user_id)) {

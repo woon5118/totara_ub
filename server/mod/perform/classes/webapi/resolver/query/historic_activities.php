@@ -32,10 +32,6 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use \mod_perform\data_providers\activity\historic_activities as historic_activities_provider;
 
-global $CFG;
-require_once($CFG->dirroot . '/totara/appraisal/lib.php');
-require_once($CFG->dirroot . '/totara/feedback360/lib.php');
-
 class historic_activities implements query_resolver, has_middleware {
 
     /**
