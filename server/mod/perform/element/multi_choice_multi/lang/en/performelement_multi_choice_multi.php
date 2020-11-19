@@ -32,7 +32,7 @@ $string['participant_restriction_min_max'] = 'Select {$a} options';
 $string['pluginname'] = 'Multiple choice multiple select element';
 $string['multi_select_options'] = 'Multi-select options';
 $string['response_restriction'] = 'Response restriction';
-$string['restriction_minimum_label'] = 'Minimum selection (empty = unlimited)';
+$string['restriction_minimum_label'] = 'Minimum selection (empty = none)';
 $string['restriction_maximum_label'] = 'Maximum selection (empty = unlimited)';
 $string['restriction_response_help_text'] = 'Use this setting to determine a minimum and maximum number of options to be selected. Leave empty if you don’t want any restrictions.';
 
