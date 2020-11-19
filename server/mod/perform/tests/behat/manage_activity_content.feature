@@ -14,7 +14,7 @@ Feature: Adding, Updating, Removing activity elements.
     When I click on "Add Element Activity" "link"
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
     And I click on "Edit content elements" "link_or_button"
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
@@ -23,14 +23,14 @@ Feature: Adding, Updating, Removing activity elements.
     And I save the activity content element
     Then I should see "Element saved." in the tui success notification toast
     When I close the tui notification toast
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
       | rawTitle   | Question 2   |
       | identifier | Identifier 2 |
     And I save the activity content element
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
@@ -132,7 +132,7 @@ Feature: Adding, Updating, Removing activity elements.
     When I click on "Add Element Activity" "link"
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
     And I click on "Edit content elements" "link_or_button"
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     Then the focused element is "[name=rawTitle]" "css_element"
     When I set the following fields to these values:
       | rawTitle   | Question 1   |
@@ -140,7 +140,7 @@ Feature: Adding, Updating, Removing activity elements.
     And I save the activity content element
     Then I should not see drag icon visible in the question "Question 1"
 
-    When I add a "Short text" activity content element
+    When I add a "Text: Short response" activity content element
     And the focused element is "[name=rawTitle]" "css_element"
     And I set the following fields to these values:
       | rawTitle   | Question 2   |
@@ -149,7 +149,7 @@ Feature: Adding, Updating, Removing activity elements.
     Then I should see drag icon visible in the question "Question 1"
     And I should see drag icon visible in the question "Question 2"
 
-    When I add a "Short text" activity content element
+    When I add a "Text: Short response" activity content element
     And the focused element is "[name=rawTitle]" "css_element"
 
     And I set the following fields to these values:
@@ -170,12 +170,12 @@ Feature: Adding, Updating, Removing activity elements.
     And I navigate to manage perform activity content page of "1" activity section
 
     # Add two question elements.
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     And I set the following fields to these values:
       | rawTitle | SectionB-Question1 |
     And I save the activity content element
     And I close the tui notification toast
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     And I set the following fields to these values:
       | rawTitle | SectionB-Question2 |
     And I save the activity content element

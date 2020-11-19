@@ -60,7 +60,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     Then I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     And I click on "Edit content elements" "link_or_button"
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     When I set the following fields to these values:
       | rawTitle   | Question 1   |
     And I save the activity content element

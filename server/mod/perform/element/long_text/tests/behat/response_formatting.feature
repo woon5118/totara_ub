@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @perform_element @javascript @vuejs
-Feature: Long text element response correctly processes text
+Feature: Text: Long response element response correctly processes text
 
   Background:
     Given I am on a totara site

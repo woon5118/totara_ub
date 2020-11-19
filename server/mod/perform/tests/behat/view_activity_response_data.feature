@@ -131,8 +131,8 @@ Feature: Test viewing Performance activity response data
 
     Then I should see "1 record selected" in the ".tui-elementResponseReportingActionCard" "css_element"
     And the following should exist in the "perform_response_element_by_reporting_id" table:
-      | Question text | Element type | Section title | Activity           | Responding relationships | Reporting ID            |
-      | Question one  | Short text   | Part one      | With reporting ids | 1                        | With reporting ids-id-1 |
+      | Question text | Element type         | Section title | Activity           | Responding relationships | Reporting ID            |
+      | Question one  | Text: Short response | Part one      | With reporting ids | 1                        | With reporting ids-id-1 |
 
     # Check back link goes to the correct tab (by content).
     When I click on "All performance data records" "link"
@@ -146,9 +146,9 @@ Feature: Test viewing Performance activity response data
     When I navigate to the mod perform response data report for "Simple optional questions activity" activity
     Then I should see "Performance data for Simple optional questions activity: 2 records shown"
     And the following should exist in the "perform_response_element_by_activity" table:
-      | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
-      | Question one  | Part one      | Short text   | 1                        | No       |              |
-      | Question two  | Part one      | Short text   | 1                        | No       |              |
+      | Question text | Section title | Element type         | Responding relationships | Required | Reporting ID |
+      | Question one  | Part one      | Text: Short response | 1                        | No       |              |
+      | Question two  | Part one      | Text: Short response | 1                        | No       |              |
 
     # Check export confirmation modal for "Export all"
     When I click on "Export all" "button"
@@ -183,9 +183,9 @@ Feature: Test viewing Performance activity response data
     And I click on "submitgroupstandard[addfilter]" "button"
     Then I should see "2 records selected" in the ".tui-elementResponseReportingActionCard" "css_element"
     And the following should exist in the "perform_response_element_by_activity" table:
-      | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
-      | Question one  | Part one      | Short text   | 1                        | No       |              |
-      | Question two  | Part one      | Short text   | 1                        | No       |              |
+      | Question text | Section title | Element type         | Responding relationships | Required | Reporting ID |
+      | Question one  | Part one      | Text: Short response | 1                        | No       |              |
+      | Question two  | Part one      | Text: Short response | 1                        | No       |              |
 
     When I click on "Preview" "button" in the "Question one" "table_row"
     Then I should see "Question one" in the tui modal
@@ -204,9 +204,9 @@ Feature: Test viewing Performance activity response data
     When I navigate to the mod perform response data report for "Simple required questions activity" activity
     Then I should see "2 records selected"
     And the following should exist in the "perform_response_element_by_activity" table:
-      | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
-      | Question one  | Part one      | Short text   | 1                        | Yes      |              |
-      | Question two  | Part one      | Short text   | 1                        | Yes      |              |
+      | Question text | Section title | Element type         | Responding relationships | Required | Reporting ID |
+      | Question one  | Part one      | Text: Short response | 1                        | Yes      |              |
+      | Question two  | Part one      | Text: Short response | 1                        | Yes      |              |
 
     When I click on "Preview" "button" in the "Question one" "table_row"
     Then I should see "Question one" in the tui modal

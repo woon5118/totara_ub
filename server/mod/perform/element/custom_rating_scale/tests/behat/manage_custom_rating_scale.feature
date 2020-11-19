@@ -13,7 +13,7 @@ Feature: Manage performance activity custom rating scale elements
     #Add multiple elements
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I add a "Custom rating scale" activity content element
+    And I add a "Rating scale: Custom" activity content element
     And I set the following fields to these values:
       | rawTitle                 | Question 1   |
       | options[0][value][text]  | Option one   |
@@ -22,7 +22,7 @@ Feature: Manage performance activity custom rating scale elements
       | options[1][value][score] | 2            |
       | identifier               | Identifier 1 |
     And I save the activity content element
-    And I add a "Custom rating scale" activity content element
+    And I add a "Rating scale: Custom" activity content element
     And I set the following fields to these values:
       | rawTitle                 | Question 2   |
       | options[0][value][text]  | Option three |
@@ -30,7 +30,7 @@ Feature: Manage performance activity custom rating scale elements
       | options[1][value][text]  | Option four  |
       | options[1][value][score] | 4            |
     And I save the activity content element
-    And I add a "Custom rating scale" activity content element
+    And I add a "Rating scale: Custom" activity content element
     And I set the following fields to these values:
       | rawTitle                 | Question 3 |
       | options[0][value][text]  | Option five |
@@ -52,7 +52,7 @@ Feature: Manage performance activity custom rating scale elements
 
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I add a "Custom rating scale" activity content element
+    And I add a "Rating scale: Custom" activity content element
     And I set the following fields to these values:
       | rawTitle                | Question 1 |
       | options[0][value][text] | Option one |
@@ -75,7 +75,7 @@ Feature: Manage performance activity custom rating scale elements
 
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I add a "Custom rating scale" activity content element
+    And I add a "Rating scale: Custom" activity content element
     And I set the following fields to these values:
       | rawTitle                | Question 1 |
       | options[0][value][text] | Option one |
@@ -99,7 +99,7 @@ Feature: Manage performance activity custom rating scale elements
 
     When I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I add a "Custom rating scale" activity content element
+    And I add a "Rating scale: Custom" activity content element
     And I set the following fields to these values:
       | rawTitle | Question 1 |
     And I save the activity content element
@@ -114,7 +114,7 @@ Feature: Manage performance activity custom rating scale elements
     And I should see "0" in the "other" element summary of the activity section
     # Add multiple elements
     And I navigate to manage perform activity content page
-    And I add a "Custom rating scale" activity content element
+    And I add a "Rating scale: Custom" activity content element
     When I set the following fields to these values:
       | rawTitle                 | Question 1 |
       | options[0][value][text]  | Option one |
@@ -124,7 +124,7 @@ Feature: Manage performance activity custom rating scale elements
     And I click on the "responseRequired" tui checkbox
     And I save the activity content element
     Then I should see "Required"
-    When I add a "Custom rating scale" activity content element
+    When I add a "Rating scale: Custom" activity content element
     And I set the following fields to these values:
       | rawTitle                 | Question 2 |
       | options[0][value][text]  | Option one |

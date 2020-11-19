@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @perform_element @javascript @vuejs
-Feature: Long text element supports multi-lang filters in titles
+Feature: Text: Long response element supports multi-lang filters in titles
 
   Background:
     Given I am on a totara site
@@ -17,7 +17,7 @@ Feature: Long text element supports multi-lang filters in titles
     Given I navigate to the edit perform activities page for activity "Add Element Activity"
     # Adding a new item
     And I navigate to manage perform activity content page
-    And I add a "Long text" activity content element
+    And I add a "Text: Long response" activity content element
     And I set the following fields to these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
     # Currently a changed text won't be filtered until saved

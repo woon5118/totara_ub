@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @perform_element @javascript @vuejs
-Feature: Custom rating scale element supports multi-lang filters in titles and options
+Feature: Rating scale: Custom element supports multi-lang filters in titles and options
 
   Background:
     Given I am on a totara site
@@ -17,7 +17,7 @@ Feature: Custom rating scale element supports multi-lang filters in titles and o
 
     # Adding a new item
     And I navigate to manage perform activity content page
-    And I add a "Custom rating scale" activity content element
+    And I add a "Rating scale: Custom" activity content element
     Then "rawTitle" "field" should be visible
     When I set the following fields to these values:
       | rawTitle                 | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |

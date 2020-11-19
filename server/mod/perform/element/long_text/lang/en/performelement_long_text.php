@@ -21,7 +21,7 @@
  * @package performelement_long_text
  */
 
-$string['name'] = 'Long text';
+$string['name'] = 'Text: Long response';
 $string['pluginname'] = 'Long text element';
 
 

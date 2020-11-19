@@ -36,7 +36,7 @@ class behat_performelement_custom_rating_scale extends behat_base {
     public function i_click_custom_rating_scale_question_element(): void {
         debugging(
             '\behat_performelement_multi_choice_single::i_save_multi_choice_single_question_element_data() is deprecated and should no longer be used.'
-            . ' Please use behat_mod_perform::i_add_a_custom_element() with "Custom rating scale" as the parameter',
+            . ' Please use behat_mod_perform::i_add_a_custom_element() with "Rating scale: Custom" as the parameter',
             DEBUG_DEVELOPER
         );
 
@@ -45,7 +45,7 @@ class behat_performelement_custom_rating_scale extends behat_base {
         $behat_general = behat_context_helper::get('behat_general');
 
         $behat_general->i_click_on("Add element","button");
-        $behat_general->i_click_on("Custom rating scale","button");
+        $behat_general->i_click_on("Rating scale: Custom","button");
     }
 
     /**

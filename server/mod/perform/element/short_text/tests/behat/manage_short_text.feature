@@ -14,14 +14,14 @@ Feature: Manage performance activity short text elements
     When I click on "Add Element Activity" "link"
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
     And I click on "Edit content elements" "link_or_button"
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     When I set the following fields to these values:
       | rawTitle   | Question 1   |
       | identifier | Identifier 1 |
     And I click on the "responseRequired" tui checkbox
     And I save the activity content element
     And I click on "Add element" "button"
-    And I click on "Short text" "button"
+    And I click on "Text: Short response" "button"
     When I set the following fields to these values:
       | rawTitle   | Question 2   |
     And I save the activity content element

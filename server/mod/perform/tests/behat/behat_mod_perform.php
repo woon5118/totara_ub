@@ -1452,7 +1452,7 @@ class behat_mod_perform extends behat_base {
             case 'Multiple choice: multi-select':
                 $this->fill_multi_choice_multi_admin_form_settings($element_setting_container);
                 break;
-            case 'Numeric rating scale':
+            case 'Rating scale: Numeric':
                 $this->fill_numeric_rating_scale_admin_form_settings($element_setting_container);
                 break;
             case 'Static content':

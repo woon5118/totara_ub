@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @perform_element @javascript @vuejs
-Feature: Short text element supports multi-lang filters in titles
+Feature: Text: Short response element supports multi-lang filters in titles
 
   Background:
     Given I am on a totara site
@@ -16,7 +16,7 @@ Feature: Short text element supports multi-lang filters in titles
 
     # Adding a new item
     And I click on "Edit content elements" "link_or_button"
-    And I add a "Short text" activity content element
+    And I add a "Text: Short response" activity content element
     And I set the following fields to these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
     # Currently a changed text won't be filtered until saved
