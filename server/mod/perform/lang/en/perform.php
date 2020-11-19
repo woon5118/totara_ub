@@ -57,7 +57,7 @@ $string['activity_participants_select_heading'] = 'Select participants';
 $string['activity_report_no_params_warning_message'] = 'This report can only be accessed from the performance reporting interface - go to the <a href="{$a->url}">performance reporting</a> page, and select some data to report on.';
 $string['activity_section_done'] = 'Done';
 $string['activity_status_active'] = 'Active';
-$string['activity_status_banner_active'] = 'This activity is <strong>active</strong>. Any changes made will be applied to future subject instances only, except for title and description, which apply to all.';
+$string['activity_status_banner_active'] = 'This activity is <strong>active</strong>. Changes can be applied that will affect future and, in some cases, existing instances.';
 $string['activity_status_banner_draft'] = 'This activity is currently in a <strong>draft state</strong>.';
 $string['activity_status_banner_help_intro'] = 'It can be activated once all of the following criteria are met:';
 $string['activity_status_banner_help_title'] = 'Show activity activation criteria';
