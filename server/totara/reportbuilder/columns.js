@@ -97,9 +97,20 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         var colName = $(column_selector).val();
         var newHeading = module.config.rb_column_headings[colName];
 
+
+        var tr = $(column_selector).parents('tr:first');
+        var columnIndex = tr.prevAll().length; // Get the index, same as tr.parent().children().index(tr);
+ 
+        $(column_selector).attr('aria-label', M.util.get_string('column_index', 'totara_reportbuilder', columnIndex));
+
         var advancedSelector = $('select.advanced_selector', $(column_selector).parents('tr:first'));
+        $(advancedSelector).attr('aria-label', M.util.get_string('column_advancedheading', 'totara_reportbuilder', columnIndex));
+        
         var headingElement = $('input.column_heading_text', $(column_selector).parents('tr:first'));
+        $(headingElement).attr('aria-label', M.util.get_string('column_customheading', 'totara_reportbuilder', columnIndex));
+
         var customHeadingCheckbox = $('input.column_custom_heading_checkbox', $(column_selector).parents('tr:first'));
+        $(customHeadingCheckbox).attr('aria-label', M.util.get_string('column_customiseheading', 'totara_reportbuilder', columnIndex));
 
         if (colName == '0') {
             advancedSelector.hide();
