@@ -34,7 +34,7 @@ class date_picker extends respondable_element_plugin {
      * @inheritDoc
      */
     public function get_sortorder(): int {
-        return 10;
+        return 70;
     }
 
     /**

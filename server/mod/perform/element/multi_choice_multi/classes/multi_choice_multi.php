@@ -97,7 +97,7 @@ class multi_choice_multi extends respondable_element_plugin {
      * @inheritDoc
      */
     public function get_sortorder(): int {
-        return 20;
+        return 40;
     }
 
     /**

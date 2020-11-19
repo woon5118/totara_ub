@@ -92,7 +92,7 @@ class numeric_rating_scale extends respondable_element_plugin {
      * @inheritDoc
      */
     public function get_sortorder(): int {
-        return 40;
+        return 50;
     }
 
     /**

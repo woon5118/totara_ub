@@ -70,6 +70,6 @@ class short_text extends respondable_element_plugin {
      * @inheritDoc
      */
     public function get_sortorder(): int {
-        return 70;
+        return 20;
     }
 }
