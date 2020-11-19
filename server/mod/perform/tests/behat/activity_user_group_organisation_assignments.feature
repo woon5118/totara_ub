@@ -101,7 +101,7 @@ Feature: Assign organisation user groups to perform activities
     And I click on "Organisation" "link" in the ".tui-dropdown__menu" "css_element"
     And I toggle the adder picker entry with "Information Technology" for "Organisation"
     And I toggle the adder picker entry with "Finance" for "Organisation"
-    And I click on "Selected items &#8237;( 2 )&#8237;" "link"
+    And I click on "Selected &#8237;( 2 )&#8237;" "link"
     Then I should see the following selected adder basket entries:
       | Organisation           |
       | Information Technology |

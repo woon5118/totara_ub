@@ -101,7 +101,7 @@ Feature: Assign position user groups to perform activities
     And I click on "Position" "link" in the ".tui-dropdown__menu" "css_element"
     And I toggle the adder picker entry with "IT Developer" for "Position"
     And I toggle the adder picker entry with "IT Manager" for "Position"
-    And I click on "Selected items &#8237;( 2 )&#8237;" "link"
+    And I click on "Selected &#8237;( 2 )&#8237;" "link"
     Then I should see the following selected adder basket entries:
       | Position     |
       | IT Developer |
