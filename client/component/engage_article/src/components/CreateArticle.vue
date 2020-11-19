@@ -24,6 +24,7 @@
       :article-content="article.content"
       @next="next"
       @cancel="$emit('cancel')"
+      @unsaved-changes="$emit('unsaved-changes')"
     />
     <AccessForm
       v-show="stage === 1"

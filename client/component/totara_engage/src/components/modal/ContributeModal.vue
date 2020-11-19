@@ -17,92 +17,107 @@
 -->
 
 <template>
-  <Modal
-    :size="size"
-    :aria-labelledby="$id('title')"
-    :dismissable="dismissable"
-  >
-    <ModalContent
-      class="tui-engageContributeModal"
-      :close-button="false"
-      :title="getTitle"
-      :content-padding="false"
+  <span>
+    <Modal
+      :size="size"
+      :aria-labelledby="$id('title')"
+      :dismissable="dismissable"
     >
-      <div class="tui-engageContributeModal__content">
-        <div
-          v-if="adder && !hideTabs"
-          class="tui-engageContributeModal__adderContainer"
-        >
-          <span>
-            {{ $str('or', 'totara_engage') }}
-            <Button
-              :text="adder.text"
-              :disabled="false"
-              :styleclass="{
-                transparent: true,
-              }"
-              @click="$emit('adder-open')"
+      <ModalContent
+        class="tui-engageContributeModal"
+        :close-button="false"
+        :title="getTitle"
+        :content-padding="false"
+      >
+        <div class="tui-engageContributeModal__content">
+          <div
+            v-if="adder && !hideTabs"
+            class="tui-engageContributeModal__adderContainer"
+          >
+            <span>
+              {{ $str('or', 'totara_engage') }}
+              <Button
+                :text="adder.text"
+                :disabled="false"
+                :styleclass="{
+                  transparent: true,
+                }"
+                @click="$emit('adder-open')"
+              />
+              {{ adder.destination }}
+            </span>
+          </div>
+          <Tabs
+            v-if="!$apollo.loading"
+            v-show="!hideTabs"
+            :selected="selectedTab"
+            :small-tabs="true"
+            :controlled="true"
+            class="tui-engageContributeModal__tabs"
+            @input="changeTabRequest"
+          >
+            <Tab
+              v-for="modal in modals"
+              :id="modal.id"
+              :key="modal.id"
+              :name="modal.label"
+              :disabled="disabledId === modal.id"
             />
-            {{ adder.destination }}
-          </span>
-        </div>
-        <Tabs
-          v-if="!$apollo.loading"
-          v-show="!hideTabs"
-          v-model="selectedTab"
-          :small-tabs="true"
-          class="tui-engageContributeModal__tabs"
-        >
-          <Tab
-            v-for="modal in modals"
-            :id="modal.id"
-            :key="modal.id"
-            :name="modal.label"
-            :disabled="disabledId === modal.id"
-          />
-        </Tabs>
+          </Tabs>
 
-        <div
-          v-if="!$apollo.loading"
-          class="tui-engageContributeModal__componentContent"
-        >
-          <!-- This is where the content of selectedTab is -->
-          <component
-            :is="selectedTab"
-            :container="container"
-            :show-notification="showNotification"
-            @change-title="stage = $event"
-            @done="$emit('done', $event)"
-            @cancel="$emit('request-close')"
-          />
-        </div>
+          <div
+            v-if="!$apollo.loading"
+            class="tui-engageContributeModal__componentContent"
+          >
+            <!-- This is where the content of selectedTab is -->
+            <component
+              :is="selectedTab"
+              :container="container"
+              :show-notification="showNotification"
+              @change-title="stage = $event"
+              @done="$emit('done', $event)"
+              @cancel="$emit('request-close')"
+              @unsaved-changes="hasUnsavedChanges = true"
+            />
+          </div>
 
-        <ButtonIcon
-          v-if="expandable"
-          v-show="!hideTabs"
-          class="tui-engageContributeModal__resize"
-          :aria-label="resizeAriaLabel"
-          :styleclass="{ transparentNoPadding: true }"
-          @click="resize"
-        >
-          <SizeContractIcon v-if="expanded" />
-          <SizeExpandIcon v-else />
-        </ButtonIcon>
-      </div>
-    </ModalContent>
-  </Modal>
+          <ButtonIcon
+            v-if="expandable"
+            v-show="!hideTabs"
+            class="tui-engageContributeModal__resize"
+            :aria-label="resizeAriaLabel"
+            :styleclass="{ transparentNoPadding: true }"
+            @click="resize"
+          >
+            <SizeContractIcon v-if="expanded" />
+            <SizeExpandIcon v-else />
+          </ButtonIcon>
+        </div>
+      </ModalContent>
+    </Modal>
+    <ConfirmationModal
+      :open="unsavedChangesModalOpen"
+      :title="$str('unsaved_changes_title', 'totara_engage')"
+      :confirm-button-text="$str('button_continue', 'totara_engage')"
+      @confirm="changeTabConfirm"
+      @cancel="unsavedChangesModalOpen = false"
+    >
+      <p>{{ $str('unsaved_changes_message', 'totara_engage') }}</p>
+    </ConfirmationModal>
+  </span>
 </template>
 
 <script>
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
-import Tabs from 'tui/components/tabs/Tabs';
-import Tab from 'tui/components/tabs/Tab';
 import SizeContractIcon from 'tui/components/icons/SizeContract';
 import SizeExpandIcon from 'tui/components/icons/SizeExpand';
+import Tab from 'tui/components/tabs/Tab';
+import Tabs from 'tui/components/tabs/Tabs';
 import tui from 'tui/tui';
-import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import Button from 'tui/components/buttons/Button';
 
 // GraphQL
 import getModals from 'totara_engage/graphql/modals';
@@ -114,14 +129,15 @@ const has = Object.prototype.hasOwnProperty;
 
 export default {
   components: {
+    Button,
+    ButtonIcon,
+    ConfirmationModal,
     Modal,
     ModalContent,
-    Tabs,
-    Tab,
     SizeContractIcon,
     SizeExpandIcon,
-    ButtonIcon,
-    Button,
+    Tab,
+    Tabs,
   },
 
   mixins: [ContainerMixin],
@@ -189,6 +205,9 @@ export default {
       hideTabs: false,
       disabledId: 0,
       stage: 0,
+      hasUnsavedChanges: false,
+      unsavedChangesModalOpen: false,
+      requestedTab: null,
     };
   },
 
@@ -257,6 +276,29 @@ export default {
 
       return [component];
     },
+
+    /**
+     * User wants to change the tab.
+     *
+     * @param {String} id
+     */
+    changeTabRequest(id) {
+      if (this.hasUnsavedChanges) {
+        this.unsavedChangesModalOpen = true;
+        this.requestedTab = id;
+      } else {
+        this.selectedTab = id;
+      }
+    },
+
+    /**
+     * User has confirmed they want to change the tab.
+     */
+    changeTabConfirm() {
+      this.hasUnsavedChanges = false;
+      this.unsavedChangesModalOpen = false;
+      this.selectedTab = this.requestedTab;
+    },
   },
 };
 </script>
@@ -264,11 +306,14 @@ export default {
 <lang-strings>
   {
     "totara_engage": [
+      "accesssettings",
+      "button_continue",
       "compress",
       "contribute",
       "expand",
       "or",
-      "accesssettings"
+      "unsaved_changes_message",
+      "unsaved_changes_title"
     ]
   }
 </lang-strings>

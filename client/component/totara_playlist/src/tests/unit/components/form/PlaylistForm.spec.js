@@ -38,4 +38,34 @@ describe('totara_playlist/components/form/PlaylistForm.vue', function() {
   it('Checks snapshot', function() {
     expect(wrapper.element).toMatchSnapshot();
   });
+
+  it('Checks name changes trigger unsaved changes event', async () => {
+    // Setting playlist name should trigger event.
+    await wrapper.setData({
+      playlist: Object.assign(wrapper.vm.playlist, {
+        name: 'New playlist title',
+      }),
+    });
+    expect(wrapper.emitted()['unsaved-changes']).toBeTruthy();
+    expect(wrapper.emitted()['unsaved-changes'].length).toBe(1);
+
+    // Also setting summary should not re-trigger the event.
+    await wrapper.setData({ summary: 'New summary' });
+    expect(wrapper.emitted()['unsaved-changes'].length).toBe(1);
+  });
+
+  it('Checks summary changes trigger unsaved changes event', async () => {
+    // Setting playlist summary should trigger event.
+    await wrapper.setData({ summary: 'New summary' });
+    expect(wrapper.emitted()['unsaved-changes']).toBeTruthy();
+    expect(wrapper.emitted()['unsaved-changes'].length).toBe(1);
+
+    // Also setting name should not re-trigger the event.
+    await wrapper.setData({
+      playlist: Object.assign(wrapper.vm.playlist, {
+        name: 'New playlist title',
+      }),
+    });
+    expect(wrapper.emitted()['unsaved-changes'].length).toBe(1);
+  });
 });

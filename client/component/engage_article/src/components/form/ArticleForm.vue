@@ -31,7 +31,6 @@
         name="article-title"
         :maxlength="75"
         :placeholder="$str('entertitle', 'engage_article')"
-        :disabled="submitting"
         :required="true"
       />
     </FormRow>
@@ -45,10 +44,6 @@
         class="tui-engageArticleForm__description-formRow"
         :is-stacked="false"
       >
-        <UnsavedChangesWarning
-          v-if="!content.isEmpty && !submitting"
-          :value="content"
-        />
         <Weka
           v-if="draftId"
           :id="id"
@@ -71,7 +66,6 @@
 
     <ButtonGroup class="tui-engageArticleForm__buttons">
       <Button
-        :loading="submitting"
         :styleclass="{ primary: 'true' }"
         :disabled="disabled"
         :aria-label="$str('createarticleshort', 'engage_article')"
@@ -79,8 +73,10 @@
         @click="submit"
       />
 
-      <CancelButton :disabled="submitting" @click="$emit('cancel')" />
+      <CancelButton @click="$emit('cancel')" />
     </ButtonGroup>
+
+    <UnsavedChangesWarning v-if="hasChanges" :value="{ hasChanges }" />
   </Form>
 </template>
 
@@ -94,7 +90,6 @@ import WekaValue from 'editor_weka/WekaValue';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
 import InfoIconButton from 'tui/components/buttons/InfoIconButton';
-
 import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
 
 // GraphQL queries
@@ -131,13 +126,15 @@ export default {
       name: this.articleName,
       content: WekaValue.empty(),
       draftId: null,
-      submitting: false,
     };
   },
 
   computed: {
     disabled() {
       return this.name.length === 0 || this.content.isEmpty;
+    },
+    hasChanges() {
+      return this.name.length > 0 || !this.content.isEmpty;
     },
   },
 
@@ -159,6 +156,12 @@ export default {
           // Silenced any invalid json string.
           this.content = WekaValue.empty();
         }
+      },
+    },
+
+    hasChanges: {
+      handler() {
+        this.$emit('unsaved-changes');
       },
     },
   },

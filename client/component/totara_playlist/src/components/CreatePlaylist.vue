@@ -18,7 +18,12 @@
 
 <template>
   <div class="tui-createPlaylist">
-    <PlaylistForm v-show="stage === 0" @next="next" @cancel="$emit('cancel')" />
+    <PlaylistForm
+      v-show="stage === 0"
+      @next="next"
+      @cancel="$emit('cancel')"
+      @unsaved-changes="$emit('unsaved-changes')"
+    />
     <AccessForm
       v-show="stage === 1"
       item-id="0"

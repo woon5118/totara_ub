@@ -119,9 +119,14 @@
       <CancelButton
         :disabled="submitting"
         class="tui-engageSurveyForm__cancelButton"
-        @click="$emit('cancel')"
+        @click="cancel"
       />
     </ButtonGroup>
+
+    <UnsavedChangesWarning
+      v-if="hasUnsavedChanges"
+      :value="{ hasUnsavedChanges }"
+    />
   </Uniform>
 </template>
 
@@ -133,27 +138,29 @@ import {
   FormText,
   FormRadioGroup,
 } from 'tui/components/uniform';
-import FieldContextProvider from 'tui/components/reform/FieldContextProvider';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import CancelButton from 'tui/components/buttons/Cancel';
+import FieldContextProvider from 'tui/components/reform/FieldContextProvider';
 import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
 import Radio from 'tui/components/form/Radio';
 import Repeater from 'tui/components/form/Repeater';
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
 import { AnswerType } from 'totara_engage/index';
 
 export default {
   components: {
-    Uniform,
+    ButtonGroup,
+    CancelButton,
     FieldArray,
-    FormRow,
-    FormText,
     FieldContextProvider,
     FormRadioGroup,
-    ButtonGroup,
+    FormRow,
+    FormText,
     LoadingButton,
-    CancelButton,
     Radio,
     Repeater,
+    Uniform,
+    UnsavedChangesWarning,
   },
 
   props: {
@@ -216,6 +223,7 @@ export default {
         options,
         optionType: this.survey.type || String(AnswerType.MULTI_CHOICE),
       },
+      hasUnsavedChanges: false,
     };
   },
   computed: {
@@ -240,10 +248,15 @@ export default {
         // If it is for creation, then this should be null.
         questionId: this.survey.questionId,
       };
+      this.hasUnsavedChanges = false;
       this.$emit('next', params);
     },
 
     change(values) {
+      if (!this.submitting && !this.hasUnsavedChanges) {
+        this.$emit('unsaved-changes');
+        this.hasUnsavedChanges = true;
+      }
       const { question, options } = values;
       this.disabled = true;
       if (question.length > 0) {
@@ -255,6 +268,13 @@ export default {
           this.disabled = false;
         }
       }
+    },
+    cancel() {
+      this.hasUnsavedChanges = false;
+      // Emit event on next tick so the unload handler can be removed first.
+      this.$nextTick(() => {
+        this.$emit('cancel');
+      });
     },
   },
 };

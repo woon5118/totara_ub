@@ -55,5 +55,7 @@ exports[`totara_playlist/components/form/PlaylistForm.vue Checks snapshot 1`] = 
      
     <cancelbutton-stub />
   </buttongroup-stub>
+   
+  <!---->
 </form-stub>
 `;

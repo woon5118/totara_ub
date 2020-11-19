@@ -54,5 +54,9 @@ exports[`engage_article/components/form/ArticleForm.vue Checks snapshot 1`] = `
      
     <cancelbutton-stub />
   </buttongroup-stub>
+   
+  <unsavedchangeswarning-stub
+    value="[object Object]"
+  />
 </form-stub>
 `;
