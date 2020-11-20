@@ -35,9 +35,10 @@ Feature: Print view of a single-section user activity
       | track_description | assignment_type | assignment_name |
       | track 1           | cohort          | aud1            |
     And the following "section elements" exist in "mod_perform" plugin:
-      | section_name   | element_name | title               |
-      | Single section | short_text   | Short text question |
-      | Single section | long_text    | Long text question  |
+      | section_name   | element_name | title                |
+      | Single section | short_text   | Short text question  |
+      | Single section | long_text    | Long text question   |
+      | Single section | date_picker  | Date picker question |
     Given the following "section relationships" exist in "mod_perform" plugin:
       | section_name   | relationship | can_view | can_answer |
       | Single section | subject      | yes      | yes        |
@@ -68,6 +69,7 @@ Feature: Print view of a single-section user activity
     # Empty print components should be displayed.
     And I should see perform "short text" question "Short text question" is unanswered in print view
     And I should see perform "long text" question "Long text question" is unanswered in print view
+    And I should see perform "Date picker" question "Date picker question" is unanswered in print view
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
@@ -79,6 +81,7 @@ Feature: Print view of a single-section user activity
     And I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Short text question" with "David short text answer one"
     And I answer "long text" question "Long text question" with "David long text answer one"
+    And I answer "Date picker" question "Date picker question" with "1 January 2020"
     When I click on "Save as draft" "button"
     Then I should see "Draft saved" in the tui success notification toast
 
@@ -97,6 +100,7 @@ Feature: Print view of a single-section user activity
     # Filled in, but not "closed" responses should be shown.
     And I should see "David short text answer one" in the ".tui-shortTextParticipantPrint" "css_element"
     And I should see "David long text answer one" in the ".tui-longTextParticipantPrint" "css_element"
+    And I should see "1 January 2020" in the ".tui-datePickerParticipantPrint" "css_element"
 
     When I navigate to the outstanding perform activities list page
     And I click on "Single section activity" "link"
@@ -117,6 +121,7 @@ Feature: Print view of a single-section user activity
     # No print components should be displayed any more.
     And ".tui-shortTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
     And ".tui-longTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+    And ".tui-datePickerParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
 
     # Instead response version of the question element should be shown
     # ...FormResponseDisplay for most components and ...HtmlFormResponseDisplay for long text
@@ -125,6 +130,7 @@ Feature: Print view of a single-section user activity
 
     And I should see "David short text answer one"
     And I should see "David long text answer one"
+    And I should see "1 January 2020"
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
@@ -141,6 +147,7 @@ Feature: Print view of a single-section user activity
     # Empty print components should be displayed.
     And I should see perform "short text" question "Short text question" is unanswered in print view
     And I should see perform "long text" question "Long text question" is unanswered in print view
+    And I should see perform "Date picker" question "Date picker question" is unanswered in print view
     And I should not see "Appraiser Four"
 
     # Check appraiser's view (view only)
@@ -152,6 +159,8 @@ Feature: Print view of a single-section user activity
     And I should not see "Your response"
     And I should see "David short text answer one"
     And I should see "David long text answer one"
+    # Date picker
+    And I should see "1 January 2020"
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"

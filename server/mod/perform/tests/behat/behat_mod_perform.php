@@ -58,6 +58,7 @@ class behat_mod_perform extends behat_base {
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'input';
     public const LONG_TEXT_RESPONSE_LOCATOR = 'textarea';
     public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
+    public const DATE_PICKER_RESPONSE_LOCATOR = '.tui-dateSelector';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses .tui-formLabel';
     public const TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR = '.tui-otherParticipantResponses__anonymousResponse-participant';
@@ -694,7 +695,14 @@ class behat_mod_perform extends behat_base {
 
         $response = $this->find_question_response($element_type, $question_text);
 
-        $response->setValue($new_answer);
+        if ($element_type === 'Date picker') {
+            /** @var behat_totara_tui $behat_totara_tui */
+            $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
+            $name = $response->getAttribute('name');
+            $behat_totara_tui->i_set_the_tui_date_selector_to($name, $new_answer);
+        } else {
+            $response->setValue($new_answer);
+        }
     }
 
     /**
@@ -980,7 +988,8 @@ class behat_mod_perform extends behat_base {
         $map = [
             'short text' => self::SHORT_TEXT_RESPONSE_LOCATOR,
             'long text' => self::LONG_TEXT_RESPONSE_LOCATOR,
-            'multi choice' => self::MULTI_CHOICE_RESPONSE_LOCATOR
+            'multi choice' => self::MULTI_CHOICE_RESPONSE_LOCATOR,
+            'Date picker' => self::DATE_PICKER_RESPONSE_LOCATOR,
         ];
 
         $locator =  $map[$element_type] ?? null;

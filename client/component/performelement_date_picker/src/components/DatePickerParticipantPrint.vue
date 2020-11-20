@@ -16,9 +16,9 @@
   @module performelement_short_text
 -->
 <template>
-  <div class="tui-shortTextParticipantPrint">
+  <div class="tui-datePickerParticipantPrint">
     <div v-if="hasBeenAnswered">{{ responseLines[0] }}</div>
-    <NotepadLines v-else />
+    <NotepadLines v-else :char-length="10" />
   </div>
 </template>
 
