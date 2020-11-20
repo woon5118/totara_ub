@@ -76,6 +76,7 @@ class view_user_activity extends perform_controller {
 
         $props = [
             'current-user-id' => user::logged_in()->id,
+            'user-activities-url' => (string) user_activities::get_base_url(),
         ];
         $url_args = [];
 

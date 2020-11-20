@@ -24,6 +24,14 @@
     :title="activity.name"
     :outer-first-loader="true"
   >
+    <template v-slot:content-nav>
+      <PageBackLink
+        v-if="!isExternalParticipant && !viewOnlyReportMode"
+        :link="$url(userActivitiesUrl)"
+        :text="$str('back_to_user_activities', 'mod_perform')"
+      />
+    </template>
+
     <template v-slot:user-overview>
       <ParticipantGeneralInformation
         v-if="subjectUser.card_display && !viewOnlyReportMode"
@@ -322,6 +330,7 @@ import Layout from 'tui/components/layouts/LayoutOneColumn';
 import LayoutSidePanel from 'mod_perform/components/user_activities/layout/LayoutOneColumnSidePanelActivities';
 import Loader from 'tui/components/loading/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
+import PageBackLink from 'tui/components/layouts/PageBackLink';
 import PageHeading from 'tui/components/layouts/PageHeading';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';
@@ -361,6 +370,7 @@ export default {
     LayoutSidePanel,
     Loader,
     OtherParticipantResponses,
+    PageBackLink,
     PageHeading,
     ParticipantUserHeader,
     ResponsesAreVisibleToDescription,
@@ -401,6 +411,13 @@ export default {
      */
     currentUserId: {
       type: Number,
+    },
+
+    /**
+     * The url enables user navigate back to user activity list
+     */
+    userActivitiesUrl: {
+      type: String,
     },
 
     /**
@@ -1189,6 +1206,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "back_to_user_activities",
       "button_close",
       "next_section",
       "previous_section",

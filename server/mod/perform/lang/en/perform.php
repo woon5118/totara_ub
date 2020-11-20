@@ -80,6 +80,7 @@ $string['back_to_activity'] = '« Back to performance activity';
 $string['back_to_activity_content'] = 'Content ({$a})';
 $string['back_to_all_activities'] = 'Back to all performance activities';
 $string['back_to_manage_participation'] = '« Back to manage participation';
+$string['back_to_user_activities'] = 'Performance activities';
 $string['bulk_export'] = 'Bulk export';
 $string['bulk_export_filter_changed_warning_message'] = 'New report filters have been applied since the page where you requested the export was last updated, and your export content will be different to what was shown on the page. This could be due to changes made in another browser tab or window to the same report. Please go back and reapply the search before exporting again, to ensure you receive the correct records';
 $string['bulk_export_no_params_warning_message'] = 'This report can only be accessed from the performance reporting interface - to select records to export, go to the <a href="{$a->url}">performance reporting</a> page, and select some data to export.';

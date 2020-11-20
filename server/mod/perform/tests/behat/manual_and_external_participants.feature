@@ -415,6 +415,8 @@ Feature: Allow users to select manual (internal and external) participants for a
     # Alright that's the last participant, subject instance should be closed after that
     When I navigate to the external participants form for user "Steve Example"
     Then I should see perform activity relationship to user "External respondent" as an "external" participant
+    # Make sure the navigate back link is not displayed for external participants
+    And I should not see "Performance activities"
     And I should see perform "short text" question "Question 1" is unanswered
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Question 1" with "External participant 2 was here"

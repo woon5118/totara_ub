@@ -38,6 +38,7 @@
     <ActivityContent
       v-else-if="!print && subjectInstance"
       :current-user-id="currentUserId"
+      :user-activities-url="userActivitiesUrl"
       :activity="subjectInstance.activity"
       :participant-instance-id="participantInstanceId"
       :participant-section-id="participantSectionId"
@@ -72,6 +73,10 @@ export default {
       required: false,
       type: Number,
       default: null,
+    },
+    userActivitiesUrl: {
+      required: true,
+      type: String,
     },
     participantInstanceId: {
       required: false,

@@ -175,3 +175,16 @@ Feature: Viewing other responses
     And I click show others responses
     And I wait until ".tui-otherParticipantResponses" "css_element" exists
     Then I should see "No response submitted"
+
+  Scenario: I can navigate back to activity list by nav link
+    When I log in as "john"
+    And I navigate to the outstanding perform activities list page
+    And I click on "John draft" "link"
+    Then I should see "Performance activities"
+
+    When I click on "Performance activities" "link"
+    Then I should see "Your activities"
+    And I should see "John draft"
+    And I should see "John is view-only subject"
+    And I should see "John is participating subject"
+

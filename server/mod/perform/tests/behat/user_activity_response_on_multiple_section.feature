@@ -236,3 +236,13 @@ Feature: Respond to activity with multiple sections
     # navigate back to section 2
     When I click on "section 2" "button"
     Then the field "Your response" matches value "John Answer two"
+
+  Scenario: End user can navigate back to activity list by nav link
+    Given I log in as "user1"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Closed activity" "link"
+    Then I should see "Performance activities"
+
+    When I click on "Performance activities" "link"
+    Then I should see "Closed activity"
+    And I should see "Open activity"
