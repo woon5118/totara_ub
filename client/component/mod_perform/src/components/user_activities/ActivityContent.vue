@@ -178,7 +178,7 @@
                     :accessible-label="sectionElement.element.title"
                     :required="sectionElement.element.is_required"
                   >
-                    <template v-slot:content>
+                    <template v-slot:content="{ labelId }">
                       <component
                         :is="sectionElement.responseDisplayComponent"
                         v-if="activeSectionIsClosed"
@@ -187,6 +187,7 @@
                         :response-lines="
                           sectionElement.response_data_formatted_lines
                         "
+                        :aria-labelledby="labelId"
                       />
                       <component
                         :is="sectionElement.formComponent"
@@ -195,6 +196,7 @@
                         :element="sectionElement.element"
                         :path="['sectionElements', sectionElement.id]"
                         :error="errors && errors[sectionElement.id]"
+                        :aria-labelledby="labelId"
                       />
                     </template>
                   </ElementParticipantForm>

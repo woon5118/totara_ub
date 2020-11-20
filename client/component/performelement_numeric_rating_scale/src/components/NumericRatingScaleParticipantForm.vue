@@ -19,17 +19,22 @@
 <template>
   <FormScope :path="path" :process="process">
     <div class="tui-elementEditNumericRatingScaleParticipantForm">
-      <FormRange
-        name="response"
-        :default-value="element.data.defaultValue"
-        :show-labels="false"
-        :min="min"
-        :max="max"
-        :validations="validations"
-      />
-      <div class="tui-elementEditNumericRatingScaleParticipantForm__input">
+      <FieldGroup :aria-labelledby="ariaLabelledby">
+        <FormRange
+          name="response"
+          :default-value="element.data.defaultValue"
+          :show-labels="false"
+          :min="min"
+          :max="max"
+          :validations="validations"
+        />
+      </FieldGroup>
+      <FieldGroup
+        class="tui-elementEditNumericRatingScaleParticipantForm__input"
+        :aria-labelledby="ariaLabelledby"
+      >
         <FormNumber name="response" :min="min" :max="max" char-length="5" />
-      </div>
+      </FieldGroup>
     </div>
   </FormScope>
 </template>
@@ -38,12 +43,14 @@
 import FormScope from 'tui/components/reform/FormScope';
 import { FormRange, FormNumber } from 'tui/components/uniform';
 import { v as validation } from 'tui/validation';
+import FieldGroup from 'tui/components/form/FieldGroup';
 
 export default {
   components: {
     FormScope,
     FormRange,
     FormNumber,
+    FieldGroup,
   },
   props: {
     path: [String, Array],
@@ -53,6 +60,7 @@ export default {
       type: Object,
       required: true,
     },
+    ariaLabelledby: String,
   },
   computed: {
     /**

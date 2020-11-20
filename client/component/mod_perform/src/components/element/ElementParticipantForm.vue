@@ -19,12 +19,13 @@
   <div class="tui-performElementResponse">
     <div v-if="error">{{ error }}</div>
     <FormRow
+      v-slot="{ labelId }"
       :label="$str('your_response', 'mod_perform')"
       :accessible-label="accessibleLabel"
       :required="required"
       :optional="optional"
     >
-      <slot name="content" />
+      <slot name="content" :labelId="labelId" />
     </FormRow>
   </div>
 </template>
