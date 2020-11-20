@@ -226,6 +226,17 @@ trait report_trait {
         }
         $columnoptions[] = new \rb_column_option(
             $groupname,
+            'timezone',
+            get_string('timezone'),
+            "$join.timezone",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'user_timezone',
+                'addtypetoheading' => $addtypetoheading
+            )
+        );
+        $columnoptions[] = new \rb_column_option(
+            $groupname,
             'lastlogin',
             get_string('userlastlogin', 'totara_reportbuilder'),
             // See MDL-22481 for why currentlogin is used instead of lastlogin.
@@ -737,6 +748,17 @@ trait report_trait {
 
         $filteroptions[] = new \rb_filter_option(
             $groupname,
+            'timezone',
+            get_string('timezone'),
+            'select',
+            array(
+                'selectfunc' => 'user_timezones_list',
+            )
+        );
+
+
+        $filteroptions[] = new \rb_filter_option(
+            $groupname,
             'lastlogin',
             get_string('userlastlogin', 'totara_reportbuilder'),
             'date',
@@ -1084,5 +1106,21 @@ trait report_trait {
         );
 
         return true;
+    }
+
+    public function rb_filter_user_timezones_list() {
+        global $DB;
+
+        $timezones = \core_date::get_list_of_timezones(null, true);
+
+        $used = $DB->get_fieldset_sql("SELECT DISTINCT timezone FROM {user} WHERE deleted = 0 ORDER BY timezone ASC");
+        foreach ($used as $tz) {
+            if (isset($timezones[$tz])) {
+                continue;
+            }
+            $timezones[$tz] = get_string('timezoneinvalid', 'core_admin', $tz);
+        }
+
+        return $timezones;
     }
 }
