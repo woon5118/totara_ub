@@ -32,8 +32,9 @@ $string['pluginname'] = 'Rating scale element';
 $string['scale_numeric_values'] = 'Numeric values';
 
 // Help messages
-$string['numeric_max_value_help'] = "Use whole numbers. The scale steps in intervals of 1, with a minimum of 3 steps. For example, from 1 to 3.";
-$string['default_value_help_text'] = "Default value is a whole number between the numeric values.";
+$string['numeric_max_value_help'] = "A whole number representing the highest point in the scale’s range. The scale steps in intervals of 1, with a minimum of 3 steps (so there must be a difference of at least 2 between minimum and maximum numeric values).";
+$string['numeric_min_value_help'] = "A whole number representing the lowest point in the scale’s range. The scale steps in intervals of 1, with a minimum of 3 steps (so there must be a difference of at least 2 between minimum and maximum numeric values).";
+$string['default_value_help_text'] = "A whole number within the range of the minimum and maximum numeric values. It represents the starting position of the sliding marker on the scale before the respondent has selected a value.";
 
 // Errors
 $string['error:answer_invalid'] = 'Answer is not valid';

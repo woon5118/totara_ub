@@ -33,7 +33,7 @@ $string['score'] = 'Score';
 $string['text'] = 'Text';
 
 // Help messages
-$string['custom_values_help'] = 'Enter the custom text label and the corresponding score rating. The score rating values are unlimited and can be entered in any order. Both the text and the score rating will be displayed to the participant';
+$string['custom_values_help'] = 'Enter a custom text label and a corresponding numeric score that combined represent a selectable value on the rating scale. The scores must be whole numbers, but do not have to be unique or in numeric order.';
 
 // Errors
 $string['error:answer_required'] = 'Answer is required';

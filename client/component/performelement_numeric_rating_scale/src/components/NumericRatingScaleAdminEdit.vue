@@ -28,6 +28,9 @@
       <!-- Min value -->
       <FormRow
         :label="$str('low_value_label', 'performelement_numeric_rating_scale')"
+        :helpmsg="
+          $str('numeric_min_value_help', 'performelement_numeric_rating_scale')
+        "
         required
       >
         <FormNumber
@@ -140,6 +143,7 @@ export default {
     "high_value_label",
     "low_value_label",
     "numeric_max_value_help",
+    "numeric_min_value_help",
     "scale_numeric_values"
   ]
 }
