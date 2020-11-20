@@ -1791,7 +1791,7 @@ class behat_totara_tui extends behat_base {
         // We should wait a while to ensure that the page is not still loading elements.
         // Giving preference to the reliability of the results rather than to the performance.
         try {
-            $nodes = $this->find_all('xpath', $xpath, false, $container, self::REDUCED_TIMEOUT);
+            $nodes = $this->find_all('xpath', $xpath, false, $container, self::get_reduced_timeout());
         } catch (ElementNotFoundException $e) {
             // All ok.
             return;
@@ -1817,7 +1817,7 @@ class behat_totara_tui extends behat_base {
                 return true;
             },
             array('nodes' => $nodes, 'text' => $text, 'element' => $element),
-            self::REDUCED_TIMEOUT,
+            self::get_reduced_timeout(),
             false,
             true
         );

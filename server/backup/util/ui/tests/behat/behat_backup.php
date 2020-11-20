@@ -378,7 +378,7 @@ class behat_backup extends behat_base {
         }
 
         if (!$timeout) {
-            $timeout = self::TIMEOUT;
+            $timeout = self::get_timeout();
         }
 
         $this->getSession()->wait($timeout * 1000, self::PAGE_READY_JS);

@@ -115,7 +115,7 @@ class behat_current_learning_block extends behat_base {
         $expandiconxpath = "//*[@class[contains(.,'expand-collapse-icon-wrap')]]";
 
         try {
-            $this->find('xpath', $expandiconxpath, false, $row, self::REDUCED_TIMEOUT);
+            $this->find('xpath', $expandiconxpath, false, $row, self::get_reduced_timeout());
         } catch (\Behat\Mink\Exception\ElementNotFoundException $e) {
             // Yay not found.
             return;

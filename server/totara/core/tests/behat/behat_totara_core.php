@@ -507,7 +507,7 @@ class behat_totara_core extends behat_base {
             // Would be better to use a 1 second sleep because the element should not be there,
             // but we would need to duplicate the whole find_all() logic to do it, the benefit of
             // changing to 1 second sleep is not significant.
-            $this->find('xpath', $locator, false, $containernode, self::REDUCED_TIMEOUT);
+            $this->find('xpath', $locator, false, $containernode, self::get_reduced_timeout());
         } catch (ElementNotFoundException $e) {
             throw new ExpectationException('The "' . $titleoralt . '" image was not found exists in the "' .
                 $containerelement . '" "' . $containerselectortype . '"', $this->getSession());
@@ -535,7 +535,7 @@ class behat_totara_core extends behat_base {
             // Would be better to use a 1 second sleep because the element should not be there,
             // but we would need to duplicate the whole find_all() logic to do it, the benefit of
             // changing to 1 second sleep is not significant.
-            $node = $this->find('xpath', $locator, false, $containernode, self::REDUCED_TIMEOUT);
+            $node = $this->find('xpath', $locator, false, $containernode, self::get_reduced_timeout());
             if ($this->running_javascript() && !$node->isVisible()) {
                 // It passes it is there but is not visible.
                 return;

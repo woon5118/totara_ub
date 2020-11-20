@@ -304,7 +304,7 @@ class behat_navigation extends behat_base {
                         'XPathResult.ANY_TYPE, null).iterateNext().getAttribute(\'data-loaded\') == "true")';
 
                     // Totara: the first access of all settings may take a very long time!
-                    $this->getSession()->wait(self::EXTENDED_TIMEOUT * 1000 * 3, $jscondition);
+                    $this->getSession()->wait(behat_base::get_extended_timeout() * 1000 * 3, $jscondition);
                 }
             }
         }
