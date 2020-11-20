@@ -22,7 +22,7 @@ import langid
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from lightfm.data import Dataset
-from .pre_processors import PreProcessors
+from subroutines.pre_processors import PreProcessors
 
 
 class DataLoader:
@@ -30,45 +30,35 @@ class DataLoader:
     This is a conceptual representation of the process to read, preprocess and transform data that
     was exported by the Totara instance, so that the data is consumable by the LightFM model class.
     """
-    def __init__(self, data_home=None, nl_libs=None, query='mf', tenant=0):
+    def __init__(self, nl_libs=None):
         """
         Class constructor method
-        :param data_home: Full path of the directory that contains the data exported by the Totara instance,
-            defaults to None
-        :type data_home: str, mandatory
         :param nl_libs: Full path to the directory containing the language processing resources e.g.,
             stopwords of different languages, lemmatizing resources, etc., defaults to None
         :type nl_libs: str, mandatory
-        :param query: One of 'mf' (collaborative filtering), 'partial' (content based filtering
-            without text processing), or 'hybrid' (content based filtering with text processing). The data
-            preparation/processing depends on this parameter, defaults to 'mf'
-        :type query: str, optional
-        :param tenant: The tenant id whose data needs to be processed, defaults to '0'
-        :type tenant: str, optional
         """
-        self.data_home = data_home
         self.nl_libs = nl_libs
-        self.query = query
-        self.tenant = tenant
 
-    def __get_interactions(self):
+    @staticmethod
+    def __get_interactions(interactions=None):
         """
-        This method reads the given tenant's `user_interaction` file and returns the interactions dataset.
+        This method uses the `interaction` DataFrame and returns the interactions dataset.
+        :param interactions: The interactions data as exported from the Totara instance, defaults to None
+        :type interactions: A pandas DataFrame
         :return: A list of tuples (user_id, item_id, weight) containing user-item interactions
         :rtype: list
         """
-        file_path = os.path.join(self.data_home, f'user_interactions_{self.tenant}.csv')
-        interactions = pd.read_csv(filepath_or_buffer=file_path, sep=',', encoding='utf-8')
         interactions = [(int(x[0]), x[1], float(x[2])) for x in interactions.to_numpy()]
         return interactions
 
-    def __get_users(self):
+    @staticmethod
+    def __get_users(users_data=None):
         """
-        Reads the file `user_data` of the given tenant and returns a list of user ids
+        Uses the pandas DataFrame `users_data` and returns a list of user ids
+        :param users_data: The users data exported from the Totara instance, defaults to None
+        :type users_data: A pandas DataFrame
         :return: A list of user ids
         """
-        file_path = os.path.join(self.data_home, f'user_data_{self.tenant}.csv')
-        users_data = pd.read_csv(filepath_or_buffer=file_path, sep=',', encoding='utf-8', index_col='user_id')
         user_ids = users_data.index.tolist()
         return user_ids
 
@@ -108,27 +98,35 @@ class DataLoader:
         :type dataframe: Pandas DataFrame object
         :return: A dictionary whose keys are item_id and the values are item_type
         """
-        dataframe_stacked = dataframe[dataframe==1].stack().reset_index()
+        dataframe_stacked = dataframe[dataframe == 1].stack().reset_index()
         item_type_map = pd.Series(dataframe_stacked.level_1.values, index=dataframe_stacked.item_id).to_dict()
         return item_type_map
 
-    def __get_items(self):
+    def __get_items(self, items_data=None, query='mf'):
         """
-        This method reads the data from the `item_data` file of the given tenant and returns a fully processed
-        items data. The processing depends on the type of `query` defined in the instance variable of the class
+        This method uses the pandas DataFrame of the items data exported from the totara instance and returns a
+            fully processed items data. The processing depends on the type of `query` defined in the instance
+            variable of the class, defaults to None
+        :param items_data: The data exported from the Totara instance, defaults to None
+        :type items_data: A pandas DataFrame
+        :param query: One of 'mf' (collaborative filtering), 'partial' (content based filtering
+            without text processing), or 'hybrid' (content based filtering with text processing). The data
+            preparation/processing depends on this parameter, defaults to 'mf'
+        :type query: str, optional
         :return: A dictionary containing four items; 'features_list' - a full list of all the possible features
             of the items data, 'items_features_data' - A list containing tuples of the shape
             `(item_id, {features_name: weight, ...})`, `item_ids` - a list of item ids and `item_type_map` - a
             dictionary with keys as the `item_id` and values as `item_type`
         """
-        file_path = os.path.join(self.data_home, f'item_data_{self.tenant}.csv')
-        items_data = pd.read_csv(filepath_or_buffer=file_path, sep=',', encoding='utf-8', index_col='item_id')
+
         item_ids = items_data.index.tolist()
-        type_cols = ['container_course', 'container_workspace', 'engage_article', 'engage_microlearning', 'totara_playlist']
+        type_cols = [
+            'container_course', 'container_workspace', 'engage_article', 'engage_microlearning', 'totara_playlist'
+        ]
 
         item_type_map = self.__get_items_attr(dataframe=items_data[type_cols])
 
-        if self.query == 'hybrid':
+        if query == 'hybrid':
             # Retrieve stopwords list.
             stopwords_file = os.path.join(self.nl_libs, 'stopwords-iso.json')
             with open(stopwords_file) as json_file:
@@ -141,8 +139,8 @@ class DataLoader:
                 stopwords = stopwords_list.get(lang[0])
                 # Cleanup the document and remove stopwords from it using the Preprocessors class
                 new_doc = PreProcessors(
-                    raw_doc=doc
-                ).preprocess_docs(stopwords=stopwords)
+                    stopwords=stopwords
+                ).preprocess_docs(raw_doc=doc)
                 processed_document.append(new_doc)
 
             # Convert the list of documents into a matrix of TF-IDF features
@@ -181,7 +179,7 @@ class DataLoader:
             # Create a list of all the feature names (tags and words)
             features_list = items_data.columns.tolist() + features_list
             features_list.remove('document')
-        elif self.query == 'partial':
+        elif query == 'partial':
             # As for the case of `query == 'hybrid'` except there are no text features
             items_features_data = self.__create_partial_features(items_data.drop(columns=['document']))
             # List of features names (tags)
@@ -201,25 +199,27 @@ class DataLoader:
 
         return items_processed_data
 
-    def __transform_data(self):
+    def __transform_data(self, interactions=None, items_data=None, users_data=None, query='mf'):
         """
         This method governs the process of reading the interactions data, items data and the users data
         as defined in the class instance variables
+        :param interactions: The interactions data as exported from the Totara instance, defaults to None
+        :type interactions: A pandas DataFrame
+        :param items_data: The data exported from the Totara instance, defaults to None
+        :type items_data: A pandas DataFrame
+        :param users_data: The users data exported from the Totara instance, defaults to None
+        :type users_data: A pandas DataFrame
+        :param query: One of 'mf' (collaborative filtering), 'partial' (content based filtering
+            without text processing), or 'hybrid' (content based filtering with text processing). The data
+            preparation/processing depends on this parameter, defaults to 'mf'
+        :type query: str, optional
         :return: A dictionary of three items; 'interaction' - the interactions data, 'items_data' - the
             items data, and the 'user_ids' - the user data.
         """
-        print(f'Processing tenant {self.tenant}')
 
-        try:
-            interactions = self.__get_interactions()
-        except ValueError as err:
-            interactions = None
-            print(f'ValueError: {err}')
-            print(f'Cannot process tenant {self.tenant}. Perhaps not enough data yet.')
-            exit()
-
-        items_data = self.__get_items()
-        user_ids = self.__get_users()
+        interactions = self.__get_interactions(interactions=interactions)
+        items_data = self.__get_items(items_data=items_data, query=query)
+        user_ids = self.__get_users(users_data=users_data)
 
         processed_data = {
             'interactions': interactions,
@@ -228,10 +228,20 @@ class DataLoader:
         }
         return processed_data
 
-    def load_data(self):
+    def load_data(self, interactions=None, items_data=None, users_data=None, query='mf'):
         """
         This method takes reads runs other methods of the class to read and preprocess interactions, items and users
         data and transforms that into the sparse matrices that can be consumed by the LightFM model class.
+        :param interactions: The interactions data as exported from the Totara instance, defaults to None
+        :type interactions: A pandas DataFrame
+        :param items_data: The data exported from the Totara instance, defaults to None
+        :type items_data: A pandas DataFrame
+        :param users_data: The users data exported from the Totara instance, defaults to None
+        :type users_data: A pandas DataFrame
+        :param query: One of 'mf' (collaborative filtering), 'partial' (content based filtering
+            without text processing), or 'hybrid' (content based filtering with text processing). The data
+            preparation/processing depends on this parameter, defaults to 'mf'
+        :type query: str, optional
         :return: A dictionary with the items; `interactions` - a sparse matrix of user-item interaction, `weights` - a
             sparse matrix of of sample weights of the same shape as the `interactions`, `item_features` - a sparse
             matrix of the shape `[n_items, n_features]` where each row contains item's weights over features,
@@ -239,7 +249,12 @@ class DataLoader:
             and `item_type_map` - a dictionay with keys as the `item_id` and values as `item_type`
         """
         # Read all datasets, preprocess and transform data to be consumed by the LightFM data class
-        transformed_data = self.__transform_data()
+        transformed_data = self.__transform_data(
+            interactions=interactions,
+            items_data=items_data,
+            users_data=users_data,
+            query=query
+        )
         # Instantiate Dataset class
         dataset = Dataset(user_identity_features=False, item_identity_features=False)
 
@@ -253,7 +268,7 @@ class DataLoader:
         # Prepare the interaction and weights sparse matrices
         interactions, weights = dataset.build_interactions(data=transformed_data['interactions'])
 
-        if self.query in ['partial', 'hybrid']:
+        if query in ['partial', 'hybrid']:
             # Prepare the item features sparse matrix if the user is not asking for content based filtering
             item_features = dataset.build_item_features(
                 data=transformed_data['items_data']['items_features_data']

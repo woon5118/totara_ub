@@ -40,6 +40,10 @@ class UserToItems:
         :type u_mapping: dict
         :param i_mapping: A dictionary where keys are Totara item ids and values are internal item ids
         :type i_mapping: dict
+        :param item_type_map: A dictionary where keys are Totara item ids and values are item types, e.g.,
+            one of `container_course`, `container_workspace`, `engage_article`, `engage_microlearning`,
+            and `totara_playlist`
+        :type item_type_map: dict
         :param item_features: A sparse matrix of shape `[n_items, n_item_features]` - Each row contains
             that item's weight over features
         :type item_features: csr_matrix
@@ -64,7 +68,8 @@ class UserToItems:
         Returns top `num_items` recommended items where `num_items` is the instance variable of the class
         :param internal_uid: The internal id of the user for whom the recommendations are sought
         :type internal_uid: int
-        :return: A list of tuples where the first elements are the Totara ids of the items and the second ones the ranking
+        :return: A list of tuples where the first elements are the Totara ids of the items and the second
+            ones the ranking
         :rtype: list
         """
         item_ids = np.fromiter(self.i_mapping.values(), dtype=np.int32)
@@ -76,11 +81,15 @@ class UserToItems:
             num_threads=self.num_threads
         )
         sorted_ids = predictions.argsort()[::-1]
-        sorted_items = [(self.i_mapping_rev[x], predictions[x], self.item_type_map[self.i_mapping_rev[x]]) for x in sorted_ids]
+        sorted_items = [
+            (self.i_mapping_rev[x], predictions[x], self.item_type_map[self.i_mapping_rev[x]]) for x in sorted_ids
+        ]
         best_with_score = []
-        item_types = ['container_course', 'container_workspace', 'engage_article', 'engage_microlearning', 'totara_playlist']
-        for type in item_types:
-            type_recommended = [(x[0], x[1]) for x in sorted_items if x[2] == type]
+        item_types = [
+            'container_course', 'container_workspace', 'engage_article', 'engage_microlearning', 'totara_playlist'
+        ]
+        for i_type in item_types:
+            type_recommended = [(x[0], x[1]) for x in sorted_items if x[2] == i_type]
             type_recommended = type_recommended[:self.num_items]
             best_with_score.extend(type_recommended)
 

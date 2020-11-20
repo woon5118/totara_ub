@@ -34,9 +34,8 @@ class ArgParser:
     def set_args(self):
         """
         This method sets up the required commandline arguments with the correct type and defaults, etc.
-        :return: A namespace object where each element can be accessed. An attribute `att` of the
-            object `args` can be accessed as `args.att`
-        :rtype: Namespace
+        :return: An object of the `argparse.ArgumentParser` class with defined command-line named arguments
+        :rtype: An object of the `argparse.ArgumentParser` class
         """
         the_parser = self.parser
         the_parser.add_argument(
@@ -49,20 +48,20 @@ class ArgParser:
             choices=['mf', 'partial', 'hybrid']
         )
         the_parser.add_argument(
-            "--result_count_user",
-            help="Number of items-to-user recommendations to return",
+            '--result_count_user',
+            help='Number of items-to-user recommendations to return',
             required=True,
             type=int
         )
         the_parser.add_argument(
-            "--result_count_item",
-            help="Number of items-to-item recommendations to return",
+            '--result_count_item',
+            help='Number of items-to-item recommendations to return',
             required=True,
             type=int
         )
         the_parser.add_argument(
-            "--threads",
-            help="Number of parallel threads to use (should be <= physical cores)",
+            '--threads',
+            help='Number of parallel threads to use (should be <= physical cores)',
             required=True,
             type=int
         )
@@ -72,4 +71,4 @@ class ArgParser:
             required=True,
             type=Path
         )
-        return the_parser.parse_args()
+        return the_parser

@@ -18,17 +18,19 @@ Please contact [licensing@totaralearning.com] for more information.
 
 import re
 
+
 class PreProcessors:
     """
     This is a conceptual representation of cleaning the document strings
     """
-    def __init__(self, raw_doc=None):
+    def __init__(self, stopwords=None):
         """
         Class constructor method
-        :param raw_doc: The document to be preprocessed/cleaned, defaults to None
-        :type raw_doc: str, mandatory
+        :param stopwords: A list of stopwords. These stopwords whenever provided must belong to
+            the same language as the `raw_doc`, defaults to None
+        :type stopwords: list, optional
         """
-        self.raw_doc = raw_doc
+        self.stopwords = stopwords
 
     @staticmethod
     def __remove_urls(in_doc=None):
@@ -43,18 +45,17 @@ class PreProcessors:
         new_doc = ' '.join(re.sub(reg_patt, " ", in_doc).split())
         return new_doc
 
-    def preprocess_docs(self, stopwords=None):
+    def preprocess_docs(self, raw_doc=None):
         """
         This method preprocesses the strings and returns a string that is in lower case, has URLs removed,
         numeric characters removed, has no stopwords, and has been lemmatized.
-        :param stopwords: A list of stopwords. These stopwords whenever provided must belong to
-            the same language as the `raw_doc`, defaults to None
-        :type stopwords: list, optional
+        :param raw_doc: The document to be preprocessed/cleaned, defaults to None
+        :type raw_doc: str, mandatory
         :return: A preprocessed document
         :rtype: str
         """
         # Convert the document to the lower case
-        doc = self.raw_doc.lower()  # type, str
+        doc = raw_doc.lower()  # type, str
         # Remove the URLs
         doc = self.__remove_urls(in_doc=doc)  # type, str
         # Remove the numeric characters
@@ -63,11 +64,13 @@ class PreProcessors:
         doc = re.sub(r'[^\w\s]', ' ', doc)  # type, str
         # Replace multiple white spaces with single one
         doc = ' '.join(doc.split(sep=' '))
+        # Remove the trailing and leading white spaces
+        doc = doc.strip()
         # Convert the document string into list of words
         doc = doc.split(sep=' ')  # type, list
         # Remove stopwords
-        if stopwords is not None:
-            doc = [t for t in doc if t not in stopwords]  # type, list
+        if self.stopwords is not None:
+            doc = [t for t in doc if t not in self.stopwords]  # type, list
         else:
             doc = doc  # type, list
         # Join the words into a single string of document
