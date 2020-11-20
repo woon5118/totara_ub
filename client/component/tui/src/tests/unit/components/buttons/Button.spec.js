@@ -30,7 +30,11 @@ const smallClass = 'tui-formBtn--small';
 describe('presentation/form/Button.vue', () => {
   beforeAll(() => {
     wrapper = shallowMount(component, {
-      propsData: { text: 'btn text' },
+      propsData: {
+        text: 'btn text',
+        autofocus: true,
+      },
+      attachToDocument: true,
       listeners: {
         click: clickFunc,
       },
@@ -77,5 +81,9 @@ describe('presentation/form/Button.vue', () => {
       },
     });
     expect(results).toHaveNoViolations();
+  });
+
+  it('should be auto focus', () => {
+    expect(wrapper.element).toBe(document.activeElement);
   });
 });

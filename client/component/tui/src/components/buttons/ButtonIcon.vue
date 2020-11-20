@@ -22,7 +22,6 @@
     :aria-describedby="ariaDescribedby"
     :aria-expanded="ariaExpanded"
     :aria-label="ariaLabel"
-    :autofocus="autofocus"
     :class="{
       'tui-formBtn--alert': styleclass.alert,
       'tui-iconBtn--prim': styleclass.primary,
@@ -143,6 +142,16 @@ export default {
 
       return this.text !== this.ariaLabel ? this.ariaLabel : false;
     },
+  },
+  mounted() {
+    if (this.autofocus && this.$el) {
+      // Make the input element to be focused, when the prop autofocus is set.
+      // We are moving away from the native attribute for element, because
+      // different browser will treat autofocus different. Furthermore,
+      // the slow performing browser will not make the element focused due
+      // to the element is not rendered on time.
+      this.$el.focus();
+    }
   },
 };
 </script>

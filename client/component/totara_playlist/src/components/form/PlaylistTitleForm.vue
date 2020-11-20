@@ -33,7 +33,9 @@
         :placeholder="label"
         :aria-label="label"
         :maxlength="75"
+        :autofocus="focusInput"
         name="playlist title"
+        @keydown.native.esc="$emit('cancel', $event)"
       />
     </FormRow>
 
@@ -66,6 +68,10 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * A flag to tell whether this form should focus on the input or not.
+     */
+    focusInput: Boolean,
   },
 
   data() {

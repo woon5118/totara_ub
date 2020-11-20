@@ -25,7 +25,6 @@
     :aria-label="ariaLabel"
     :aria-labelledby="ariaLabelledby"
     :autocomplete="autocomplete"
-    :autofocus="autofocus"
     :class="[
       styleclass.preIcon ? 'tui-formInput--preIcon' : null,
       styleclass.postIcon ? 'tui-formInput--postIcon' : null,
@@ -118,6 +117,17 @@ export default {
       },
     },
     value: [Number, String],
+  },
+
+  mounted() {
+    if (this.autofocus && this.$el) {
+      // Make the input element to be focused, when the prop autofocus is set.
+      // We are moving away from the native attribute for element, because
+      // different browser will treat autofocus different. Furthermore,
+      // the slow performing browser will not make the element focused due
+      // to the element is not rendered on time.
+      this.$el.focus();
+    }
   },
 };
 </script>

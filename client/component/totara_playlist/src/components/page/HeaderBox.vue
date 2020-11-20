@@ -22,6 +22,7 @@
       v-if="!editing"
       :update-able="updateAble"
       :button-aria-label="$str('edit_playlist_title', 'totara_playlist')"
+      :focus-button="focusEditButton"
       class="tui-playlistPageHeaderBox__titleBox"
       @click="editing = true"
     >
@@ -31,8 +32,9 @@
     </InlineEditing>
 
     <PlaylistTitleForm
-      v-if="editing"
+      v-else
       :title="title"
+      :focus-input="true"
       :submitting="submitting"
       @submit="updatePlaylistTitle"
       @cancel="editing = false"
@@ -74,7 +76,18 @@ export default {
     return {
       editing: false,
       submitting: false,
+      focusEditButton: false,
     };
+  },
+
+  watch: {
+    /**
+     * @param {Boolean} value
+     */
+    editing(value) {
+      // Only make the edit button focus when we are not editing anymore.
+      this.focusEditButton = !value;
+    },
   },
 
   methods: {

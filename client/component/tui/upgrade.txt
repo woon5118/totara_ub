@@ -1,6 +1,14 @@
 This file describes API changes in /client/component/tui,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+* Updated Input.vue to disregard props "autofocus"
+  * Template changes
+* Updated Button.vue to disregard props "autofocus"
+  * Template changes
+* Updated ButtonIcon.vue to disregard props "autofocus"
+  * Template changes
+
 === 13.2 ===
 * Updated SidePanel.vue component to address overlapping issues
   * SCSS changes

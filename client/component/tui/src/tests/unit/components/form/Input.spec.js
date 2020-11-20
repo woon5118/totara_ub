@@ -24,7 +24,11 @@ const eventFunc = jest.fn();
 describe('presentation/form/Input.vue', () => {
   beforeAll(() => {
     wrapper = shallowMount(component, {
-      propsData: { type: 'text' },
+      propsData: {
+        type: 'text',
+        autofocus: true,
+      },
+      attachToDocument: true,
       listeners: {
         input: eventFunc,
         change: eventFunc,
@@ -35,5 +39,9 @@ describe('presentation/form/Input.vue', () => {
 
   it('Checks snapshot', () => {
     expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('Checks for focus', () => {
+    expect(wrapper.element).toBe(document.activeElement);
   });
 });

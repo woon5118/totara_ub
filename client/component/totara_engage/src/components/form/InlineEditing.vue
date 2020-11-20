@@ -32,6 +32,7 @@
       v-show="updateAble"
       ref="inlineEditingBtn"
       :aria-label="buttonAriaLabel"
+      :autofocus="focusButton"
       :styleclass="{ transparent: true, small: true }"
       class="tui-inlineEditing__btn"
     >
@@ -59,6 +60,10 @@ export default {
     },
     fullWidth: Boolean,
     restrictedMode: Boolean,
+    /**
+     * A flag to tell whether this component should turn the auto focus on the button or not.
+     */
+    focusButton: Boolean,
     updateAble: {
       type: Boolean,
       required: true,

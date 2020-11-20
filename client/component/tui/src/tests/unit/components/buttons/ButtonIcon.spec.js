@@ -29,7 +29,9 @@ describe('presentation/form/ButtonIcon.vue', () => {
         ariaLabel: 'btn icon',
         id: 'buttonicon',
         text: 'Magic',
+        autofocus: true,
       },
+      attachToDocument: true,
     });
   });
 
@@ -50,5 +52,9 @@ describe('presentation/form/ButtonIcon.vue', () => {
       },
     });
     expect(results).toHaveNoViolations();
+  });
+
+  it('should focus the element', () => {
+    expect(wrapper.element).toBe(document.activeElement);
   });
 });

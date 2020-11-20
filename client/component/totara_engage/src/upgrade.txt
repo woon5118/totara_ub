@@ -1,6 +1,10 @@
 This files describes API changes in /client/component/totara_engage,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+* Update InlineEditing.vue to pass through prop "focusButton" to tui ButtonIcon.vue
+  * Template changes
+
 === 13.2 ===
 
 * Added new optional prop "fromLibrary" for component BaseContent.vue
