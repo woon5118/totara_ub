@@ -1376,13 +1376,14 @@ class core_course_management_renderer extends plugin_renderer_base {
 
         $output = html_writer::start_tag('form', array('id' => $formid, 'action' => $searchurl, 'method' => 'get',
             'class' => 'form-inline'));
-        $output .= html_writer::start_tag('fieldset', array('class' => 'coursesearchbox invisiblefieldset m-y-1'));
+
+        $output .= html_writer::start_tag('div', array('class' => 'coursesearchbox invisiblefieldset m-y-1', 'style' => 'display: inline-block'));
         $output .= html_writer::tag('label', $strsearchcourses, array('for' => $inputid));
         $output .= html_writer::empty_tag('input', array('type' => 'text', 'id' => $inputid, 'size' => $inputsize,
             'name' => 'search', 'value' => s($value), 'class' => 'form-control m-x-1'));
         $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('go'),
             'class' => 'btn btn-secondary'));
-        $output .= html_writer::end_tag('fieldset');
+        $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('form');
 
         return $output;
