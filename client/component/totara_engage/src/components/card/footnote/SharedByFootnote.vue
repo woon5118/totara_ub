@@ -44,13 +44,13 @@
       @click.stop.prevent="unshare"
     >
       <Loading v-if="loading" />
-      <Delete v-else />
+      <Remove v-else :size="300" state="alert" />
     </ButtonIcon>
   </div>
 </template>
 
 <script>
-import Delete from 'tui/components/icons/Delete';
+import Remove from 'tui/components/icons/Remove';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Loading from 'tui/components/icons/Loading';
 import { notify } from 'tui/notifications';
@@ -60,9 +60,9 @@ import unShare from 'totara_engage/graphql/unshare';
 
 export default {
   components: {
-    Delete,
     ButtonIcon,
     Loading,
+    Remove,
   },
 
   props: {
