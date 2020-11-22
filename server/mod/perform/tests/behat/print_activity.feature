@@ -29,8 +29,8 @@ Feature: Print view of a single-section user activity
       | john  | aud1   |
       | david | aud1   |
     And the following "activity tracks" exist in "mod_perform" plugin:
-      | activity_name           | track_description |
-      | Single section activity | track 1           |
+      | activity_name           | track_description | due_date_offset |
+      | Single section activity | track 1           | 1, DAY          |
     And the following "track assignments" exist in "mod_perform" plugin:
       | track_description | assignment_type | assignment_name |
       | track 1           | cohort          | aud1            |
@@ -56,10 +56,18 @@ Feature: Print view of a single-section user activity
     And I should see "Single section activity"
     And I should see "Short text question"
     And I should see "Your response"
+    And the ".tui-participantContentPrint" "css_element" should contain the following sentence:
+      | Printed on | ##today##j F Y## |
+    And the ".tui-participantContentPrint__instanceDetails" "css_element" should contain the following sentence:
+      | Created on | ##today##j F Y## |
+    And I should see "Overall progress: Not yet started" in the ".tui-participantContentPrint__instanceDetails" "css_element"
+    And I should see "Your progress: Not yet started" in the ".tui-participantContentPrint__instanceDetails" "css_element"
+    And the ".tui-participantContentPrint__instanceDetails" "css_element" should contain the following sentence:
+      | Due date: | ##tomorrow##j F Y## |
 
     # Empty print components should be displayed.
-    And ".tui-notepadLines" "css_element" should exist in the ".tui-shortTextParticipantPrint" "css_element"
-    And ".tui-notepadLines" "css_element" should exist in the ".tui-longTextParticipantPrint" "css_element"
+    And I should see perform "short text" question "Short text question" is unanswered in print view
+    And I should see perform "long text" question "Long text question" is unanswered in print view
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
@@ -76,7 +84,18 @@ Feature: Print view of a single-section user activity
 
     When I click on "Cancel" "button"
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "david" is the participant
-    Then I should see "David short text answer one" in the ".tui-shortTextParticipantPrint" "css_element"
+
+    Then the ".tui-participantContentPrint" "css_element" should contain the following sentence:
+      | Printed on | ##today##j F Y## |
+    And the ".tui-participantContentPrint__instanceDetails" "css_element" should contain the following sentence:
+      | Created on | ##today##j F Y## |
+    And I should see "Overall progress: In progress" in the ".tui-participantContentPrint__instanceDetails" "css_element"
+    And I should see "Your progress: In progress" in the ".tui-participantContentPrint__instanceDetails" "css_element"
+    And the ".tui-participantContentPrint__instanceDetails" "css_element" should contain the following sentence:
+      | Due date: | ##tomorrow##j F Y## |
+
+    # Filled in, but not "closed" responses should be shown.
+    And I should see "David short text answer one" in the ".tui-shortTextParticipantPrint" "css_element"
     And I should see "David long text answer one" in the ".tui-longTextParticipantPrint" "css_element"
 
     When I navigate to the outstanding perform activities list page
@@ -86,8 +105,17 @@ Feature: Print view of a single-section user activity
     And I should see "Section submitted and closed." in the tui success notification toast
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "david" is the participant
 
+    Then the ".tui-participantContentPrint" "css_element" should contain the following sentence:
+      | Printed on | ##today##j F Y## |
+    And the ".tui-participantContentPrint__instanceDetails" "css_element" should contain the following sentence:
+      | Created on | ##today##j F Y## |
+    And I should see "Overall progress: In progress" in the ".tui-participantContentPrint__instanceDetails" "css_element"
+    And I should see "Your progress: Complete" in the ".tui-participantContentPrint__instanceDetails" "css_element"
+    And the ".tui-participantContentPrint__instanceDetails" "css_element" should contain the following sentence:
+      | Due date: | ##tomorrow##j F Y## |
+
     # No print components should be displayed any more.
-    Then ".tui-shortTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+    And ".tui-shortTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
     And ".tui-longTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
 
     # Instead response version of the question element should be shown
@@ -111,8 +139,8 @@ Feature: Print view of a single-section user activity
     And I should see "Your response"
 
     # Empty print components should be displayed.
-    And ".tui-notepadLines" "css_element" should exist in the ".tui-shortTextParticipantPrint" "css_element"
-    And ".tui-notepadLines" "css_element" should exist in the ".tui-longTextParticipantPrint" "css_element"
+    And I should see perform "short text" question "Short text question" is unanswered in print view
+    And I should see perform "long text" question "Long text question" is unanswered in print view
     And I should not see "Appraiser Four"
 
     # Check appraiser's view (view only)
@@ -153,8 +181,8 @@ Feature: Print view of a single-section user activity
     Then I should see "Your response"
 
     # Empty print components should be displayed.
-    And ".tui-notepadLines" "css_element" should exist in the ".tui-shortTextParticipantPrint" "css_element"
-    And ".tui-notepadLines" "css_element" should exist in the ".tui-longTextParticipantPrint" "css_element"
+    And I should see perform "short text" question "Short text question" is unanswered in print view
+    And I should see perform "long text" question "Long text question" is unanswered in print view
     And I should not see "Subject response"
     And I should not see "Appraiser response"
 

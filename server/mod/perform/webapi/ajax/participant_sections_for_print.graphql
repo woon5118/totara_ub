@@ -4,6 +4,10 @@ query mod_perform_participant_sections_for_print(
   mod_perform_participant_instance(
     participant_instance_id: $participant_instance_id
   ) {
+    subject_instance {
+      progress_status
+    }
+    progress_status
     core_relationship {
       idnumber
       name

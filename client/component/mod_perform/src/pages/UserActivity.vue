@@ -34,6 +34,7 @@
       :created-at="subjectInstance.created_at"
       :due-date="subjectInstance.due_date"
       :job-assignments="jobAssignments"
+      :printed-on-date="printedOnDate"
     />
     <ActivityContent
       v-else-if="!print && subjectInstance"
@@ -95,11 +96,8 @@ export default {
       type: String,
       default: '',
     },
-    print: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
+    print: Boolean,
+    printedOnDate: String,
   },
 
   data() {

@@ -2166,4 +2166,31 @@ class behat_general extends behat_base {
             throw new ExpectationException('Image with alt text "' . $text . '" was not displayed on the page', $this->getSession());
         }
     }
+
+    /**
+     * Assert an element contains a sentence, parameters are split over a TableNode
+     * so we can interpolate date placeholders ("##today##j F Y##").
+     *
+     * Note that date placeholders must be in their own node.
+     *
+     * @Then /^the "([^"]*)" "([^"]*)" should contain the following sentence:$/
+     *
+     * @param string $selector_type
+     * @param string $element
+     * @param TableNode $sentence_fragments_table
+     * @link https://docs.moodle.org/dev/Writing_acceptance_tests#Human-readable_and_relative_dates
+     * @throws ElementNotFoundException
+     */
+    public function the_should_contain_the_following_sentence(
+        string $element,
+        string $selector_type,
+        TableNode $sentence_fragments_table
+    ): void {
+        $sentence = implode(' ', $sentence_fragments_table->getRow(0));
+        $node = $this->get_selected_node($selector_type, $element);
+
+        if (strpos($node->getText(), $sentence) === false) {
+            throw new ExpectationException("Sentence: '$sentence' not found in the element", $this->getSession());
+        }
+    }
 }

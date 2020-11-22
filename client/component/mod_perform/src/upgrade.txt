@@ -1,6 +1,10 @@
 This file describes API changes in /client/component/mod_perform,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+* Updated the template structure of ActivityContentPrint.vue to add new icons, add new pieces of information, and improve element spacing and font sizes
+    * Template, SCSS changes & lang string changes
+
 === 13.2 ===
 * Reworked several components to centralise common functionality improving consistency and reducing duplication
     * Added a new wrapper component for all custom elements

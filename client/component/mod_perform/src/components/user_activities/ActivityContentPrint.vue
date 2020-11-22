@@ -18,56 +18,63 @@
 <template>
   <div class="tui-participantContentPrint">
     <Loader :loading="$apollo.loading">
+      <div class="tui-participantContentPrint__printedOnDate">
+        {{ printedOnDate }}
+      </div>
       <ParticipantGeneralInformation
         v-if="subjectUser.card_display"
+        class="tui-participantContentPrint__participantGeneralInformation"
         :subject-user="subjectUser"
         :job-assignments="jobAssignments"
         :current-user-is-subject="currentUserIsSubject"
         :relationship="relationshipToUser"
       />
       <div class="tui-participantContentPrint__header">
-        <h2>
-          {{ activity.type.display_name }}
-        </h2>
-
-        <h1>
+        <h1 class="tui-participantContentPrint__activityName">
           {{ activity.name }}
         </h1>
 
-        <p class="tui-participantContentPrint__header-date">
-          {{ $str('user_activities_created_at', 'mod_perform', createdAt) }}
-          <span v-if="dueDate">
-            {{
-              $str('user_activities_complete_before', 'mod_perform', dueDate)
-            }}
-          </span>
+        <h2 class="tui-participantContentPrint__activityType">
+          {{ activity.type.display_name }}
+        </h2>
+
+        <p class="tui-participantContentPrint__instanceDetails">
+          <span
+            v-for="(detail, i) in participantInstanceDetails"
+            :key="i"
+            class="tui-participantContentPrint__instanceDetails-detail"
+            >{{ detail }}</span
+          >
         </p>
       </div>
-      <div>
-        <RequiredOptionalIndicator is-required />
-        {{ $str('section_element_response_required', 'mod_perform') }}
+      <div class="tui-participantContentPrint__legendKey">
+        <div>
+          <RequiredOptionalIndicator is-required />
+          {{ $str('section_element_response_required', 'mod_perform') }}
+        </div>
+        <div>
+          <PrintedTodoIcon class="tui-participantContentPrint__printedTodo" />
+          {{ $str('add_your_response', 'mod_perform') }}
+        </div>
       </div>
 
-      <div class="tui-participantContentPrint__section">
-        <div
-          v-for="sectionResponse in participantSectionResponses"
-          :key="sectionResponse.id"
-          class="tui-participantContentPrint__section"
+      <div
+        v-for="sectionResponse in participantSectionResponses"
+        :key="sectionResponse.id"
+        class="tui-participantContentPrint__section"
+      >
+        <h3
+          v-if="activity.settings.multisection"
+          class="tui-participantContentPrint__sectionHeading"
         >
-          <Uniform
-            v-if="sectionResponse.id in initialUniformValues"
-            input-width="full"
-            :initial-values="initialUniformValues[sectionResponse.id]"
-          >
-            <div class="tui-participantContentPrint__sectionHeading">
-              <h3
-                v-if="activity.settings.multisection"
-                class="tui-participantContentPrint__sectionHeading-title"
-              >
-                {{ sectionResponse.section.display_title }}
-              </h3>
-            </div>
-
+          {{ sectionResponse.section.display_title }}
+        </h3>
+        <Uniform
+          v-if="sectionResponse.id in initialUniformValues"
+          input-width="full"
+          :initial-values="initialUniformValues[sectionResponse.id]"
+        >
+          <div class="tui-participantContentPrint__sectionItems">
             <div
               v-for="elementResponse in elementsResponsesBySection[
                 sectionResponse.id
@@ -75,6 +82,10 @@
               :key="elementResponse.id"
               class="tui-participantContentPrint__sectionItem"
             >
+              <PrintedTodoIcon
+                v-if="showPrintedTodo(sectionResponse, elementResponse)"
+                class="tui-participantContentPrint__printedTodo"
+              />
               <h3
                 v-if="elementResponse.element.title"
                 :id="$id('title')"
@@ -122,11 +133,23 @@
                   :view-only="false"
                   :section-element="elementResponse"
                   :anonymous-responses="activity.anonymous_responses"
+                  class="tui-participantContentPrint__otherParticipantResponses"
+                />
+                <component
+                  :is="elementResponse.printComponent"
+                  v-if="!elementResponse.is_respondable"
+                  class="tui-participantContentPrint__element"
+                  :element="elementResponse.element"
+                  :path="['sectionElements', elementResponse.id]"
+                  :data="elementResponse.response_data"
+                  :response-lines="
+                    elementResponse.response_data_formatted_lines
+                  "
                 />
               </div>
             </div>
-          </Uniform>
-        </div>
+          </div>
+        </Uniform>
       </div>
 
       <div
@@ -151,6 +174,7 @@ import OtherParticipantResponses from 'mod_perform/components/user_activities/pa
 import ParticipantGeneralInformation from 'mod_perform/components/user_activities/participant/ParticipantGeneralInformation';
 import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';
 import { Uniform } from 'tui/components/uniform';
+import PrintedTodoIcon from 'tui/components/icons/PrintedTodo';
 
 // graphQL
 import participantSectionsForPrintQuery from 'mod_perform/graphql/participant_sections_for_print';
@@ -164,6 +188,7 @@ export default {
     OtherParticipantResponses,
     ParticipantGeneralInformation,
     Uniform,
+    PrintedTodoIcon,
   },
 
   props: {
@@ -214,6 +239,14 @@ export default {
      */
     jobAssignments: {
       type: Array,
+      required: true,
+    },
+
+    /**
+     * Pre-formatted "Printed at ..." header string.
+     */
+    printedOnDate: {
+      type: String,
       required: true,
     },
   },
@@ -326,6 +359,43 @@ export default {
         RELATIONSHIP_SUBJECT
       );
     },
+    participantInstanceDetails() {
+      if (this.participantInstance === null) {
+        return [];
+      }
+
+      const details = [
+        this.$str(
+          'user_activities_print_created_on',
+          'mod_perform',
+          this.createdAt
+        ),
+        this.$str(
+          'user_activities_print_overall_progress',
+          'mod_perform',
+          this.getStatusText(
+            this.participantInstance.subject_instance.progress_status
+          )
+        ),
+        this.$str(
+          'user_activities_print_your_progress',
+          'mod_perform',
+          this.getStatusText(this.participantInstance.progress_status)
+        ),
+      ];
+
+      if (this.dueDate) {
+        details.push(
+          this.$str(
+            'user_activities_print_due_date',
+            'mod_perform',
+            this.dueDate
+          )
+        );
+      }
+
+      return details;
+    },
   },
   apollo: {
     participantSectionResponses: {
@@ -348,30 +418,86 @@ export default {
     printActivity() {
       window.print();
     },
+    /**
+     * Get the localized status text for a particular user activity.
+     *
+     * @param status {string}
+     * @returns {string}
+     */
+    getStatusText(status) {
+      switch (status) {
+        case 'NOT_STARTED':
+          return this.$str('user_activities_status_not_started', 'mod_perform');
+        case 'IN_PROGRESS':
+          return this.$str('user_activities_status_in_progress', 'mod_perform');
+        case 'COMPLETE':
+          return this.$str('user_activities_status_complete', 'mod_perform');
+        case 'PROGRESS_NOT_APPLICABLE':
+          return this.$str(
+            'user_activities_status_not_applicable',
+            'mod_perform'
+          );
+        case 'NOT_SUBMITTED':
+          return this.$str(
+            'user_activities_status_not_submitted',
+            'mod_perform'
+          );
+        default:
+          return '';
+      }
+    },
+    /**
+     * Should we show the printed-todo icon.
+     *
+     * @param sectionResponse {Object}
+     * @param elementResponse {Object}
+     * @returns {boolean}
+     */
+    showPrintedTodo(sectionResponse, elementResponse) {
+      if (sectionResponse.availability_status === 'CLOSED') {
+        return false;
+      }
+
+      if (!sectionResponse.can_answer) {
+        return false;
+      }
+
+      return (
+        elementResponse.is_respondable &&
+        elementResponse.response_data_formatted_lines.length === 0
+      );
+    },
   },
 };
 </script>
 <lang-strings>
 {
   "mod_perform": [
+    "add_your_response",
     "print",
     "relation_to_subject_self",
     "section_element_response_optional",
     "section_element_response_required",
-    "user_activities_created_at",
     "user_activities_complete_before",
-    "user_activities_other_response_show",
-    "user_activities_your_relationship_to_user"
+    "user_activities_print_created_on",
+    "user_activities_print_due_date",
+    "user_activities_print_overall_progress",
+    "user_activities_print_your_progress",
+    "user_activities_status_complete",
+    "user_activities_status_in_progress",
+    "user_activities_status_not_applicable",
+    "user_activities_status_not_started",
+    "user_activities_status_not_submitted"
   ]
 }
 </lang-strings>
 
 <style lang="scss">
 .tui-participantContentPrint {
-  @include tui-font-body();
+  @include tui-font-body-small;
 
-  @media screen {
-    padding: var(--gap-10);
+  &__printedOnDate {
+    text-align: center;
   }
 
   &__user {
@@ -388,29 +514,72 @@ export default {
     }
   }
 
+  &__activityType {
+    @include tui-font-heading-small;
+    margin: 0;
+  }
+
+  &__activityName {
+    @include tui-font-heading-medium;
+  }
+
   &__header {
-    @include tui-font-heading-medium();
-    margin: var(--gap-12) 0 var(--gap-4) 0;
-    padding: var(--gap-2) var(--gap-4);
+    margin-top: var(--gap-12);
+    padding: var(--gap-4);
     text-align: center;
     border: var(--border-width-thin) solid var(--color-primary);
 
-    &-date {
-      @include tui-font-body-small();
-      padding: var(--gap-6) var(--gap-4) 0;
-      color: var(--color-neutral-6);
+    & > * + * {
+      margin: var(--gap-6) 0 0 0;
     }
   }
 
+  &__participantGeneralInformation {
+    margin-top: var(--gap-4);
+  }
+
+  &__legendKey {
+    margin-top: var(--gap-2);
+
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
+  }
+
+  &__sectionHeading {
+    margin: var(--gap-4) 0 0;
+    @include tui-font-heading-small;
+  }
+
   &__section {
+    margin-top: var(--gap-8);
+
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+
     &-requiredContainer {
       margin-top: var(--gap-2);
     }
 
     &-responseRequired {
       display: inline-flex;
-      @include tui-font-heading-label();
+      @include tui-font-heading-label;
       color: var(--color-primary);
+    }
+  }
+
+  &__instanceDetails {
+    text-align: center;
+
+    &-detail {
+      display: inline-block;
+
+      &:not(:last-child):after {
+        margin: 0 var(--gap-1);
+        border-left: solid 1px var(--color-text);
+        content: '';
+      }
     }
   }
 
@@ -422,6 +591,12 @@ export default {
     }
   }
 
+  &__sectionItems {
+    & > * + * {
+      margin-top: var(--gap-8);
+    }
+  }
+
   &__sectionItem {
     &-content {
       & > * {
@@ -430,20 +605,34 @@ export default {
     }
 
     &-contentHeader {
-      display: inline-flex;
-      @include tui-font-heading-x-small();
+      @include tui-font-heading-x-small;
+      display: inline;
+      margin-top: 0;
       margin-left: 0;
     }
   }
 
+  &__otherParticipantResponses {
+    margin-top: var(--gap-8);
+  }
+
   &__actionButtons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     display: flex;
     justify-content: center;
-    padding-bottom: var(--gap-12);
+    width: 100%;
+    padding: var(--gap-2) 0;
+    background: rgba(247, 247, 247, 0.8);
+  }
 
-    & > * + * {
-      margin-left: var(--gap-4);
-    }
+  @media screen {
+    max-width: 21cm;
+    margin: auto auto var(--gap-12);
+    padding: var(--gap-12);
+    border: var(--border-width-thin) solid var(--color-border);
+    box-shadow: var(--shadow-4);
   }
 
   @media print {

@@ -50,7 +50,9 @@ class behat_mod_perform extends behat_base {
 
     public const PERFORM_ELEMENT_VALIDATION_ERROR_LOCATOR = '.tui-formFieldError';
     public const PERFORM_ELEMENT_LOCATOR = '.tui-participantContent__sectionItem';
+    public const PERFORM_ELEMENT_PRINT_LOCATOR = '.tui-participantContentPrint__sectionItem';
     public const PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR = '.tui-participantContent__sectionItem-contentHeader';
+    public const PERFORM_ELEMENT_QUESTION_TEXT_PRINT_LOCATOR = '.tui-participantContentPrint__sectionItem-contentHeader';
     public const PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR = '.tui-performRequiredOptionalIndicator--optional';
     public const PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR = '.tui-performRequiredOptionalIndicator--required';
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'input';
@@ -61,7 +63,7 @@ class behat_mod_perform extends behat_base {
     public const TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR = '.tui-otherParticipantResponses__anonymousResponse-participant';
     public const PARTICIPANT_FORM_RESPONSE_DISPLAY_LOCATOR = '.tui-participantFormResponseDisplay';
     public const PARTICIPANT_FORM_HTML_VIEW_ONLY_RESPONSE_LOCATOR = '.tui-participantFormHtmlResponseDisplay';
-    public const PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR = '.tui-participantContentPrint .tui-participantContentPrint__section .tui-participantContentPrint__section:nth-of-type(%d)';
+    public const PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR = '.tui-participantContentPrint__section';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_VALUE_EXTERNAL = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_ACTIVITY_GENERAL_INFORMATION_RELATIONSHIP_LOCATOR = '.tui-participantGeneralInformation__relationship-heading';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR = '.tui-participantContent__sectionHeading-otherResponseSwitch button';
@@ -93,6 +95,8 @@ class behat_mod_perform extends behat_base {
     public const ADMIN_FORM_STATIC_CONTENT_WEKA = '.tui-weka';
     public const FORM_BUILDER_ADD_ELEMENT_BUTTONS = '.tui-dropdownButton';
     public const FORM_BUILDER_RAW_TITLE_NAME = 'rawTitle';
+    public const TUI_NOTEPAD_LINES = '.tui-notepadLines';
+    public const TUI_PARTICIPANT_CONTENT_PRINT_PRINTED_TODO = '.tui-participantContentPrint__printedTodo';
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -171,6 +175,33 @@ class behat_mod_perform extends behat_base {
      */
     public function i_should_see_perform_question_is_unanswered(string $element_type, string $question_text): void {
          $this->i_should_see_perform_question_is_answered_with($element_type, $question_text, '');
+    }
+
+    /**
+     * @Then /^I should see perform "([^"]*)" question "([^"]*)" is unanswered in print view$/
+     * @param string $element_type
+     * @param string $question_text
+     */
+    public function i_should_see_perform_question_is_unanswered_print(string $element_type, string $question_text): void {
+        $this->wait_for_pending_js();
+
+        $question = $this->find_question_from_text($question_text, true);
+
+        $notepad_lines = $question->find('css', self::TUI_NOTEPAD_LINES);
+        if ($notepad_lines === null) {
+            $this->fail('Question was not unanswered, notepad lines were not present');
+        }
+
+        $printed_todo_icon = $question->find('css', self::TUI_PARTICIPANT_CONTENT_PRINT_PRINTED_TODO);
+        if ($printed_todo_icon === null) {
+            $this->fail('Question was not unanswered, printed todo icon was not present');
+        }
+
+        $response_locator = $this->get_response_element_response_locator($element_type);
+        $form_response = $question->find('css', $response_locator);
+        if ($form_response !== null) {
+            $this->fail('Question was not unanswered, it had a response');
+        }
     }
 
     /**
@@ -481,13 +512,21 @@ class behat_mod_perform extends behat_base {
      *
      * @param string $should_or_should_not
      * @param string $expected_text
-     * @param string $section_number
+     * @param int $section_number
      */
-    public function i_should_see_in_print_section(string $should_or_should_not, string $expected_text, string $section_number): void {
-        $method = $should_or_should_not === 'not ' ? 'assert_element_not_contains_text' : 'assert_element_contains_text';
-        $this->execute('behat_general::'. $method,
-            [$expected_text, sprintf(self::PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR, $section_number), 'css_element']
-        );
+    public function i_should_see_in_print_section(string $should_or_should_not, string $expected_text, int $section_number): void {
+        $should_contain_text = $should_or_should_not !== 'not ';
+
+        /** @var NodeElement $node */
+        $node = $this->find_all('css', self::PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR)[$section_number - 1];
+
+        if (!$should_contain_text && strpos($node->getText(), $expected_text) !== false) {
+            throw new ExpectationException("Sentence: '$expected_text' was found in the section", $this->getSession());
+        }
+
+        if ($should_contain_text && strpos($node->getText(), $expected_text) === false) {
+            throw new ExpectationException("Sentence: '$expected_text' was not found in the section", $this->getSession());
+        }
     }
 
     /**
@@ -953,12 +992,12 @@ class behat_mod_perform extends behat_base {
         return $locator;
     }
 
-    private function find_question_from_text(string $question_text): NodeElement {
+    private function find_question_from_text(string $question_text, bool $is_print = false): NodeElement {
         /** @var NodeElement[] $questions */
-        $questions = $this->find_all('css', self::PERFORM_ELEMENT_LOCATOR);
+        $questions = $this->find_all('css', $is_print ? self::PERFORM_ELEMENT_PRINT_LOCATOR : self::PERFORM_ELEMENT_LOCATOR);
 
         foreach ($questions as $question) {
-            $found_question = $question->find('css', self::PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR);
+            $found_question = $question->find('css', $is_print ? self::PERFORM_ELEMENT_QUESTION_TEXT_PRINT_LOCATOR : self::PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR);
 
             if ($found_question === null) {
                 continue;

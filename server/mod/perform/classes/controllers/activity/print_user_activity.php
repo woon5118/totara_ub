@@ -41,7 +41,7 @@ class print_user_activity extends perform_controller {
      * @var participant_instance_model
      */
     protected $participant_instance;
-    protected $layout = 'popup';
+    protected $layout = 'webview';
 
     /**
      * @inheritDoc
@@ -81,6 +81,7 @@ class print_user_activity extends perform_controller {
             'participant-section-id' => $participant_section_id,
             'print' => true,
             'subject-instance-id' => (int)$this->participant_instance->subject_instance_id,
+            'printed-on-date' => $this->get_printed_on_date(),
         ];
 
         $activity_name = (string)$this->participant_instance->subject_instance->activity->name;
@@ -101,6 +102,23 @@ class print_user_activity extends perform_controller {
      */
     protected function get_participant_section_id(): int {
         return $this->get_required_param('participant_section_id', PARAM_INT);
+    }
+
+    /**
+     * Get the "Printed on ..." header string.
+     * Yes because this comes from the back end controller
+     * it can technically be out of date by the time the page is actually printed,
+     * the date is the important part rather than the exact time.
+     *
+     * @return string
+     */
+    private function get_printed_on_date(): string {
+        $formatted_date = userdate(
+            time(),
+            get_string('strftimedatetime', 'langconfig')
+        );
+
+        return get_string('printed_on_date', 'mod_perform', $formatted_date);
     }
 
 }
