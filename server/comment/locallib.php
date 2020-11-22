@@ -183,7 +183,9 @@ class comment_manager {
             }
             // Totara: do not show delete options if current user doesn't have capability.
             if ($candelete) {
-                $checkbox = html_writer::checkbox('comments', $c->id, false);
+                $start_label = html_writer::start_tag('label', ['for' => 'comment_'.$c->id]);
+                $end_label = html_writer::end_tag('label');
+                $checkbox = $start_label. html_writer::checkbox('comments', $c->id, false, null, ['id' => 'comment_'.$c->id]). $end_label;
                 $action = html_writer::link(new moodle_url($link, array('commentid' => $c->id)), get_string('delete'));
                 if (!empty($context_url)) {
                     $action .= html_writer::empty_tag('br');
