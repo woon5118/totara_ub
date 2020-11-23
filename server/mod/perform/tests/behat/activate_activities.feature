@@ -45,9 +45,9 @@ Feature: Activation of activities
     When I navigate to the manage perform activities page
     Then I should see the tui datatable contains:
       | Name                    | Type      | Status |
-      | Active activity         | Check-in  | Active |
-      | Empty draft activity    | Appraisal | Draft  |
       | Complete draft activity | Feedback  | Draft  |
+      | Empty draft activity    | Appraisal | Draft  |
+      | Active activity         | Check-in  | Active |
 
     When I open the dropdown menu in the tui datatable row with "Empty draft activity" "Name"
     Then I should see "Activate" option in the dropdown menu
@@ -73,9 +73,9 @@ Feature: Activation of activities
     Then I should see " was successfully activated." in the tui success notification toast
     And I should see the tui datatable contains:
       | Name                    | Type      | Status |
-      | Active activity         | Check-in  | Active |
-      | Empty draft activity    | Appraisal | Draft  |
       | Complete draft activity | Feedback  | Active |
+      | Empty draft activity    | Appraisal | Draft  |
+      | Active activity         | Check-in  | Active |
 
   @javascript @vuejs
   Scenario: Activating activities on the manage activity page

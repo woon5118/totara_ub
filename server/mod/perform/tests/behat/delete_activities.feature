@@ -9,8 +9,8 @@ Feature: Deleting perform activities
     # that is why the activity setup is repeated with just the insertion order swapped.
     Given the following "activities" exist in "mod_perform" plugin:
       | activity_name   | description        | activity_type | activity_status |
-      | Draft activity  | A draft activity   | feedback      | Draft           |
       | Active activity | An active activity | feedback      | Active          |
+      | Draft activity  | A draft activity   | feedback      | Draft           |
 
     When I navigate to the manage perform activities page
     Then I should see the tui datatable contains:
@@ -36,8 +36,8 @@ Feature: Deleting perform activities
     # that is why the activity setup is repeated with just the insertion order swapped.
     Given the following "activities" exist in "mod_perform" plugin:
       | activity_name   | description        | activity_type | activity_status |
-      | Active activity | An active activity | feedback      | Active          |
       | Draft activity  | A draft activity   | feedback      | Draft           |
+      | Active activity | An active activity | feedback      | Active          |
 
     When I navigate to the manage perform activities page
     Then I should see the tui datatable contains:

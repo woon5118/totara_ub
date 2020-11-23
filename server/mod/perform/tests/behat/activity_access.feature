@@ -25,9 +25,9 @@ Feature: Checking access to performance activities in different situations
     Then I should see "Manage performance activities"
     And I should see the tui datatable contains:
       | Name                          |
-      | John is participating subject |
-      | David is subject              |
       | John is not participating     |
+      | David is subject              |
+      | John is participating subject |
     And "Participation reporting" "link" should exist
     # Site managers can create new activities by default
     And I should see "Add activity"
@@ -42,9 +42,9 @@ Feature: Checking access to performance activities in different situations
     And I should see "Add activity"
     When I click on "Add activity" "button"
     And I set the following fields to these values:
-      | Title | My Test Activity             |
+      | Title          | My Test Activity             |
       | Description    | My Test Activity description |
-      | Type  | Feedback                     |
+      | Type           | Feedback                     |
     When I click on "Create" "button"
     Then the "Content" tui tab should be active
     And I should see "My Test Activity"

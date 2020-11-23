@@ -15,8 +15,8 @@ Feature: Manage performance activity page
       | jack     | Jack      | Rabbit   | jack.rabbit@example.com |
     And the following "activities" exist in "mod_perform" plugin:
       | activity_name   | description        | activity_type | activity_status | created_at |
-      | Draft activity  | A draft activity   | feedback      | Draft           | 2000-01-01 |
       | Active activity | An active activity | feedback      | Active          | 2000-01-01 |
+      | Draft activity  | A draft activity   | feedback      | Draft           | 2000-01-01 |
 
   Scenario: Admin can access the activity management page
     Given I log in as "admin"
