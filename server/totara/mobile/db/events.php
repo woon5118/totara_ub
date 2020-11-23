@@ -26,4 +26,8 @@ $observers = array(
         'eventname' => '\core\event\user_deleted',
         'callback' => 'totara_mobile\local\observer::user_deleted',
     ),
+    array(
+        'eventname' => '\message_totara_airnotifier\event\fcmtoken_rejected',
+        'callback' => 'totara_mobile\local\observer::fcmtoken_rejected',
+    ),
 );

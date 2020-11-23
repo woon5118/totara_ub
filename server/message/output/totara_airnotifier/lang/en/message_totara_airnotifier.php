@@ -28,6 +28,7 @@ $string['config_airnotifier_host'] = 'Homepage URL of the AirNotifier server to 
 $string['airnotifier_appcode'] = 'AirNotifier App Code';
 $string['airnotifier_appname'] = 'AirNotifier App Name';
 $string['airnotifier_host'] = 'AirNotifier Server URL';
+$string['event_fcmtoken_rejected'] = 'FCM Token rejected';
 $string['event_pushnotification_sent'] = 'Push notification sent';
 $string['pluginname'] = 'Totara AirNotifier';
 $string['request_appcode_error:notdefault'] = 'App code can only be requested with default settings';

@@ -258,6 +258,32 @@ final class device {
     }
 
     /**
+     * Wipe the fcmtoken for any devices using it.
+     *
+     * @param string $token
+     * @return bool
+     */
+    public static function invalidate_fcmtoken($token) {
+        global $DB;
+
+        // If the invalid token is an empty string, we have nothing to do.
+        if (empty($token)) {
+            return true;
+        }
+
+        // There should only ever be one device associated with the token.
+        $devices = $DB->get_records('totara_mobile_devices', ['fcmtoken' => $token]);
+        foreach ($devices as $device) {
+            $DB->set_field('totara_mobile_devices', 'fcmtoken', null, ['id' => $device->id]);
+
+            // Trigger a token-removed event.
+            fcmtoken_removed::create_from_device($device)->trigger();
+        }
+
+        return true;
+    }
+
+    /**
      * Delete one users device or all their devices.
      *
      * @param int $userid

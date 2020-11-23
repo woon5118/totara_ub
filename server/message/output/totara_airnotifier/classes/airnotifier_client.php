@@ -24,6 +24,7 @@
 namespace message_totara_airnotifier;
 
 use curl;
+use message_totara_airnotifier\event\fcmtoken_rejected;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -213,11 +214,14 @@ class airnotifier_client {
             } else {
                 $ch->post($hostname . '/api/v2/push', $jsondata, $options);
             }
+
             $response = $ch->getResponse();
+            $rejectresp = ['400 Bad Request', '404 Not Found'];
             if (!empty($response['HTTP/1.1']) && $response['HTTP/1.1'] == '202 Accepted') {
                 $result[$token] = true;
-            } else {
-                $result[$token] = false;
+            } else if (in_array($response['HTTP/1.1'], $rejectresp)) {
+                fcmtoken_rejected::create_from_token($token)->trigger();
+                return false;
             }
         }
 

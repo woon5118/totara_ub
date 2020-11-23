@@ -38,4 +38,8 @@ final class observer {
     public static function user_deleted(\core\event\user_deleted $event) {
         device::delete($event->objectid);
     }
+
+    public static function fcmtoken_rejected(\message_totara_airnotifier\event\fcmtoken_rejected $event) {
+        device::invalidate_fcmtoken($event->other['fcmtoken']);
+    }
 }
