@@ -485,7 +485,7 @@ if ($allentries) {
                 // print the group break if apply
 
                 echo '<div>';
-                echo '<table cellspacing="0" class="glossarycategoryheader">';
+                echo '<table cellspacing="0" class="glossarycategoryheader" role="presentation">';
 
                 echo '<tr>';
                 if ($userispivot) {
