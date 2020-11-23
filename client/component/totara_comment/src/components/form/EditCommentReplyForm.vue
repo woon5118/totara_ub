@@ -90,6 +90,7 @@ export default {
         return {
           comment_area: this.item.comment_area.toLowerCase(),
           id: this.itemId,
+          draft_id: this.item.file_draft_id,
         };
       },
 
@@ -98,7 +99,11 @@ export default {
       },
 
       skip() {
-        return this.$apollo.queries.item.loading;
+        return (
+          !this.item ||
+          this.item.file_draft_id === null ||
+          this.$apollo.queries.item.loading
+        );
       },
     },
   },

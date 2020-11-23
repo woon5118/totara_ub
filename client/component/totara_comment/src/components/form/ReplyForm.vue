@@ -118,9 +118,12 @@ export default {
         return {
           id: this.commentId,
           comment_area: 'reply',
+          draft_id: this.draftId,
         };
       },
-
+      skip() {
+        return this.draftId === null;
+      },
       update({ editor }) {
         return editor;
       },

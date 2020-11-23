@@ -128,9 +128,12 @@ export default {
           area: this.area,
           comment_area: 'comment',
           instance_id: this.instanceId,
+          draft_id: this.draftId,
         };
       },
-
+      skip() {
+        return this.draftId === null;
+      },
       update({ editor }) {
         return editor;
       },
