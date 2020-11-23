@@ -37,7 +37,10 @@
   >
     <div
       class="tui-formImageUpload"
-      :class="{ 'tui-formImageUpload--highlight': isDrag }"
+      :class="{
+        'tui-formImageUpload--highlight': isDrag,
+        'tui-formImageUpload--isError': isError,
+      }"
       v-on="dragEvents"
     >
       <div class="tui-formImageUpload__actions">
@@ -48,12 +51,13 @@
               ? $str('addextended', 'totara_core', ariaLabelExtension)
               : $str('add', 'totara_core')
           "
+          :aria-describedby="ariaDescribedbyId"
           @click="pickFile"
         >
           <AddIcon size="200" />
         </ButtonIcon>
         <ButtonIcon
-          v-if="(files && files[0]) || showDelete"
+          v-if="(files && files[0] && !isError) || showDelete"
           class="tui-formImageUpload__deleteButton"
           :styleclass="{ stealth: true }"
           :aria-label="
@@ -61,7 +65,6 @@
               ? $str('deleteextended', 'totara_core', ariaLabelExtension)
               : $str('delete', 'totara_core')
           "
-          :aria-describedby="ariaDescribedby"
           @click="clearUpload(deleteDraft, files && files[0])"
         >
           <DeleteIcon />
@@ -81,6 +84,7 @@
           <Progress :value="Math.round(files[0].progress)" :small="true" />
         </template>
       </div>
+      <FieldError v-if="isError" :id="errorId" :error="errorMessage" />
     </div>
   </Upload>
 </template>
@@ -92,7 +96,7 @@ import ResponsiveImage from 'tui/components/images/ResponsiveImage';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import DeleteIcon from 'tui/components/icons/Delete';
 import Progress from 'tui/components/progress/Progress';
-import { notify } from 'tui/notifications';
+import FieldError from 'tui/components/form/FieldError';
 
 export default {
   components: {
@@ -102,6 +106,7 @@ export default {
     ButtonIcon,
     DeleteIcon,
     Progress,
+    FieldError,
   },
 
   props: {
@@ -119,7 +124,12 @@ export default {
     },
     currentUrl: String,
     defaultUrl: String,
-    acceptedTypes: Array,
+    acceptedTypes: {
+      type: Array,
+      default: () => {
+        return ['image/*'];
+      },
+    },
     ariaDescribedby: String,
     ariaLabelExtension: String,
     contextId: [Number, String],
@@ -129,12 +139,42 @@ export default {
   data() {
     return {
       selectedImageUrl: null,
+      errorMessage: '',
+      errorId: this.$id('field-error'),
     };
   },
 
   computed: {
     displayUrl() {
       return this.selectedImageUrl || this.currentUrl || this.defaultUrl;
+    },
+
+    /**
+     * Is the upload control in an error state (as decided by an error message)
+     *
+     * @returns {Boolean} Is there a validation issue?
+     */
+    isError() {
+      return this.errorMessage !== '';
+    },
+
+    /**
+     * Creates the aria-describedby attribute for the add file button
+     *
+     * @returns {String} id of the error control & "label"
+     */
+    ariaDescribedbyId() {
+      let describedby = [];
+
+      if (this.isError) {
+        describedby.push(this.errorId);
+      }
+
+      if (this.ariaDescribedby) {
+        describedby.push(this.ariaDescribedby);
+      }
+
+      return describedby.join(' ');
     },
   },
 
@@ -148,6 +188,7 @@ export default {
       this.$emit('update', {
         url,
       });
+      this.errorMessage = '';
     },
 
     handleError(e) {
@@ -156,7 +197,7 @@ export default {
       if (typeof e.error == 'string') {
         errorMessage = e.error;
       }
-      notify({ type: 'error', message: errorMessage });
+      this.errorMessage = errorMessage;
     },
 
     clearUpload(deleteDraft, file) {
@@ -218,6 +259,11 @@ export default {
       border-color: var(--form-input-border-color-focus);
       outline: none;
       box-shadow: var(--form-input-shadow-focus);
+    }
+
+    .tui-formImageUpload--isError & {
+      border-color: var(--form-input-border-color-invalid);
+      box-shadow: var(--form-input-shadow-invalid);
     }
   }
   &__display {

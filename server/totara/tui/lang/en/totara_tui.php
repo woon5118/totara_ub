@@ -70,7 +70,7 @@ $string['defaultimage'] = '{$a} default image';
 
 // Theme settings - Branding tab.
 $string['formbrand_label_logo'] = 'Logo';
-$string['formbrand_details_logo'] = 'Upload a logo to be used as the site\'s logo and it will appear in the main navigation';
+$string['formbrand_details_logo'] = 'Upload an image to be used as the site’s logo. Acceptable image formats: PNG, JPG, GIF, SVG.';
 $string['formbrand_label_logoalttext'] = 'Logo alternative text';
 $string['formbrand_details_logoalttext'] = 'Add the name of the site, to function as a text alternative to the logo image. There\'s no need to include "logo" in this field.';
 $string['formbrand_label_favicon'] = 'Favicon';
