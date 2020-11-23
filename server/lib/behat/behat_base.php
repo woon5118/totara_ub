@@ -937,4 +937,24 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
             $driver->click($xpath);
         }
     }
+
+    /**
+     * Find a specific element where the attribute also matches a specific value.
+     *
+     * @param $element
+     * @param $attribute
+     * @param $value
+     *
+     * @return NodeElement|null
+     */
+    protected function find_element_with_attribute_value($element, $attribute, $value): ?NodeElement {
+        $page = $this->getSession()->getPage();
+        $node_elements = $page->findAll('css', $element);
+        foreach ($node_elements as $node_element) {
+            if ($node_element->getAttribute($attribute) === $value) {
+                return $node_element;
+            }
+        }
+        return null;
+    }
 }
