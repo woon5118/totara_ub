@@ -136,14 +136,14 @@ class activity extends provider {
      * @param repository $repository
      */
     protected function sort_query_by_name(repository $repository): void {
-        $repository->order_by('name');
+        $repository->order_by('name')->order_by('id', 'ASC');
     }
 
     /**
      * @param repository $repository
      */
     protected function sort_query_by_creation_date(repository $repository): void {
-        $repository->order_by('created_at', 'DESC');
+        $repository->order_by('created_at', 'DESC')->order_by('id', 'DESC');
     }
 
     /**
