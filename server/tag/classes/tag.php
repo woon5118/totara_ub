@@ -81,7 +81,7 @@ class core_tag_tag {
      */
     protected function __construct($record) {
         if (empty($record->id)) {
-            throw new coding_exeption("Record must contain at least field 'id'");
+            throw new coding_exception("Record must contain at least field 'id'");
         }
         $this->record = $record;
     }
@@ -172,8 +172,15 @@ class core_tag_tag {
         foreach ($tags as $veryrawname) {
             $rawname = clean_param($veryrawname, PARAM_TAG);
             if (!$rawname) {
-                $rv[$rawname] = false;
+                // Totara: ignore invalid tags, the calling code expects array of objects!
+                continue;
             } else {
+                if ($DB->record_exists('tag', ['tagcollid' => $tagcollid, 'name' => core_text::strtolower($rawname)])) {
+                    // Totara: the validation logic in calling code cannot cope with accent insensitive code,
+                    //         so better make sure there will not be fatal errors caused by tag duplicates.
+                    //         Performance cost should not be too big because we do not add tags all the time.
+                    continue;
+                }
                 $obj = (object)(array)$tagobject;
                 $obj->rawname = $rawname;
                 $obj->name    = core_text::strtolower($rawname);
@@ -367,6 +374,12 @@ class core_tag_tag {
             $newtags = static::add($tagcollid, array_values($missing), $isstandard);
             foreach ($newtags as $tag) {
                 $result[$tag->name] = $tag;
+            }
+        }
+        // Totara: get rid of nulls that were placeholders for added values.
+        foreach ($result as $k => $v) {
+            if ($v === null) {
+                unset($result[$k]);
             }
         }
         return $result;
@@ -680,7 +693,7 @@ class core_tag_tag {
     public static function set_item_tags($component, $itemtype, $itemid, context $context, $tagnames, $tiuserid = 0) {
         if ($itemtype === 'tag') {
             if ($tiuserid) {
-                throw new coding_exeption('Related tags can not have tag instance userid');
+                throw new coding_exception('Related tags can not have tag instance userid');
             }
             debugging('You can not use set_item_tags() for tagging a tag, please use set_related_tags()', DEBUG_DEVELOPER);
             static::get($itemid, '*', MUST_EXIST)->set_related_tags($tagnames);
