@@ -3993,6 +3993,7 @@ function totara_hierarchy_parse_competency_assignment_availability($assignavaila
             0 => $assignment_availabilities['none'],
             1 => $assignment_availabilities['self'],
             2 => $assignment_availabilities['other'],
+            3 => $assignment_availabilities['any'],
         ];
     }
 
