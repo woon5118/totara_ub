@@ -104,7 +104,7 @@ YUI.add('moodle-core_filepicker', function(Y) {
             M.core_filepicker.loadedpreviews[newsrc] = true;
             this.set('src', newsrc).addClass('realpreview');
             delete lazyloading[this.get('id')];
-            var treenode = this.ancestor('.fp-treeview')
+            var treenode = this.ancestor('.fp-treeview');
             if (treenode && treenode.get('parentNode').treeview) {
                 treenode.get('parentNode').treeview.getRoot().refreshPreviews(this.get('id'), newsrc);
             }
@@ -392,6 +392,11 @@ YUI.add('moodle-core_filepicker', function(Y) {
                 var element = options.filenode.cloneNode(true);
                 parent.appendChild(element);
                 element.addClass(options.classnamecallback(node));
+                
+                if (element.one('.fp-filename-field')) {
+                    element.one('.fp-filename-field').setAttribute("aria-hidden", "true");
+                }
+
                 var filenamediv = element.one('.fp-filename');
                 filenamediv.setContent(file_get_displayname(node));
                 var imgdiv = element.one('.fp-thumbnail'), width, height, src;
@@ -806,8 +811,6 @@ M.core_filepicker.init = function(Y, options) {
             } else {
                 this.view_as_icons(appenditems);
             }
-            this.fpnode.one('.fp-content').setAttribute('tabindex', '0');
-            this.fpnode.one('.fp-content').focus();
             // display/hide the link for requesting next page
             if (!appenditems && this.active_repo.hasmorepages) {
                 if (!this.fpnode.one('.fp-content .fp-nextpage')) {
@@ -1280,12 +1283,18 @@ M.core_filepicker.init = function(Y, options) {
             root.setContent(content);
         },
         viewbar_set_enabled: function(mode) {
-            var viewbar = this.fpnode.one('.fp-viewbar')
+            var viewbar = this.fpnode.one('.fp-viewbar');
             if (viewbar) {
                 if (mode) {
                     viewbar.addClass('enabled').removeClass('disabled');
+                    viewbar.setAttribute("aria-label", M.util.get_string('changedisplay', 'repository'));
+                    viewbar.setAttribute("role", "radiogroup");
                     this.fpnode.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').setAttribute("aria-disabled", "false");
                     this.fpnode.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').setAttribute("tabindex", "");
+                    this.fpnode.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').setAttribute("role", "radio");
+                    this.fpnode.all('.fp-vb-icons').setAttribute("aria-label", M.util.get_string('displayfileiconaslinks', 'repository'));
+                    this.fpnode.all('.fp-vb-tree').setAttribute("aria-label", M.util.get_string('displayfiletreeintable', 'repository'));
+                    this.fpnode.all('.fp-vb-details').setAttribute("aria-label", M.util.get_string('displayfiledetailsintable', 'repository'));
                 } else {
                     viewbar.removeClass('enabled').addClass('disabled');
                     this.fpnode.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').setAttribute("aria-disabled", "true");
@@ -1293,8 +1302,10 @@ M.core_filepicker.init = function(Y, options) {
                 }
             }
             this.fpnode.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked');
+            this.fpnode.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').setAttribute("aria-checked", "false");
             var modes = {1:'icons', 2:'tree', 3:'details'};
             this.fpnode.all('.fp-vb-'+modes[this.viewmode]).addClass('checked');
+            this.fpnode.all('.fp-vb-'+modes[this.viewmode]).setAttribute("aria-checked", "true");
         },
         viewbar_clicked: function(e) {
             e.preventDefault();
@@ -1388,6 +1399,7 @@ M.core_filepicker.init = function(Y, options) {
             // set name and icon and assign callbacks
             var reponode = this.fpnode.one('.fp-repo');
             if (reponode) {
+                reponode.setAttribute('role', 'button');
                 var list = reponode.get('parentNode');
                 list.removeChild(reponode);
                 for (i in sorted_repositories) {
@@ -1645,7 +1657,6 @@ M.core_filepicker.init = function(Y, options) {
             if (obj.repo_id && scope.options.repositories[obj.repo_id]) {
                 scope.fpnode.addClass('repository_'+scope.options.repositories[obj.repo_id].type)
             }
-            Y.one('.file-picker .fp-repo-items').focus();
 
             // display response
             if (obj.login) {

@@ -565,7 +565,7 @@ class core_files_renderer extends plugin_renderer_base {
      */
     protected function fp_js_template_generallayout() {
         $rv = '
-<div tabindex="0" class="file-picker fp-generallayout" role="dialog" aria-live="assertive">
+<div class="file-picker fp-generallayout" role="dialog" aria-live="assertive">
     <div class="fp-repo-area">
         <ul class="fp-list" role="tablist">
             <li class="fp-repo" role="tab" aria-selected="false" tabindex="-1">
@@ -575,7 +575,7 @@ class core_files_renderer extends plugin_renderer_base {
             </li>
         </ul>
     </div>
-    <div class="fp-repo-items" tabindex="0">
+    <div class="fp-repo-items">
         <div class="fp-navbar">
             <div>
                 <div class="fp-toolbar">

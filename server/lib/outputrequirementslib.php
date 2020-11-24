@@ -836,13 +836,15 @@ require(['core/autoinitialise'], function(ai) {
                                         'escape', 'moodle-core_filepicker', 'moodle-core-notification-dialogue'
                                     ),
                                     'strings'  => array(array('lastmodified', 'moodle'), array('name', 'moodle'), array('type', 'repository'), array('size', 'repository'),
-                                                        array('invalidjson', 'repository'), array('error', 'moodle'), array('info', 'moodle'),
-                                                        array('nofilesattached', 'repository'), array('filepicker', 'repository'), array('logout', 'repository'),
-                                                        array('nofilesavailable', 'repository'), array('norepositoriesavailable', 'repository'),
-                                                        array('fileexistsdialogheader', 'repository'), array('fileexistsdialog_editor', 'repository'),
-                                                        array('fileexistsdialog_filemanager', 'repository'), array('renameto', 'repository'),
-                                                        array('referencesexist', 'repository'), array('select', 'repository')
-                                                    ));
+                                        array('displayfileiconaslinks', 'repository'), array('displayfiledetailsintable', 'repository'),
+                                        array('displayfiletreeintable', 'repository'), array('invalidjson', 'repository'), array('error', 'moodle'), 
+                                        array('info', 'moodle'), array('nofilesattached', 'repository'), array('filepicker', 'repository'), 
+                                        array('logout', 'repository'), array('nofilesavailable', 'repository'), array('norepositoriesavailable', 'repository'),
+                                        array('fileexistsdialogheader', 'repository'), array('fileexistsdialog_editor', 'repository'),
+                                        array('fileexistsdialog_filemanager', 'repository'), array('renameto', 'repository'),
+                                        array('referencesexist', 'repository'), array('select', 'repository'), array('changedisplay', 'repository')
+                                    )
+                    );
                     break;
                 case 'core_comment':
                     $module = array('name'     => 'core_comment',

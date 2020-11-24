@@ -537,6 +537,9 @@ a.ygtvspacer:hover {
   color: transparent;
   text-decoration: none;
 }
+a.ygtvspacer:focus {
+  outline: 1px dotted;
+}
 
 .ygtvlabel,
 .ygtvlabel:link,
