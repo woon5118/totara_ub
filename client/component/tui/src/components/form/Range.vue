@@ -27,7 +27,11 @@
     <!-- Slider -->
     <input
       :id="id"
-      :class="['tui-range__input', value && 'tui-range__input--selected']"
+      class="tui-range__input"
+      :class="{
+        'tui-range__input--selected': value,
+        'tui-range__input--noThumb': noThumb,
+      }"
       type="range"
       :aria-label="ariaLabel"
       :aria-labelledby="ariaLabelledby"
@@ -78,6 +82,7 @@ export default {
     showLabels: Boolean,
     lowLabel: String,
     highLabel: String,
+    noThumb: Boolean,
   },
 
   computed: {
@@ -228,6 +233,19 @@ export default {
       }
       &::-ms-thumb {
         background: var(--color-state);
+      }
+    }
+
+    &.tui-range__input--noThumb {
+      &::-webkit-slider-thumb {
+        display: none;
+      }
+      &::-moz-range-thumb {
+        // Display none does not work.
+        opacity: 0;
+      }
+      &::-ms-thumb {
+        display: none;
       }
     }
   }

@@ -18,16 +18,25 @@
 <template>
   <div class="tui-numericRatingScalePrint">
     <Range
-      name="response"
-      :value="activeRange"
+      :value="data"
+      :no-thumb="!hasBeenAnswered"
       :default-value="element.data.defaultValue"
       :show-labels="false"
       :min="min"
       :max="max"
     />
-    <div class="tui-numericRatingScalePrint__value">
-      <NotepadLines :char-length="10"  />
+
+    <div
+      v-if="hasBeenAnswered"
+      class="tui-numericRatingScalePrint__formattedResponse"
+    >
+      {{ formattedResponse }}
     </div>
+    <NotepadLines
+      v-else
+      class="tui-numericRatingScalePrint__notepadLines"
+      :char-length="10"
+    />
   </div>
 </template>
 
@@ -41,6 +50,7 @@ export default {
     NotepadLines,
   },
   props: {
+    data: [String, Number],
     responseLines: {
       type: Array,
       required: true,
@@ -73,12 +83,34 @@ export default {
      *
      * @return {boolean}
      */
-    activeRange() {
+    hasBeenAnswered() {
+      return this.formattedResponse !== null;
+    },
+
+    /**
+     * Has this question been answered.
+     *
+     * @return {string|null}
+     */
+    formattedResponse() {
       if (this.responseLines.length > 0) {
         return this.responseLines[0];
       }
+
       return null;
     },
   },
 };
 </script>
+
+<style lang="scss">
+.tui-numericRatingScalePrint {
+  &__formattedResponse {
+    margin-top: var(--gap-8);
+  }
+
+  &__notepadLines {
+    margin-top: var(--gap-4);
+  }
+}
+</style>
