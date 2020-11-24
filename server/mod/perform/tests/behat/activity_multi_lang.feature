@@ -44,5 +44,5 @@ Feature: Activity general information supports multi-lang filters
     And I log in as "john"
     And I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
-      | Activity title          | Type      | Overall progress | Your progress   |
-      | title changed & updated | Appraisal | Not yet started  | Not yet started |
+      | Activity title                             | Type      | Overall progress | Your progress   |
+      | title changed & updated (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |

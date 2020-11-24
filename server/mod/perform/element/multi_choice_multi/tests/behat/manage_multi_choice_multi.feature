@@ -94,6 +94,7 @@ Feature: Manage performance activity multiple choice-answers elements
       | rawTitle | Question 1 |
     And I save the activity content element
     And I should see "Required"
+    And I click on "Cancel" "button"
 
   Scenario: Save required and optional multiple answers elements
     Given I log in as "admin"

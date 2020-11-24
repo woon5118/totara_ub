@@ -107,6 +107,8 @@ Feature: Create and update activity general info fields
     When I set the field "Activity title" to "  "
     Then the "Save changes" "button" should be disabled
 
+    Then I click on "Cancel" "button"
+
   Scenario: Type and attribution settings are read only when activity status is active
     Given I log in as "admin"
     And I navigate to the manage perform activities page

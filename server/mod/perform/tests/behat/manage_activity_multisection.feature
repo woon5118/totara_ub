@@ -199,6 +199,9 @@ Feature: Managing an activity with multiple sections
     And I should not see "Untitled section" in the "3" activity section
     And I should not see "Untitled section" in the "4" activity section
 
+    Then I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "3" activity section
+    And I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "4" activity section
+
   Scenario: Manage activity - Add section above and below
     When I navigate to the edit perform activities page for activity "Participant set up test"
     Then "Add section" "button" should not be visible

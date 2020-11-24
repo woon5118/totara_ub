@@ -55,8 +55,8 @@ Feature: Manually add participants as a manager
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
-      | Activity title      | Type      | Overall progress | Your progress   |
-      | Subject and manager | Appraisal | Not yet started  | Not yet started |
+      | Activity title                         | Type      | Overall progress | Your progress   |
+      | Subject and manager (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |
 
   Scenario: No participants can be manually added when subject is the only relationship
     When I navigate to the perform manage participation subject instances report for activity "Subject only activity"

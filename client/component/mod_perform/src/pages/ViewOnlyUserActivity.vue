@@ -31,6 +31,7 @@
         v-else-if="activityFound"
         :current-user-id="currentUserId"
         :activity="subjectInstance.activity"
+        :created-at="subjectInstance.created_at"
         :subject-instance-id="subjectInstanceId"
         :section-id="sectionId"
         :subject-user="subjectInstance.subject_user"

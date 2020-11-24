@@ -63,18 +63,18 @@ Feature: Visibility conditions effect on the Participants.
   Scenario: Description shows for activity with All responses visibility option
     Given I log in as "john"
     And I navigate to the outstanding perform activities list page
-    When I click on "All responses" "link_or_button_exact"
+    When I click on "All responses" "link"
     Then I should see "Responses are only visible to viewers when response submission is closed for all participants"
 
   Scenario: Description shows for activity with Own responses visibility option
     Given I log in as "john"
     And I navigate to the outstanding perform activities list page
-    When I click on "Own responses" "link_or_button_exact"
+    When I click on "Own responses" "link"
     Then I should see "Responses are only visible to viewers when their own response submission is closed"
 
   Scenario: Description does not shows for activity with None visibility option
     Given I log in as "john"
     And I navigate to the outstanding perform activities list page
-    When I click on "None" "link_or_button_exact"
+    When I click on "None" "link"
     Then I should not see "Responses are only visible to viewers when response submission is closed for all participants"
     Then I should not see "Responses are only visible to viewers when their own response submission is closed"

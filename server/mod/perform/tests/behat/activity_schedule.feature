@@ -71,7 +71,6 @@ Feature: Define track schedules to perform activities
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
-    And I click on "Limited" "button"
 
     Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
     And the "scheduleFixed[from]" tui date selector timezone should be set to "UTC"
@@ -195,6 +194,9 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[fromOffset][before][value] | 100 |
       | scheduleDynamic[toOffset][before][value]   | 1   |
 
+    Then I save the activity schedule
+    And I click on "Confirm" "button"
+
   Scenario: Check validation messages of dynamic activity schedule
     Given I log in as "admin"
     And I navigate to the manage perform activities page
@@ -288,6 +290,9 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[toOffset][after][range]    | weeks              |
       | scheduleDynamic[dynamic_source]            | User creation date |
       | scheduleDynamic[useAnniversary]            | 1                  |
+
+    Then I save the activity schedule
+    And I click on "Confirm" "button"
 
   Scenario: Check due date is disabled by default and can be enabled
     Given I log in as "admin"
@@ -497,6 +502,9 @@ Feature: Define track schedules to perform activities
     Then I should see "none (repeat until creation period ends)"
     When I click on "Open-ended" "button"
     Then I should see "none (repeat indefinitely)"
+
+    Then I save the activity schedule
+    And I click on "Confirm" "button"
 
   Scenario: User custom field dynamic schedule
     Given I log in as "admin"

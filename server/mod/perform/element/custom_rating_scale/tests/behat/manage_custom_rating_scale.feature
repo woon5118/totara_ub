@@ -104,6 +104,7 @@ Feature: Manage performance activity custom rating scale elements
       | rawTitle | Question 1 |
     And I save the activity content element
     Then I should see "Required"
+    And I click on "Cancel" "button"
 
   Scenario: Save required and optional custom rating scale elements
     Given I log in as "admin"
@@ -137,4 +138,3 @@ Feature: Manage performance activity custom rating scale elements
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section
-

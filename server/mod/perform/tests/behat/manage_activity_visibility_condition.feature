@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @javascript @vuejs
-Feature: As an activity administrator, I need to be able to update visibility condition,
+Feature: As an activity administrator, I need to be able to update visibility condition
   so that I can control when answers are displayed to users
 
   Background:
@@ -45,6 +45,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
     When I toggle the "Anonymise responses" tui form row toggle switch
     Then ".tui-radioGroup" "css_element" should exist
     And the "All responding participants' responses must be marked closed." radio button is selected
+    And I click on "Save changes" "button"
 
   Scenario: Show warning message on saving changes when condition is not none and automatic closure is disabled
     Given I log in as "admin"

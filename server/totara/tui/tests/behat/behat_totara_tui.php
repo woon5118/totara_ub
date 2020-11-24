@@ -84,9 +84,6 @@ class behat_totara_tui extends behat_base {
 
     private const CHECKBOX_LOCATOR = '.tui-checkbox__input';
 
-    private const RADIO_LOCATOR = '.tui-radio__input';
-    private const RADIO_LABEL_LOCATOR = '.tui-radio__label';
-
     private const TOGGLE_BUTTON_LOCATOR = '.tui-toggleSwitch__ui';
     private const TOGGLE_BUTTON_LABEL_LOCATOR = '.tui-toggleSwitch__btn';
 
@@ -432,11 +429,60 @@ class behat_totara_tui extends behat_base {
         $cell = $this->find_data_table_cell($column_heading_text, $row_number, $table_locator, $table_selector_type, $root);
 
         $cell_text = $cell->getText();
+        $expected_text_expanded = $this->expanded_text($expected_text);
 
-        if ($cell_text !== $expected_text) {
-            $exception_message = "Expected cell ({$column_heading_text}, {$row_number}) to contain text \"{$expected_text}\" instead found \"{$cell_text}\"";
+        if ($cell_text !== $expected_text_expanded) {
+            $exception_message = "Expected cell ({$column_heading_text}, {$row_number}) to contain text \"{$expected_text_expanded}\" instead found \"{$cell_text}\"";
             throw new ExpectationException($exception_message, $this->getSession());
         }
+    }
+
+    /**
+     * Expands the given text with respect to dynamic dates, etc.
+     *
+     * @param string $text text to expand.
+     *
+     * @return string the expanded string.
+     */
+    private function expanded_text(string $text): string {
+        $matches = [];
+        $expanded = $text;
+
+        // Handle explicitly formatted time offsets eg ##today##j F Y##.
+        $now = new DateTimeImmutable();
+        if (preg_match_all('/##(.*)##(.*)##/', $expanded, $matches, PREG_SET_ORDER) == 1) {
+            foreach ($matches as $match) {
+                [$pattern, $offset, $format] = $match;
+                $expanded = $this->expand_date($expanded, $pattern, $offset, $format);
+            }
+        }
+
+        // Handle normal time offsets eg ##today##.
+        if (preg_match_all('/##(.*)##/', $expanded, $matches, PREG_SET_ORDER) == 1) {
+            foreach ($matches as $match) {
+                [$pattern, $offset] = $match;
+                $expanded = $this->expand_date($expanded, $pattern, $offset);
+            }
+        }
+
+        return $expanded;
+    }
+
+    /**
+     * Expands a date related text.
+     */
+    private function expand_date($text, $pattern, $offset, $format = DATE_ISO8601): string {
+        $now = new DateTimeImmutable();
+        $then = $now->modify($offset)->format($format);
+
+        return str_replace($pattern, $then, $text);
+    }
+
+    /**
+     * Formats a date.
+     */
+    private function format_date(string $offset, string $format = DATE_ISO8601): string {
+        return $now->modify($offset)->format($format);
     }
 
     /**

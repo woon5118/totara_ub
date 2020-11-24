@@ -84,9 +84,9 @@ Feature: Viewing user activities list with view-only access
     Given I log in as "john"
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
-      | Activity title          | Type      | Overall progress | Your progress   |
-      | Multi section activity  | Feedback  | Not yet started  | Not yet started |
-      | Single section activity | Appraisal | Not yet started  | Not yet started |
+      | Activity title                             | Type      | Overall progress | Your progress   |
+      | Multi section activity (##today##j F Y##)  | Feedback  | Not yet started  | Not yet started |
+      | Single section activity (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |
     When I toggle expanding row "2" of the tui datatable
     Then I should not see "Appraiser" under the expanded row of the tui datatable
     And I should see the tui datatable in the ".tui-performUserActivityListSection:nth-child(1)" "css_element" contains:
@@ -116,9 +116,9 @@ Feature: Viewing user activities list with view-only access
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
-      | Activity title          | Type      | Overall progress | Your progress   |
-      | Multi section activity  | Feedback  | Not yet started  | n/a (view only) |
-      | Single section activity | Appraisal | Not yet started  | n/a (view only) |
+      | Activity title                             | Type      | Overall progress | Your progress   |
+      | Multi section activity (##today##j F Y##)  | Feedback  | Not yet started  | n/a (view only) |
+      | Single section activity (##today##j F Y##) | Appraisal | Not yet started  | n/a (view only) |
     When I toggle expanding row "2" of the tui datatable
     Then I should not see "Appraiser" under the expanded row of the tui datatable
     # For single section activity the activity meta data has a text indicating view-only.
@@ -138,9 +138,9 @@ Feature: Viewing user activities list with view-only access
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
-      | Activity title          | Type      | Relationship to user | Overall progress | Your progress   |
-      | Multi section activity  | Feedback  | Manager, Appraiser   | Not yet started  | Not yet started |
-      | Single section activity | Appraisal | Manager, Appraiser   | Not yet started  | Not yet started |
+      | Activity title                             | Type      | Relationship to user | Overall progress | Your progress   |
+      | Multi section activity (##today##j F Y##)  | Feedback  | Manager, Appraiser   | Not yet started  | Not yet started |
+      | Single section activity (##today##j F Y##) | Appraisal | Manager, Appraiser   | Not yet started  | Not yet started |
     When I toggle expanding row "2" of the tui datatable
     Then I should not see "Appraiser" under the expanded row of the tui datatable
     And I should not see "You have view-only access to this activity." under the expanded row of the tui datatable
@@ -148,7 +148,8 @@ Feature: Viewing user activities list with view-only access
       | Relationship to user | User     | Section progress |
       | Subject              | John One | Not yet started  |
       | Manager              | You      | Not yet started  |
-    When I click on "Single section activity" "link_or_button_exact"
+
+    When I click on "Multi section activity" "button" in the ".tui-dataTableCell__content" "css_element"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     And I should see "Manager (Not yet started)"
     And I should see "Appraiser (View only)"

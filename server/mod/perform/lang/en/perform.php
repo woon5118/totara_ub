@@ -63,6 +63,7 @@ $string['activity_status_banner_help_intro'] = 'It can be activated once all of 
 $string['activity_status_banner_help_title'] = 'Show activity activation criteria';
 $string['activity_status_draft'] = 'Draft';
 $string['activity_title_for_subject'] = '{$a->activity} for {$a->user}';
+$string['activity_title_with_subject_creation_date'] = '{$a->title} ({$a->date})';
 $string['activity_type'] = 'Activity type';
 $string['activity_type_help_text'] = 'This can be changed later as long as the activity is still in draft.';
 $string['add_activity'] = 'Add activity';

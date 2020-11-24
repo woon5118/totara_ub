@@ -71,11 +71,11 @@
             "
             :styleclass="{ transparent: true }"
             class="tui-performUserActivityList__selectRelationshipLink"
-            :text="subjectInstance.subject.activity.name"
+            :text="getActivityTitle(subjectInstance.subject)"
             @click.prevent="showRelationshipSelector(subjectInstance)"
           />
           <a v-else :href="getViewActivityUrl(subjectInstance)">
-            {{ subjectInstance.subject.activity.name }}
+            {{ getActivityTitle(subjectInstance.subject) }}
           </a>
         </Cell>
         <Cell
@@ -558,6 +558,30 @@ export default {
     },
 
     /**
+     * Returns the activity title generated from the subject instance passed it.
+     *
+     * @param {Object} subject
+     * @returns {string}
+     */
+    getActivityTitle(subject) {
+      var title = subject.activity.name.trim();
+      var suffix = subject.created_at ? subject.created_at.trim() : '';
+
+      if (suffix) {
+        return this.$str(
+          'activity_title_with_subject_creation_date',
+          'mod_perform',
+          {
+            title: title,
+            date: suffix,
+          }
+        );
+      }
+
+      return title;
+    },
+
+    /**
      * Relationship names for the logged in user for a set of participant instances.
      *
      * @param {Object[]} participantInstances - The participant instances from the subject instance we are getting the relationship text for
@@ -578,11 +602,12 @@ export default {
      * @returns {string}
      */
     getExpandLabel(subjectInstance) {
+      const activityTitle = this.getActivityTitle(subjectInstance.subject);
       if (!this.isAboutOthers) {
-        return subjectInstance.subject.activity.name;
+        return activityTitle;
       }
       return this.$str('activity_title_for_subject', 'mod_perform', {
-        activity: subjectInstance.subject.activity.name,
+        activity: activityTitle,
         user: subjectInstance.subject.subject_user.fullname,
       });
     },
@@ -687,6 +712,7 @@ export default {
   {
     "mod_perform": [
       "activity_title_for_subject",
+      "activity_title_with_subject_creation_date",
       "all_job_assignments",
       "is_overdue",
       "print_activity",

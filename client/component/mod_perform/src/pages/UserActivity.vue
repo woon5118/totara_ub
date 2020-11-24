@@ -41,6 +41,7 @@
       :current-user-id="currentUserId"
       :user-activities-url="userActivitiesUrl"
       :activity="subjectInstance.activity"
+      :created-at="subjectInstance.created_at"
       :participant-instance-id="participantInstanceId"
       :participant-section-id="participantSectionId"
       :subject-user="subjectInstance.subject_user"

@@ -21,7 +21,7 @@
     :is="showSidePanel ? 'LayoutSidePanel' : 'Layout'"
     class="tui-participantContent"
     :loading="$apollo.loading"
-    :title="activity.name"
+    :title="getActivityTitle()"
     :outer-first-loader="true"
   >
     <template v-slot:content-nav>
@@ -393,6 +393,14 @@ export default {
     activity: {
       required: true,
       type: Object,
+    },
+
+    /**
+     * Created day of activity.
+     */
+    createdAt: {
+      type: String,
+      required: true,
     },
 
     /**
@@ -1010,6 +1018,27 @@ export default {
     },
 
     /**
+     * Returns the activity title.
+     */
+    getActivityTitle() {
+      var title = this.activity.name.trim();
+      var suffix = this.createdAt ? this.createdAt.trim() : '';
+
+      if (suffix) {
+        return this.$str(
+          'activity_title_with_subject_creation_date',
+          'mod_perform',
+          {
+            title: title,
+            date: suffix,
+          }
+        );
+      }
+
+      return title;
+    },
+
+    /**
      * Redirects back to the list of user activities with a success message.
      */
     goBackToListCompletionSuccess() {
@@ -1208,6 +1237,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "activity_title_with_subject_creation_date",
       "back_to_user_activities",
       "button_close",
       "next_section",

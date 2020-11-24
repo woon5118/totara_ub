@@ -92,6 +92,7 @@ Feature: Manage performance activity multiple choice elements
       | rawTitle | Question 1 |
     And I save the activity content element
     And I should see "Required"
+    And I click on "Cancel" "button"
 
   Scenario: Save required and optional multiple choice elements
     Given I log in as "admin"
@@ -121,4 +122,3 @@ Feature: Manage performance activity multiple choice elements
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section
-

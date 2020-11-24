@@ -71,4 +71,4 @@ Feature: Manage performance activity static content
     And I wait for the next second
     And I save the activity content element
     Then I should see "Required"
-
+    And I click on "Cancel" "button"
