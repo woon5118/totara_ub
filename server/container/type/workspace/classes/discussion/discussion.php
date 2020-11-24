@@ -322,12 +322,29 @@ final class discussion {
                                    ?int $actor_id = null): void {
         global $USER, $CFG;
 
-        if (null === $content_format) {
-            $content_format = $this->entity->content_format;
+        if (empty($content)) {
+            throw new \coding_exception("Cannot update a discussion with empty content");
         }
 
         if (null === $actor_id || 0 === $actor_id) {
             $actor_id = $USER->id;
+        }
+
+        if (null === $content_format) {
+            $content_format = $this->entity->content_format;
+        }
+
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        // Convert the editor content to plain text.
+        // Note that this should be happening before processing the files, as processing files
+        // can cause the draft files to be removed.
+        $content_text = content_to_text($content, $content_format);
+
+        if (null !== $draft_id) {
+            // After converted to text, we will have to rewrite the
+            // file urls in order to get rid of those hardcoded URL in the content.
+            $content_text = file_rewrite_urls_to_pluginfile($content_text, $draft_id);
         }
 
         $this->entity->content = static::process_content_with_files(
@@ -341,7 +358,6 @@ final class discussion {
         if ((null === $draft_id || 0 === $draft_id) && !$this->prevent_delete_files_on_update) {
             // Draft's id is empty, therefore we should go thru the current trailing files
             // to remove them.
-            require_once("{$CFG->dirroot}/lib/filelib.php");
             $fs = get_file_storage();
 
             $context = \context_course::instance($this->entity->course_id);
@@ -354,7 +370,7 @@ final class discussion {
         }
 
         $this->entity->content_format = $content_format;
-        $this->entity->content_text = content_to_text($this->entity->content, $content_format);
+        $this->entity->content_text = $content_text;
 
         $this->entity->timestamp = time();
 

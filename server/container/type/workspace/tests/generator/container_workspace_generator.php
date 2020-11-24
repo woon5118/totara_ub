@@ -65,7 +65,7 @@ final class container_workspace_generator extends component_generator_base {
 
         if (null === $name || '' === $name) {
             if (core_text::strlen($this->random_name()) > 75) {
-                $name = \core_text::substr($this->random_name(), 0, 75);
+                $name = core_text::substr($this->random_name(), 0, 75);
             } else {
                 $name = $this->random_name();
             }
@@ -209,11 +209,11 @@ final class container_workspace_generator extends component_generator_base {
         }
 
         return discussion_helper::create_discussion(
-          $workspace,
-          $content,
-          $draft_id,
-          $content_format,
-          $actor_id
+            $workspace,
+            $content,
+            $draft_id,
+            $content_format,
+            $actor_id
         );
     }
 
@@ -225,7 +225,7 @@ final class container_workspace_generator extends component_generator_base {
      */
     public function create_workspace_from_params(array $parameters): workspace {
         if (!isset($parameters['name']) || empty($parameters['owner'])) {
-            throw new \coding_exception(
+            throw new coding_exception(
                 "Workspace name and owner are required"
             );
         }
@@ -264,7 +264,7 @@ final class container_workspace_generator extends component_generator_base {
         global $DB;
 
         if (empty($parameters['username']) || empty($parameters['workspace'])) {
-            throw new \coding_exception('`workspace` and `username` are required');
+            throw new coding_exception('`workspace` and `username` are required');
         }
 
         $user = core_user::get_user_by_username($parameters['username']);
@@ -273,7 +273,7 @@ final class container_workspace_generator extends component_generator_base {
 
         $roles = get_archetype_roles('workspaceowner');
         if (empty($roles)) {
-            throw new \coding_exception("No role for archetype 'workspaceowner'");
+            throw new coding_exception("No role for archetype 'workspaceowner'");
         }
         $role = reset($roles);
 
@@ -291,7 +291,7 @@ final class container_workspace_generator extends component_generator_base {
         global $DB, $CFG;
 
         if (empty($parameters['username']) || empty($parameters['workspace'] || empty($parameters['content']))) {
-            throw new \coding_exception('`workspace` and `username` are required');
+            throw new coding_exception('`workspace` and `username` are required');
         }
 
         require_once("{$CFG->dirroot}/lib/filelib.php");

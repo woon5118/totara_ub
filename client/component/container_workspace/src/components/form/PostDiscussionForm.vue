@@ -26,7 +26,9 @@
     />
 
     <WorkspaceDiscussionForm
+      v-if="!$apollo.loading"
       :submitting="submitting"
+      :draft-id="draftId"
       :show-cancel-button="false"
       :workspace-context-id="workspaceContextId"
       class="tui-workspacePostDiscussionForm__form"
@@ -38,6 +40,9 @@
 <script>
 import PostAvatar from 'container_workspace/components/profile/PostAvatar';
 import WorkspaceDiscussionForm from 'container_workspace/components/form/WorkspaceDiscussionForm';
+
+// GraphQL queries
+import discussionDraftId from 'container_workspace/graphql/discussion_draft_id';
 
 export default {
   components: {
@@ -71,6 +76,22 @@ export default {
     },
 
     submitting: Boolean,
+  },
+
+  apollo: {
+    draftId: {
+      query: discussionDraftId,
+      fetchPolicy: 'network-only',
+      variables() {
+        return {
+          id: this.discussionId,
+        };
+      },
+
+      update({ draft_id }) {
+        return draft_id;
+      },
+    },
   },
 };
 </script>

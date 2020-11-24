@@ -17,6 +17,10 @@ type container_workspace_discussion {
   """
   draft_content(format: core_format!): String!
   """
+  The draft id used to format the draft files in draft_content.
+  """
+  draft_id: Int!
+  """
   Time description that follows engage's convention
   """
   time_description: String!

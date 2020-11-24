@@ -28,7 +28,6 @@
         :value="formContent"
       />
       <WekaEditor
-        v-if="!$apollo.queries.draftId.loading"
         :id="id"
         :key="editorKey"
         v-model="formContent"
@@ -75,9 +74,6 @@ import WekaValue from 'editor_weka/WekaValue';
 import { FORMAT_JSON_EDITOR } from 'tui/format';
 import { uniqueId } from 'tui/util';
 
-// GraphQL queries
-import discussionDraftId from 'container_workspace/graphql/discussion_draft_id';
-
 export default {
   components: {
     FormRow,
@@ -109,6 +105,10 @@ export default {
         return FORMAT_JSON_EDITOR;
       },
     },
+    draftId: {
+      type: [String, Number],
+      default: null,
+    },
     showCancelButton: {
       type: Boolean,
       default: true,
@@ -121,26 +121,9 @@ export default {
     },
   },
 
-  apollo: {
-    draftId: {
-      query: discussionDraftId,
-      fetchPolicy: 'network-only',
-      variables() {
-        return {
-          id: this.discussionId,
-        };
-      },
-
-      update({ draft_id }) {
-        return draft_id;
-      },
-    },
-  },
-
   data() {
     return {
       editorKey: `editor-weka-${uniqueId()}`,
-      draftId: null,
       formContent: WekaValue.empty(),
     };
   },

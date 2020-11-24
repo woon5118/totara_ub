@@ -75,11 +75,11 @@ final class discussion_helper {
 
         // Start creating the discussion, after that we will trigger an event for this.
         $discussion = discussion::create(
-          $content,
-          $workspace->get_id(),
-          $draft_id,
-          $content_format,
-          $actor_id
+            $content,
+            $workspace->get_id(),
+            $draft_id,
+            $content_format,
+            $actor_id
         );
 
         // Update the timestamp of the workspace.

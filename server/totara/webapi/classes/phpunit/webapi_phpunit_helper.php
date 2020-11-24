@@ -82,7 +82,7 @@ trait webapi_phpunit_helper {
         if ($is_multi_part_operation) {
             $result = $raw['data'];
         } else {
-            $result = $raw['data'][$query_name] ?? null;
+            $result = !empty($raw['data']) && is_array($raw['data']) ? reset($raw['data']) : null;
         }
 
         $errors = $raw['errors'][0] ?? [];

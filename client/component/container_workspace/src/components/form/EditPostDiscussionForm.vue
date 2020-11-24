@@ -17,9 +17,10 @@
 -->
 <template>
   <WorkspaceDiscussionForm
-    v-if="!$apollo.loading"
+    v-if="discussion"
     :content="discussion.draft_content"
     :content-format="discussion.content_format"
+    :draft-id="discussion.draft_id"
     :submit-button-text="$str('done', 'container_workspace')"
     :submitting="submitting"
     :discussion-id="discussionId"
@@ -65,7 +66,7 @@ export default {
 
   data() {
     return {
-      discussion: {},
+      discussion: null,
     };
   },
 
