@@ -433,6 +433,10 @@ export default {
     this.colourOverridesEnabled = this.initialValues.formcolours_field_useoverrides.value;
 
     this.initialValuesSet = true;
+    this.$emit('mounted', {
+      category: 'colours',
+      values: this.formatDataForMutation(this.initialValues),
+    });
   },
 
   methods: {

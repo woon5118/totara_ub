@@ -159,6 +159,7 @@ export default {
       mergedFormData
     );
     this.initialValuesSet = true;
+    this.$emit('mounted', { category: 'custom', values: this.initialValues });
   },
 
   methods: {

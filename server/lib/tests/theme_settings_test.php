@@ -912,6 +912,172 @@ class core_theme_settings_testcase extends advanced_testcase {
         self::assertTrue($settings->is_tenant_branding_enabled());
     }
 
+    public function test_is_initial_tenant_branding() {
+        $theme_config = theme_config::load('ventura');
+        $site_settings = new settings($theme_config, 0);
+        self::assertFalse($site_settings->is_initial_tenant_branding());
+
+        $generator = self::getDataGenerator();
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+        $tenant = $tenant_generator->create_tenant();
+
+        $tenant_settings = new settings($theme_config, $tenant->id);
+        self::assertTrue($tenant_settings->is_initial_tenant_branding());
+
+        // Now enable custom tenant branding
+        $categories = [
+            [
+                'name' => 'tenant',
+                'properties' => [
+                    [
+                        'name' => 'formtenant_field_tenant',
+                        'type' => 'boolean',
+                        'value' => 'true',
+                    ]
+                ]
+            ],
+        ];
+        $tenant_settings->validate_categories($categories);
+        $tenant_settings->update_categories($categories);
+        self::assertFalse($tenant_settings->is_initial_tenant_branding());
+    }
+
+    public function test_is_re_enabling_tenant_branding() {
+        $categories = [
+            [
+                'name' => 'tenant',
+                'properties' => [
+                    [
+                        'name' => 'formtenant_field_tenant',
+                        'type' => 'boolean',
+                        'value' => 'true',
+                    ]
+                ]
+            ],
+        ];
+
+        $theme_config = theme_config::load('ventura');
+        $site_settings = new settings($theme_config, 0);
+        self::assertFalse($site_settings->is_re_enabling_tenant_branding($categories));
+
+        $generator = self::getDataGenerator();
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+        $tenant = $tenant_generator->create_tenant();
+
+        // Enable twice
+        $tenant_settings = new settings($theme_config, $tenant->id);
+        self::assertFalse($tenant_settings->is_re_enabling_tenant_branding($categories));
+
+        $tenant_settings->validate_categories($categories);
+        $tenant_settings->update_categories($categories);
+        self::assertFalse($tenant_settings->is_re_enabling_tenant_branding($categories));
+
+        // Disable first and then re-able
+        $categories[0]['properties'][0]['value'] = 'false';
+        self::assertFalse($tenant_settings->is_re_enabling_tenant_branding($categories));
+
+        $tenant_settings->validate_categories($categories);
+        $tenant_settings->update_categories($categories);
+
+        $categories[0]['properties'][0]['value'] = 'true';
+        self::assertTrue($tenant_settings->is_re_enabling_tenant_branding($categories));
+    }
+
+    public function test_enabling_tenant_also_copies_site_files() {
+        global $USER;
+
+        $generator = $this->getDataGenerator();
+
+        // Create tenants.
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+        $tenant1 = $tenant_generator->create_tenant();
+
+        $this->setAdminUser();
+        $admin_context = context_user::instance($USER->id);
+
+        // Add a logo for the site
+        $files = [
+            [
+                'ui_key' => 'sitelogo',
+                'draft_id' => $this->create_image('new_site_logo', $admin_context),
+            ]
+        ];
+
+        $theme_config = theme_config::load('ventura');
+        $site_settings = new settings($theme_config, 0);
+        $site_settings->update_files($files);
+
+        $site_files = $site_settings->get_files();
+        $site_logo = array_filter($site_files, function ($file) {
+            return $file instanceof logo_image;
+        });
+        $this->assertCount(1, $site_logo);
+        /** @var logo_image $site_logo */
+        $site_logo = reset($site_logo);
+
+        $tenant_settings = new settings($theme_config, $tenant1->id);
+        $tenant_files = $tenant_settings->get_files();
+        $tenant_logo = array_filter($tenant_files, function ($file) {
+            return $file instanceof logo_image;
+        });
+        $this->assertCount(1, $tenant_logo);
+        /** @var logo_image $tenant_logo */
+        $tenant_logo = reset($tenant_logo);
+
+        $site_item_id = $site_logo->get_item_id();
+        $tenant_item_id = $tenant_logo->get_item_id();
+
+        // tenant should not have a file
+        $site_file_record = $this->get_logo_file_record($site_item_id);
+        $tenant_file_record = $this->get_logo_file_record($tenant_item_id);
+        $this->assertNotNull($site_file_record);
+        $this->assertNull($tenant_file_record);
+
+        // Update the tenant files without copying site files should have no effect
+        $tenant_settings->update_files([], false);
+        $site_file_record = $this->get_logo_file_record($site_item_id);
+        $tenant_file_record = $this->get_logo_file_record($tenant_item_id);
+        $this->assertNotNull($site_file_record);
+        $this->assertNull($tenant_file_record);
+
+        // Now update the tenant files without passing a file
+        $tenant_settings->update_files([], true);
+        // The tenant should now have a copy of the site file
+        $site_file_record = $this->get_logo_file_record($site_item_id);
+        $tenant_file_record = $this->get_logo_file_record($tenant_item_id);
+        $this->assertNotNull($site_file_record);
+        $this->assertNotNull($tenant_file_record);
+        $this->assertNotEqualsCanonicalizing($site_file_record, $tenant_file_record);
+    }
+
+    /**
+     * @param int $item_id
+     * @return Object|null
+     */
+    private function get_logo_file_record(int $item_id): ?object {
+        global $DB;
+
+        $rows = $DB->get_records('files',
+            [
+                'component' => 'totara_core',
+                'filearea' => 'logo',
+                'itemid' => $item_id,
+            ]
+        );
+        if (!$rows) {
+            return null;
+        }
+
+        $rows = array_filter($rows, function ($row) {
+            return $row->filename !== '.';
+        });
+
+        return reset($rows);
+    }
+
     private function skip_if_build_not_present() {
         if (!file_exists(bundle::get_vendors_file())) {
             $this->markTestSkipped('Tui build files must exist for this test to complete.');

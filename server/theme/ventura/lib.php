@@ -58,7 +58,7 @@ function theme_ventura_extend_navigation_category_settings($navigation, $context
 
     $url = new moodle_url('/totara/tui/theme_settings.php',
         [
-            'theme' => 'ventura',
+            'theme_name' => 'ventura',
             'tenant_id' => $tenant->id,
         ]
     );

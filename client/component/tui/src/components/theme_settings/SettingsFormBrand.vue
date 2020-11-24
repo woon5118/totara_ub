@@ -188,6 +188,10 @@ export default {
       mergedFormData
     );
     this.initialValuesSet = true;
+    this.$emit('mounted', {
+      category: 'brand',
+      values: this.formatDataForMutation(this.initialValues),
+    });
   },
 
   methods: {

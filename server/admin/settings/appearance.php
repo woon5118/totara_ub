@@ -17,7 +17,7 @@ if (!empty($USER->tenantid)) {
             new admin_externalpage(
                 'ventura_editor',
                 new lang_string('pluginname','theme_ventura'),
-                "$CFG->wwwroot/totara/tui/theme_settings.php?theme=ventura&tenant_id=$tenant->id",
+                "$CFG->wwwroot/totara/tui/theme_settings.php?theme_name=ventura&tenant_id=$tenant->id",
                 'totara/tui:themesettings',
                 false,
                 $categorycontext

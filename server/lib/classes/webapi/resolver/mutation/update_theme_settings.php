@@ -58,8 +58,22 @@ final class update_theme_settings implements mutation_resolver, has_middleware {
         // Save settings.
         $theme_settings = new theme_settings($theme_config, $tenant_id);
         $theme_settings->validate_categories($categories);
+
+        $is_initial_tenant_update = $theme_settings->is_initial_tenant_branding();
+        $is_re_enabling_tenant = $theme_settings->is_re_enabling_tenant_branding($categories);
+
+        if (!$is_initial_tenant_update && $is_re_enabling_tenant) {
+            // Update only the tenant settings
+            $categories = array_filter($categories, function ($category) {
+                return $category['name'] === 'tenant';
+            });
+        }
         $theme_settings->update_categories($categories);
-        $theme_settings->update_files($files);
+
+        if (!$is_re_enabling_tenant) {
+            // Don't update files when re-enabling tenant
+            $theme_settings->update_files($files, $is_initial_tenant_update);
+        }
 
         // Clear theme caches so that updated styles are served to the client.
         theme_reset_all_caches();

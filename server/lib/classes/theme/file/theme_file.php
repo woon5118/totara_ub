@@ -26,6 +26,7 @@ namespace core\theme\file;
 use core\files\file_area;
 use core\files\file_helper;
 use core\files\type\file_type;
+use core\theme\settings as theme_settings;
 use context;
 use moodle_url;
 use stored_file;
@@ -223,10 +224,11 @@ abstract class theme_file {
             return null;
         }
 
+        $theme_settings = new theme_settings($this->theme_config, $this->tenant_id);
         $file = $this->get_current_file($this->get_item_id($this->tenant_id, $theme));
 
-        // If no file found for tenant and theme check if site setting is set for theme.
-        if (empty($file) && $this->tenant_id > 0) {
+        // If not using custom tenant branding or no file found check if site setting is set for theme.
+        if ($this->tenant_id > 0 && !$theme_settings->is_tenant_branding_enabled()) {
             $file = $this->get_current_file(
                 $this->get_item_id(0, $theme),
                 \context_system::instance()
@@ -394,6 +396,42 @@ abstract class theme_file {
     }
 
     /**
+     * Copy site file to tenant
+     */
+    public function copy_site_file_to_tenant(): void {
+        global $USER;
+
+        if ($this->tenant_id === 0) {
+            return;
+        }
+
+        $site_file = $this->get_current_file(
+            $this->get_item_id(0),
+            \context_system::instance()
+        );
+        if (!$site_file) {
+            return;
+        }
+
+        $draft_id = $this->get_file_area()->get_draft_id();
+        $fs = get_file_storage();
+        $tenant_file = $fs->create_file_from_storedfile(
+            [
+                'contextid' => \context_user::instance($USER->id)->id,
+                'component' => 'user',
+                'filearea' => 'draft',
+                'itemid' => $draft_id
+            ],
+            $site_file
+        );
+
+        // Reset instance_files
+        $this->set_tenant_id($this->tenant_id);
+        $this->save_files($draft_id);
+    }
+
+
+    /**
      * Delete the current stored file associated with this theme file
      * and clean up configuration.
      */
@@ -446,7 +484,7 @@ abstract class theme_file {
 
         if (!empty($this->tenant_id)) {
             return \context_tenant::instance($this->tenant_id);
-        } elseif (!empty($USER->tenantid)) {
+        } else if (!empty($USER->tenantid)) {
             return \context_tenant::instance($USER->tenantid);
         }
 
@@ -462,7 +500,7 @@ abstract class theme_file {
      *
      * @return string
      */
-    abstract static public function get_id(): string;
+    abstract public static function get_id(): string;
 
     /**
      * @return string

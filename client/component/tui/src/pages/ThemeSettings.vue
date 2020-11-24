@@ -68,6 +68,7 @@
                 :file-form-field-data="embeddedFormData.fileData"
                 :is-saving="isSaving"
                 :context-id="embeddedFormData.contextId"
+                @mounted="setInitialTenantCategoryValues"
                 @submit="submit"
               />
             </Tab>
@@ -86,6 +87,7 @@
                   embeddedFormData.mergedProcessedCSSVariableData
                 "
                 :is-saving="isSaving"
+                @mounted="setInitialTenantCategoryValues"
                 @submit="submit"
               />
             </Tab>
@@ -214,6 +216,11 @@ export default {
       isSaving: false,
       // raw CSS variable data, this is handled via fetch, not GraphQL
       rawCSSVariableData: null,
+      // Categories to add when tenant is enabled
+      tenantCategories: {
+        brand: [],
+        colours: [],
+      },
     };
   },
 
@@ -414,8 +421,24 @@ export default {
           currentValues.formtenant_field_tenant.value;
       }
 
+      // If enabling custom tenant override, we also pass brand and colours
       let dataToMutate = this.formatDataForMutation(currentValues);
-      this.submit(dataToMutate);
+      this.submit(
+        dataToMutate,
+        this.selectedTenantId && this.tenantOverridesEnabled
+      );
+    },
+
+    /**
+     * Set initial tenant category data to add when custom configuration is enabled
+     *
+     * @param {Object} categoryData
+     */
+    setInitialTenantCategoryValues(categoryData) {
+      let category = categoryData.category;
+      if (this.tenantCategories[category]) {
+        this.tenantCategories[category] = categoryData.values;
+      }
     },
 
     /**
@@ -425,14 +448,27 @@ export default {
      *
      * @param {Object} payload The submitted form data expressed in full data
      *                          structure expected by mutation.
+     * @param {Boolean} addTenantDefaults
      */
-    async submit(payload) {
+    async submit(payload, addTenantDefaults) {
       let categoryData = [
         {
           name: payload.form,
           properties: payload.fields,
         },
       ];
+
+      if (addTenantDefaults) {
+        Object.keys(this.tenantCategories).forEach(function(category) {
+          if (this.tenantCategories[category].form) {
+            categoryData.push({
+              name: this.tenantCategories[category].form,
+              properties: this.tenantCategories[category].fields,
+            });
+          }
+        }, this);
+      }
+
       let fileData = [];
       if (payload.files) {
         fileData = payload.files.map(file => {
