@@ -57,7 +57,9 @@ class TestDataReader(unittest.TestCase):
         mock_read_csv.return_value = test_return
         users_read = self.reader.read_users_file(tenant=dummy_tenant)
         test_file = os.path.join(self.data_home, f'user_data_{dummy_tenant}.csv')
-        mock_read_csv.assert_called_once_with(filepath_or_buffer=test_file, sep=',', encoding='utf-8', index_col='user_id')
+        mock_read_csv.assert_called_once_with(
+            filepath_or_buffer=test_file, sep=',', encoding='utf-8', index_col='user_id'
+        )
         self.assertEqual(users_read, test_return)
 
     @patch('subroutines.data_reader.pd.read_csv')
@@ -71,7 +73,9 @@ class TestDataReader(unittest.TestCase):
         mock_read_csv.return_value = test_return
         items_read = self.reader.read_items_file(tenant=dummy_tenant)
         test_file = os.path.join(self.data_home, f'item_data_{dummy_tenant}.csv')
-        mock_read_csv.assert_called_once_with(filepath_or_buffer=test_file, sep=',', encoding='utf-8', index_col='item_id')
+        mock_read_csv.assert_called_once_with(
+            filepath_or_buffer=test_file, sep=',', encoding='utf-8', index_col='item_id'
+        )
         self.assertEqual(items_read, test_return)
 
     @patch('subroutines.data_reader.pd.read_csv')

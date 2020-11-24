@@ -34,14 +34,14 @@ class TestBuildModel(unittest.TestCase):
         self.item_features = 30
         self.num_threads = 6
         self.item_alpha = 1e-6
-        self.hparams = {'epochs': 10, 'no_components': 10}
+        self.hyperparams = {'epochs': 10, 'no_components': 10}
         self.model = BuildModel(
             interactions=self.interactions,
             weights=self.weights,
             item_features=self.item_features,
             num_threads=self.num_threads,
             item_alpha=self.item_alpha,
-            optimized_hparams=self.hparams
+            optimized_hyperparams=self.hyperparams
         )
 
     @patch('subroutines.build_model.LightFM.fit')
@@ -55,7 +55,7 @@ class TestBuildModel(unittest.TestCase):
             sample_weight=self.weights,
             user_features=None,
             item_features=self.item_features,
-            epochs=self.hparams['epochs'],
+            epochs=self.hyperparams['epochs'],
             num_threads=self.num_threads
         )
 
@@ -64,4 +64,4 @@ class TestBuildModel(unittest.TestCase):
         This method tests if the class `LightFM` has been instantiated with the correct size of
         lateral dimensions
         """
-        self.assertEqual(self.model.optimized_hparams['no_components'], self.hparams['no_components'])
+        self.assertEqual(self.model.optimized_hyperparams['no_components'], self.hyperparams['no_components'])

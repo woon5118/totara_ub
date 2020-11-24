@@ -27,9 +27,8 @@ class DataReader:
     def __init__(self, data_home=None):
         """
         Class constructor method
-        :param data_home: Full path of the directory that contains the data exported by the Totara instance,
-            defaults to None
-        :type data_home: str, mandatory
+        :param data_home: Full path of the directory that contains the data exported by the Totara instance
+        :type data_home: str
         """
         self.data_home = data_home
 

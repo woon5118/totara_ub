@@ -45,16 +45,20 @@ class TestDataLoader(unittest.TestCase):
     def test_get_interactions(self):
         """
         This method tests if the `__get_interactions` method of the `DataLoader` class
-        returns a list object, the size of the list is as expected, each element
-        of the returned list is a tuple and the length of each tuple in the list is 3.
+        returns a tuple object, with first element as a list and the second element as a dictionary.
+        The length of the first element (list) is as expected, each element
+        of the returned first element (list) is a tuple, the length of each tuple in the list is 3,
+        the second element is a dictionary and the values of the dictionary are the lists.
         """
-        interactions = self.data_loader._DataLoader__get_interactions(
-            interactions=self.interactions
+        interactions, positive_inter_map = self.data_loader._DataLoader__get_interactions(
+            interactions_df=self.interactions
         )
         self.assertIsInstance(interactions, list)
         self.assertEqual(self.interactions.shape[0], len(interactions))
         self.assertEqual(len(random.choice(interactions)), 3)
         self.assertIsInstance(random.choice(interactions), tuple)
+        self.assertIsInstance(positive_inter_map, dict)
+        self.assertIsInstance(random.choice(list(positive_inter_map.values())), list)
 
     def test_get_users(self):
         """
@@ -73,16 +77,16 @@ class TestDataLoader(unittest.TestCase):
         a dictionary object and the contents of the dictionary are as expected
         """
         size = 20
-        test_vals = random.choices(population=[0, 1], k=size)
+        test_values = random.choices(population=[0, 1], k=size)
         test_features = ['feature_' + str(i) for i in range(size)]
         test_series = pd.Series(
-            data=test_vals,
+            data=test_values,
             index=test_features
         )
-        indices_1s = [i for i, x in enumerate(test_vals) if x == 1]
-        vals_1s = [x for x in test_vals if x == 1]
+        indices_1s = [i for i, x in enumerate(test_values) if x == 1]
+        values_1s = [x for x in test_values if x == 1]
         features_1s = [test_features[i] for i in indices_1s]
-        test_dict = dict(zip(features_1s, vals_1s))
+        test_dict = dict(zip(features_1s, values_1s))
         computed_dict = self.data_loader._DataLoader__create_feature_dict(
             row=test_series
         )
@@ -159,7 +163,7 @@ class TestDataLoader(unittest.TestCase):
         """
         for query in ['hybrid', 'partial', 'mf']:
             transformed_data = self.data_loader._DataLoader__transform_data(
-                interactions=self.interactions,
+                interactions_df=self.interactions,
                 items_data=self.items_data,
                 users_data=self.users_data,
                 query=query
@@ -167,6 +171,8 @@ class TestDataLoader(unittest.TestCase):
             self.assertIsInstance(transformed_data, dict)
             self.assertIsInstance(transformed_data['interactions'], list)
             self.assertEqual(len(transformed_data['interactions']), self.interactions.shape[0])
+            self.assertIsInstance(transformed_data['positive_inter_map'], dict)
+            self.assertIsInstance(random.choice(list(transformed_data['positive_inter_map'].values())), list)
             self.assertIsInstance(transformed_data['items_data'], dict)
             self.assertIsInstance(transformed_data['user_ids'], list)
             self.assertEqual(len(transformed_data['user_ids']), self.users_data.shape[0])
@@ -178,7 +184,7 @@ class TestDataLoader(unittest.TestCase):
         """
         for query in ['hybrid', 'partial', 'mf']:
             loaded_data = self.data_loader.load_data(
-                interactions=self.interactions,
+                interactions_df=self.interactions,
                 items_data=self.items_data,
                 users_data=self.users_data,
                 query=query
@@ -196,6 +202,8 @@ class TestDataLoader(unittest.TestCase):
             self.assertEqual(len(loaded_data['mapping'][2]), self.items_data.shape[0])
             self.assertIsInstance(loaded_data['item_type_map'], dict)
             self.assertEqual(len(loaded_data['item_type_map']), self.items_data.shape[0])
+            self.assertIsInstance(loaded_data['positive_inter_map'], dict)
+            self.assertIsInstance(random.choice(list(loaded_data['positive_inter_map'].values())), list)
             if query == 'mf':
                 self.assertIsNone(loaded_data['item_features'])
             else:

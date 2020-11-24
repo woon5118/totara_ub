@@ -30,15 +30,14 @@ class OptimizeHyperparams:
     def __init__(self, interactions=None, item_features=None, weights=None, num_threads=2, item_alpha=0.0):
         """
         Constructor method
-        :param interactions: the matrix containing user-item interactions of shape `[n_users, n_items]`,
-            defaults to None
-        :type interactions: np.float32 coo_matrix, mandatory
+        :param interactions: the matrix containing user-item interactions of shape `[n_users, n_items]`
+        :type interactions: np.float32 coo_matrix
         :param item_features: A matrix of shape `[n_items, n_item_features]` where each row contains that item's weight
-            over features, defaults to None
-        :type item_features: csr_matrix, mandatory
+            over features
+        :type item_features: csr_matrix
         :param weights: A matrix with entries expressing weights of individual interactions from the interactions
-            matrix. Its row and col arrays must be the same as those of the interactions matrix, defaults to None
-        :type weights: coo_matrix, mandatory
+            matrix. Its row and col arrays must be the same as those of the interactions matrix
+        :type weights: coo_matrix
         :param num_threads: Number of parallel computation threads to use. Should not be higher than the number of
             physical cores, defaults to 2
         :type num_threads: int, optional
@@ -55,19 +54,19 @@ class OptimizeHyperparams:
         """
         Computes approximate partial derivatives of the test AUC score with respect to the number of epochs and
         with respect to the latent dimension or the number of components
-        :param f: The AUC score at the given `epochs` and given `comps`, defaults to 0.5
-        :type f: float, mandatory
-        :param train_data: Train dataset, defaults to None
-        :type train_data: coo_matrix, mandatory
-        :param test_data: Test dataset, defaults to None
-        :type test_data: coo_matrix, mandatory
+        :param f: The AUC score at the given `epochs` and given `comps`
+        :type f: float
+        :param train_data: Train dataset
+        :type train_data: coo_matrix
+        :param test_data: Test dataset
+        :type test_data: coo_matrix
         :param train_weights: A matrix with entries expressing weights of individual interactions from the train_data
-            matrix. Its row and col arrays must be the same as those of the train_data matrix, defaults to None
-        :type train_weights: coo_matrix, mandatory
-        :param epochs: Number of epochs, defaults to 1
-        :type epochs: int, mandatory
-        :param comps: Latent dimension or the number of components, defaults to 5
-        :type comps: int, mandatory
+            matrix. Its row and col arrays must be the same as those of the train_data matrix
+        :type train_weights: coo_matrix
+        :param epochs: Number of epochs
+        :type epochs: int
+        :param comps: Latent dimension or the number of components
+        :type comps: int
         :returns: Partial derivative with respect to the epochs and with respect to the number of components,
             respectively
         :rtype: tuple
@@ -98,17 +97,17 @@ class OptimizeHyperparams:
         """
         Computes the AUC score on the `test_data` after building model on the `train_data` with the given epochs
         and the number of components
-        :param train_data: Train dataset, defaults to None
-        :type train_data: coo_matrix, mandatory
-        :param test_data: Test dataset, defaults to None
-        :type test_data: coo_matrix, mandatory
+        :param train_data: Train dataset
+        :type train_data: coo_matrix
+        :param test_data: Test dataset
+        :type test_data: coo_matrix
         :param train_weights: A matrix with entries expressing weights of individual interactions from the train_data
-            matrix. Its row and col arrays must be the same as those of the train_data matrix, defaults to None
-        :type train_weights: coo_matrix, mandatory
-        :param epochs: Number of epochs, defaults to 1
-        :type epochs: int, mandatory
-        :param comps: Latent dimension or the number of components, defaults to 5
-        :type comps: int, mandatory
+            matrix. Its row and col arrays must be the same as those of the train_data matrix
+        :type train_weights: coo_matrix
+        :param epochs: Number of epochs
+        :type epochs: int
+        :param comps: Latent dimension or the number of components
+        :type comps: int
         :return: The AUC score on the `test_data`
         :rtype: float
         """
@@ -144,7 +143,7 @@ class OptimizeHyperparams:
         the hyper-parameters, respectively. This process continues until the improvement
         in the test AUC score is smaller than 1e-5
         :param lr: The learning rate, determines the size of steps
-        :type lr: float, mandatory
+        :type lr: float
         :returns: A tuple of three lists; epochs, comps, and scores
         :rtype: tuple
         """

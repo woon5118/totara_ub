@@ -34,28 +34,38 @@ class DataLoader:
         """
         Class constructor method
         :param nl_libs: Full path to the directory containing the language processing resources e.g.,
-            stopwords of different languages, lemmatizing resources, etc., defaults to None
-        :type nl_libs: str, mandatory
+            stopwords of different languages, lemmatizing resources, etc.
+        :type nl_libs: str
         """
         self.nl_libs = nl_libs
 
     @staticmethod
-    def __get_interactions(interactions=None):
+    def __get_interactions(interactions_df=None):
         """
-        This method uses the `interaction` DataFrame and returns the interactions dataset.
-        :param interactions: The interactions data as exported from the Totara instance, defaults to None
-        :type interactions: A pandas DataFrame
-        :return: A list of tuples (user_id, item_id, weight) containing user-item interactions
-        :rtype: list
+        This method uses the `interactions_df` DataFrame and returns a tuple object composed of interactions
+            (a list) and positive_inter_map (a dictionary with user-to-items information).
+        :param interactions_df: The interactions data as exported from the Totara instance
+        :type interactions_df: An instance of pandas DataFrame
+        :return: A tuple where the first element is a list of tuples (user_id, item_id, weight) containing
+            user-item interactions, and the second element is a dictionary whose keys are the Totara user ids
+            and values are the lists containing the Totara item ids that user has interacted with in the past.
+            Note that this dictionary only contains the Totara user ids of those users who have had at one
+            interaction with an item in the past
+        :rtype: tuple
         """
-        interactions = [(int(x[0]), x[1], float(x[2])) for x in interactions.to_numpy()]
-        return interactions
+        positive_interactions = interactions_df[interactions_df.rating == 1]
+        users_interacted = positive_interactions.user_id.unique()
+        positive_inter_map = dict(
+            (u, positive_interactions[positive_interactions.user_id == u].item_id.tolist()) for u in users_interacted
+        )
+        interactions = [(int(x[0]), x[1], float(x[2])) for x in interactions_df.to_numpy()]
+        return interactions, positive_inter_map
 
     @staticmethod
     def __get_users(users_data=None):
         """
         Uses the pandas DataFrame `users_data` and returns a list of user ids
-        :param users_data: The users data exported from the Totara instance, defaults to None
+        :param users_data: The users data exported from the Totara instance
         :type users_data: A pandas DataFrame
         :return: A list of user ids
         """
@@ -80,8 +90,8 @@ class DataLoader:
         This method prepares a list of tags `(item_id, [tag1, tag2, tag3, ...])`; by adding only those tags to
         each item where that tag (column header) had a value 1 in the pandas DataFrame
         :param dataframe: A pandas DataFrame where row labels are item ids and column headers are tags. The values
-            of tags for each item can be 0 or 1, defaults to None
-        :type dataframe: pandas DataFrame, mandatory
+            of tags for each item can be 0 or 1
+        :type dataframe: pandas DataFrame
         :return: list of tuples where each tuple if of the shape `(item_id, [tag1, tag2, tag3, ...])`
         :rtype: list
         """
@@ -94,7 +104,7 @@ class DataLoader:
         """
         This method creates a map between the item_id and item_type from the input dataframe
         :param dataframe: A pandas DataFrame where row labels are item ids, column headers are item_types and the
-            values in these columns are binary coded (0 or 1), defaults to None
+            values in these columns are binary coded (0 or 1)
         :type dataframe: Pandas DataFrame object
         :return: A dictionary whose keys are item_id and the values are item_type
         """
@@ -107,7 +117,7 @@ class DataLoader:
         This method uses the pandas DataFrame of the items data exported from the totara instance and returns a
             fully processed items data. The processing depends on the type of `query` defined in the instance
             variable of the class, defaults to None
-        :param items_data: The data exported from the Totara instance, defaults to None
+        :param items_data: The data exported from the Totara instance
         :type items_data: A pandas DataFrame
         :param query: One of 'mf' (collaborative filtering), 'partial' (content based filtering
             without text processing), or 'hybrid' (content based filtering with text processing). The data
@@ -199,44 +209,46 @@ class DataLoader:
 
         return items_processed_data
 
-    def __transform_data(self, interactions=None, items_data=None, users_data=None, query='mf'):
+    def __transform_data(self, interactions_df=None, items_data=None, users_data=None, query='mf'):
         """
         This method governs the process of reading the interactions data, items data and the users data
         as defined in the class instance variables
-        :param interactions: The interactions data as exported from the Totara instance, defaults to None
-        :type interactions: A pandas DataFrame
-        :param items_data: The data exported from the Totara instance, defaults to None
+        :param interactions_df: The interactions data as exported from the Totara instance
+        :type interactions_df: A pandas DataFrame
+        :param items_data: The data exported from the Totara instance
         :type items_data: A pandas DataFrame
-        :param users_data: The users data exported from the Totara instance, defaults to None
+        :param users_data: The users data exported from the Totara instance
         :type users_data: A pandas DataFrame
         :param query: One of 'mf' (collaborative filtering), 'partial' (content based filtering
             without text processing), or 'hybrid' (content based filtering with text processing). The data
             preparation/processing depends on this parameter, defaults to 'mf'
         :type query: str, optional
-        :return: A dictionary of three items; 'interaction' - the interactions data, 'items_data' - the
-            items data, and the 'user_ids' - the user data.
+        :return: A dictionary of four items; 'interaction' - the interactions data,
+            `positive_inter_map` - the users-to-items_list map (where positive interactions happened),
+            'items_data' - the items data, and the 'user_ids' - the user data.
         """
 
-        interactions = self.__get_interactions(interactions=interactions)
+        interactions, positive_inter_map = self.__get_interactions(interactions_df=interactions_df)
         items_data = self.__get_items(items_data=items_data, query=query)
         user_ids = self.__get_users(users_data=users_data)
 
         processed_data = {
             'interactions': interactions,
+            'positive_inter_map': positive_inter_map,
             'items_data': items_data,
             'user_ids': user_ids
         }
         return processed_data
 
-    def load_data(self, interactions=None, items_data=None, users_data=None, query='mf'):
+    def load_data(self, interactions_df=None, items_data=None, users_data=None, query='mf'):
         """
         This method takes reads runs other methods of the class to read and preprocess interactions, items and users
         data and transforms that into the sparse matrices that can be consumed by the LightFM model class.
-        :param interactions: The interactions data as exported from the Totara instance, defaults to None
-        :type interactions: A pandas DataFrame
-        :param items_data: The data exported from the Totara instance, defaults to None
+        :param interactions_df: The interactions data as exported from the Totara instance
+        :type interactions_df: A pandas DataFrame
+        :param items_data: The data exported from the Totara instance
         :type items_data: A pandas DataFrame
-        :param users_data: The users data exported from the Totara instance, defaults to None
+        :param users_data: The users data exported from the Totara instance
         :type users_data: A pandas DataFrame
         :param query: One of 'mf' (collaborative filtering), 'partial' (content based filtering
             without text processing), or 'hybrid' (content based filtering with text processing). The data
@@ -246,11 +258,13 @@ class DataLoader:
             sparse matrix of of sample weights of the same shape as the `interactions`, `item_features` - a sparse
             matrix of the shape `[n_items, n_features]` where each row contains item's weights over features,
             `mapping` - a tuple of four dictionaries (user id map, user features map, item id map, item feature map),
-            and `item_type_map` - a dictionay with keys as the `item_id` and values as `item_type`
+            `item_type_map` - a dictionary with keys as the `item_id` and values as `item_type`, and
+            `positive_inter_map` - a dictionary where keys are the Totara user ids (of the users who interacted with
+            at least one item) and values are lists of the Totara item ids
         """
         # Read all datasets, preprocess and transform data to be consumed by the LightFM data class
         transformed_data = self.__transform_data(
-            interactions=interactions,
+            interactions_df=interactions_df,
             items_data=items_data,
             users_data=users_data,
             query=query
@@ -282,6 +296,7 @@ class DataLoader:
             'weights': weights,
             'item_features': item_features,
             'mapping': dataset.mapping(),
-            'item_type_map': transformed_data['items_data']['item_type_map']
+            'item_type_map': transformed_data['items_data']['item_type_map'],
+            'positive_inter_map': transformed_data['positive_inter_map']
         }
         return results

@@ -27,12 +27,11 @@ class SimilarItems:
     def __init__(self, item_mapping=None, item_representations=None, num_items=10):
         """
         Constructor method
-        :param item_mapping: A dictionary where keys are Totara item ids and values are internal item ids, defaults to None
-        :type item_mapping: dict, mandatory
-        :param item_representations: The latent representations of the items in the shape `[n_items, num_components]`,
-            defaults to None
-        :type item_representations: np.float32 array, mandatory
-        :param num_items: The number of similar item recommendations for each item, defaults to None
+        :param item_mapping: A dictionary where keys are Totara item ids and values are internal item ids
+        :type item_mapping: dict
+        :param item_representations: The latent representations of the items in the shape `[n_items, num_components]`
+        :type item_representations: np.float32 array
+        :param num_items: The number of similar item recommendations for each item, defaults to 10
         :type num_items: int, optional
         """
         self.item_mapping = item_mapping
@@ -45,7 +44,7 @@ class SimilarItems:
         Returns `num_items` number of items (as defined in the class constructor method) similar
         to the item with internal id `internal_idx`
         :param item_meta: Totara id, and Internal id of the item whose similar items are being sought
-        :type item_meta: tuple (`totara_id`, `internal_id`), mandatory
+        :type item_meta: tuple (`totara_id`, `internal_id`)
         :return: A list of (`totara_id`, `similarity_score`) of `num_items` that are similar to the given item
         :rtype: list
         """

@@ -37,9 +37,9 @@ class TestPreProcessors(unittest.TestCase):
         This method tests if the `__remove_urls` method of the `PreProcessors` class removes urls from the text
         documents
         """
-        test_doc = 'The website address of Totara Learnig Solutions Ltd is https://www.totaralearning.com/'
+        test_doc = 'The website address of Totara Learning Solutions Ltd is https://www.totaralearning.com/'
         returned_doc = self.pre_processor._PreProcessors__remove_urls(in_doc=test_doc)
-        url_removed_doc = 'The website address of Totara Learnig Solutions Ltd is'
+        url_removed_doc = 'The website address of Totara Learning Solutions Ltd is'
         self.assertEqual(returned_doc, url_removed_doc)
 
     def test_lower_applied(self):
@@ -47,9 +47,9 @@ class TestPreProcessors(unittest.TestCase):
         This method tests if the `preprocess_docs` method of the `PreProcessors` class changes the upper case characters
         to the lower case ones.
         """
-        test_doc = 'The website address of Totara Learnig Solutions Ltd is https://www.totaralearning.com/'
+        test_doc = 'The website address of Totara Learning Solutions Ltd is https://www.totaralearning.com/'
         processed_doc = self.pre_processor.preprocess_docs(raw_doc=test_doc)
-        lowered_doc = 'the website address of totara learnig solutions ltd is'
+        lowered_doc = 'the website address of totara learning solutions ltd is'
         self.assertEqual(processed_doc, lowered_doc)
 
     def test_numerics_removed(self):
@@ -69,5 +69,5 @@ class TestPreProcessors(unittest.TestCase):
         """
         test_doc = '  A quick   brown fox jumps over the lazy    dog '
         processed_doc = self.pre_processor.preprocess_docs(raw_doc=test_doc)
-        spaces_remd_doc = 'a quick brown fox jumps over the lazy dog'
-        self.assertEqual(processed_doc, spaces_remd_doc)
+        spaces_removed_doc = 'a quick brown fox jumps over the lazy dog'
+        self.assertEqual(processed_doc, spaces_removed_doc)

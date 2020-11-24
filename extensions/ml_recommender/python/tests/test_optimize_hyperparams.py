@@ -72,8 +72,8 @@ class TestOptimizeHyperparams(unittest.TestCase):
     @patch('subroutines.optimize_hyperparams.LightFM.fit')
     def test_compute_performance(self, mock_lightfm_fit, mock_auc_score):
         """
-        This method tests if the `__compute_performace` method of the `OptimizeHyperparams` class calls the `fit` method
-        of `LightFM` class once with the correct arguments, and if the `auc_score` function has been called once
+        This method tests if the `__compute_performance` method of the `OptimizeHyperparams` class calls the `fit`
+        method of `LightFM` class once with the correct arguments, and if the `auc_score` function has been called once
         and if the returned value is correct with mocked auc_score.
         """
         train_data = 10

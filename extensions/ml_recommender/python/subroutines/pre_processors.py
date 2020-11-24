@@ -36,8 +36,8 @@ class PreProcessors:
     def __remove_urls(in_doc=None):
         """
         This static method removes part of string that matches with a URL pattern
-        :param in_doc: The document string from which the URL needs to be removed, defaults to None
-        :type in_doc: str, mandatory
+        :param in_doc: The document string from which the URL needs to be removed
+        :type in_doc: str
         :return: A string after URLs have been removed
         :rtype: str
         """
@@ -49,8 +49,8 @@ class PreProcessors:
         """
         This method preprocesses the strings and returns a string that is in lower case, has URLs removed,
         numeric characters removed, has no stopwords, and has been lemmatized.
-        :param raw_doc: The document to be preprocessed/cleaned, defaults to None
-        :type raw_doc: str, mandatory
+        :param raw_doc: The document to be preprocessed/cleaned
+        :type raw_doc: str
         :return: A preprocessed document
         :rtype: str
         """

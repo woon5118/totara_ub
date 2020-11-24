@@ -17,10 +17,11 @@ Please contact [licensing@totaralearning.com] for more information.
 """
 
 import unittest
-from unittest.mock import Mock
-import random
+from unittest.mock import patch, Mock
 import numpy as np
 from pandas import DataFrame
+from tests.generate_data import GenerateData
+from subroutines.data_loader import DataLoader
 from subroutines.user_to_items import UserToItems
 
 
@@ -32,51 +33,75 @@ class TestUserToItems(unittest.TestCase):
         """
         Hook method for setting up the fixture before exercising it
         """
-        test_users_n = 10
-        self.test_items_n = 20
-        model = Mock()
-        self.test_prediction = np.random.rand(self.test_items_n)
-        model.predict.return_value = self.test_prediction
-        types_choices = [
-            'container_course', 'container_workspace', 'engage_article', 'engage_microlearning',
-            'totara_playlist'
-        ]
-        u_mapping = dict(zip(range(2, (test_users_n + 2)), range(test_users_n)))
-        self.i_mapping = dict(
-            zip(['item' + str(i) for i in range(1, (self.test_items_n + 1))], range(self.test_items_n))
+        data_generator = GenerateData()
+        data_loader = DataLoader()
+        processed_data = data_loader.load_data(
+            interactions_df=data_generator.get_interactions(),
+            users_data=data_generator.get_users(),
+            items_data=data_generator.get_items()
         )
-        self.i_type_map = dict(
-            zip(
-                ['item' + str(i) for i in range(1, (self.test_items_n + 1))],
-                random.choices(population=types_choices, k=self.test_items_n)
-            )
-        )
+        self.model = Mock()
+        self.mock_predictions = np.random.rand(10)
+        self.model.predict.return_value = self.mock_predictions
         self.user_to_items = UserToItems(
-            u_mapping=u_mapping, i_mapping=self.i_mapping, model=model, item_type_map=self.i_type_map
+            u_mapping=processed_data['mapping'][0],
+            i_mapping=processed_data['mapping'][2],
+            item_type_map=processed_data['item_type_map'],
+            item_features=processed_data['item_features'],
+            positive_inter_map=processed_data['positive_inter_map'],
+            model=self.model
         )
 
-    def test_get_items(self):
+    @patch('subroutines.user_to_items.np.fromiter')
+    def test_fromiter_called_in_get_items(self, mock_fromiter):
         """
-        This method tests if the `__get_items` method of the 'UserToItems` class returns the items as expected and the
-        `predict` method of the `LightFM` class has been called once.
+        This method tests if the `__get_items` method of the `UserToItems` class calls the
+        `np.fromiter` function exactly once with the correct arguments
         """
-        test_internal_uid = random.choice(list(self.i_mapping.values()))
-        sorted_ids = self.test_prediction.argsort()[::-1]
-        i_mapping_rev = {v: k for k, v in self.i_mapping.items()}
+        test_uid = 5
+        __ = self.user_to_items._UserToItems__get_items(internal_uid=test_uid)
+        mock_fromiter.assert_called_once()
+        self.assertEqual(list(self.user_to_items.i_mapping.values()), list(mock_fromiter.call_args[0][0]))
+        self.assertDictEqual({'dtype': np.int32}, mock_fromiter.call_args[1])
+
+    def test_predict_called_in_get_items(self):
+        """
+        This method tests if the `__get_items` method of the `UserToItems` class calls the `predict` method
+        on the LightFM model object exactly once with the correct arguments
+        """
+        test_uid = 5
+        __ = self.user_to_items._UserToItems__get_items(internal_uid=test_uid)
+        self.model.predict.assert_called_once()
+        self.assertEqual(self.model.predict.call_args[1]['user_ids'], test_uid)
+        np.testing.assert_equal(
+            self.model.predict.call_args[1]['item_ids'],
+            np.fromiter(self.user_to_items.i_mapping.values(), dtype=np.int32)
+        )
+        self.assertEqual(self.model.predict.call_args[1]['item_features'], None)
+        self.assertEqual(self.model.predict.call_args[1]['num_threads'], self.user_to_items.num_threads)
+
+    def test_get_items_overall(self):
+        """
+        This method tests if the `__get_items` method of the `UserToItems` class returns a list of items
+        as expected, i.e., after excluding the already seen items and ordered as per their ranking/score
+        for the given user
+        """
+        test_uid = 5
+        computed_recommended_items = self.user_to_items._UserToItems__get_items(
+            internal_uid=test_uid,
+            reduction_percentage=0.3
+        )
+        sorted_ids = self.mock_predictions.argsort()[::-1]
         sorted_items = [
-            (i_mapping_rev[x], self.test_prediction[x], self.i_type_map[i_mapping_rev[x]]) for x in sorted_ids
+            (
+                self.user_to_items.i_mapping_rev[x],
+                self.mock_predictions[x],
+                self.user_to_items.item_type_map[self.user_to_items.i_mapping_rev[x]]
+            )
+            for x in sorted_ids
         ]
-        best_with_score = []
-        item_types = [
-            'container_course', 'container_workspace', 'engage_article', 'engage_microlearning', 'totara_playlist'
-        ]
-        for i_type in item_types:
-            type_recommended = [(x[0], x[1]) for x in sorted_items if x[2] == i_type]
-            type_recommended = type_recommended[:self.user_to_items.num_items]
-            best_with_score.extend(type_recommended)
-        the_ans = self.user_to_items._UserToItems__get_items(internal_uid=test_internal_uid)
-        self.user_to_items.model.predict.assert_called_once()
-        self.assertEqual(the_ans, best_with_score)
+        best_with_score = self.user_to_items._UserToItems__top_x_by_cat(sorted_items)
+        self.assertEqual(computed_recommended_items, best_with_score)
 
     def test_all_items(self):
         """
@@ -85,4 +110,4 @@ class TestUserToItems(unittest.TestCase):
         """
         computed_user_items = self.user_to_items.all_items()
         self.assertIsInstance(computed_user_items, DataFrame)
-        self.assertEqual(computed_user_items.shape, (self.test_items_n * self.user_to_items.num_items, 3))
+        self.assertEqual(computed_user_items.shape[1], 3)

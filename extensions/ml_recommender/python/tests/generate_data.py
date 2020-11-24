@@ -67,14 +67,14 @@ class GenerateData:
 
     def get_tenants(self):
         """
-        :return: A DataFrame containing data from the `tenants.csv`
+        :return: A DataFrame containing data like the one in the `tenants.csv`
         """
         tenants_df = pd.DataFrame(data={'tenants': list(range(self.n_tenants))})
         return tenants_df
 
     def get_users(self):
         """
-        :return: A DataFrame containing data from the `user_data_x.csv` where `x` is the tenant
+        :return: A DataFrame containing data like the one in the `user_data_x.csv` where `x` is the tenant
         """
         lang = random.choices(population=['en', 'es', 'de', 'it', 'ne'], k=len(self.user_id))
         users_data = pd.DataFrame(
@@ -88,7 +88,7 @@ class GenerateData:
 
     def get_items(self):
         """
-        :return: A DataFrame containing data from the `item_data_x.csv` where `x` is the tenant
+        :return: A DataFrame containing data like the one in the `item_data_x.csv` where `x` is the tenant
         """
         document = [lorem.paragraph() for _ in range(len(self.item_id))]
         items_data = pd.DataFrame(
@@ -109,7 +109,7 @@ class GenerateData:
 
     def get_interactions(self):
         """
-        :return: A DataFrame containing data from the `user_interactions_x.csv` where `x` is the
+        :return: A DataFrame containing data like the one in the `user_interactions_x.csv` where `x` is the
             tenant
         """
         df_users = pd.DataFrame({'key': [1] * len(self.user_id_inter), 'user_id': self.user_id_inter})

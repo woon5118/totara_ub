@@ -82,11 +82,11 @@ def run_modelling_process():
         # Process the tenant's data from data_home directory and read into the memory
         d_loader = DataLoader(nl_libs=nl_libs)
         t1 = time.time()
-        interactions = data_reader.read_interactions_file(tenant=tenant)
+        interactions_df = data_reader.read_interactions_file(tenant=tenant)
         items_data = data_reader.read_items_file(tenant=tenant)
         users_data = data_reader.read_users_file(tenant=tenant)
         processed_data = d_loader.load_data(
-            interactions=interactions,
+            interactions_df=interactions_df,
             items_data=items_data,
             users_data=users_data,
             query=query
@@ -129,12 +129,12 @@ def run_modelling_process():
 
             m, s = divmod((time.time() - t2), 60)
             print(
-                f'The hyper-parameters optimization of the model for tenant {tenant} took {m: .0f}\n'
-                f'minutes and {s: .2f} seconds to converge.\n'
+                f'The hyper-parameters optimization of the model for tenant {tenant} took\n'
+                f'{m: .0f} minutes and {s: .2f} seconds to converge.\n'
             )
             print(
                 f'The best hyper-parameters found for tenant {tenant}:\n   epochs: {epochs[-1]}\n'
-                f'   n_components: {comps[-1]}\nThe best score: {scores[-1]: .3f}\n'
+                f'   n_components: {comps[-1]}\n   The best score: {scores[-1]: .3f}\n'
             )
             # --------------------------------------------------
             # Train the final model with the optimum number of 'epochs' and the 'no_components'
@@ -144,7 +144,7 @@ def run_modelling_process():
                 weights=processed_data['weights'],
                 item_features=processed_data['item_features'],
                 num_threads=num_threads,
-                optimized_hparams={
+                optimized_hyperparams={
                     'epochs': epochs[-1],
                     'no_components': comps[-1]
                 },
@@ -175,6 +175,7 @@ def run_modelling_process():
                 i_mapping=processed_data['mapping'][2],
                 item_type_map=processed_data['item_type_map'],
                 item_features=processed_data['item_features'],
+                positive_inter_map=processed_data['positive_inter_map'],
                 model=final_model,
                 num_items=user_result_count,
                 num_threads=num_threads
