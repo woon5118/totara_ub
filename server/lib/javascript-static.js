@@ -1373,25 +1373,28 @@ document.body.addEventListener('click', function (e) {
         var url = node.getAttribute('href').split('?')[0];
         var queryString = node.getAttribute('href').split('?')[1];
         var urlForm = document.createElement('form');
-        var sesskeyInput = document.createElement('input');
-        sesskeyInput.type = 'hidden';
-        sesskeyInput.name = 'sesskey';
-        sesskeyInput.value = M.cfg.sesskey;
-        urlForm.appendChild(sesskeyInput);
 
-        queryString.split('&').forEach(function(string) {
+        // Ensure sesskey is not in the URL (so it doesn't appear in logs etc)
+        queryString = queryString.split('&').filter(function(string) {
             var query = string.split('=');
-            var input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = query[0];
-            input.value = decodeURIComponent(query[1]);
-            urlForm.appendChild(input);
-        });
+            if (query[0] === 'sesskey') {
+                if (M.cfg.sesskey === query[1]) {
+                    var sesskeyInput = document.createElement('input');
+                    sesskeyInput.type = 'hidden';
+                    sesskeyInput.name = 'sesskey';
+                    sesskeyInput.value = M.cfg.sesskey;
+                    urlForm.appendChild(sesskeyInput);
+                }
+                return false;
+            } else {
+                return true;
+            }
+        }).join('&');
 
-        urlForm.action = url;
+        urlForm.action = url + '?' + queryString;
         urlForm.method = 'POST';
         urlForm.style.display = 'none';
         document.body.appendChild(urlForm);
         urlForm.submit();
     }
-})
+});

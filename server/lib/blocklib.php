@@ -1345,7 +1345,7 @@ class block_manager {
         global $CFG;
 
         $controls = array();
-        $actionurl = $this->page->url->out(false);
+        $actionurl = $this->page->url->out(false, array('sesskey' => sesskey()));
         $blocktitle = $block->get_title();
         if (empty($blocktitle)) {
             $blocktitle = $block->arialabel;
