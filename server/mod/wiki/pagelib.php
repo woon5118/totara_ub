@@ -634,6 +634,7 @@ class page_wiki_comments extends page_wiki {
 
             $t = new html_table();
             $t->id = 'wiki-comments';
+            $t->attributes['role'] = "presentation";
             $cell1 = new html_table_cell($OUTPUT->user_picture($user, array('popup' => true)));
             $cell2 = new html_table_cell(get_string('bynameondate', 'forum', $by));
             $cell3 = new html_table_cell();
@@ -1487,6 +1488,7 @@ class page_wiki_map extends page_wiki {
         $swid = $this->subwiki->id;
 
         $table = new html_table();
+        $table->attributes['role'] = "presentation";
         $table->head = array(get_string('contributions', 'wiki') . $OUTPUT->help_icon('contributions', 'wiki'));
         $table->attributes['class'] = 'generalbox table';
         $table->data = array();
@@ -1552,6 +1554,7 @@ class page_wiki_map extends page_wiki {
         $fromlinks = wiki_get_linked_from_pages($page->id);
 
         $table = new html_table();
+        $table->attributes['role'] = "presentation";
         $table->attributes['class'] = 'wiki_navigation_from table';
         $table->head = array(get_string('navigationfrom', 'wiki') . $OUTPUT->help_icon('navigationfrom', 'wiki') . ':');
         $table->data = array();
@@ -1605,6 +1608,7 @@ class page_wiki_map extends page_wiki {
         $tree = wiki_build_tree($page, $node, $keys);
 
         $table = new html_table();
+        $table->attributes['role'] = "presentation";
         $table->head = array(get_string('pageindex', 'wiki') . $OUTPUT->help_icon('pageindex', 'wiki'));
         $table->attributes['class'] = 'generalbox table';
         $table->data[] = array($this->render_navigation_node($tree));
@@ -1644,6 +1648,7 @@ class page_wiki_map extends page_wiki {
         }
 
         $table = new html_table();
+        $table->attributes['role'] = "presentation";
         $table->head = array(get_string('pagelist', 'wiki') . $OUTPUT->help_icon('pagelist', 'wiki'));
         $table->attributes['class'] = 'generalbox table';
         foreach ($stdaux as $key => $elem) {
@@ -1673,6 +1678,7 @@ class page_wiki_map extends page_wiki {
         $swid = $this->subwiki->id;
 
         $table = new html_table();
+        $table->attributes['role'] = "presentation";
         $table->head = array(get_string('orphaned', 'wiki') . $OUTPUT->help_icon('orphaned', 'wiki'));
         $table->attributes['class'] = 'generalbox table';
         $table->data = array();
@@ -1709,6 +1715,7 @@ class page_wiki_map extends page_wiki {
         $swid = $this->subwiki->id;
 
         $table = new html_table();
+        $table->attributes['role'] = "presentation";
         $table->head = array(get_string('updatedpages', 'wiki') . $OUTPUT->help_icon('updatedpages', 'wiki'));
         $table->attributes['class'] = 'generalbox table';
         $table->data = array();
