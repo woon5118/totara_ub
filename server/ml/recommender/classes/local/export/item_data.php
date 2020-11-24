@@ -17,21 +17,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package ml_recommender
  */
 namespace ml_recommender\local\export;
 
+use coding_exception;
+use dml_exception;
 use ml_recommender\local\csv\writer;
+use ml_recommender\local\unique_id;
+use moodle_recordset;
+use totara_engage\access\access;
 use totara_engage\timeview\time_view;
 
 /**
  * Export class for item (i.e. articles, playlists) data.
  */
 class item_data extends export {
-
+    /**
+     * @return string
+     */
     public function get_name(): string {
         return 'item_data';
+    }
+
+    /**
+     * @return array
+     */
+    public static function get_supported_components(): array {
+        return [
+            'container_course',
+            'container_workspace',
+            'engage_article',
+            'engage_microlearning',
+            'totara_playlist',
+        ];
     }
 
     /**
@@ -48,53 +68,44 @@ class item_data extends export {
         }
 
         // Components.
-        $component_names = [
-            'container_course',
-            'container_workspace',
-            'engage_article',
-            'engage_microlearning',
-            'totara_playlist'
-        ];
-        $component_names = $this->one_hot_components($component_names);
+        $component_names = $this->one_hot_components(static::get_supported_components());
 
         // Component names are not consistently applied in tags table - note differences here.
         $tag_component_names = [
-            'container_course' => 'course'
+            'container_course' => 'course',
         ];
 
         $topics = $this->get_topics();
 
         // Build headings -> id, [components], [topics], document.
         $headings = ['item_id'];
-        foreach ($component_names as $component_name => $onehot) {
-            $headings[] = $component_name;
-        }
+        $headings = array_merge($headings, array_keys($component_names));
+
         foreach ($topics as $key => $topic) {
             $headings[] = $topic;
         }
-        $headings[] = 'document';
 
+        $headings[] = 'document';
         $writer->add_data($headings);
 
         foreach ($recordset as $item) {
             $cells = [$item->uniqueid];
+            [$component] = unique_id::normalise_unique_id($item->uniqueid);
+            $component_onehot = $component_names[$component];
 
-            foreach ($component_names as $component_name => $onehot) {
-                if (strpos($item->uniqueid, $component_name) === 0) {
-                    $component = $component_name;
-                    $component_onehot = $onehot;
-                    break;
-                }
-            }
-
-            foreach ($component_onehot as $id => $onehot) {
+            foreach ($component_onehot as $onehot) {
                 $cells[] = $onehot;
             }
 
             $resource_topics = [];
             if (isset($tag_component_names[$component])) {
                 $select = 'itemid = ? and itemtype = ?';
-                $this_item_topics = $DB->get_fieldset_select('tag_instance', 'tagid', $select, [$item->id, $tag_component_names[$component]]);
+                $this_item_topics = $DB->get_fieldset_select(
+                    'tag_instance',
+                    'tagid',
+                    $select,
+                    [$item->id, $tag_component_names[$component]]
+                );
             } else {
                 $select = 'itemid = ? and component = ?';
                 $component = ($component == 'engage_microlearning') ? 'engage_article' : $component;
@@ -102,12 +113,12 @@ class item_data extends export {
             }
 
             foreach ($this_item_topics as $index => $id) {
-                $resource_topics[(int)$id] = true;
+                $resource_topics[(int) $id] = true;
             }
 
             // One-hot encode topics for item.
             foreach ($topics as $id => $topic) {
-                if(isset($resource_topics[$id])) {
+                if (isset($resource_topics[$id])) {
                     $cells[] = 1;
                 } else {
                     $cells[] = 0;
@@ -126,7 +137,11 @@ class item_data extends export {
                 0
             );
 
-            $item->content = html_to_text(format_text($item->content, $item->summaryformat));
+            if (!empty($item->content)) {
+                // Skip the empty string.
+                $item->content = content_to_text($item->content, $item->summaryformat);
+            }
+
             $cells[] = $this->scrubtext($item->title . ' ' . $item->content);
 
             // Create CSV record.
@@ -139,7 +154,7 @@ class item_data extends export {
 
     /**
      * Prepare and run SQL query to database to get users
-     * @return \moodle_recordset
+     * @return moodle_recordset
      */
     private function get_export_recordset() {
         global $DB, $CFG;
@@ -186,7 +201,7 @@ class item_data extends export {
         $unique_workspace_id = $DB->sql_concat("'container_workspace'", 'cw.id');
         $unique_course_id = $DB->sql_concat("'container_course'", 'cc.id');
 
-        $public = \totara_engage\access\access::PUBLIC;
+        $public = access::PUBLIC;
         $microlearning_time_view = time_view::LESS_THAN_FIVE;
 
         $sql = "
@@ -229,17 +244,16 @@ class item_data extends export {
      * @param string $text
      * @return string
      */
-    private function scrubtext(string $text) :string {
-        $text = str_replace(['"'],"'", $text);
-        return trim(str_replace(['\n', '\r', '\t', ','],' ', $text));
+    private function scrubtext(string $text): string {
+        $text = str_replace(['"'], "'", $text);
+        return trim(str_replace(['\n', '\r', '\t', ','], ' ', $text));
     }
 
     /**
      * Get a scrubbed list of registered topics and tags to include as item metadata.
      *
      * We want only tags for those courses where self-enrolment is enabled, but all Engage topics.
-     *
-     * @throws \dml_exception
+     * @return array
      */
     private function get_topics() {
         global $DB;
@@ -257,7 +271,7 @@ class item_data extends export {
 
         $topics = [];
         foreach ($system_topics as $id => $topic) {
-            $topics[$id] = 'topic_' . str_replace(['"', "'", '-', ',', '.', '  ', ' '],'', $topic->name);
+            $topics[$id] = 'topic_' . str_replace(['"', "'", '-', ',', '.', '  ', ' '], '', $topic->name);
         }
 
         return $topics;
@@ -269,14 +283,16 @@ class item_data extends export {
      * @return array
      */
     private function one_hot_components(array $component_names) {
-        $hot = 0;
+        // Reset the list of component names into very basic array with key
+        // as the position of that component name.
+        $component_names = array_values($component_names);
+
         $components = [];
         $default = array_fill(0, count($component_names), 0);
 
-        foreach ($component_names as $component_name) {
+        foreach ($component_names as $hot => $component_name) {
             $components[$component_name] = $default;
             $components[$component_name][$hot] = 1;
-            $hot += 1;
         }
 
         return $components;

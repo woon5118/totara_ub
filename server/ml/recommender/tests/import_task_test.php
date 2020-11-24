@@ -17,10 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralearning.com>
+ * @author  Valerii Kuznetsov <valerii.kuznetsov@totaralearning.com>
  * @package ml_recommender
  */
+
 defined('MOODLE_INTERNAL') || die();
+
+use core\task\manager;
+use ml_recommender\local\csv\writer;
+use ml_recommender\local\environment;
+use ml_recommender\task\import;
 
 class ml_recommender_import_testcase extends advanced_testcase {
 
@@ -30,7 +36,10 @@ class ml_recommender_import_testcase extends advanced_testcase {
         [$i2i, $i2u] = $this->prepare();
 
         ob_start();
-        $task = \core\task\manager::get_scheduled_task(\ml_recommender\task\import::class);
+
+        /** @var import $task */
+        $task = manager::get_scheduled_task(import::class);
+        $task->set_print_output(true);
         $task->execute();
 
         $output = ob_get_contents();
@@ -46,7 +55,7 @@ class ml_recommender_import_testcase extends advanced_testcase {
     }
 
     protected function prepare() {
-        $data_path = \ml_recommender\local\environment::get_data_path();
+        $data_path = environment::get_data_path();
         if (!is_dir($data_path)) {
             mkdir($data_path, 0777, true);
         }
@@ -57,7 +66,7 @@ class ml_recommender_import_testcase extends advanced_testcase {
             ['target_iid' => 'totara_playlist1', 'similar_iid' => 'engage_article96', 'ranking' => 0.629082918167],
             ['target_iid' => 'totara_playlist1', 'similar_iid' => 'totara_playlist70', 'ranking' => 0.627931892872],
             ['target_iid' => 'engage_article2', 'similar_iid' => 'engage_article24', 'ranking' => 0.602713346481],
-            ['target_iid' => 'engage_article2', 'similar_iid' => 'engage_article47', 'ranking' => 0.599358260632]
+            ['target_iid' => 'engage_article2', 'similar_iid' => 'engage_article47', 'ranking' => 0.599358260632],
         ];
 
         $i2u = [
@@ -66,16 +75,16 @@ class ml_recommender_import_testcase extends advanced_testcase {
             ['uid' => 2, 'iid' => 'engage_article242', 'ranking' => 1.892577528954],
             ['uid' => 2, 'iid' => 'totara_playlist1', 'ranking' => 1.879106402397],
             ['uid' => 1, 'iid' => 'engage_article271', 'ranking' => 1.845853328705],
-            ['uid' => 1, 'iid' => 'engage_article122', 'ranking' => 1.669565081596]
+            ['uid' => 1, 'iid' => 'engage_article122', 'ranking' => 1.669565081596],
         ];
 
-        $iwriter = new \ml_recommender\local\csv\writer($data_path . 'i2i_0.csv');
+        $iwriter = new writer($data_path . 'i2i_0.csv');
         $iwriter->add_headings(array_keys(current($i2i)));
         foreach ($i2i as $i2i_item) {
             $iwriter->add_data(array_values($i2i_item));
         }
 
-        $uwriter = new \ml_recommender\local\csv\writer($data_path . 'i2u_0.csv');
+        $uwriter = new writer($data_path . 'i2u_0.csv');
         $uwriter->add_headings(array_keys(current($i2u)));
         foreach ($i2u as $i2u_item) {
             $uwriter->add_data(array_values($i2u_item));

@@ -17,12 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package ml_recommender
  */
 namespace ml_recommender\local\export;
 
 use ml_recommender\local\csv\writer;
+use stdClass;
 
 /**
  * Using for exporting data.
@@ -30,7 +31,7 @@ use ml_recommender\local\csv\writer;
 abstract class export {
 
     /**
-     * @var \stdClass Limit export to specific tenant
+     * @var stdClass Limit export to specific tenant
      */
     protected $tenant = null;
 
@@ -43,10 +44,10 @@ abstract class export {
 
     /**
      * Limit export to data relevant to specific tenant
-     * @param \stdClass $tenant
+     * @param stdClass|null $tenant
      * @return void
      */
-    public function set_tenant(\stdClass $tenant = null) {
+    public function set_tenant(stdClass $tenant = null) {
         $this->tenant = $tenant;
     }
 

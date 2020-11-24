@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use ml_recommender\local\import\item_item;
+
 /**
  * Test item_item import
  */
@@ -44,7 +46,7 @@ class ml_recommender_import_item_item_testcase extends advanced_testcase {
         ];
 
         // Upload items per item.
-        $item_recommendations = new \ml_recommender\local\import\item_item();
+        $item_recommendations = new item_item();
         $item_recommendations->import(new ArrayIterator($i2i));
 
         // Check count of uploaded records.

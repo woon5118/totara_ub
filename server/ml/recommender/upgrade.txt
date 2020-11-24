@@ -1,0 +1,8 @@
+This files describes API changes in /ml/recommender/*,
+information provided here is intended especially for developers.
+
+
+=== 13.3 ===
+
+* The function ml_recommender\local\import::get_component_id has been deprecated.
+  Please use ml_recommender\local\unique_id::normalise_unique_id instead.

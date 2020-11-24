@@ -23,12 +23,14 @@
 
 namespace ml_recommender\local;
 
+use core_component;
 use ml_recommender\local\csv\reader;
 use ml_recommender\local\import\import;
+use stdClass;
 
 class importer {
     /**
-     * @var \stdClass
+     * @var stdClass
      */
     private $tenant = null;
 
@@ -51,11 +53,23 @@ class importer {
      * importer constructor.
      *
      * @param string $data_path directory path for CSV files
-     * @param int $time adjust timestamp
+     * @param int    $time      adjust timestamp
      */
     public function __construct(string $data_path, int $time = 0) {
         $this->data_path = $data_path;
         $this->time = $time ?: time();
+    }
+
+    /**
+     * Returning an array of importer class's name.
+     * @return string[]
+     */
+    public static function get_import_classes(): array {
+        return core_component::get_namespace_classes(
+            'local\\import',
+            import::class,
+            'ml_recommender'
+        );
     }
 
     /**
@@ -67,11 +81,7 @@ class importer {
             return $this->imports;
         }
 
-        $classes = \core_component::get_namespace_classes(
-            'local\\import',
-            import::class,
-            'ml_recommender'
-        );
+        $classes = static::get_import_classes();
 
         foreach ($classes as $class) {
             $this->imports[] = new $class();
@@ -82,9 +92,9 @@ class importer {
 
     /**
      * Limit import to one tenant only
-     * @param \stdClass $tenant
+     * @param stdClass $tenant
      */
-    public function set_tenant(\stdClass $tenant) {
+    public function set_tenant(stdClass $tenant) {
         $this->tenant = $tenant;
     }
 
@@ -99,9 +109,9 @@ class importer {
             if (!empty($this->tenant)) {
                 $id = $this->tenant->id;
             }
-            $csvpath = $this->data_path . '/' . $import->get_name() . '_' . $id . '.csv';
+            $csvpath = static::get_import_csv_file($import->get_name(), $id, $this->data_path);
             if (!file_exists($csvpath)) {
-                debugging('No import CSV found for '. $import->get_name(). '. Skipping.');
+                debugging('No import CSV found for ' . $import->get_name() . '. Skipping.');
                 continue;
             }
             $csv_reader = new reader($csvpath);
@@ -110,10 +120,44 @@ class importer {
     }
 
     /**
+     * A helper function to construct the csv file path to import. Default the $data_path to
+     * environment data path, only when it is not provided.
+     *
+     * @param string      $import_name
+     * @param int         $id_number
+     * @param string|null $data_path
+     * @return string
+     */
+    public static function get_import_csv_file(string $import_name, int $id_number, ?string $data_path = null): string {
+        if (empty($data_path)) {
+            $data_path = environment::get_data_path();
+        }
+
+        $data_path = rtrim($data_path, "/\\");
+        return "{$data_path}/{$import_name}_{$id_number}.csv";
+    }
+
+    /**
+     * A helper function to construct the tenant csv file path. Default the $data_path
+     * to environment data path, only when it is not provided.
+     *
+     * @param string|null $data_path
+     * @return string
+     */
+    public static function get_tenant_csv_file(?string $data_path = null): string {
+        if (empty($data_path)) {
+            $data_path = environment::get_data_path();
+        }
+
+        $data_path = rtrim($data_path, "/\\");
+        return "{$data_path}/tenants.csv";
+    }
+
+    /**
      * Load all tenants that were used during export
      */
     public function load_tenants() {
-        $csv_reader = new reader($this->data_path . '/tenants.csv');
+        $csv_reader = new reader(static::get_tenant_csv_file($this->data_path));
         $tenants = [];
         foreach ($csv_reader as $tenant) {
             $tenants[] = $tenant['tenants'];

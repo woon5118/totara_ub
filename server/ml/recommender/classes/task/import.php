@@ -23,6 +23,8 @@
 
 namespace ml_recommender\task;
 
+use core\task\scheduled_task;
+use Exception;
 use ml_recommender\local\environment;
 use ml_recommender\local\flag;
 use ml_recommender\local\importer;
@@ -30,18 +32,53 @@ use ml_recommender\local\importer;
 /**
  * Class import performs all import logic
  */
-class import extends \core\task\scheduled_task {
+class import extends scheduled_task {
+    /**
+     * @var bool
+     */
+    private $print_output;
 
+    /**
+     * import constructor.
+     */
+    public function __construct() {
+        $this->print_output = (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST);
+    }
+
+    /**
+     * @param bool $print_output
+     * @return void
+     */
+    public function set_print_output(bool $print_output): void {
+        $this->print_output = $print_output;
+    }
+
+    /**
+     * @return string
+     */
     public function get_name() {
         return get_string('importdatatask', 'ml_recommender');
     }
 
+    /**
+     * @param string $message
+     * @return void
+     */
+    private function output(string $message): void {
+        if ($this->print_output) {
+            mtrace($message);
+        }
+    }
+
+    /**
+     * @return void
+     */
     public function execute() {
         global $CFG, $DB;
 
         $data_path = environment::get_data_path();
 
-        mtrace("Import directory " . $data_path);
+        $this->output("Import directory {$data_path}");
         environment::enforce_data_path_sanity();
 
         flag::must_not_in_progress(flag::ML);
@@ -49,7 +86,7 @@ class import extends \core\task\scheduled_task {
 
         flag::must_start(flag::IMPORT);
 
-        mtrace('Starting import...');
+        $this->output('Starting import...');
         try {
             $tenants = [null];
             if ($CFG->tenantsenabled) {
@@ -60,24 +97,25 @@ class import extends \core\task\scheduled_task {
             $tenants_csv = $importer->load_tenants();
             foreach ($tenants as $tenant) {
                 if ($tenant) {
-                    mtrace('Importing for tenant ' . $tenant->name);
+                    $this->output("Importing for tenant {$tenant->name}");
+
                     if (!in_array($tenant->id, $tenants_csv)) {
                         debugging("Tenant {$tenant->name} not found in CSV. Skipping.");
                         continue;
                     }
+
                     $importer->set_tenant($tenant);
                 }
                 $importer->import();
             }
-            mtrace("Cleaning up old recommendations...");
+            $this->output("Cleaning up old recommendations...");
             $importer->clean();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             flag::complete(flag::IMPORT);
             throw $e;
         }
 
         flag::must_complete(flag::IMPORT);
-
-        mtrace('Import completed.');
+        $this->output('Import completed');
     }
 }

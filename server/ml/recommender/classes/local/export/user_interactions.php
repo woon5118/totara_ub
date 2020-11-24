@@ -17,13 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package ml_recommender
  */
 namespace ml_recommender\local\export;
 
 use ml_recommender\local\csv\writer;
 use ml_recommender\local\environment;
+use moodle_recordset;
 use totara_engage\timeview\time_view;
 
 /**
@@ -49,7 +50,7 @@ class user_interactions extends export {
             'user_id',
             'item_id',
             'rating',
-            'timestamp'
+            'timestamp',
         ]);
 
         foreach ($recordset as $interaction) {
@@ -77,7 +78,7 @@ class user_interactions extends export {
                 $user_id,
                 $item_id,
                 $rating,
-                $timestamp
+                $timestamp,
             ]);
         }
         $writer->close();
@@ -88,7 +89,7 @@ class user_interactions extends export {
 
     /**
      * Prepare and run SQL query to database to get interactions
-     * @return \moodle_recordset
+     * @return moodle_recordset
      */
     private function get_export_recordset() {
         global $DB;
@@ -105,10 +106,11 @@ class user_interactions extends export {
         }
 
         $components = ['engage_article', 'totara_playlist', 'container_workspace'];
-        list($components_in_sql, $components_params) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
+        [$components_in_sql, $components_params] = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
 
         $sql = "
-            SELECT ri.user_id, ri.item_id, mrc.component, MAX(ri.time_created) AS mytimestamp, SUM(ri.rating) AS myrating, tea.timeview
+            SELECT ri.user_id, ri.item_id, mrc.component, 
+                   MAX(ri.time_created) AS mytimestamp, SUM(ri.rating) AS myrating, tea.timeview
             FROM {ml_recommender_interactions} ri
             INNER JOIN {ml_recommender_components} mrc ON (mrc.id = ri.component_id)
             INNER JOIN {ml_recommender_interaction_types} mrit ON (mrit.id = ri.interaction_type_id)

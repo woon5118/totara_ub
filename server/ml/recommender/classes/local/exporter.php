@@ -23,12 +23,14 @@
 
 namespace ml_recommender\local;
 
+use core_component;
 use ml_recommender\local\csv\writer;
 use ml_recommender\local\export\export;
+use stdClass;
 
 class exporter {
     /**
-     * @var \stdClass
+     * @var stdClass
      */
     private $tenant = null;
 
@@ -46,7 +48,7 @@ class exporter {
     /**
      * @var string directory path for CSV files
      */
-    private $data_path = '';
+    private $data_path;
 
     /**
      * exporter constructor.
@@ -58,6 +60,18 @@ class exporter {
     }
 
     /**
+     * Returning a class name.
+     * @return string[]
+     */
+    public static function get_export_classes(): array {
+        return core_component::get_namespace_classes(
+            'local\\export',
+            export::class,
+            'ml_recommender'
+        );
+    }
+
+    /**
      * Get array of exporter instances
      * @return export[]
      */
@@ -66,11 +80,7 @@ class exporter {
             return $this->exports;
         }
 
-        $classes = \core_component::get_namespace_classes(
-            'local\\export',
-            export::class,
-            'ml_recommender'
-        );
+        $classes = static::get_export_classes();
 
         foreach ($classes as $class) {
             $this->exports[] = new $class();
@@ -81,9 +91,9 @@ class exporter {
 
     /**
      * Limit export to one tenant only
-     * @param \stdClass $tenant
+     * @param stdClass $tenant
      */
-    public function set_tenant(\stdClass $tenant) {
+    public function set_tenant(stdClass $tenant) {
         $this->tenant = $tenant;
     }
 
@@ -100,7 +110,7 @@ class exporter {
                 $this->tenantids[$id] = $id;
             }
 
-            $csv_path = $this->data_path . '/' . $exporter->get_name() . '_' . $id . '.csv';
+            $csv_path = static::get_export_csv_file_path($exporter->get_name(), $id, $this->data_path);
             $csv_writer = new writer($csv_path);
 
             if (!empty($this->tenant)) {
@@ -111,14 +121,51 @@ class exporter {
     }
 
     /**
+     * A metadata helper function to build a full file path for any csv.
+     * If $data_path is not provided, we will use the environment temp path,
+     * because it is too risky to use the actual environment data path.
+     *
+     * @param string      $export_name
+     * @param int         $id_number
+     * @param string|null $data_path
+     *
+     * @return string
+     */
+    public static function get_export_csv_file_path(string $export_name, int $id_number, ?string $data_path = null): string {
+        if (empty($data_path)) {
+            $data_path = environment::get_temp_path();
+        }
+
+        $data_path = rtrim($data_path, "/\\");
+        return "{$data_path}/{$export_name}_{$id_number}.csv";
+    }
+
+    /**
      * Save all registered tenants during export into CSV file
      */
     public function export_tenants() {
-        $writer = new writer($this->data_path . '/tenants.csv');
+        $csv_file = static::get_tenant_csv_file_path($this->data_path);
+
+        $writer = new writer($csv_file);
         $writer->add_headings(['tenants']);
         foreach ($this->tenantids as $tenantid) {
             $writer->add_data([$tenantid]);
         }
         $writer->close();
+    }
+
+    /**
+     * If $data_path has not yet provided, we fallback to the temporary path.
+     *
+     * @param string|null $data_path
+     * @return string
+     */
+    public static function get_tenant_csv_file_path(?string $data_path = null): string {
+        if (empty($data_path)) {
+            $data_path = environment::get_temp_path();
+        }
+
+        $data_path = rtrim($data_path, "/\\");
+        return "{$data_path}/tenants.csv";
     }
 }

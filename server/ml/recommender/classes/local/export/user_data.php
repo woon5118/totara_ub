@@ -17,18 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package ml_recommender
  */
 namespace ml_recommender\local\export;
 
 use ml_recommender\local\csv\writer;
+use moodle_recordset;
 
 /**
  * Export class for user data.
  */
 class user_data extends export {
-
+    /**
+     * @return string
+     */
     public function get_name(): string {
         return 'user_data';
     }
@@ -46,14 +49,14 @@ class user_data extends export {
         // Column headings for csv file.
         $writer->add_headings([
             'user_id',
-            'lang'
+            'lang',
         ]);
 
         foreach ($recordset as $user) {
             // Create CSV record.
             $writer->add_data([
                 $user->id,
-                $user->lang
+                $user->lang,
             ]);
         }
         $writer->close();
@@ -64,7 +67,7 @@ class user_data extends export {
 
     /**
      * Prepare and run SQL query to database to get users
-     * @return \moodle_recordset
+     * @return moodle_recordset
      */
     private function get_export_recordset() {
         global $CFG, $DB;
@@ -80,8 +83,8 @@ class user_data extends export {
         $guest_id = $CFG->siteguest;
         $sql = "
             SELECT u.id, u.lang 
-            FROM {user} u
-            $tenant_join_sql 
+            FROM \"ttr_user\" u
+            {$tenant_join_sql}
             WHERE u.deleted = 0 AND u.suspended = 0 AND u.id <> $guest_id
         ";
 

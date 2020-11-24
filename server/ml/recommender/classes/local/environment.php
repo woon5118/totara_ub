@@ -17,10 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package ml_recommender
  */
 namespace ml_recommender\local;
+
+use coding_exception;
 
 /**
  * Class environment
@@ -116,7 +118,7 @@ final class environment {
             $threads = 2;
         }
 
-        return (int)$threads;
+        return (int) $threads;
     }
 
     /**
@@ -180,16 +182,16 @@ final class environment {
         global $CFG;
         $ml_data_root = rtrim(static::get_ml_data_root_path(), '/\\');
         if (strlen($ml_data_root) < 3) {
-            throw new \coding_exception('Recommenders data path (ml_recommender/data_path) must be 3 or more characters long');
+            throw new coding_exception('Recommenders data path (ml_recommender/data_path) must be 3 or more characters long');
         }
 
         if ($ml_data_root == $CFG->dataroot) {
-            throw new \coding_exception('Recommenders data path (ml_recommender/data_path) cannot be the same as site data root');
+            throw new coding_exception('Recommenders data path (ml_recommender/data_path) cannot be the same as site data root');
         }
 
         if (!is_dir($ml_data_root) || !is_writable($ml_data_root)) {
             if (!mkdir($ml_data_root, $CFG->directorypermissions, true)) {
-                throw new \coding_exception('Error creating ML data root directory (ml_recommender/data_path)');
+                throw new coding_exception('Error creating ML data root directory (ml_recommender/data_path)');
             }
         }
     }

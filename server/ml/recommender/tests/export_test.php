@@ -17,15 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Vernon Denny <vernon.denny@totaralearning.com>
+ * @author  Vernon Denny <vernon.denny@totaralearning.com>
  * @package ml_recommender
  */
 defined('MOODLE_INTERNAL') || die();
 
-use totara_engage\access\access;
+use core\task\manager;
+use ml_recommender\local\csv\writer;
 use ml_recommender\local\environment;
 use ml_recommender\local\exporter;
-use ml_recommender\local\csv\writer;
+use ml_recommender\task\export;
+use totara_engage\access\access;
+use totara_topic\topic;
 
 class ml_recommender_export_testcase extends advanced_testcase {
     /**
@@ -34,7 +37,7 @@ class ml_recommender_export_testcase extends advanced_testcase {
     public function test_ml_export(): void {
         $this->prepare();
 
-         // Set up list of exporters.
+        // Set up list of exporters.
         $data_path = self::get_data_path();
         $exporter = new exporter($data_path);
         $exporters = $exporter->get_exports();
@@ -58,8 +61,11 @@ class ml_recommender_export_testcase extends advanced_testcase {
         $this->prepare();
 
         ob_start();
-        \ml_recommender\task\export::cleanup(true);
-        $task = \core\task\manager::get_scheduled_task(\ml_recommender\task\export::class);
+        export::cleanup(true);
+
+        /** @var export $task */
+        $task = manager::get_scheduled_task(export::class);
+        $task->set_print_output(true);
         $task->execute();
 
         $output = ob_get_contents();
@@ -73,6 +79,8 @@ class ml_recommender_export_testcase extends advanced_testcase {
         $this->prepare();
 
         $generator = $this->getDataGenerator();
+
+        /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
 
@@ -85,11 +93,13 @@ class ml_recommender_export_testcase extends advanced_testcase {
         // Engage topics.
         $mytopics = ['T1topic1', 'T1topic2', 'T1topic3'];
         foreach ($mytopics as $key => $topic) {
-            $topics[$key] = \totara_topic\topic::create($topic);
+            $topics[$key] = topic::create($topic);
         }
 
         // Create content within tenant.
         $this->setUser($user3->id);
+
+        /** @var engage_article_generator $article_generator */
         $article_generator = $generator->get_plugin_generator('engage_article');
         $article_4 = $article_generator->create_article([
             'access' => access::PUBLIC,
@@ -102,13 +112,17 @@ class ml_recommender_export_testcase extends advanced_testcase {
         ]);
 
         // Interactions.
+        /** @var ml_recommender_generator $recommendations_generator */
         $recommendations_generator = $generator->get_plugin_generator('ml_recommender');
         $recommendations_generator->create_recommender_interaction(2, $article_4->get_id(), 'engage_article');
         $recommendations_generator->create_recommender_interaction($user3->id, $article_4->get_id(), 'engage_article');
 
         ob_start();
-        \ml_recommender\task\export::cleanup(true);
-        $task = \core\task\manager::get_scheduled_task(\ml_recommender\task\export::class);
+        export::cleanup(true);
+
+        /** @var export $task */
+        $task = manager::get_scheduled_task(export::class);
+        $task->set_print_output(true);
         $task->execute();
 
         $output = ob_get_contents();
@@ -157,7 +171,7 @@ class ml_recommender_export_testcase extends advanced_testcase {
         // Engage topics.
         $mytopics = ['topic1', 'topic2', 'topics3'];
         foreach ($mytopics as $key => $topic) {
-            $topics[$key] = \totara_topic\topic::create($topic);
+            $topics[$key] = topic::create($topic);
         }
 
         // Engage content.
@@ -178,7 +192,7 @@ class ml_recommender_export_testcase extends advanced_testcase {
             'topics' => [
                 $topics[0]->get_id(),
                 $topics[2]->get_id(),
-            ]
+            ],
         ]);
 
         $article_3 = $article_generator->create_article([
@@ -186,7 +200,7 @@ class ml_recommender_export_testcase extends advanced_testcase {
             'topics' => [
                 $topics[1]->get_id(),
                 $topics[2]->get_id(),
-            ]
+            ],
         ]);
 
         // Interactions.
@@ -208,7 +222,7 @@ class ml_recommender_export_testcase extends advanced_testcase {
         foreach ($csv_files as $csv => $db_count) {
             $data = [];
             $path = "{$data_path}/{$csv}_0.csv";
-            $file = fopen($path,'r');
+            $file = fopen($path, 'r');
             while (!feof($file)) {
                 $row = fgetcsv($file);
                 if (!empty($row)) {
@@ -217,7 +231,7 @@ class ml_recommender_export_testcase extends advanced_testcase {
             }
             fclose($file);
 
-            $this->assertCount($db_count+1, $data, $csv);
+            $this->assertCount($db_count + 1, $data, $csv);
         }
 
     }
@@ -245,14 +259,14 @@ class ml_recommender_export_testcase extends advanced_testcase {
         $tenants[$tenant] = [
             'user_data' => 1, // tenant user
             'item_data' => 2, // new article + self-enrol course
-            'user_interactions' => 2
+            'user_interactions' => 2,
         ];
 
         foreach ($tenants as $tenant_id => $csv_files) {
             foreach ($csv_files as $csv => $db_count) {
                 $data = [];
                 $path = "{$data_path}/{$csv}_" . $tenant_id . ".csv";
-                $file = fopen($path,'r');
+                $file = fopen($path, 'r');
                 while (!feof($file)) {
                     $row = fgetcsv($file);
                     if (!empty($row)) {

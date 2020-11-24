@@ -23,6 +23,8 @@
 
 namespace ml_recommender\local;
 
+use coding_exception;
+
 /**
  * Class flag manage possible multi-processing conflicts
  */
@@ -45,7 +47,7 @@ class flag {
     /**
      * Return true if some process is started but haven't finished
      *
-     * @param string $process name of process to check (this class constant)
+     * @param string $process     name of process to check (this class constant)
      * @param string $custom_path Use another folder to check for flags instead of data folder
      * @return bool returns true if starting flag exists and finishing is not
      */
@@ -59,7 +61,7 @@ class flag {
     /**
      * If process is in progress, will output error and exit
      *
-     * @param string $process name of process to check (this class constant)
+     * @param string $process     name of process to check (this class constant)
      * @param string $custom_path Use another folder to check for flags instead of data folder
      */
     public static function must_not_in_progress(string $process, string $custom_path = "") {
@@ -71,7 +73,7 @@ class flag {
     /**
      * Put start flag indicating start of process
      *
-     * @param string $process name of process to check (this class constant)
+     * @param string $process     name of process to check (this class constant)
      * @param string $custom_path Use another folder to check for flags instead of data folder
      * @return bool If flag was put successfully
      */
@@ -88,19 +90,19 @@ class flag {
     /**
      * Tries to put start flag and throws exception if cannot
      *
-     * @param string $process name of process to check (this class constant)
+     * @param string $process     name of process to check (this class constant)
      * @param string $custom_path Use another folder to check for flags instead of data folder
      */
     public static function must_start(string $process, string $custom_path = "") {
         if (!static::start($process, $custom_path)) {
-            throw new \coding_exception("Cannot write start flag: $process");
+            throw new coding_exception("Cannot write start flag: $process");
         }
     }
 
     /**
      * Put start flag indicating start of process and return result
      *
-     * @param string $process name of process to check (this class constant)
+     * @param string $process     name of process to check (this class constant)
      * @param string $custom_path Use another folder to check for flags instead of data folder
      * @return bool If flag was put successfully
      */
@@ -117,14 +119,15 @@ class flag {
     /**
      * Tries to put complete flag and throws exception if cannot
      *
-     * @param string $process name of process to check (this class constant)
+     * @param string $process     name of process to check (this class constant)
      * @param string $custom_path Use another folder to check for flags instead of data folder
      */
     public static function must_complete(string $process, string $custom_path = "") {
         if (!static::complete($process, $custom_path)) {
-            throw new \coding_exception("Cannot write complete flag: $process");
+            throw new coding_exception("Cannot write complete flag: $process");
         }
     }
+
     /**
      * Returns corresponding start and finish flag names
      *
@@ -139,7 +142,7 @@ class flag {
         ];
 
         if (!isset($map[$process])) {
-            throw new \coding_exception('Failed to check flag for unknown process: ' . $process);
+            throw new coding_exception('Failed to check flag for unknown process: ' . $process);
         }
 
         return $map[$process];
@@ -148,7 +151,7 @@ class flag {
     /**
      * Displays problem with lock, lock timestamp, and exit
      *
-     * @param string $process name of process to check (this class constant)
+     * @param string $process     name of process to check (this class constant)
      * @param string $custom_path Use another folder to check for flags instead of data folder
      */
     protected static function error(string $process, string $custom_path = "") {
@@ -161,7 +164,10 @@ class flag {
             $timestamp = file_get_contents($filepath);
         }
         $date = $timestamp ? date("Y-m-d H:i:s", $timestamp) : '(unknown)';
-        $fullmessage = "$process not finished. Created: $date. Location: $filepath.";
-        throw new \coding_exception($fullmessage . ' Possibly parallel process is still running, or it was crashed. Use export CLI script with --force to restart.');
+        $fullmessage = "{$process} not finished. Created: $date. Location: {$filepath}.";
+        throw new coding_exception(
+            $fullmessage . ' Possibly parallel process is still running, or it was crashed. ' .
+            'Use export CLI script with --force to restart.'
+        );
     }
 }

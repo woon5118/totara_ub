@@ -23,6 +23,8 @@
 
 namespace ml_recommender\local\csv;
 
+use coding_exception;
+
 /**
  * Class writer Simple stream implementation of CSV writer
  */
@@ -51,24 +53,29 @@ class writer {
         $this->csvpath = $csvpath;
         $this->fp = fopen($this->csvpath, 'w+');
         if (!$this->fp) {
-            throw new \coding_exception('Could not open CSV for writing: ' . $csvpath);
+            throw new coding_exception('Could not open CSV for writing: ' . $csvpath);
         }
     }
 
     /**
      * Write headers for CSV (must be executed first and only once)
      * @param array $headers
+     * @return void
      */
     public function add_headings(array $headers) {
         if ($this->rowsadded) {
-            throw new \coding_exception('Could not write headers to CSV since rows were already added');
+            throw new coding_exception('Could not write headers to CSV since rows were already added');
         }
         $this->add_data($headers);
     }
 
+    /**
+     * @param array $row
+     * @return void
+     */
     public function add_data(array $row) {
         if (false === fputcsv($this->fp, $row)) {
-            throw new \coding_exception('Could not write to CSV file');
+            throw new coding_exception('Could not write to CSV file');
         }
         $this->rowsadded = true;
     }
