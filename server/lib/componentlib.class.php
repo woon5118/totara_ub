@@ -586,7 +586,7 @@ class component_installer {
      */
     public static function download_file_content(string $url) {
         $response = \download_file_content($url, null, null, true);
-        if ($response->status === 200) {
+        if ($response->status == '200') {
             return $response->results;
         } else {
             // Do not dump a debugging message under behat.
