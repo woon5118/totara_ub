@@ -1,10 +1,18 @@
 This files describes API changes in /client/component/tui,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+* Updated Input.vue, Button.vue and ButtonIcon.vue to handle prop "autofocus" in JS
+  * Template changes
+
 === 13.2 ===
 
 * Added closeable prop to Popover.vue component
 * Added closeable prop to PopoverFrame.vue component
 * Added closeablePopover prop to LabelledButtonTrigger.vue component
+* Updated SidePanel.vue component to address overlapping issues
+  * SCSS changes
 * Updated Range.vue component to not emit a change event on focus
 * Converted Loader.vue emptySlot computed property to a isEmptySlot method so it correctly updates for subsequent requests
+* Updated Form.vue to prevent native submit behavior unless native-submit prop or action/method attributes are passed
+  * Template changes

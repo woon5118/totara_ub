@@ -30,6 +30,7 @@
     <Form
       :vertical="vertical"
       :input-width="inputWidth"
+      novalidate
       @submit="slotProps.handleSubmit"
     >
       <slot v-bind="slotProps" />

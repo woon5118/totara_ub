@@ -24,7 +24,7 @@
       vertical && 'tui-form--vertical',
       'tui-form--inputWidth-' + inputWidth,
     ]"
-    @submit="$emit('submit', $event)"
+    @submit="handleSubmit"
   >
     <slot />
   </form>
@@ -42,6 +42,20 @@ export default {
       type: String,
       validator: x => ['full', 'limited'].includes(x),
       default: 'limited',
+    },
+
+    nativeSubmit: Boolean,
+  },
+
+  methods: {
+    handleSubmit(e) {
+      // prevent default action unless nativeSubmit prop is passed,
+      // or method/action attributes are set
+      if (!this.nativeSubmit && !this.$attrs.method && !this.$attrs.action) {
+        e.preventDefault();
+      }
+
+      this.$emit('submit', e);
     },
   },
 };
