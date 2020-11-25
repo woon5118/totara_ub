@@ -30,10 +30,10 @@ class enrol_user_enrolment_form extends moodleform {
     function definition() {
         $mform = $this->_form;
 
-        $ue     = $this->_customdata['ue'];
+        $ue = $this->_customdata['ue'];
         $enrol = $this->_customdata['enrol'];
 
-        $mform->addElement('header','general', '');
+        $mform->addElement('header', 'general', get_string('editenrolment', 'enrol'));
 
         $activestr = get_string('participationactive', 'enrol');
         $statushelpstr = '';
