@@ -206,9 +206,15 @@ class rb_source_totaramessages extends rb_base_source {
                 'checkbox',
                 get_string('select', 'rb_source_totaramessages'),
                 'base.messageid',
-                array('displayfunc' => 'message_checkbox',
-                      'noexport' => true,
-                      'nosort' => true)
+                array(
+                    'displayfunc' => 'message_checkbox',
+                    'extrafields' => array(
+                        'useridto' => 'msg.useridto',
+                        'msgsubject' => 'msg.subject',
+                    ),
+                    'noexport' => true,
+                    'nosort' => true
+                )
             ),
             new rb_column_option(
                 'message_values',
@@ -352,14 +358,16 @@ class rb_source_totaramessages extends rb_base_source {
                 'dismiss_link',
                 get_string('dismissmsg', 'rb_source_totaramessages'),
                 'base.messageid',
-                array('displayfunc' => 'message_dismiss_link',
-                      'extrafields' => array(
-                          'useridto' => 'msg.useridto'
-                      ),
-                      'required' => true,
-                      'noexport' => true,
-                      //'capability' => 'moodle/local:updatethingy',
-                      'nosort' => true)
+                array(
+                    'displayfunc' => 'message_dismiss_link',
+                    'extrafields' => array(
+                        'useridto' => 'msg.useridto',
+                        'msgsubject' => 'msg.subject',
+                    ),
+                    'required' => true,
+                    'noexport' => true,
+                    'nosort' => true
+                )
             ),
         );
         return $requiredcolumns;

@@ -467,6 +467,12 @@ class behat_totara_data_generators extends behat_base {
                 'age_data' => 'age_quiz_responses'
             )
         ),
+        'totara_message' => array(
+            'alerts' => array(
+                'datagenerator' => 'alert_from_params',
+                'required' => array('fromuser', 'touser', 'description')
+            )
+        ),
         'totara_mobile' => array(
             'devices' => array(
                 'age_data' => 'age_mobile_devices'

@@ -43,7 +43,13 @@ class message_checkbox extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        return \html_writer::checkbox('totara_message_' . $value, $value, false, '', array('id' => 'totara_message', 'class' => "selectbox"));
+        $extrafields = self::get_extrafields_row($row, $column);
+        $label = get_string('selectdesc', 'rb_source_totaramessages', $extrafields->msgsubject);
+        return \html_writer::checkbox('totara_message_' . $value, $value, false, '', [
+            'id' => 'totara_message_select_' . $value,
+            'class' => "selectbox",
+            'aria-label' => $label
+        ]);
     }
 
     /**

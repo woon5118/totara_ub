@@ -52,7 +52,12 @@ class message_dismiss_link extends base {
         }
 
         $out = totara_message_dismiss_action($value);
-        $out .= \html_writer::checkbox('totara_message_' . $value, $value, false, '', array('id' => 'totara_msgcbox_' . $value, 'class' => "selectbox"));
+        $label = get_string('selectdesc', 'rb_source_totaramessages', $extrafields->msgsubject);
+        $out .= \html_writer::checkbox('totara_message_' . $value, $value, false, '', [
+            'id' => 'totara_msgcbox_' . $value,
+            'class' => "selectbox",
+            'aria-label' => $label
+        ]);
 
         return $out;
     }

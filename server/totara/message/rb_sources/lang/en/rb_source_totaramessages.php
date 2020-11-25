@@ -36,6 +36,7 @@ $string['msgurgencyicon'] = 'Message Urgency (icon)';
 $string['name'] = 'Name';
 $string['sent'] = 'Sent';
 $string['select'] = 'Select';
+$string['selectdesc'] = 'Select message {$a}';
 $string['statement'] = 'Message Content';
 $string['subject'] = 'Subject';
 $string['type'] = 'Type';
