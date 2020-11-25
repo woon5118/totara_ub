@@ -34,8 +34,9 @@ function performelement_static_content_fix_broken_elements(): void {
         $records = $DB->get_records('perform_element', ['plugin_name' => 'static_content']);
         foreach ($records as $record) {
             $data = json_decode($record->data, true);
-            if ($data === null) {
-                // Unexpected data structure, let's skip this one
+            if ($data === null || empty($data['wekaDoc'])) {
+                // Unexpected data structure, let's skip this one.
+                // The empty $data['wekaDoc'] should never be happened, but who knows.
                 continue;
             }
 

@@ -84,4 +84,43 @@ class performelement_static_content_fix_broken_elements_testcase extends advance
         $this->assertEquals($other_element->data, $other_element_reloaded->data);
     }
 
+    /**
+     * @return void
+     */
+    public function test_fix_broken_structure_test(): void {
+        global $CFG;
+        require_once("{$CFG->dirroot}/mod/perform/element/static_content/db/upgradelib.php");
+
+        $not_so_broken_content = json_encode([
+            'docFormat' => "FORMAT_JSON_EDITOR",
+            'draftId' => 42,
+            'format' => "HTML",
+            'wekaDoc' => null
+        ]);
+
+        $element_one = new element();
+        $element_one->context_id = 1;
+        $element_one->plugin_name = 'static_content';
+        $element_one->title = 'Kaboom!';
+        $element_one->is_required = 0;
+        $element_one->data = $not_so_broken_content;
+        $element_one->save();
+
+
+        $element_two = new element();
+        $element_two->context_id = 1;
+        $element_two->plugin_name = 'static_content';
+        $element_two->title = 'Kaboom!';
+        $element_two->is_required = 0;
+        $element_two->data = '{}';
+        $element_two->save();
+
+        performelement_static_content_fix_broken_elements();
+
+        $element_one->refresh();
+        $element_two->refresh();
+
+        self::assertEquals($not_so_broken_content, $element_one->data);
+        self::assertEquals('{}', $element_two->data);
+    }
 }
