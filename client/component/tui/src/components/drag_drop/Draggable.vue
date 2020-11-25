@@ -82,6 +82,7 @@ export default {
       required: true,
     },
     disabled: Boolean,
+    ariaLabel: String,
   },
 
   // ensure manager strings are loaded
@@ -591,6 +592,7 @@ export default {
         'totara_core'
       ),
       'aria-describedby': defaultDragDropManager.getDragInstructionsId(),
+      'aria-label': this.ariaLabel,
     };
 
     const moveMenu = h(DraggableMoveMenu, {

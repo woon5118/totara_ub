@@ -314,6 +314,7 @@ $string['modal_section_delete_title'] = 'Confirm section deletion';
 $string['modulename'] = 'Performance activity';
 $string['modulenameplural'] = 'Performance activities';
 $string['move'] = 'Move';
+$string['move_element'] = 'Move {$a}';
 $string['move_to_other_section'] = 'Move to another section';
 $string['multiple_sections_confirmation_title'] = 'Confirm format change';
 $string['modal_confirm'] = 'Confirm';

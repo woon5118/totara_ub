@@ -61,6 +61,9 @@
                   :index="index * itemsPerRow + i"
                   type="playlist-grid-item"
                   :value="card"
+                  :aria-label="
+                    $str('move_element', 'totara_playlist', card.name)
+                  "
                 >
                   <PropsProvider :provide="{ nativeListeners: events }">
                     <div
@@ -293,7 +296,8 @@ export default {
 <lang-strings>
 {
   "totara_playlist": [
-    "playlist_resource"
+    "playlist_resource",
+    "move_element"
   ]
 }
 </lang-strings>

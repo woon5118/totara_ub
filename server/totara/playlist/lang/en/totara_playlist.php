@@ -45,6 +45,7 @@ $string['mentionbody:comment'] = '<strong>{$a->fullname}</strong> has commented 
 $string['mentionbody:playlist'] = '<strong>{$a->fullname}</strong> has mentioned you in the playlist {$a->title}.';
 $string['mentiontitle:playlist'] = '{$a} has mentioned you in a playlist';
 $string['mentionview:playlist'] = 'View playlist';
+$string['move_element'] = 'Move {$a}';
 $string['privacywarningtitle'] = 'This will result in a change';
 $string['privacychangeprivatetorestrictedorpublic'] = 'Some of the resources in this playlist are only visible to you. If you share this playlist, the resources will become visible to all people and workspaces you share it with.';
 $string['privacychangerestrictedtopublic'] = 'Some of the resources in this playlist are only visible to limited people and workspaces. If you change the visibility to everyone, all resources in this playlist will become visible.';

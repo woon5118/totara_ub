@@ -57,6 +57,13 @@
               v-slot="{ dragging, attrs, events, moveMenu, anyDragging }"
               :index="index"
               :value="sectionElement.id"
+              :aria-label="
+                $str(
+                  'move_element',
+                  'mod_perform',
+                  sectionElement.element.title
+                )
+              "
               type="element"
               :disabled="!validDragElement(sectionElement)"
             >
@@ -916,6 +923,7 @@ export default {
     "modal_element_move_title",
     "modal_element_move_to",
     "move",
+    "move_element",
     "required_fields",
     "toast_error_generic_update",
     "toast_success_delete_element",
