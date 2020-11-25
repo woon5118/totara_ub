@@ -45,6 +45,29 @@ class totara_core_get_course_image_testcase extends advanced_testcase {
             $url->out()
         );
 
+        // Now update the theme course default image, this should override the one set above on the system level
+        $files = [
+            [
+                'ui_key' => 'learncourse',
+                'draft_id' => $this->create_image('new_course_image', $user_context),
+            ]
+        ];
+        $theme_settings->update_files($files);
+
+        // Confirm that new default image is fetched.
+        $url = $course_image->get_current_or_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/course/defaultcourseimage/{$course_image->get_item_id()}/new_course_image.png",
+            $url->out()
+        );
+
+        // Confirm that the default URL is still pointing to the correct default image.
+        $url = $course_image->get_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage",
+            $url->out()
+        );
+
         // Let's set a new default file on the system level
         $setting = new \admin_setting_configstoredfile(
             'course/defaultimage',
@@ -64,25 +87,9 @@ class totara_core_get_course_image_testcase extends advanced_testcase {
         $setting->write_setting($draft_id);
 
         // Confirm that new system default image is fetched.
-        $url = $course_image->get_current_or_default_url();
+        $url = $course_image->get_default_url();
         $this->assertEquals(
             "https://www.example.com/moodle/pluginfile.php/1/course/defaultimage/".theme_get_revision()."/new_course_image.png",
-            $url->out()
-        );
-
-        // Now update the theme course default image, this should override the one set above on the system level
-        $files = [
-            [
-                'ui_key' => 'learncourse',
-                'draft_id' => $this->create_image('new_course_image', $user_context),
-            ]
-        ];
-        $theme_settings->update_files($files);
-
-        // Confirm that new default image is fetched.
-        $url = $course_image->get_current_or_default_url();
-        $this->assertEquals(
-            "https://www.example.com/moodle/pluginfile.php/1/course/defaultcourseimage/{$course_image->get_item_id()}/new_course_image.png",
             $url->out()
         );
 

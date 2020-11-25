@@ -46,6 +46,29 @@ class totara_program_image_testcase extends advanced_testcase {
             $url->out()
         );
 
+        // Update default image of the theme which should now come first
+        $files = [
+            [
+                'ui_key' => 'learnprogram',
+                'draft_id' => $this->create_image('new_program_image', $user_context),
+            ]
+        ];
+        $theme_settings->update_files($files);
+
+        // Confirm that new default image is fetched.
+        $url = $program_image->get_current_or_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/defaultprogramimage/{$program_image->get_item_id()}/new_program_image.png",
+            $url->out()
+        );
+
+        // Confirm that the default URL is still pointing to the correct default image.
+        $url = $program_image->get_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_program/1/defaultimage",
+            $url->out()
+        );
+
         // Now update the system default image for programs
         $fs = get_file_storage();
         $rc = [
@@ -60,25 +83,9 @@ class totara_program_image_testcase extends advanced_testcase {
         ];
         $fs->create_file_from_string($rc, 'Hello World !!!');
 
-        $url = $program_image->get_current_or_default_url();
+        $url = $program_image->get_default_url();
         $this->assertEquals(
             "https://www.example.com/moodle/pluginfile.php/1/totara_core/totara_program_default_image/0/hello_world.png",
-            $url->out()
-        );
-
-        // Update default image of the theme which should now come first
-        $files = [
-            [
-                'ui_key' => 'learnprogram',
-                'draft_id' => $this->create_image('new_program_image', $user_context),
-            ]
-        ];
-        $theme_settings->update_files($files);
-
-        // Confirm that new default image is fetched.
-        $url = $program_image->get_current_or_default_url();
-        $this->assertEquals(
-            "https://www.example.com/moodle/pluginfile.php/1/totara_core/defaultprogramimage/{$program_image->get_item_id()}/new_program_image.png",
             $url->out()
         );
 

@@ -146,7 +146,11 @@ class certification_image extends theme_file {
             );
         }
 
-        return $OUTPUT->image_url('defaultimage', 'totara_certification');
+        return $OUTPUT->image_url(
+            'defaultimage',
+            'totara_certification',
+            false
+        );
     }
 
 }

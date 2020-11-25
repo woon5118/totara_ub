@@ -360,6 +360,13 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertEquals('Totara Logo Updated', $alt_text);
         $this->assertEquals(true, $logo_image->is_available());
 
+        // Confirm that the default URL is still pointing to the correct default image.
+        $url = $logo_image->get_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_core/1/logo",
+            $url->out()
+        );
+
         // Confirm that new logo and alternative text load through master header.
         $mastheadlogo = new totara_core\output\masthead_logo();
         $mastheaddata = $mastheadlogo->export_for_template($OUTPUT);
@@ -427,6 +434,13 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertEquals(
             "https://www.example.com/moodle/pluginfile.php/1/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
             $url
+        );
+
+        // Confirm that the default URL is still pointing to the correct default image.
+        $url = $favicon_image->get_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/theme/1/favicon",
+            $url->out()
         );
 
         // Confirm that new favicon loads through master header.
@@ -581,6 +595,13 @@ class core_theme_settings_testcase extends advanced_testcase {
         );
         $this->assertEquals(true, $login_image->is_available());
         $this->assertEquals('Totara Login', $login_image->get_alt_text());
+
+        // Confirm that the default URL is still pointing to the correct default image.
+        $url = $login_image->get_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_core/1/default_login",
+            $url->out()
+        );
 
         // Disable site login image and update alternative text.
         $categories = [

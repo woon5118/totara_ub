@@ -66,6 +66,13 @@ class engage_article_image_testcase extends advanced_testcase {
             "https://www.example.com/moodle/pluginfile.php/1/totara_core/defaultarticleimage/{$article_image->get_item_id()}/new_article_image.png",
             $url
         );
+
+        // Confirm that the default URL is still pointing to the correct default image.
+        $url = $article_image->get_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/engage_article/1/default",
+            $url->out()
+        );
     }
 
     public function test_image_enabled() {

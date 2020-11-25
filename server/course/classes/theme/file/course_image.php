@@ -109,8 +109,17 @@ class course_image extends theme_file {
 
         $system_context = context_system::instance();
         $fs = get_file_storage();
+
         // First check whether there's a default image on the system level
-        $files = $fs->get_area_files($system_context->id, 'course', 'defaultimage', 0, "timemodified DESC", false);
+        $files = $fs->get_area_files(
+            $system_context->id,
+            'course',
+            'defaultimage',
+            0,
+            'timemodified DESC',
+            false
+        );
+
         if ($files) {
             $file = reset($files);
             return moodle_url::make_pluginfile_url(
@@ -124,7 +133,11 @@ class course_image extends theme_file {
             );
         }
 
-        return $OUTPUT->image_url('course_defaultimage', 'core');
+        return $OUTPUT->image_url(
+            'course_defaultimage',
+            'core',
+            false
+        );
     }
 
     /**

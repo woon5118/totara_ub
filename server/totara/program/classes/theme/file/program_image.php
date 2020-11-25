@@ -146,7 +146,11 @@ class program_image extends theme_file {
             );
         }
 
-        return $OUTPUT->image_url('defaultimage', 'totara_program');
+        return $OUTPUT->image_url(
+            'defaultimage',
+            'totara_program',
+            false
+        );
     }
 
 }
