@@ -512,6 +512,10 @@ abstract class rb_base_source {
         return $yn;
     }
 
+    /**
+     * @param reportbuilder $report
+     * @return array
+     */
     function rb_filter_organisations_list($report) {
         global $CFG, $USER, $DB;
 
@@ -537,17 +541,18 @@ abstract class rb_base_source {
         if (isset($contentoptions) && is_array($contentoptions)) {
             foreach ($contentoptions as $option) {
                 $name = $option->classname;
-                $classname = '\totara_reportbuilder\rb\content\\' . $name;
+                $classname = $report->src->resolve_content_classname($name);
+                if (!$classname) {
+                    continue;
+                }
                 $settingname = $name . '_content';
-                if (class_exists($classname)) {
-                    if ($name == 'completed_org' || $name == 'current_org') {
-                        if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
-                            $localset = true;
-                        }
-                    } else {
-                        if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
-                            $nonlocal = true;
-                        }
+                if ($name == 'completed_org' || $name == 'current_org') {
+                    if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
+                        $localset = true;
+                    }
+                } else {
+                    if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
+                        $nonlocal = true;
                     }
                 }
             }
@@ -1025,6 +1030,28 @@ abstract class rb_base_source {
         foreach ($this->joinlist as $join) {
             if ($join->name === $name) {
                 return $join;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns full PHP class name for given content restriction name.
+     *
+     * NOTE: this relies on values set in $usedcomponents property.
+     *
+     * @param string $name
+     * @return string|null class name or NULL if not found
+     */
+    final public function resolve_content_classname(string $name): ?string {
+        $classname = 'totara_reportbuilder\rb\content\\' . $name;
+        if (class_exists($classname)) {
+            return $classname;
+        }
+        foreach ($this->usedcomponents as $component) {
+            $classname = $component. '\rb\content\\' . $name;
+            if (class_exists($classname)) {
+                return $classname;
             }
         }
         return null;

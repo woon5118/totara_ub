@@ -131,8 +131,8 @@ class totara_reportbuilder_templates_testcase extends advanced_testcase {
 
             // Check content restrictions.
             foreach ($template->contentsettings as $option => $settings) {
-                $classname = '\totara_reportbuilder\rb\content\\' . $option;
-                self::assertTrue(class_exists($classname), "The content restriction class {$classname} does not exists for template {$template_classname}");
+                $classname = $src->resolve_content_classname($option);
+                self::assertNotNull($classname, "The content restriction class {$option} does not exists for template {$template_classname}");
             }
 
             // Check access restrictions.

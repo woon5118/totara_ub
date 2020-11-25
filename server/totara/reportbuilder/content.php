@@ -92,7 +92,7 @@ echo $output->footer();
  * Update the report content settings with data from the submitted form
  *
  * @param integer $id Report ID to update
- * @param object $report Report builder object that is being updated
+ * @param reportbuilder $report Report builder object that is being updated
  * @param object $fromform Moodle form object containing the new content data
  *
  * @return boolean True if the content settings could be updated successfully
@@ -119,9 +119,9 @@ function reportbuilder_update_content($id, $report, $fromform) {
 
     // pass form data to content class for processing
     foreach ($contentoptions as $option) {
-        $classname = '\totara_reportbuilder\rb\content\\' . $option->classname;
-        if (!class_exists($classname)) {
-            throw new coding_exception("The content class '{$classname}' does not exist");
+        $classname = $report->src->resolve_content_classname($option->classname);
+        if (!$classname) {
+            print_error('contentclassnotexist', 'totara_reportbuilder', '', $option->classname);
         }
 
         $obj = new $classname();

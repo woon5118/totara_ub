@@ -3102,7 +3102,10 @@ class reportbuilder {
         if (isset($this->contentoptions) && is_array($this->contentoptions)) {
             foreach ($this->contentoptions as $option) {
                 $name = $option->classname;
-                $classname = '\totara_reportbuilder\rb\content\\' . $name;
+                $classname = $this->src->resolve_content_classname($name);
+                if (!$classname) {
+                    print_error('contentclassnotexist', 'totara_reportbuilder', '', $name);
+                }
                 $settingname = $name . '_content';
 
                 $fields = array();
@@ -3121,17 +3124,13 @@ class reportbuilder {
                     $fields = array_shift($fields);
                 }
 
-                if (class_exists($classname)) {
-                    $class = new $classname($this->reportfor);
+                $class = new $classname($this->reportfor);
 
-                    if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
-                        // this content option is enabled
-                        // call function to get SQL snippet
-                        list($out[], $contentparams) = $class->sql_restriction($fields, $reportid);
-                        $params = array_merge($params, $contentparams);
-                    }
-                } else {
-                    print_error('contentclassnotexist', 'totara_reportbuilder', '', $classname);
+                if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
+                    // this content option is enabled
+                    // call function to get SQL snippet
+                    list($out[], $contentparams) = $class->sql_restriction($fields, $reportid);
+                    $params = array_merge($params, $contentparams);
                 }
             }
         }
@@ -3178,10 +3177,13 @@ class reportbuilder {
         if (isset($this->contentoptions) && is_array($this->contentoptions)) {
             foreach ($this->contentoptions as $option) {
                 $name = $option->classname;
-                $classname = '\totara_reportbuilder\rb\content\\' . $name;
+                $classname = $this->src->resolve_content_classname($name);
+                if (!$classname) {
+                    continue;
+                }
                 $settingname = $name . '_content';
 
-                if (class_exists($classname) && method_exists($classname, 'sql_hierarchy_restriction')) {
+                if (method_exists($classname, 'sql_hierarchy_restriction')) {
                     $class = new $classname($this->reportfor);
 
                     if (method_exists($classname, 'sql_hierarchy_restriction_prefix') &&
@@ -3224,18 +3226,17 @@ class reportbuilder {
         if ($this->contentmode != REPORT_BUILDER_CONTENT_MODE_NONE) {
             foreach ($this->contentoptions as $option) {
                 $name = $option->classname;
-                $classname = '\totara_reportbuilder\rb\content\\' . $name;
+                $classname = $this->src->resolve_content_classname($name);
+                if (!$classname) {
+                    print_error('contentclassnotexist', 'totara_reportbuilder', '', $name);
+                }
                 $settingname = $name . '_content';
                 $title = $option->title;
-                if (class_exists($classname)) {
-                    $class = new $classname($this->reportfor);
-                    if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
-                        // this content option is enabled
-                        // call function to get text string
-                        $res[] = $class->text_restriction($title, $reportid);
-                    }
-                } else {
-                    print_error('contentclassnotexist', 'totara_reportbuilder', '', $classname);
+                $class = new $classname($this->reportfor);
+                if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
+                    // this content option is enabled
+                    // call function to get text string
+                    $res[] = $class->text_restriction($title, $reportid);
                 }
             }
             if ($this->contentmode == REPORT_BUILDER_CONTENT_MODE_ALL) {
@@ -3437,15 +3438,15 @@ class reportbuilder {
         $contentjoins = array();
         foreach ($this->contentoptions as $option) {
             $name = $option->classname;
-            $classname = '\totara_reportbuilder\rb\content\\' . $name;
-            if (class_exists($classname)) {
-                // @TODO take settings form instance, not database, otherwise caching will fail after content settings change
-                if (reportbuilder::get_setting($reportid, $name . '_content', 'enable')) {
-                    // this content option is enabled
-                    // get required joins
-                    $contentjoins = array_merge($contentjoins,
-                        $this->get_joins($option, 'content'));
-                }
+            $classname = $this->src->resolve_content_classname($name);
+            if (!$classname) {
+                continue;
+            }
+            // @TODO take settings form instance, not database, otherwise caching will fail after content settings change
+            if (reportbuilder::get_setting($reportid, $name . '_content', 'enable')) {
+                // this content option is enabled
+                // get required joins
+                $contentjoins = array_merge($contentjoins, $this->get_joins($option, 'content'));
             }
         }
         return $contentjoins;
@@ -3469,13 +3470,14 @@ class reportbuilder {
         if (isset($this->contentoptions) && is_array($this->contentoptions)) {
             foreach ($this->contentoptions as $option) {
                 $name = $option->classname;
-                $classname = '\totara_reportbuilder\rb\content\\' . $name;
+                $classname = $this->src->resolve_content_classname($name);
+                if (!$classname) {
+                    continue;
+                }
                 $settingname = $name . '_content';
-                if (class_exists($classname)) {
-                    if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
-                        foreach ($option->fields as $alias => $field) {
-                            $fields[] = $field . ' AS rb_content_option_' . $alias;
-                        }
+                if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
+                    foreach ($option->fields as $alias => $field) {
+                        $fields[] = $field . ' AS rb_content_option_' . $alias;
                     }
                 }
             }
@@ -7039,15 +7041,19 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
             $todb->value = $toolbarsearchcolumn['value'];
             $DB->insert_record('report_builder_search_cols', $todb);
         }
+
+        $src = reportbuilder::get_source_object($embed->source, false, true, null);
+
         // Add content restrictions.
         foreach ($embed->contentsettings as $option => $settings) {
-            $classname = '\totara_reportbuilder\rb\content\\' . $option;
-            if (class_exists($classname)) {
-                foreach ($settings as $name => $value) {
-                    if (!reportbuilder::update_setting($newid, $classname::TYPE, $name, $value)) {
-                            throw new moodle_exception('Error inserting content restrictions');
-                        }
-                }
+            $classname = $src->resolve_content_classname($option);
+            if (!$classname) {
+                continue;
+            }
+            foreach ($settings as $name => $value) {
+                if (!reportbuilder::update_setting($newid, $classname::TYPE, $name, $value)) {
+                        throw new moodle_exception('Error inserting content restrictions');
+                    }
             }
         }
         // add access restrictions

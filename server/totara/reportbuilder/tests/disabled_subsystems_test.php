@@ -68,6 +68,10 @@ class totara_reportbuilder_disabled_subsystems_testcase extends advanced_testcas
     private function get_embedded_report_records() {
         global $DB;
 
+        reportbuilder::reset_source_object_cache();
+        reportbuilder::reset_caches();
+        totara_rb_purge_ignored_reports();
+
         $report = reportbuilder::create_embedded('manage_embedded_reports');
         list($sql, $params) = $report->build_query();
 

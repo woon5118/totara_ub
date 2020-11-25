@@ -122,6 +122,7 @@ final class template_helper {
             $error = "Source {$template->source} not found";
             return false;
         }
+        $src = \reportbuilder::get_source_object($template->source, false, true, null);
 
         $todb = new \stdClass();
         $todb->shortname            = \reportbuilder::create_shortname($template->shortname);
@@ -203,12 +204,14 @@ final class template_helper {
 
             // Add content restrictions.
             foreach ($template->contentsettings as $option => $settings) {
-                $classname = '\totara_reportbuilder\rb\content\\' . $option;
-                if (class_exists($classname)) {
-                    foreach ($settings as $name => $value) {
-                        if (!\reportbuilder::update_setting($reportid, $classname::TYPE, $name, $value)) {
-                            throw new \moodle_exception('Error inserting content restrictions');
-                        }
+                $classname = $src->resolve_content_classname($option);
+                if (!$classname) {
+                    debugging("Content restriction {$option} is not available", DEBUG_DEVELOPER);
+                    continue;
+                }
+                foreach ($settings as $name => $value) {
+                    if (!\reportbuilder::update_setting($reportid, $classname::TYPE, $name, $value)) {
+                        throw new \moodle_exception('Error inserting content restrictions');
                     }
                 }
             }
