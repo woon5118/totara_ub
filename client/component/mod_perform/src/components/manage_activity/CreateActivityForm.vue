@@ -24,60 +24,54 @@
       :close-button="false"
       @dismiss="$emit('cancel')"
     >
-      <Form>
-        <FormRow
-          v-slot="{ id }"
-          :label="$str('create_activity_title', 'mod_perform')"
-          required
-        >
-          <InputText
-            :id="id"
-            v-model="form.name"
+      <Uniform ref="form" :initial-values="initialValues" @submit="trySave">
+        <FormRow :label="$str('create_activity_title', 'mod_perform')" required>
+          <FormText
+            name="name"
             :maxlength="ACTIVITY_NAME_MAX_LENGTH"
             char-length="full"
+            :validations="v => [v.required()]"
           />
         </FormRow>
 
         <FormRow
-          v-slot="{ id }"
           :label="
             $str('general_info_label_activity_description', 'mod_perform')
           "
         >
-          <Textarea :id="id" v-model="form.description" char-length="full" />
-          <FormRowDetails :id="$id('aria-describedby')">
+          <FormTextarea
+            name="description"
+            char-length="full"
+            :aria-describedby="$id('desc-desc')"
+          />
+          <FormRowDetails :id="$id('desc-desc')">
             {{ $str('you_can_add_this_later', 'mod_perform') }}
           </FormRowDetails>
         </FormRow>
 
         <FormRow
-          v-slot="{ id }"
           :label="$str('create_activity_type', 'mod_perform')"
           :required="true"
         >
-          <div>
-            <Select
-              :id="id"
-              v-model="form.type"
-              :aria-labelledby="id"
-              :aria-describedby="$id('aria-describedby')"
-              :options="activityTypes"
-              char-length="10"
-            />
-            <FormRowDetails :id="$id('aria-describedby')">
-              {{ $str('activity_type_help_text', 'mod_perform') }}
-            </FormRowDetails>
-          </div>
+          <FormSelect
+            name="type"
+            :aria-describedby="$id('select-desc')"
+            :options="activityTypes"
+            char-length="10"
+            :validations="v => [v.required()]"
+          />
+          <FormRowDetails :id="$id('select-desc')">
+            {{ $str('activity_type_help_text', 'mod_perform') }}
+          </FormRowDetails>
         </FormRow>
-      </Form>
+      </Uniform>
 
       <template v-slot:buttons>
         <Button
           :styleclass="{ primary: true }"
           :text="$str('button_create', 'mod_perform')"
-          :disabled="isSaving || hasNoTitle || hasNoType"
-          type="submit"
-          @click.prevent="trySave"
+          :disabled="isSaving"
+          @click="$refs.form.submit()"
         />
 
         <CancelButton :disabled="isSaving" @click="$emit('request-close')" />
@@ -89,31 +83,31 @@
 <script>
 import Button from 'tui/components/buttons/Button';
 import CancelButton from 'tui/components/buttons/Cancel';
-import Form from 'tui/components/form/Form';
-import FormRow from 'tui/components/form/FormRow';
+import {
+  Uniform,
+  FormRow,
+  FormText,
+  FormSelect,
+  FormTextarea,
+} from 'tui/components/uniform';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
-import InputText from 'tui/components/form/InputText';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
-import Select from 'tui/components/form/Select';
-import Textarea from 'tui/components/form/Textarea';
 import { ACTIVITY_NAME_MAX_LENGTH } from 'mod_perform/constants';
-
-//GraphQL
 import createActivityMutation from 'mod_perform/graphql/create_activity';
 
 export default {
   components: {
     Button,
     CancelButton,
-    Form,
+    Uniform,
     FormRow,
     FormRowDetails,
-    InputText,
+    FormText,
+    FormSelect,
+    FormTextarea,
     Modal,
     ModalContent,
-    Select,
-    Textarea,
   },
 
   props: {
@@ -122,39 +116,22 @@ export default {
 
   data() {
     return {
-      form: {
-        name: '',
-        description: '',
-        type: 0,
+      initialValues: {
+        type: null,
       },
-      activityTypes: [
-        {
-          id: 0,
-          label: this.$str('create_activity_select_placeholder', 'mod_perform'),
-        },
-      ].concat(this.types),
       isSaving: false,
       mutationError: null,
     };
   },
 
   computed: {
-    /**
-     * Is the title/name text empty.
-     *
-     * @return {boolean}
-     */
-    hasNoTitle() {
-      return !this.form.name || this.form.name.trim().length === 0;
-    },
-
-    /**
-     * Is the activity type unselected.
-     *
-     * @return {boolean}
-     */
-    hasNoType() {
-      return this.form.type === 0;
+    activityTypes() {
+      return [
+        {
+          id: null,
+          label: this.$str('create_activity_select_placeholder', 'mod_perform'),
+        },
+      ].concat(this.types);
     },
   },
 
@@ -169,11 +146,11 @@ export default {
      *
      * @returns {Promise<void>}
      */
-    async trySave() {
+    async trySave(values) {
       this.isSaving = true;
 
       try {
-        const savedActivity = await this.save();
+        const savedActivity = await this.save(values);
         this.$emit('mutation-success', savedActivity);
       } catch (e) {
         this.$emit('mutation-error', e);
@@ -186,11 +163,10 @@ export default {
     /**
      * @returns {Promise<{id, name, description}>}
      */
-    async save() {
+    async save(values) {
       const { data: resultData } = await this.$apollo.mutate({
         mutation: createActivityMutation,
-        variables: this.form,
-        refetchAll: false,
+        variables: values,
       });
 
       return resultData.mod_perform_create_activity.activity;

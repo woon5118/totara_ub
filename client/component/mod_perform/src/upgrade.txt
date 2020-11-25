@@ -35,6 +35,8 @@ information provided here is intended especially for developers.
     * Template & SCSS changes
 * Updated Activities.vue page to support filtering and pagination of activities.
 * Moved the activity_types apollo query from CreateActivityForm.vue into Activities.vue
+* Updated CreateActivityForm.vue to use Uniform form library
+    * Template changes
 
 === 13.1 ===
 * Updated manageActivity.vue page to be using a core layout
