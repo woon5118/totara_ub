@@ -47,7 +47,8 @@ final class article_card extends card {
         $extra_data = [
             'image' => $this->get_card_image('engage_article_resource')->out(false),
             'usage' => article::get_resource_usage($this->instanceid),
-            'timeview'=> null,
+            'timeview' => null,
+            'alt' => ''
         ];
 
         $extra = $this->get_json_decoded_extra();
@@ -56,6 +57,7 @@ final class article_card extends card {
             $extra_data['timeview'] = time_view::get_code($extra['timeview']);
         }
 
+        $extra_data['alt'] = !empty($extra['alt_text']) ? $extra['alt_text'] : '';
         return $extra_data;
     }
 

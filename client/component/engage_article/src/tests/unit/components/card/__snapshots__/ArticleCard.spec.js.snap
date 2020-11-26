@@ -10,8 +10,8 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
     class="tui-engageArticleCard__imageheader"
   >
     <img
-      alt="Hello world resource"
       class="tui-engageArticleCard__image"
+      role="presentation"
       src="/"
     />
      

@@ -39,6 +39,7 @@ class engage_article_image_processor_testcase extends advanced_testcase {
         $document = document::create($content['case1']);
         $first_node = $processor->find_first_valid_image_node($document);
         $this->assertInstanceOf('core\json_editor\node\image', $first_node);
+        self::assertEquals('test alt', $first_node->get_alt_text());
 
         // Link Media (Image)
         $document = document::create($content['case2']);

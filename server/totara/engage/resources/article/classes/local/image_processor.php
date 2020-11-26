@@ -289,4 +289,19 @@ final class image_processor {
         $info = $this->get_file_info($image->get_filename());
         return $fs->create_file_from_storedfile($info, $image);
     }
+
+    /**
+     * @param string|array  $document
+     * @return string
+     */
+    public function get_image_alt_text($document): string {
+        $document = document::create($document);
+        $node = $this->find_first_valid_image_node($document);
+
+        if ($node instanceof image) {
+            return $node->get_alt_text();
+        }
+
+        return '';
+    }
 }

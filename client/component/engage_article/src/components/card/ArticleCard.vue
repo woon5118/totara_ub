@@ -33,7 +33,8 @@
     >
       <img
         slot="image"
-        :alt="name"
+        :alt="extraData.alt || null"
+        :role="getRoleAttr"
         :src="extraData.image"
         class="tui-engageArticleCard__image"
       />
@@ -175,6 +176,10 @@ export default {
         return this.$str('timemorethanten', 'engage_article');
       }
       return null;
+    },
+
+    getRoleAttr() {
+      return !this.extraData.alt ? 'presentation' : null;
     },
   },
 

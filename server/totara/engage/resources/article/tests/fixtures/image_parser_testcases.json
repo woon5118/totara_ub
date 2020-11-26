@@ -7,7 +7,7 @@
         "attrs": {
           "url": "@@PLUGINFILE@@/space.jpg",
           "filename": "space.jpg",
-          "alttext": null
+          "alttext": "test alt"
         }
       },
       {

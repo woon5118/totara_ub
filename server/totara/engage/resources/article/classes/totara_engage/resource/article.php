@@ -485,7 +485,8 @@ final class article extends resource_item implements time_viewable {
 
             $extra = [
                 'timeview' => $this->article->timeview,
-                'image' => null
+                'image' => null,
+                'alt_text' => ''
             ];
 
             $resourceid = $this->get_id();
@@ -503,6 +504,9 @@ final class article extends resource_item implements time_viewable {
                 );
 
                 $extra['image'] = $moodle_url->out_as_local_url(false);
+
+                // Save customized alt text to card extra.
+                $extra['alt_text'] = $processor->get_image_alt_text($this->get_content());
             }
 
             $this->resource->extra = $extra;
