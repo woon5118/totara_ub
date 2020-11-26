@@ -99,6 +99,8 @@ export default {
   --form-toggle-text-offset: var(--gap-2);
   --form-toggle-dot-offset: 0.2rem;
   --form-toggle-bottom: 1.8rem;
+  --form-toggle-focus-border: var(--border-width-normal);
+  --form-toggle-focus-gap: 0.1rem;
 }
 
 .tui-toggleSwitch {
@@ -130,6 +132,8 @@ export default {
     position: relative;
     width: var(--form-toggle-container-width);
     margin-left: var(--form-toggle-text-offset);
+    // prettier-ignore
+    padding: calc(var(--form-toggle-focus-gap) + var(--form-toggle-focus-border));
 
     // the toggle background
     &:before {
@@ -150,8 +154,10 @@ export default {
     // the toggle dot
     &:after {
       position: absolute;
-      top: var(--form-toggle-dot-offset);
-      left: var(--form-toggle-dot-offset);
+      // prettier-ignore
+      top: calc(var(--form-toggle-dot-offset) + calc(var(--form-toggle-focus-gap) + var(--form-toggle-focus-border)));
+      // prettier-ignore
+      left: calc(var(--form-toggle-dot-offset) + calc(var(--form-toggle-focus-gap) + var(--form-toggle-focus-border)));
       display: block;
       width: var(--form-toggle-dot-size);
       height: var(--form-toggle-dot-size);
@@ -165,10 +171,6 @@ export default {
     &:hover,
     &:focus {
       cursor: pointer;
-      &:before {
-        background-color: var(--form-toggle-off-bg-color-hover-focus);
-        transition-duration: var(none--transition-form-duration);
-      }
     }
 
     &[disabled] {
@@ -202,10 +204,22 @@ export default {
     &:hover,
     &:focus {
       ~ .tui-toggleSwitch__ui {
-        &:before {
-          background-color: var(--form-toggle-off-bg-color-hover-focus);
+        padding: var(--form-toggle-focus-gap);
+        border: var(--form-toggle-focus-border) solid transparent;
+        // prettier-ignore
+        border-radius: calc(calc(var(--form-toggle-container-radius) + var(--form-toggle-focus-gap)) + var(--form-toggle-focus-border));
+
+        &:after {
+          // prettier-ignore
+          top: calc(var(--form-toggle-dot-offset) + var(--form-toggle-focus-gap));
+          // prettier-ignore
+          left: calc(var(--form-toggle-dot-offset) + var(--form-toggle-focus-gap));
         }
       }
+    }
+
+    &:focus ~ .tui-toggleSwitch__ui {
+      border: var(--form-toggle-focus-border) solid var(--color-state);
     }
   }
 
@@ -213,7 +227,8 @@ export default {
   &__btn[aria-pressed] ~ &__ui {
     // the dot
     &:after {
-      right: var(--form-toggle-dot-offset);
+      // prettier-ignore
+      right: calc(var(--form-toggle-dot-offset) + calc(var(--form-toggle-focus-gap) + var(--form-toggle-focus-border)));
       left: auto;
     }
 
@@ -236,8 +251,9 @@ export default {
     &:hover,
     &:focus {
       ~ .tui-toggleSwitch__ui {
-        &:before {
-          background-color: var(--form-toggle-on-bg-color-hover-focus);
+        &:after {
+          // prettier-ignore
+          right: calc(var(--form-toggle-dot-offset) + var(--form-toggle-focus-gap));
         }
       }
     }
