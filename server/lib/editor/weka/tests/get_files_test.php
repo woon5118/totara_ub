@@ -37,45 +37,6 @@ class editor_weka_get_files_testcase extends advanced_testcase {
     /**
      * @return void
      */
-    public function test_get_area_files(): void {
-        $generator = $this->getDataGenerator();
-        $course = $generator->create_course();
-
-        $context = \context_course::instance($course->id);
-
-        // Save a few files to the course.
-        $fs = get_file_storage();
-        $file_ids = [];
-
-        for ($i = 0; $i < 5; $i++) {
-            $file_record = new stdClass();
-            $file_record->contextid = $context->id;
-            $file_record->itemid = 0;
-            $file_record->component = 'course';
-            $file_record->filearea = 'summary';
-            $file_record->filename = "file_{$i}.png";
-            $file_record->filepath = '/';
-
-            $file = $fs->create_file_from_string($file_record, uniqid());
-            $file_ids[] = $file->get_id();
-        }
-
-        // Fetching the files from weka text editor.
-        $weka_editor = new weka_texteditor();
-        $weka_editor->set_contextid($context->id);
-
-        $fetched_files = $weka_editor->get_files('course', 'summary', 0);
-        self::assertNotEmpty($fetched_files);
-        self::assertCount(5, $fetched_files);
-
-        foreach ($fetched_files as $fetched_file) {
-            self::assertContains($fetched_file->get_id(), $file_ids);
-        }
-    }
-
-    /**
-     * @return void
-     */
     public function test_get_draft_files(): void {
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();

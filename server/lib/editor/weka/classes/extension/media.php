@@ -24,13 +24,9 @@ namespace editor_weka\extension;
 
 /**
  * Media extesion includes web_image and video types.
+ * @method static media create(array $options)
  */
 final class media extends extension {
-    /**
-     * @var array
-     */
-    private $accepttypes;
-
     /**
      * @return string
      */
@@ -43,13 +39,9 @@ final class media extends extension {
      */
     public function get_accepted_types(): array {
         global $CFG;
+        require_once("{$CFG->dirroot}/lib/filelib.php");
 
-        if (!isset($this->accepttypes)) {
-            require_once("{$CFG->dirroot}/lib/filelib.php");
-            $this->accepttypes = file_get_typegroup('extension', ['web_image', 'web_video', 'web_audio']);
-        }
-
-        return $this->accepttypes;
+        return file_get_typegroup('extension', ['web_image', 'web_video', 'web_audio']);
     }
 
     /**

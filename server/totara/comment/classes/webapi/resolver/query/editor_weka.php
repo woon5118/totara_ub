@@ -17,20 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package totara_comment
  */
 namespace totara_comment\webapi\resolver\query;
 
+use context;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use totara_comment\resolver_factory;
-use context;
 use totara_comment\webapi\editor_weka_helper;
 use totara_comment\webapi\resolver\middleware\validate_comment_area;
 use totara_core\identifier\component_area;
+use weka_texteditor;
 
 /**
  * Query to fetch editor configuration of other component and area, but will be masked with this very component
@@ -38,12 +39,12 @@ use totara_core\identifier\component_area;
  */
 final class editor_weka implements query_resolver, has_middleware {
     /**
-     * @param array $args
+     * @param array             $args
      * @param execution_context $ec
      *
-     * @return \weka_texteditor
+     * @return weka_texteditor
      */
-    public static function resolve(array $args, execution_context $ec): \weka_texteditor {
+    public static function resolve(array $args, execution_context $ec): weka_texteditor {
         if (!empty($args['id'])) {
             debugging(
                 "The argument 'id' has been deprecated, please do not use it",
@@ -78,7 +79,7 @@ final class editor_weka implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new validate_comment_area('comment_area')
+            new validate_comment_area('comment_area'),
         ];
     }
 }

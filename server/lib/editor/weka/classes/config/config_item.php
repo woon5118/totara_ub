@@ -17,16 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package editor_weka
  */
 namespace editor_weka\config;
 
-use editor_weka\extension\attachment;
-use editor_weka\extension\extension;
-use editor_weka\extension\link;
-use editor_weka\extension\mention;
-use editor_weka\extension\text;
+use editor_weka\factory\extension_loader;
 
 /**
  * A class for holding configuration data.
@@ -45,52 +41,43 @@ final class config_item {
     const EXTENSION_ALL = 'all';
 
     /**
-     * @var string
-     */
-    private $area;
-
-    /**
-     * @var string
-     */
-    private $component;
-
-    /**
+     * Array of extension class names
      * @var string[]
      */
     private $extensions;
 
     /**
-     * @var bool
-     */
-    private $showtoolbar;
-
-    /**
-     * @var array
-     */
-    private $extensionsoptions;
-
-    /**
      * item constructor.
      *
-     * @param string $component
-     * @param string $area
+     * @param string|null $component
+     * @param string|null $area
      */
-    private function __construct(string $component, string $area) {
-        $this->component = $component;
-        $this->area = $area;
+    private function __construct(?string $component = null, ?string $area = null) {
+        if (!empty($component)) {
+            debugging(
+                "The parameter '\$component' had been deprecated and no longer used, please update the caller",
+                DEBUG_DEVELOPER
+            );
+        }
+
+        if (!empty($area)) {
+            debugging(
+                "The parameter '\$area' had been deprecated and no longer used, please update the caller",
+                DEBUG_DEVELOPER
+            );
+        }
 
         $this->extensions = [];
-
-        // Default to true.
-        $this->showtoolbar = true;
-        $this->extensionsoptions = [];
     }
 
     /**
+     * This function has been deprecated,
+     *
      * @return bool
+     * @deprecated since Totara 13.3
      */
     public function show_toolbar(): bool {
-        return $this->showtoolbar;
+        return true;
     }
 
     /**
@@ -101,9 +88,7 @@ final class config_item {
      */
     public function get_metadata(): array {
         return [
-            'showtoolbar' => $this->showtoolbar,
             'includeextensions' => $this->extensions,
-            'extensionsoptions' => $this->extensionsoptions
         ];
     }
 
@@ -112,67 +97,33 @@ final class config_item {
      * @return config_item
      */
     public static function from_array(array $config): config_item {
-        if (!isset($config['area']) || !isset($config['component'])) {
-            throw new \coding_exception("No value defined for property 'component' or 'area");
-        }
-
-        $instance = new static($config['component'], $config['area']);
+        $instance = new static();
 
         if (array_key_exists('includeextensions', $config)) {
             if (is_array($config['includeextensions'])) {
-                $instance->extensions = $config['includeextensions'];
+                $extensions = array_merge(
+                    extension_loader::get_minimal_required_extension_classes(),
+                    $config['includeextensions']
+                );
+
+                $instance->extensions = array_unique(
+                    array_map(
+                        function (string $extension_class): string {
+                            return ltrim($extension_class, '\\');
+                        },
+                        $extensions
+                    )
+                );
             } else {
                 if (is_string($config['includeextensions']) && static::EXTENSION_ALL === $config['includeextensions']) {
                     // So this component-area want to use all the extensions. Therefore, we will load
                     // all the extensions from the system.
 
-                    $extensions = array_merge(
                     // Default extension classes from the editor only.
-                        [text::class, link::class, mention::class, attachment::class],
-                        \core_component::get_namespace_classes(
-                            'editor_weka\\extension',
-                            extension::class
-                        )
-                    );
-
-                    $instance->extensions = array_unique($extensions);
+                    $instance->extensions = extension_loader::get_all_extension_classes();
                 } else {
                     debugging("Invalid value for key 'includeextensions'", DEBUG_DEVELOPER);
                 }
-            }
-        }
-
-        if (array_key_exists('showtoolbar', $config)) {
-            $instance->showtoolbar = (bool) $config['showtoolbar'];
-        }
-
-        // The property 'extensionsoptions' should be a hashmap of the extension classname as the key and the value is
-        // a hashmap of the options as key => value.
-        $key = 'extensionsoptions';
-        if (array_key_exists($key, $config) && is_array($config[$key])) {
-            $parentcls = extension::class;
-
-            foreach ($config[$key] as $extension => $options) {
-                // Just to make sure that the map is correctly set.
-                if (!class_exists($extension) || !is_subclass_of($extension, $parentcls)) {
-                    debugging(
-                        "The attribute's key of property '{$key}' array should be a proper classname " .
-                        "that extends '{$parentcls}'",
-                        DEBUG_DEVELOPER
-                    );
-
-                    continue;
-                } else if (!is_array($options)) {
-                    debugging(
-                        "The options of extension '{$extension}' needs to be an array " .
-                        "for component '{$instance->component}-{$instance->area}'",
-                        DEBUG_DEVELOPER
-                    );
-
-                    continue;
-                }
-
-                $instance->extensionsoptions[$extension] = $options;
             }
         }
 
@@ -180,6 +131,8 @@ final class config_item {
     }
 
     /**
+     * Returning the list of extension class name(s).
+     *
      * @return string[]
      */
     public function get_extensions(): array {
@@ -192,12 +145,15 @@ final class config_item {
      *
      * @param string $extensionname
      * @return array
+     *
+     * @deprecated since Totara 13.3
      */
     public function get_options_for_extension(string $extensionname): array {
-        if (!array_key_exists($extensionname, $this->extensionsoptions)) {
-            return [];
-        }
+        debugging(
+            "The function \\editor_weka\\config\\config_item::get_options_for_extension had been deprecated and no longer used",
+            DEBUG_DEVELOPER
+        );
 
-        return $this->extensionsoptions[$extensionname];
+        return [];
     }
 }

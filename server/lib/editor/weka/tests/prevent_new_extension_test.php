@@ -1,8 +1,8 @@
 <?php
 /**
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,20 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package editor_weka
  */
-namespace editor_weka\extension;
+defined('MOODLE_INTERNAL') || die();
 
-/**
- * @method static mention create(array $options)
- */
-final class mention extends extension {
+use editor_weka\extension\extension;
+
+class editor_weka_prevent_new_extension_testcase extends advanced_testcase {
     /**
-     * @return string
+     * @return void
      */
-    public function get_js_path(): string {
-        return 'editor_weka/extensions/mention';
+    public function test_make_sure_no_newly_introduced_extensions(): void {
+        $classes = core_component::get_namespace_classes(
+            'editor_weka\\extensions',
+            extension::class
+        );
+
+        self::assertEmpty($classes);
     }
 }

@@ -31,8 +31,10 @@ class editor_weka_get_config_testcase extends advanced_testcase {
      */
     public function test_get_empty_config(): void {
         $factory = new factory();
-        $config = $factory->get_configuration('editor_weka', 'something_that_is_not_existing');
 
-        $this->assertNull($config);
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Cannot find the configuration of area 'something_that_is_not_existing'");
+
+        $factory->get_configuration('editor_weka', 'something_that_is_not_existing');
     }
 }

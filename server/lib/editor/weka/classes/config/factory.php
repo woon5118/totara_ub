@@ -17,10 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package editor_weka
  */
 namespace editor_weka\config;
+
+use cache;
+use coding_exception;
+use core_component;
 
 /**
  * Config class for editor.
@@ -48,22 +52,22 @@ final class factory {
         }
 
         $istest = (defined('PHPUNIT_TEST') && PHPUNIT_TEST);
-        $cache = \cache::make('editor_weka', 'editorconfig');
+        $cache = cache::make('editor_weka', 'editorconfig');
 
         if (!$istest) {
             // Cache should only be done for the non unit-testing environment.
             $configuration = $cache->get('configuration');
 
-            if ($configuration && is_array($configuration)) {
+            if (is_array($configuration)) {
                 $this->configuration = $configuration;
                 return;
             }
         }
 
-        $types = \core_component::get_plugin_types();
+        $types = core_component::get_plugin_types();
 
         foreach ($types as $type => $directory) {
-            $pluginfiles = \core_component::get_plugin_list_with_file($type, 'db/editor_weka.php');
+            $pluginfiles = core_component::get_plugin_list_with_file($type, 'db/editor_weka.php');
             if (empty($pluginfiles)) {
                 continue;
             }
@@ -99,40 +103,22 @@ final class factory {
      * @param string $component
      * @param string $area
      *
-     * @return config_item|null
+     * @return config_item
      */
-    public function get_configuration(string $component, string $area): ?config_item {
+    public function get_configuration(string $component, string $area): config_item {
         $this->load();
 
         if (!isset($this->configuration[$component])) {
             // No configuration found for component
-            return null;
+            throw new coding_exception("Cannot find the configuration for component '{$component}'");
         }
 
         $config = $this->configuration[$component];
         if (!isset($config[$area])) {
-            return null;
+            throw new coding_exception("Cannot find the configuration of area '{$area}'");
         }
 
         $data = $config[$area];
-
-        if (array_key_exists('area', $data)) {
-            debugging(
-                "Please do not set the key 'area' for the editor config, as it will be reset",
-                DEBUG_DEVELOPER
-            );
-        }
-
-        if (array_key_exists('component', $data)) {
-            debugging(
-                "Please do not set the key 'component' for the editor config, as it will be reset",
-                DEBUG_DEVELOPER
-            );
-        }
-
-        $data['component'] = $component;
-        $data['area'] = $area;
-
         return config_item::from_array($data);
     }
 
@@ -140,9 +126,9 @@ final class factory {
      * This function will be mainly used to mock the configuration of the editor weka based for the place of
      * '{$area} - {$component}'. Note that this API will only cache the data to memory but not to physical storage.
      *
-     * @param string        $component
-     * @param string        $area
-     * @param config_item   $config_item
+     * @param string      $component
+     * @param string      $area
+     * @param config_item $config_item
      *
      * @return void
      */
@@ -154,7 +140,7 @@ final class factory {
         $config = $this->configuration[$component];
 
         if (isset($config[$area])) {
-            throw new \coding_exception(
+            throw new coding_exception(
                 "The area '{$area}' for component '{$component}' is already existing in the configuration data"
             );
         }

@@ -17,20 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Chester <simon.chester@totaralearning.com>
+ * @author  Simon Chester <simon.chester@totaralearning.com>
  * @package editor_weka
  */
+
+use core\json_editor\helper\document_helper;
 use editor_weka\config\config_item;
 use editor_weka\config\factory;
 use editor_weka\extension\extension;
-use editor_weka\extension\link;
-use editor_weka\extension\text;
-use editor_weka\extension\ruler;
-use editor_weka\extension\emoji;
-use editor_weka\extension\hashtag;
-use editor_weka\extension\list_extension;
-use editor_weka\extension\mention;
-use core\json_editor\helper\document_helper;
+use totara_tui\output\component;
 
 final class weka_texteditor extends texteditor {
     /**
@@ -45,6 +40,11 @@ final class weka_texteditor extends texteditor {
     private $factory;
 
     /**
+     * @var bool
+     */
+    private $show_toolbar;
+
+    /**
      * weka_texteditor constructor.
      * @param factory|null $factory
      */
@@ -55,6 +55,7 @@ final class weka_texteditor extends texteditor {
 
         $this->contextid = null;
         $this->factory = $factory;
+        $this->show_toolbar = true;
     }
 
     /**
@@ -83,7 +84,7 @@ final class weka_texteditor extends texteditor {
      * {@inheritdoc}
      */
     public function get_supported_formats() {
-        return array(FORMAT_JSON_EDITOR => FORMAT_JSON_EDITOR);
+        return [FORMAT_JSON_EDITOR => FORMAT_JSON_EDITOR];
     }
 
     /**
@@ -104,35 +105,22 @@ final class weka_texteditor extends texteditor {
      * @param string|null $component
      * @param string|null $area
      *
-     * @return config_item|null
+     * @return config_item
      */
-    protected function get_config(?string $component = null, ?string $area = null): ?config_item {
-        $config = null;
-
-        if (null !== $component && '' !== $component) {
-            // Component is being given, we should be able to get the config item, unless the configuration
-            // was not set.
-            if (null === $area || '' === $area) {
-                $area = config_item::AREA_DEFAULT;
-            }
-
-            $config = $this->factory->get_configuration($component, $area);
-
-            if (null === $config) {
-                // Still no config found, we will have to debug here.
-                debugging(
-                    "The configuration for editor within component '{$component}' " .
-                    "at area '{$area}' does not exist. Please setup your configuration properly.",
-                    DEBUG_DEVELOPER
-                );
-            }
+    protected function get_config(?string $component = null, ?string $area = null): config_item {
+        if (empty($component)) {
+            $component = 'editor_weka';
         }
 
-        return $config;
+        if (empty($area)) {
+            $area = config_item::AREA_DEFAULT;
+        }
+
+        return $this->factory->get_configuration($component, $area);
     }
 
     /**
-     * This function will try to invoke {@see extension::__construct}
+     * This function will try to invoke {@see extension::create()}
      *
      * @param string|null $component
      * @param string|null $area
@@ -141,63 +129,53 @@ final class weka_texteditor extends texteditor {
      */
     public function get_extensions(string $component = 'editor_weka', string $area = 'learn'): array {
         $config = $this->get_config($component, $area);
+        $extension_classes = $config->get_extensions();
 
-        // Default to have link, text and ruler only. The component that wants to use the
-        // editor will need to define the extensions that they want to use.
-        $classes = [link::class, text::class, ruler::class];
-
-        if (null !== $config) {
-            $classes = array_merge(
-                $classes,
-                $config->get_extensions()
-            );
-        } else {
-            $classes = array_merge($classes, [
-                emoji::class,
-                hashtag::class,
-                list_extension::class,
-                mention::class,
-            ]);
-        }
-
-        $classes = array_unique($classes);
         $extensions = [];
+        $context_system_id = context_system::instance()->id;
 
-        foreach ($classes as $cls) {
-            /** @var extension $extension */
-            $extension = new $cls(
-                $component,
-                $area,
-                $this->contextid
-            );
+        foreach ($extension_classes as $extension_class) {
+            $options = [
+                'component' => $component,
+                'area' => $area,
+                'context_id' => $this->contextid ?? $context_system_id,
+            ];
 
-            if (null !== $config) {
-                $options = $config->get_options_for_extension($cls);
-                $extension->set_options($options);
-            }
-
-            $extensions[] = $extension;
+            $extensions[] = call_user_func_array([$extension_class, 'create'], [$options]);
         }
 
         return $extensions;
     }
 
     /**
-     * @param string|null $component
-     * @param string|null $area
+     * @param string|null $component Deprecated since totara 13.3
+     * @param string|null $area      Deprecated since totara 13.3
      *
      * @return bool
      */
     public function show_toolbar(?string $component = null, ?string $area = null): bool {
-        // Default to true most of the time.
-        $result = true;
-        $cfg = $this->get_config($component, $area);
-
-        if (null != $cfg) {
-            $result = $cfg->show_toolbar();
+        if (!empty($component)) {
+            debugging(
+                "The parameter '\$component' had been deprecated and no longer used, please update all calls",
+                DEBUG_DEVELOPER
+            );
         }
 
-        return $result;
+        if (!empty($area)) {
+            debugging(
+                "The parameter '\$area' had been deprecated and no longer used, please update all calls"
+            );
+        }
+
+        return $this->show_toolbar;
+    }
+
+    /**
+     * @param bool $show
+     * @return void
+     */
+    public function set_show_toolbar(bool $show): void {
+        $this->show_toolbar = $show;
     }
 
     /**
@@ -234,6 +212,10 @@ final class weka_texteditor extends texteditor {
                 // This doesn't need to be fancy; markup for conversion should be simple and XSS-free.
                 $this->text = clean_text($this->text);
             }
+        }
+
+        if (array_key_exists('show_toolbar', $options)) {
+            $this->set_show_toolbar($options['show_toolbar']);
         }
 
         // Start finding the draft_item_id within file picker options.
@@ -285,12 +267,19 @@ final class weka_texteditor extends texteditor {
      *
      * @param string $component
      * @param string $area
-     * @param int $item_id
+     * @param int    $item_id
      *
      * @return stored_file[]
+     * @deprecated since Totara 13.3
      */
     public function get_files(string $component, string $area, int $item_id): array {
         global $CFG;
+
+        debugging(
+            "The function \\weka_texteditor::get_files is deprecated and no longer used, " .
+            "pleas use \\file_storage::get_area_files instead",
+            DEBUG_DEVELOPER
+        );
 
         if (empty($this->contextid)) {
             // There is no chances to fetch the file without context.
@@ -299,7 +288,6 @@ final class weka_texteditor extends texteditor {
 
         require_once("{$CFG->dirroot}/lib/filelib.php");
         $fs = get_file_storage();
-
 
         $files = $fs->get_area_files(
             $this->contextid,
@@ -314,7 +302,7 @@ final class weka_texteditor extends texteditor {
 
         return array_filter(
             $files,
-            function (\stored_file $file): bool {
+            function (stored_file $file): bool {
                 return !$file->is_directory();
             }
         );
@@ -324,7 +312,7 @@ final class weka_texteditor extends texteditor {
      * Only returning files without the directories.
      * Note that this function will only return files that had moved to the draft area.
      *
-     * @param int $draft_item_id
+     * @param int      $draft_item_id
      * @param int|null $user_id
      * @return stored_file[]
      */
@@ -359,14 +347,14 @@ final class weka_texteditor extends texteditor {
      */
     private function prepare_editor_options(string $elementid, ?array $options = null): array {
         $params = [
-            'id' => (string)$elementid,
+            'id' => (string) $elementid,
             'extensions' => [],
 
             // Always shows the toolbar.
             'showtoolbar' => true,
             'file_item_id' => $options['item_id'] ?? null,
             'context_id' => $this->contextid ?? context_system::instance()->id,
-            'files' => []
+            'files' => [],
         ];
 
         $component = $options['component'] ?? 'editor_weka';
@@ -397,7 +385,7 @@ final class weka_texteditor extends texteditor {
 
                 // It is an json_encoded string, as same as the property declared for
                 // editor's extension type in graphql
-                'options' => $json
+                'options' => $json,
             ];
         }
 
@@ -415,7 +403,7 @@ final class weka_texteditor extends texteditor {
                             $file->get_itemid(),
                             $file->get_filepath(),
                             $file->get_filename()
-                        )->out(false)
+                        )->out(false),
                     ];
                 },
                 $draft_files
@@ -430,17 +418,17 @@ final class weka_texteditor extends texteditor {
      * @return string
      */
     private function get_js_import_code(array $params): string {
-        $component = new \totara_tui\output\component('editor_weka/pages/WekaIntegration', [
-            'params' => $params
+        $component = new component('editor_weka/pages/WekaIntegration', [
+            'params' => $params,
         ]);
         $html_encoded = json_encode($component->out_html());
         $id_encoded = json_encode($params['id']);
 
         if (JSON_ERROR_NONE != json_last_error()) {
-            throw new \coding_exception("Cannot encode JSON parameters");
+            throw new coding_exception("Cannot encode JSON parameters");
         }
 
-        return /** @lang javascript */"
+        return /** @lang JavaScript */ "
             ;(function(){
                 var textarea = document.getElementById({$id_encoded});
                 textarea.style.display = 'none';

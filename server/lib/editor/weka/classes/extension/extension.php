@@ -20,53 +20,154 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package editor_weka
  */
-
 namespace editor_weka\extension;
 
+use coding_exception;
+use context_system;
+use editor_weka\config\config_item;
+
 /**
- * An extension is  a collection of nodes of json_editor. Don't get mixed up between the extension and the node,
+ * An extension is a collection of nodes of json_editor. Don't get mixed up between the extension and the node,
  * as node is just single unit, where as the extension can be either a single unit or multiple units. However, the
  * extension in this very context is to tell the weka editor which front-end component to be pulled, so that
  * at the front-end the editor can be constructed properly.
  */
 abstract class extension {
     /**
-     * The component where this extension is being used.
-     * @var string|null
+     * This property is no longer used. However, it is in here to allow PHPStorm trigger warning.
+     *
+     * @var null
+     * @deprecated since Totara 13.3
      */
-    protected $component;
+    private $component;
 
     /**
-     * The area where this extension is being used.
-     * @var string|null
+     * This property is no longer used. However, it is in here to allow PHPStorm trigger warning.
+     *
+     * @var null
+     * @deprecated since Totara 13.3
      */
-    protected $area;
+    private $area;
 
     /**
-     * The context id where this extension is being used.
-     * If contextid is not being passed, then system context will be used.
-     * @var int
+     * This property is no longer used. However, it is in here to allow PHPStorm trigger warning.
+     *
+     * @var null
+     * @deprecated since Totara 13.3
      */
-    protected $contextid;
+    private $contextid;
 
     /**
      * extension constructor.
      * Preventing any complicated construction of the children.
      *
-     * @param string|null $component    The component metadata where this extension is being used.
-     * @param string|null $area         The area metadata where this extension is being used.
-     * @param int|null    $contextid    The context where this extension is being used
+     * @param string|null $component    Deprecated
+     * @param string|null $area         Deprecated
+     * @param int|null    $contextid    Deprecated
      */
-    final public function __construct(?string $component, ?string $area,
+    public function __construct(?string $component = null, ?string $area = null,
                                       ?int $contextid = null) {
-        if (null == $contextid) {
-            // Default to context system id.
-            $contextid = \context_system::instance()->id;
+        if (!empty($component)) {
+            debugging(
+                "The parameter '\$component' had been deprecated and no longer used, please update your caller",
+                DEBUG_DEVELOPER
+            );
         }
 
-        $this->component = $component;
-        $this->area = $area;
-        $this->contextid = $contextid;
+        if (!empty($area)) {
+            debugging(
+                "The parameter '\$area' had been deprecated and no longer used, please update your caller",
+                DEBUG_DEVELOPER
+            );
+        }
+
+        if (!empty($contextid)) {
+            debugging(
+                "The parameter '\$contextid' had been deprecated and no longer used, please pdate your caller",
+                DEBUG_DEVELOPER
+            );
+        }
+
+        $this->component = null;
+        $this->area = null;
+        $this->contextid = null;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
+    final public function __get(string $name) {
+        switch ($name) {
+            case 'component':
+                debugging(
+                    "The property 'component' had been deprecated and there is no alternative. Please update all calls.",
+                    DEBUG_DEVELOPER
+                );
+
+                // Default value for component.
+                return 'editor_weka';
+
+            case 'area':
+                debugging(
+                    "The property 'area' had been deprecated and there is no alternative. Please update all calls.",
+                    DEBUG_DEVELOPER
+                );
+
+                // Default value for area
+                return config_item::AREA_DEFAULT;
+
+            case 'contextid':
+                debugging(
+                    "The property 'contextid' had been deprecated and there is no alternative. Please update all calls.",
+                    DEBUG_DEVELOPER
+                );
+
+                // Default value for contextid
+                return context_system::instance()->id;
+
+            default:
+                throw new coding_exception(
+                    "Magic function '__get' is not supported for property '{$name}'"
+                );
+
+        }
+    }
+
+    /**
+     * @param string        $name
+     * @param mixed|null    $value
+     *
+     * @return void
+     */
+    final public function __set(string $name, $value): void {
+        switch ($name) {
+            case 'component':
+            case 'area':
+            case 'contextid':
+                debugging(
+                    "The property '{$name}' had been deprecated and there is no alternative. Please update all calls.",
+                    DEBUG_DEVELOPER
+                );
+
+                return;
+
+            default:
+                throw new coding_exception(
+                    "Magic function '__set' is not supported for property '{$name}'"
+                );
+        }
+    }
+
+    /**
+     * @param array $options
+     * @return extension
+     */
+    public static function create(array $options): extension {
+        $extension = new static();
+        $extension->set_options($options);
+
+        return $extension;
     }
 
     /**

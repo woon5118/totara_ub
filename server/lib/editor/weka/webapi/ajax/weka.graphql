@@ -15,7 +15,7 @@ query editor_weka_weka(
     context_id: $context_id
   ) {
     __typename
-    showtoolbar(component: $component, area: $area)
+    showtoolbar
     extensions(component: $component, area: $area) {
       __typename
       name

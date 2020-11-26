@@ -23,13 +23,21 @@
 namespace editor_weka\extension;
 
 /**
- * Extension attachment.
+ * @method static attachment create(array $options)
  */
 final class attachment extends extension {
     /**
-     * @var array|null
+     * @var array
      */
-    private $accepttypes;
+    private $accept_types;
+
+    /**
+     * attachment constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->accept_types = [];
+    }
 
     /**
      * @return string
@@ -46,9 +54,9 @@ final class attachment extends extension {
         global $CFG;
         parent::set_options($options);
 
-        if (array_key_exists('accepttypes', $options) && is_array($options['accepttypes'])) {
+        if (array_key_exists('accept_types', $options) && is_array($options['accept_types'])) {
             require_once("{$CFG->dirroot}/lib/filelib.php");
-            $this->accepttypes = file_get_typegroup('extension', $options['accepttypes']);
+            $this->accept_types = file_get_typegroup('extension', $options['accept_types']);
         }
     }
 
@@ -56,11 +64,7 @@ final class attachment extends extension {
      * @return array
      */
     public function get_accept_types(): array {
-        if (!isset($this->accepttypes)) {
-            $this->accepttypes = [];
-        }
-
-        return $this->accepttypes;
+        return $this->accept_types;
     }
 
     /**

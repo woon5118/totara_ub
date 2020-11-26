@@ -25,11 +25,22 @@ namespace editor_weka\extension;
 use core\orm\query\builder;
 use editor_weka\entity\emoji as entity;
 
+/**
+ * @method static attachment create(array $option)
+ */
 final class emoji extends extension {
     /**
-     * @var array|null
+     * @var array
      */
     private $emojis;
+
+    /**
+     * emoji constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->emojis = [];
+    }
 
     /**
      * @return string
@@ -57,10 +68,6 @@ final class emoji extends extension {
      * @return array
      */
     public function get_emojis(): array {
-        if (!isset($this->emojis)) {
-            $this->emojis = [];
-        }
-
         return $this->emojis;
     }
 

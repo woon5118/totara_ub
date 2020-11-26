@@ -17,12 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package totara_comment
  */
 namespace totara_comment\webapi\resolver\middleware;
 
 use Closure;
+use coding_exception;
 use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
@@ -54,13 +55,13 @@ class validate_comment_area implements middleware {
      */
     public function handle(payload $payload, Closure $next): result {
         if (!$payload->has_variable($this->area_key)) {
-            throw new \coding_exception("Cannot find area key '{$this->area_key}' in the payload");
+            throw new coding_exception("Cannot find area key '{$this->area_key}' in the payload");
         }
 
         $comment_area = $payload->get_variable($this->area_key);
 
         if (!in_array(strtolower($comment_area), [comment::COMMENT_AREA, comment::REPLY_AREA])) {
-            throw new \coding_exception("Invalid comment area: {$comment_area}");
+            throw new coding_exception("Invalid comment area: {$comment_area}");
         }
 
         return $next->__invoke($payload);
