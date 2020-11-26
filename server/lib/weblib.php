@@ -3561,7 +3561,7 @@ function debugging($message = '', $level = DEBUG_NORMAL, $backtrace = null) {
             if (CLI_SCRIPT) {
                 echo "++ $message ++\n$from";
             } else {
-                echo '<div class="notifytiny debuggingmessage" data-rel="debugging">' , $message , $from , '</div>';
+                echo '<div class="notifytiny debuggingmessage" data-rel="debugging">' , clean_text($message) , $from , '</div>';
             }
             if (defined('BEHAT_SITE_RUNNING') or defined('BEHAT_TEST')) {
                 if (!defined('BEHAT_UTIL')) {

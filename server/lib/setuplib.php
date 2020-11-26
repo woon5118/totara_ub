@@ -562,8 +562,10 @@ function get_exception_info($ex) {
     // Be careful, no guarantee weblib.php is loaded.
     if (function_exists('clean_text')) {
         $message = clean_text($message);
+        $debuginfo = clean_text($debuginfo);
     } else {
         $message = htmlspecialchars($message);
+        $debuginfo = htmlspecialchars($debuginfo);
     }
 
     if (!empty($CFG->errordocroot)) {
