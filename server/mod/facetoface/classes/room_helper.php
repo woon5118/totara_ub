@@ -237,7 +237,7 @@ final class room_helper {
         global $USER;
         // Private cache;
         static $usercapabilitylist = [];
-        if (isset($usercapabilitylist[$eventid][$USER->id])) {
+        if (isset($usercapabilitylist[$eventid][$USER->id]) && (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST)) {
             return $usercapabilitylist[$eventid][$USER->id];
         }
 
