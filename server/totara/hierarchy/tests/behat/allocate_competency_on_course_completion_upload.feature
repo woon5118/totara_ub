@@ -160,13 +160,8 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
-
-    # Upload course completion for other courses with today's date
-    When the following courses are completed:
-      | user     | course | timecompleted  |
       | learner1 | C2     | today          |
-    And I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
+    Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
     Then I log out
 
     # Check course completion and competency status updated
@@ -190,12 +185,6 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
-    And I wait for the next second
-
-    # Upload course completion for other courses with last month's date
-    When the following courses are completed:
-      | user     | course | timecompleted  |
       | learner1 | C2     | last month     |
     Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
     And I log out
