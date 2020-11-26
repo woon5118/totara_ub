@@ -77,22 +77,7 @@ class block_current_learning extends block_base {
      */
     public function init() {
         $this->title = get_string('pluginname', 'block_current_learning');
-
-        if (empty($this->config)) {
-            $this->config = new stdClass();
-        }
-
-        if (empty($this->config->alerperiod)) {
-            $this->config->alertperiod = self::DEFAULT_ALERT_PERIOD;
-        }
-
-        if (empty($this->config->warningperiod)) {
-            $this->config->warningperiod = self::DEFAULT_WARNING_PERIOD;
-        }
-
-        if (empty($this->config->view)) {
-            $this->config->view = self::DEFAULT_VIEW;
-        }
+        // NOTE: do NOT initialise $this->>config here, _load_instance() must be executed first!
     }
 
     /**
@@ -114,6 +99,23 @@ class block_current_learning extends block_base {
 
         if ($this->content !== null) {
             return $this->content;
+        }
+
+        // Use defaults for missing config values, this cannot be done earlier.
+        if (empty($this->config)) {
+            $this->config = new stdClass();
+        }
+
+        if (empty($this->config->alerperiod)) {
+            $this->config->alertperiod = self::DEFAULT_ALERT_PERIOD;
+        }
+
+        if (empty($this->config->warningperiod)) {
+            $this->config->warningperiod = self::DEFAULT_WARNING_PERIOD;
+        }
+
+        if (empty($this->config->view)) {
+            $this->config->view = self::DEFAULT_VIEW;
         }
 
         $this->content = new stdClass();
@@ -221,6 +223,8 @@ class block_current_learning extends block_base {
                 $template = 'block_current_learning/block_tiles';
                 $this->itemsperpage = 6;
                 break;
+            default:
+                $template = 'block_current_learning/block';
         }
 
         // Create the pagination data if we have items to display.
