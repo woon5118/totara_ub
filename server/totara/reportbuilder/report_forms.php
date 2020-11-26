@@ -397,7 +397,7 @@ class report_builder_edit_filters_form extends moodleform {
         $mform->addHelpButton('toolbarsearch', 'toolbarsearch', 'totara_reportbuilder');
         $mform->setExpanded('toolbarsearch');
 
-        $mform->addElement('advcheckbox', 'toolbarsearchdisabled', get_string('toolbarsearchdisabled', 'totara_reportbuilder'));
+        $mform->addElement('advcheckbox', 'toolbarsearchdisabled', get_string('toolbarsearchdisabled', 'totara_reportbuilder'), '', ['aria-label' => get_string('toolbarsearchdisabled', 'totara_reportbuilder')]);
         $mform->setDefault('toolbarsearchdisabled', !$report->toolbarsearch);
         $mform->addHelpButton('toolbarsearchdisabled', 'toolbarsearchdisabled', 'totara_reportbuilder');
 

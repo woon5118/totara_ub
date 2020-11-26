@@ -192,6 +192,44 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
         // Set up 'move' button events.
         module.rb_init_filter_movedown_btns();
         module.rb_init_filter_moveup_btns();
+
+        // Add aria label for standard region.
+        this.rb_init_add_aria_label_to_rows('standard');
+
+        // Add aria label for sidebar region.
+        this.rb_init_add_aria_label_to_rows('sidebar');
+    },
+
+    rb_init_add_aria_label_to_rows: function (region) {
+        var tr = $('#id_new'+region+'filter').parents('tr:first');
+        var columnIndex = tr.prevAll().length;
+        $('#id_new'+region+'filter').attr('aria-label', M.util.get_string('filtering_search_field', 'totara_reportbuilder', columnIndex));
+        $('#id_new'+region+'customname').attr('aria-label', M.util.get_string('filtering_customise_field', 'totara_reportbuilder', columnIndex));
+        $('#id_new'+region+'filtername').attr('aria-label', M.util.get_string('filtering_customise_name', 'totara_reportbuilder', columnIndex));
+        $('#id_new'+region+'advanced').attr('aria-label', M.util.get_string('filtering_advanced', 'totara_reportbuilder', columnIndex));
+        if (region == 'standard') {
+            $('#id_newstandardfilteringrequired').attr('aria-label', M.util.get_string('filteringrequired_field', 'totara_reportbuilder', columnIndex));
+        }
+
+        var selectors = tr.siblings().find('select.filter_selector');
+        var checkboxes = tr.siblings().find('input.filter_custom_name_checkbox:checkbox');
+        var fieldNames = tr.siblings().find('input.filter_name_text');
+        var advanceCheckboxes = tr.siblings().find('input.filter_advanced_checkbox:checkbox');
+        if (region == 'standard') {
+            var requiredCheckboxes = tr.siblings().find('input.filter_filteringrequired_checkbox:checkbox');
+        }
+
+        var index = 1;
+        for (var i=0; i<selectors.length; i++) {
+            $(selectors[i]).attr('aria-label', M.util.get_string('filtering_search_field', 'totara_reportbuilder', index));
+            $(checkboxes[i]).attr('aria-label', M.util.get_string('filtering_customise_field', 'totara_reportbuilder', index));
+            $(fieldNames[i]).attr('aria-label', M.util.get_string('filtering_customise_name', 'totara_reportbuilder', index));
+            $(advanceCheckboxes[i]).attr('aria-label', M.util.get_string('filtering_advanced', 'totara_reportbuilder', index));
+            if (region == 'standard') {
+                $(requiredCheckboxes[i]).attr('aria-label', M.util.get_string('filteringrequired_field', 'totara_reportbuilder', index));
+            }
+            index++;
+        }
     },
 
     rb_init_search_column_rows: function() {
@@ -219,6 +257,18 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
 
         // Set up delete button events.
         module.rb_init_search_column_deletebuttons();
+
+        // Add aria label to toolbar search region.
+        var tr = $('#id_newsearchcolumn').parents('tr:first');
+        var columnIndex = tr.prevAll().length;
+        $('#id_newsearchcolumn').attr('aria-label', M.util.get_string('filtering_search_field', 'totara_reportbuilder', columnIndex));
+
+        var selectors = tr.siblings().find('select.search_column_selector');
+        var index = 1;
+        for (var i=0; i<selectors.length; i++) {
+            $(selectors[i]).attr('aria-label', M.util.get_string('filtering_search_field', 'totara_reportbuilder', index));
+            index++;
+        }
     },
 
     rb_init_filter_addbutton: function(filterselector, region) {
@@ -280,15 +330,20 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                         filterbox.find('select.filter_selector').attr('name', 'filter'+fid);
                         filterbox.find('select optgroup[label=New]').remove();
                         filterbox.find('select.filter_selector').attr('id', 'id_filter'+fid);
+                        filterbox.find('select.filter_selector').attr('aria-label', M.util.get_string('filtering_search_field', 'totara_reportbuilder', fid));
                         customname.attr('id', 'id_customname'+fid);
                         customname.attr('name', 'customname'+fid);
+                        customname.attr('aria-label', M.util.get_string('filtering_customise_field', 'totara_reportbuilder', fid))
                         nametext.attr('id', 'id_filtername'+fid);
                         nametext.attr('name', 'filtername'+fid);
+                        nametext.attr('aria-label', M.util.get_string('filtering_customise_name', 'totara_reportbuilder', fid))
                         advancedCheck.attr('name', 'advanced'+fid);
                         advancedCheck.attr('id', 'id_advanced'+fid);
+                        advancedCheck.attr('aria-label', M.util.get_string('filtering_advanced', 'totara_reportbuilder', fid));
                         if (region == 'standard') {
                             filteringrequiredCheck.attr('name', 'filteringrequired'+fid);
                             filteringrequiredCheck.attr('id', 'id_filteringrequired'+fid);
+                            filteringrequiredCheck.attr('aria-label', M.util.get_string('filteringrequired_field', 'totara_reportbuilder', fid));
                             filteringrequiredCheck.closest('tr').attr('fid', fid);
                         } else {
                             advancedCheck.closest('tr').attr('fid', fid);

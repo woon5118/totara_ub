@@ -94,15 +94,28 @@ foreach ($report->columnoptions as $option) {
 $globalinitialdisplay = get_config('totara_reportbuilder', 'globalinitialdisplay');
 $initialdisplay = ($report->initialdisplay == RB_INITIAL_DISPLAY_HIDE || ($globalinitialdisplay && !$report->embedded)) ? 1 : 0;
 $sizeoffilters  = sizeof($report->filters) + sizeof($report->searchcolumns);
-$PAGE->requires->strings_for_js(array('saving', 'confirmfilterdelete', 'confirmsearchcolumndelete', 'delete', 'moveup',
-    'movedown', 'add', 'initialdisplay_error', 'confirmfilterdelete_rid_enabled', 'confirmfilterdelete_grid_enabled'), 'totara_reportbuilder');
-$args = array('args' => '{"user_sesskey":"'.$USER->sesskey.'", "rb_reportid":'.$id.',
-    "rb_filters":'.$sizeoffilters.', "rb_initial_display":'.$initialdisplay.', "rb_global_initial_display":'.$globalinitialdisplay.',
-    "rb_filter_headings":'.json_encode($filterheadings).', "rb_search_column_headings":'.json_encode($searchcolumnheadings).'}');
+$PAGE->requires->strings_for_js(
+    array(
+        'saving', 'confirmfilterdelete', 'confirmsearchcolumndelete', 'delete', 'moveup', 'filtering_search_field',
+        'filtering_customise_name', 'filteringrequired_field', 'filtering_customise_field', 'filtering_advanced',
+        'movedown', 'add', 'initialdisplay_error', 'confirmfilterdelete_rid_enabled', 'confirmfilterdelete_grid_enabled'
+    ),
+    'totara_reportbuilder'
+);
+$args = array(
+    'args' => '{"user_sesskey":"'.$USER->sesskey.'", 
+    "rb_reportid":'.$id.',
+    "rb_filters":'.$sizeoffilters.', 
+    "rb_initial_display":'.$initialdisplay.', 
+    "rb_global_initial_display":'.$globalinitialdisplay.',
+    "rb_filter_headings":'.json_encode($filterheadings).', 
+    "rb_search_column_headings":'.json_encode($searchcolumnheadings).'}'
+);
 $jsmodule = array(
     'name' => 'totara_reportbuilderfilters',
     'fullpath' => '/totara/reportbuilder/filters.js',
-    'requires' => array('json'));
+    'requires' => array('json')
+);
 $PAGE->requires->js_init_call('M.totara_reportbuilderfilters.init', $args, false, $jsmodule);
 
 
