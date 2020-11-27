@@ -17,7 +17,11 @@
 -->
 <template>
   <FormScope :path="path" :process="process">
-    <FormRadioGroup :validations="validations" name="response">
+    <FormRadioGroup
+      class="tui-multiChoiceSingleParticipantForm"
+      :validations="validations"
+      name="response"
+    >
       <Radio
         v-for="item in element.data.options"
         :key="item.name"

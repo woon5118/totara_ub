@@ -17,7 +17,7 @@
 -->
 <template>
   <FormScope :path="path" :process="process">
-    <div>
+    <div class="tui-multiChoiceMultiParticipantForm">
       <span v-for="(settingString, i) in settingStrings" :key="i">
         {{ settingString }} <br v-if="i < settingString.length" />
       </span>

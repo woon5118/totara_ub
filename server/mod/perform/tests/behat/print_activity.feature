@@ -35,14 +35,14 @@ Feature: Print view of a single-section user activity
       | track_description | assignment_type | assignment_name |
       | track 1           | cohort          | aud1            |
     And the following "section elements" exist in "mod_perform" plugin:
-      | section_name   | element_name         | title                        | data                                                                                                                                                                           |
-      | Single section | short_text           | Short text question          | {}                                                                                                                                                                             |
-      | Single section | long_text            | Long text question           | {}                                                                                                                                                                             |
-      | Single section | date_picker          | Date picker question         | {}                                                                                                                                                                             |
-      | Single section | multi_choice_single  | Multi choice single question | {"options":[{"name":"option_1","value":"A"},{"name":"option_2","value":"B"}]}                                                                                                  |
-      | Single section | multi_choice_multi   | Multi choice multi question  | {"max":"2","min":"0","options":[{"name":"option_1","value":"A"},{"name":"option_2","value":"B"},{"name":"option_3","value":"C"}]}                                              |
-      | Single section | custom_rating_scale  | Custom rating scale question | {"options":[{"name":"option_1","value":{"text":"A","score":"1"}},{"name":"option_2","value":{"text":"B","score":"5"}},{"name":"option_3","value":{"text":"C","score":"10"}}]}  |
-      | Single section | numeric_rating_scale | Numeric rating scale question| {"defaultValue":"3","highValue":"5","lowValue":"1"}                                                                                                                            |
+      | section_name   | element_name         | title                         | data                                                                                                                                                                          |
+      | Single section | short_text           | Short text question           | {}                                                                                                                                                                            |
+      | Single section | long_text            | Long text question            | {}                                                                                                                                                                            |
+      | Single section | date_picker          | Date picker question          | {}                                                                                                                                                                            |
+      | Single section | multi_choice_single  | Multi choice single question  | {"options":[{"name":"option_1","value":"A"},{"name":"option_2","value":"B"}]}                                                                                                 |
+      | Single section | multi_choice_multi   | Multi choice multi question   | {"max":"2","min":"0","options":[{"name":"option_1","value":"A"},{"name":"option_2","value":"B"},{"name":"option_3","value":"C"}]}                                             |
+      | Single section | custom_rating_scale  | Custom rating scale question  | {"options":[{"name":"option_1","value":{"text":"A","score":"1"}},{"name":"option_2","value":{"text":"B","score":"5"}},{"name":"option_3","value":{"text":"C","score":"10"}}]} |
+      | Single section | numeric_rating_scale | Numeric rating scale question | {"defaultValue":"3","highValue":"5","lowValue":"1"}                                                                                                                           |
 
     Given the following "section relationships" exist in "mod_perform" plugin:
       | section_name   | relationship | can_view | can_answer |
@@ -91,10 +91,10 @@ Feature: Print view of a single-section user activity
     And I answer "short text" question "Short text question" with "David short text answer one"
     And I answer "long text" question "Long text question" with "David long text answer one"
     And I answer "date picker" question "Date picker question" with "1 January 2020"
-    And I answer "multi choice single" question "Multi choice single question" with "A"
-    And I answer "multi choice multi" question "Multi choice multi question" with "A"
+    And I answer "multi choice single" question "Multi choice single question" with "B"
+    And I answer "multi choice multi" question "Multi choice multi question" with "C"
     And I answer "custom rating scale" question "Custom rating scale question" with "A (score: 1)"
-    And I answer "numeric rating scale" question "Numeric rating scale question" with "3"
+    And I answer "numeric rating scale" question "Numeric rating scale question" with "5"
 
     When I click on "Save as draft" "button"
     Then I should see "Draft saved" in the tui success notification toast
@@ -115,7 +115,13 @@ Feature: Print view of a single-section user activity
     And I should see "David short text answer one" in the ".tui-shortTextParticipantPrint" "css_element"
     And I should see "David long text answer one" in the ".tui-longTextParticipantPrint" "css_element"
     And I should see "1 January 2020" in the ".tui-datePickerParticipantPrint" "css_element"
-    And I should see "1 January 2020" in the ".tui-datePickerParticipantPrint" "css_element"
+    And I should see "5" in the ".tui-numericRatingScaleParticipantPrint" "css_element"
+
+    # Some print components simply point to the participant form component
+    And I should see perform "multi choice single" question "Multi choice single question" is answered with "B" in print view
+    And I should see perform "multi choice multi" question "Multi choice multi question" is answered with "C" in print view
+    And I should see perform "custom rating scale" question "Custom rating scale question" is answered with "A (score: 1)" in print view
+    And I should see perform "numeric rating scale" question "Numeric rating scale question" is answered with "5" in print view
 
     When I navigate to the outstanding perform activities list page
     And I click on "Single section activity" "link"
@@ -137,6 +143,13 @@ Feature: Print view of a single-section user activity
     And ".tui-shortTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
     And ".tui-longTextParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
     And ".tui-datePickerParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+    And ".tui-numericRatingScaleParticipantPrint" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+
+    # Some components reuse their participant form components as the print component
+    And ".tui-staticContentElementParticipantForm" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+    And ".tui-multiChoiceSingleParticipantForm" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+    And ".tui-multiChoiceMultiParticipantForm" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
+    And ".tui-customRatingScaleParticipantForm" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
 
     # Instead response version of the question element should be shown
     # ...FormResponseDisplay for most components and ...HtmlFormResponseDisplay for long text
@@ -149,6 +162,9 @@ Feature: Print view of a single-section user activity
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
+    And I should see "B"
+    And I should see "C"
+    And I should see "A (score: 1)"
 
     # Check manager's view (response only, can't see other's responses)
     When I am on homepage
@@ -162,7 +178,12 @@ Feature: Print view of a single-section user activity
     # Empty print components should be displayed.
     And I should see perform "short text" question "Short text question" is unanswered in print view
     And I should see perform "long text" question "Long text question" is unanswered in print view
-    And I should see perform "Date picker" question "Date picker question" is unanswered in print view
+    And I should see perform "date picker" question "Date picker question" is unanswered in print view
+    And I should see perform "multi choice single" question "Multi choice multi question" is unanswered in print view
+    And I should see perform "multi choice multi" question "Multi choice single question" is unanswered in print view
+    And I should see perform "custom rating scale" question "Custom rating scale question" is unanswered in print view
+    And I should see perform "numeric rating scale" question "Numeric rating scale question" is unanswered in print view
+
     And I should not see "Appraiser Four"
 
     # Check appraiser's view (view only)
@@ -179,6 +200,12 @@ Feature: Print view of a single-section user activity
     And I should see "Manager response"
     And I should see "John One"
     And I should see "No response submitted"
+    # Multi - single
+    And I should see "B"
+    # Multi - multi
+    And I should see "C"
+    # Custom rating
+    And I should see "A (score: 1)"
 
   Scenario: Print view for single section with user having multiple relationships
     # Add a response as the subject.

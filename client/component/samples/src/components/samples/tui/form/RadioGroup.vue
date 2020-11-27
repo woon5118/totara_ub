@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-testArrow">
+  <div>
     A group of radio buttons
 
     <SamplesExample>

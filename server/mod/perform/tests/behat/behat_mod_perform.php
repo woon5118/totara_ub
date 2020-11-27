@@ -57,12 +57,12 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR = '.tui-performRequiredOptionalIndicator--required';
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'input';
     public const LONG_TEXT_RESPONSE_LOCATOR = 'textarea';
-    public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
     public const DATE_PICKER_RESPONSE_LOCATOR = '.tui-dateSelector';
-    public const MULTI_CHOICE_MULTI_RESPONSE_LOCATOR = 'input';
-    public const MULTI_CHOICE_SINGLE_RESPONSE_LOCATOR = 'input';
-    public const CUSTOM_RATING_SCALE_RESPONSE_LOCATOR = 'input';
-    public const NUMERIC_RATING_SCALE_RESPONSE_LOCATOR = 'input[type=number]';
+    public const MULTI_CHOICE_MULTI_RESPONSE_LOCATOR = '.tui-checkboxGroup';
+    public const MULTI_CHOICE_SINGLE_RESPONSE_LOCATOR = '.tui-radioGroup';
+    public const CUSTOM_RATING_SCALE_RESPONSE_LOCATOR = '.tui-radioGroup';
+    public const NUMERIC_RATING_SCALE_RANGE_RESPONSE_LOCATOR = 'input[type=range]';
+    public const NUMERIC_RATING_SCALE_NUMBER_RESPONSE_LOCATOR = 'input[type=number]';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses .tui-formLabel';
     public const TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR = '.tui-otherParticipantResponses__anonymousResponse-participant';
@@ -212,6 +212,10 @@ class behat_mod_perform extends behat_base {
             }
         }
     }
+
+    /**
+
+     */
 
     /**
      * @Then /^activity section "(?P<section_number>\d+)" should exist$/
@@ -474,24 +478,48 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Then /^I should see perform "([^"]*)" question "([^"]*)" is answered with "([^"]*)"$/
-     * @param $element_type
-     * @param $question_text
-     * @param $expected_answer_text
-     * @throws ExpectationException
+     * @Then /^I should see perform "([^"]*)" question "([^"]*)" is answered with "([^"]*)"(| in print view)$/
+     * @param string $element_type
+     * @param string $question_text
+     * @param string $expected_answer_text
+     * @param string $in_print_view
      */
     public function i_should_see_perform_question_is_answered_with(
         string $element_type,
         string $question_text,
-        string $expected_answer_text
+        string $expected_answer_text,
+        string $in_print_view = ''
     ): void {
         $this->wait_for_pending_js();
 
-        $response = $this->find_question_response($element_type, $question_text);
+        $response = $this->find_question_response($element_type, $question_text, $in_print_view === ' in print view');
 
-        $actual_answer_text = trim($response->getText());
+        switch ($element_type) {
+            case 'multi choice multi':
+            case 'multi choice single':
+            case 'custom rating scale':
+                $label_to_check = null;
+                foreach ($response->findAll('css', 'input') as $input) {
+                    if ($input->isChecked()) {
+                        $label_to_check = $input->getParent()->find('css', 'label');
+                        break;
+                    }
+                }
 
-        if ($expected_answer_text !== $actual_answer_text) {
+                if ($label_to_check !== null) {
+                    $actual_answer_text = $label_to_check->getText();
+                } else {
+                    $this->fail("No selected option found for '{$element_type}' question");
+                }
+                break;
+            case 'numeric rating scale':
+                $actual_answer_text = $response->getValue();
+                break;
+            default:
+                $actual_answer_text = $response->getText();
+        }
+
+        if ($expected_answer_text !== trim($actual_answer_text)) {
             throw new ExpectationException(
                 "Expected answer to be \"{$expected_answer_text}\"  found \"{$actual_answer_text}\"",
                 $this->getSession()
@@ -701,27 +729,37 @@ class behat_mod_perform extends behat_base {
 
         $this->wait_for_pending_js();
 
+        // Please not setting the value on the actual range (using setValue()), does not work.
+        if ($element_type === 'numeric rating scale') {
+            $element_type .= ':number';
+        }
+
         $response = $this->find_question_response($element_type, $question_text);
+
+        /** @var behat_totara_tui $behat_totara_tui */
+        $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
 
         switch ($element_type) {
             case 'date picker':
-                /** @var behat_totara_tui $behat_totara_tui */
-                $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
                 $name = $response->getAttribute('name');
                 $behat_totara_tui->i_set_the_tui_date_selector_to($name, $new_answer);
                 break;
             case 'multi choice single':
             case 'custom rating scale':
-                /** @var behat_totara_tui $behat_totara_tui */
-                $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
-                $name = $response->getAttribute('name');
-                $behat_totara_tui->i_click_the_tui_radio_in_the($new_answer, $name);
-                break;
             case 'multi choice multi':
-                /** @var behat_totara_tui $behat_totara_tui */
-                $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
-                $name = $response->getAttribute('name');
-                $behat_totara_tui->i_click_the_tui_checkbox($name);
+                $element_to_click = null;
+                foreach ($response->findAll('css', 'label') as $label) {
+                    if (trim($label->getText()) === $new_answer) {
+                        $element_to_click = $label;
+                        break;
+                    }
+                }
+
+                if ($element_to_click !== null) {
+                    $element_to_click->click();
+                } else {
+                    $this->fail("No '{$new_answer}' option found for '{$element_type}' question");
+                }
                 break;
             default:
                 $response->setValue($new_answer);
@@ -989,8 +1027,14 @@ class behat_mod_perform extends behat_base {
         $this->find('css', self::SCHEDULE_SAVE_LOCATOR)->click();
     }
 
-    private function find_question_response(string $element_type, string $question_text) {
-        $question = $this->find_question_from_text($question_text);
+    /**
+     * @param string $element_type
+     * @param string $question_text
+     * @param bool $is_print
+     * @return NodeElement
+     */
+    private function find_question_response(string $element_type, string $question_text, bool $is_print = false): NodeElement {
+        $question = $this->find_question_from_text($question_text, $is_print);
 
         $response_locator = $this->get_response_element_response_locator($element_type);
 
@@ -1015,7 +1059,8 @@ class behat_mod_perform extends behat_base {
             'multi choice multi' => self::MULTI_CHOICE_MULTI_RESPONSE_LOCATOR,
             'multi choice single' => self::MULTI_CHOICE_SINGLE_RESPONSE_LOCATOR,
             'custom rating scale' => self::CUSTOM_RATING_SCALE_RESPONSE_LOCATOR,
-            'numeric rating scale' => self::NUMERIC_RATING_SCALE_RESPONSE_LOCATOR,
+            'numeric rating scale' => self::NUMERIC_RATING_SCALE_RANGE_RESPONSE_LOCATOR,
+            'numeric rating scale:number' => self::NUMERIC_RATING_SCALE_NUMBER_RESPONSE_LOCATOR,
         ];
 
         $locator =  $map[$element_type] ?? null;

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-testArrow">
+  <div>
     A stand-alone radio buttons, to group radios together use the radio group
     component
 

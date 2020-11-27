@@ -12,12 +12,12 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @author Jaron Steenson <jaron.steenson@totaralearning.com>
   @module samples
 -->
 
 <template>
-  <div class="tui-testArrow">
+  <div>
     A series of simple notepad style lines for printing unfilled text inputs and
     areas.
 

@@ -16,7 +16,7 @@
   @package performelement_numeric_rating_scale
 -->
 <template>
-  <div class="tui-numericRatingScalePrint">
+  <div class="tui-numericRatingScaleParticipantPrint">
     <Range
       :value="data"
       :no-thumb="!hasBeenAnswered"
@@ -28,13 +28,13 @@
 
     <div
       v-if="hasBeenAnswered"
-      class="tui-numericRatingScalePrint__formattedResponse"
+      class="tui-numericRatingScaleParticipantPrint__formattedResponse"
     >
       {{ formattedResponse }}
     </div>
     <NotepadLines
       v-else
-      class="tui-numericRatingScalePrint__notepadLines"
+      class="tui-numericRatingScaleParticipantPrint__notepadLines"
       :char-length="10"
     />
   </div>
@@ -104,7 +104,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-numericRatingScalePrint {
+.tui-numericRatingScaleParticipantPrint {
   &__formattedResponse {
     margin-top: var(--gap-8);
   }
