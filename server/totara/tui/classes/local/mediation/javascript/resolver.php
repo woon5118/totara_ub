@@ -136,8 +136,8 @@ final class resolver extends \totara_tui\local\mediation\resolver {
     private function get_theme_sha_for_etag_comparison() {
         $chain = $this->get_theme_config()->get_tui_theme_chain();
         $shas = [];
-        foreach ($chain as $component) {
-            $file = bundle::get_bundle_js_file($component);
+        foreach ($chain as $theme) {
+            $file = bundle::get_bundle_js_file('theme_' . $theme);
             if ($file && file_exists($file)) {
                 $shas[] = sha1_file($file);
             }
