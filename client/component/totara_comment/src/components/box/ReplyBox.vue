@@ -72,6 +72,7 @@
           :show-reply-button-text="showReplyButtonText"
           :show-like-button-text="showLikeButtonText"
           :inline-head="replyHeadInline"
+          :editor="editor"
           class="tui-commentReplyBox__reply"
           :class="{
             'tui-commentReplyBox__reply--large': isLarge,
@@ -91,6 +92,7 @@
         ref="reply-form"
         :comment-id="commentId"
         :size="size"
+        :editor="editor"
         :reply-to="innerReplyTo"
         class="tui-commentReplyBox__replyForm"
         @cancel="$emit('update-show-reply-form', false)"
@@ -173,6 +175,19 @@ export default {
     showReplyButtonText: Boolean,
     replyTo: null,
     replyHeadInline: Boolean,
+    /**
+     * Editor setting, do not modify this object.
+     */
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          compact: true,
+          variant: undefined,
+        };
+      },
+    },
   },
 
   apollo: {

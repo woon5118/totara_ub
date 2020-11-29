@@ -108,7 +108,9 @@
       <SidePanelCommentBox
         component="totara_playlist"
         area="comment"
+        editor-variant="totara_playlist-comment"
         :instance-id="playlist.id"
+        :editor-context-id="playlist.contextid"
         class="tui-playlistSidePanel__commentBox"
       />
     </template>

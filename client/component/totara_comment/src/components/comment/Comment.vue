@@ -48,6 +48,7 @@
       :on-edit="showForm.comment"
       :is-reply="false"
       :size="size"
+      :editor="editor"
       @cancel-editing="showForm.comment = false"
       @update-item="updateComment"
     />
@@ -85,6 +86,7 @@
       :show-reply-button-text="showReplyButtonText"
       :reply-to="replyTo"
       :reply-head-inline="inlineHead"
+      :editor="editor"
       class="tui-comment__replyBox"
       @update-show-reply-form="showForm.reply = $event"
       @create-reply="$emit('add-reply', commentId)"
@@ -229,6 +231,21 @@ export default {
     deleted: {
       type: Boolean,
       required: true,
+    },
+
+    /**
+     * Editor setting, do not modify this object.
+     */
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          compact: true,
+          variant: undefined,
+          contextId: undefined,
+        };
+      },
     },
 
     showLikeButtonText: Boolean,

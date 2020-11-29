@@ -37,5 +37,6 @@ mutation container_workspace_update_discussion_content(
     }
     edited
     comment_cursor
+    workspace_context_id
   }
 }

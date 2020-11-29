@@ -2,6 +2,16 @@ This files describes API changes in /client/component/totara_playlist,
 information provided here is intended especially for developers.
 
 === 13.3 ===
+* Updates in PlaylistForm.vue:
+  * Template changes
+    * Replaced props "component" and "area" with "usage-identifier" for component editor_weka Weka.vue
+    * Added props "variant" and "compact" to component "editor_weka" Weka.vue
+* Updated PlaylistSidePanel.vue to add prop "editor-variant" and "editor-context-id" to component totara_comment SidePanelCommetnBox.vue
+  * Template changes
+* Updates in PlaylistSummary.vue:
+  * Template changes
+    * Replaced props "component" and "area" with "usage-identifier" for component editor_weka Weka.vue
+    * Added props "variant" and "compact" to component editor_weka Weka.vue
 * Updated PlaylistTitleForm.vue to pass through optional prop "focusInput" to tui InputText.vue
   * Template changes
 * Updated HeaderBox.vue to pass variable to totara_engage InlineEditing prop "focus-button"

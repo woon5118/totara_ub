@@ -18,23 +18,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package editor_weka
+ * @package core
  */
-defined('MOODLE_INTERNAL') || die();
+namespace core\editor\abstraction;
 
-use editor_weka\config\factory;
-
-class editor_weka_get_config_testcase extends advanced_testcase {
+/**
+ * An abstraction of variant that is used the set the editor's behaviour.
+ */
+interface variant {
     /**
-     * Test to assure that our cache is able to be constructed.
-     * @return void
+     * Returning a metadata for extra options.
+     * @return array
      */
-    public function test_get_empty_config(): void {
-        $factory = new factory();
+    public function get_additional_options(): array;
 
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage("Cannot find the configuration of area 'something_that_is_not_existing'");
+    /**
+     * Returning a context's id of which it is used to construct the variant.
+     * @return int
+     */
+    public function get_context_id(): int;
 
-        $factory->get_configuration('editor_weka', 'something_that_is_not_existing');
-    }
+    /**
+     * Returning a variant name of which it is used to construct the variant.
+     * @return string
+     */
+    public function get_variant_name(): string;
+
+    /**
+     * @param string $variant_name
+     * @param int    $context_id
+     * @return variant
+     */
+    public static function create(string $variant_name, int $context_id): variant;
 }

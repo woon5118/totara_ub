@@ -21,8 +21,11 @@
     <Weka
       v-if="draftId && showEditor"
       v-model="content"
-      component="editor_weka"
-      area="default"
+      :usage-identifier="{
+        component: 'editor_weka',
+        area: 'default',
+      }"
+      variant="standard"
       :file-item-id="draftId"
     />
     <hr />

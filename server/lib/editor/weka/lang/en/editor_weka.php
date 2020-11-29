@@ -24,7 +24,6 @@
 $string['add_image_alt_text'] = 'Add alt text';
 $string['attachment'] = 'Attachment';
 $string['actions_menu_for'] = 'Actions menu for {$a}';
-$string['cachedef_editorconfig'] = 'Editor configuration cache';
 $string['displayas'] = 'Display as';
 $string['display_as_attachment'] = 'Display as attachment';
 $string['display_as_card'] = 'Display as card';
@@ -62,3 +61,6 @@ $string['view_search_results'] = 'View search results';
 $string['edit_link'] = 'Edit link';
 $string['go_to_link'] = 'Go to link';
 $string['insert_link'] = 'Insert link';
+
+// Deprecated since Totara 13.3
+$string['cachedef_editorconfig'] = 'Editor configuration cache';

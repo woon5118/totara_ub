@@ -74,6 +74,7 @@ type totara_engage_resource {
   user: core_user!
   access: totara_engage_access!
   time: String!
+  context_id: Int!
 }
 
 type totara_engage_card {

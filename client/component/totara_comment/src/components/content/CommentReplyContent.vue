@@ -32,6 +32,7 @@
       v-else
       :item-id="itemId"
       :size="size"
+      :editor="editor"
       class="tui-commentReplyContent__editForm"
       @cancel="$emit('cancel-editing')"
       @update-item="$emit('update-item', $event)"
@@ -85,6 +86,18 @@ export default {
       },
       validator(prop) {
         return isValid(prop);
+      },
+    },
+
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          compact: true,
+          variant: undefined,
+          contextId: undefined,
+        };
       },
     },
   },

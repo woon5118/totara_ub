@@ -54,7 +54,7 @@ final class users_by_pattern implements query_resolver, has_middleware {
             $context = context::instance_by_id($args['contextid']);
         }
 
-        if (!$ec->has_relevant_context()) {
+        if (!$ec->has_relevant_context() && CONTEXT_SYSTEM != $context->contextlevel) {
             $ec->set_relevant_context($context);
         }
 

@@ -28,16 +28,20 @@
        -->
       <div class="tui-commentForm__input">
         <Weka
-          v-if="!$apollo.queries.editorOption.loading && draftId"
+          v-if="draftId"
           :key="editorKey"
           v-model="content"
           :data-key="editorKey"
-          area="comment"
-          component="totara_comment"
-          :options="editorOption"
+          :usage-identifier="{
+            component: 'totara_comment',
+            area: 'comment',
+          }"
+          :variant="editor.variant"
+          :compact="editor.compact"
           :file-item-id="draftId"
           :placeholder="$str('entercomment', 'totara_comment')"
           :data-file-item-id="draftId"
+          :context-id="editor.contextId"
           class="tui-commentForm__editor"
           @ready="$emit('form-ready')"
         />
@@ -70,7 +74,6 @@ import ResponseBox from 'totara_comment/components/form/box/ResponseBox';
 import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
 
 // GraphQL queries
-import getEditorWeka from 'totara_comment/graphql/get_editor_weka';
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';
 
 export default {
@@ -94,20 +97,34 @@ export default {
         return isValid(prop);
       },
     },
-
-    component: {
-      type: String,
-      required: true,
-    },
-
-    area: {
-      type: String,
-      required: true,
-    },
-
-    instanceId: {
-      type: [String, Number],
-      required: true,
+    /**
+     * This prop had been deprecated and no longer used.
+     * @deprecated since Totara 13.3
+     */
+    component: String,
+    /**
+     * This prop had been deprecated and no longer used.
+     * @deprecated since Totara 13.3
+     */
+    area: String,
+    /**
+     * This prop had been deprecated and no longer used.
+     * @deprecated since Totara 13.3
+     */
+    instanceId: [String, Number],
+    /**
+     * Editor setting, do not modify this object.
+     */
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          compact: true,
+          variant: undefined,
+          contextId: undefined,
+        };
+      },
     },
 
     submitting: Boolean,
@@ -119,38 +136,13 @@ export default {
     },
   },
 
-  apollo: {
-    editorOption: {
-      query: getEditorWeka,
-      variables() {
-        return {
-          component: this.component,
-          area: this.area,
-          comment_area: 'comment',
-          instance_id: this.instanceId,
-          draft_id: this.draftId,
-        };
-      },
-      skip() {
-        return this.draftId === null;
-      },
-      update({ editor }) {
-        return editor;
-      },
-    },
-
-    draftId: {
-      query: fileDraftId,
-      fetchPolicy: 'no-cache',
-      update({ item_id }) {
-        return item_id;
-      },
-    },
-  },
-
   data() {
     return {
       editorKey: `totara_comment_editor_weka_${uniqueId()}`,
+      /**
+       * This data attribute had been deprecated and no longer used.
+       * @deprecated since Totara 13.3
+       */
       editorOption: null,
       draftId: null,
       content: WekaValue.empty(),
@@ -163,7 +155,33 @@ export default {
     },
   },
 
+  watch: {
+    editorOption() {
+      console.warn(
+        "The attribute 'editorOption' had been deprecated, please do not use it"
+      );
+    },
+  },
+
   async mounted() {
+    if (this.component) {
+      console.warn(
+        "The prop 'component' had been deprecated and no longer used, please update all call"
+      );
+    }
+
+    if (this.area) {
+      console.warn(
+        "The prop 'area' had been deprecated and no longer used, please update all call"
+      );
+    }
+
+    if (this.instanceId) {
+      console.warn(
+        "The prop 'instanceId' had been deprecated and no longer used, please update all call"
+      );
+    }
+
     await this.$_loadDraftId();
   },
 
@@ -192,7 +210,6 @@ export default {
       this.content = WekaValue.empty();
 
       // Changing the key so that the editor can be re-constructed
-      await this.$apollo.queries.editorOption.refetch();
       await this.$_loadDraftId();
 
       this.editorKey = `totara_comment_editor_weka_${uniqueId()}`;

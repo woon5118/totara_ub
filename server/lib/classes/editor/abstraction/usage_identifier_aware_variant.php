@@ -18,25 +18,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package container_workspace
+ * @package core
  */
-defined('MOODLE_INTERNAL') || die();
+namespace core\editor\abstraction;
 
-$editor = [
-    'description' => [
-        'showtoolbar' => false,
-        'includeextensions' => [
-            '\editor_weka\extension\hashtag'
-        ]
-    ],
+use totara_core\identifier\component_area;
 
-    'discussion' => [
-        'includeextensions' => [
-            '\editor_weka\extension\hashtag',
-            '\editor_weka\extension\emoji',
-            '\editor_weka\extension\attachment',
-            '\editor_weka\extension\media',
-            '\editor_weka\extension\mention'
-        ],
-    ]
-];
+/**
+ * This interface is to help the process to inject the information
+ * related to the usage identifier to the instance itself and can pass it down
+ * to a lower additional options of variant.
+ */
+interface usage_identifier_aware_variant {
+    /**
+     * @param component_area $component_area
+     * @return void
+     */
+    public function set_component_area(component_area $component_area): void;
+
+    /**
+     * @return component_area
+     */
+    public function get_component_area(): component_area;
+
+    /**
+     * @param int $instance_id
+     * @return void
+     */
+    public function set_instance_id(int $instance_id): void;
+
+    /**
+     * @return int|null
+     */
+    public function get_instance_id(): ?int;
+}

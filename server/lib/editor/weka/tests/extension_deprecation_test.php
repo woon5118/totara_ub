@@ -22,7 +22,6 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use editor_weka\config\config_item;
 use editor_weka\extension\extension;
 
 /**
@@ -104,7 +103,7 @@ class editor_weka_extension_deprecation_testcase extends advanced_testcase {
         $area_value = $this->extended_class->run_pass_area('area_value');
 
         self::assertNotEquals('area_value', $area_value);
-        self::assertEquals(config_item::AREA_DEFAULT, $area_value);
+        self::assertEquals('default', $area_value);
 
         $this->assertDebuggingCalled([
             "The property 'area' had been deprecated and there is no alternative. Please update all calls.",

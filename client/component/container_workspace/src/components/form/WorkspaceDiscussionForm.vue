@@ -31,10 +31,13 @@
         :id="id"
         :key="editorKey"
         v-model="formContent"
-        component="container_workspace"
-        area="discussion"
+        variant="container_workspace-discussion"
+        :usage-identifier="{
+          component: 'container_workspace',
+          area: 'discussion',
+          instanceId: discussionId,
+        }"
         :file-item-id="draftId"
-        :instance-id="discussionId"
         :context-id="workspaceContextId"
         :placeholder="$str('start_discussion', 'container_workspace')"
         class="tui-workspaceDiscussionForm__editor"

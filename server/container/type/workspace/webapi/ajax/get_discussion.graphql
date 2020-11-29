@@ -15,6 +15,7 @@ query container_workspace_get_discussion($id: param_integer!) {
     }
     total_comments
     total_reactions
+    workspace_context_id
     discussion_interactor {
       __typename
       discussion_id

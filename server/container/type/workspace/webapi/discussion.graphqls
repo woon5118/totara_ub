@@ -56,6 +56,10 @@ type container_workspace_discussion {
   A magic value for content's format. Normally it would be FORMAT_JSON_EDITOR which is 42.
   """
   content_format: Int!
+  """
+  The context's id of a discussion.
+  """
+  workspace_context_id: Int!
 }
 
 """

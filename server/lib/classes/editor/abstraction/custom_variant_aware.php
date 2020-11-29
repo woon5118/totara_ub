@@ -17,25 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
- * @package performelement_static_content
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package core
  */
+namespace core\editor\abstraction;
 
 /**
- * Declare extensions that should be available in the editor for
- * the specific component area.
- * @see \editor_weka\config\factory
+ * This interface is to tell the process to stop on validating the standard
+ * variant names and let it through.
+ *
+ * Only implement this interface when you really want to support custom variant name.
+ * This interface was meant to support backward compatible for old version of weka editor.
+ *
+ * Note that this interface should only be used for variant.
  */
-$editor = [
-    // Area key
-    'content' => [
-        // Extensions to include
-        'includeextensions' => [
-            '\editor_weka\extension\attachment',
-            '\editor_weka\extension\emoji',
-            '\editor_weka\extension\list_extension',
-            '\editor_weka\extension\mention',
-            '\editor_weka\extension\media'
-        ],
-    ],
-];
+interface custom_variant_aware {
+}

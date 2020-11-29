@@ -1,6 +1,18 @@
 This files describes API changes in /totara/comment/*.
 The information here is intended only for developers.
 
+=== 13.3 ===
+
+--- Update to GraphQL ---
+* The query "totara_comment_editor_weka" had been deprecated and no longer used. The behaviour had also been changed,
+  please use query "editor_weka_editor" instead
+* The query "totara_comment_editor_weka_from_id" had been deprecated and no longer used. The behaviour had also been changed,
+  please use query "editor_weka_editor" instead
+
+--- Update to API ---
+* totara_comment\webapi\editor_weka_helper::create_mask_editor had been deprecated and longer used.
+  The behaviour of this function had also been changed. Please update all calls.
+
 === 13.2 ===
 
 --- Update to GraphQL ---

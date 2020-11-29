@@ -35,6 +35,7 @@
       :with-border="withBorder"
       :first-cursor="firstCursor"
       :comment-inline-head="commentInlineHead"
+      :editor="editor"
       class="tui-commentBox__comments"
       @update-submitting="$emit('update-submitting', $event)"
       @fetch-comments="$emit('fetch-comments', $event)"
@@ -46,10 +47,8 @@
       <CommentForm
         v-show="!$apollo.queries.totalComments.loading && showCommentForm"
         ref="comment-form"
-        :area="area"
-        :component="component"
-        :instance-id="instanceId"
         :size="size"
+        :editor="editor"
         :submit-button-text="submitFormButtonText"
         class="tui-commentBox__commentForm"
         :class="{
@@ -142,6 +141,20 @@ export default {
     instanceId: {
       type: [String, Number],
       required: true,
+    },
+    /**
+     * Editor setting, do not modify this object.
+     */
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          compact: true,
+          variant: undefined,
+          contextId: undefined,
+        };
+      },
     },
 
     submitting: Boolean,

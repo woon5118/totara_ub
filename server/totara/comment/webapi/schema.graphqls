@@ -149,12 +149,16 @@ extend type Query {
   the files are moved to draft.
   """
   totara_comment_draft_item(id: param_integer!): totara_comment_draft_item!
+
   """
   Since we are allowing the comment's editor to be flexible where it is being used, and the editor is only allow to
   be locked down to the component it is used. Which in this case, the editor is locked down to the totara_comment
   component. And totara_comment component is being used in different component - therefore we are going to fetch
   the extensions for editor weka that the parent component want the editor to be. Then we will mask it with
   the totara_comment component.
+
+  This query had been deprecated and the behaviour of the query had been changed.
+  Please use query editor_weka_editor instead.
   """
   totara_comment_editor_weka(
     """
@@ -187,6 +191,9 @@ extend type Query {
   """
   This query will behave similar to query totara_comment_editor_weka. However, this query is fetching based
   on either comment's id or reply's id as they are from the same table.
+
+  This query had been deprecated and the behaviour had been changed.
+  Please use query editor_weka_editor instead.
   """
   totara_comment_editor_weka_from_id(
     """

@@ -48,6 +48,60 @@ class extension_loader {
     }
 
     /**
+     * Returning a built-up metadata of extensions and potentially extension options
+     * base on the variant's name.
+     *
+     * @param string $name
+     * @return array
+     */
+    public static function get_extensions_for_variant(string $name): array {
+        $definitions = variant_definition::get_definitions();
+        $metadata = [
+            'extensions' => []
+        ];
+
+        if (!array_key_exists($name, $definitions)) {
+            debugging("The variant name= '{$name}' is not supported", DEBUG_DEVELOPER);
+            $metadata['extensions'] = static::get_all_extension_classes();
+
+            return $metadata;
+        }
+
+        $definition = $definitions[$name];
+        $exclude_extensions = [];
+
+        if (array_key_exists('exclude_extensions', $definition)) {
+            $exclude_extensions = $definition['exclude_extensions'];
+        }
+
+        $metadata['extensions'] = static::get_all_extension_classes_exclude($exclude_extensions);
+        return $metadata;
+    }
+
+    /**
+     * @param array $exclude_classes
+     * @return array
+     */
+    private static function get_all_extension_classes_exclude(array $exclude_classes) {
+        $all_extensions = static::get_all_extension_classes();
+        $exclude_classes = array_map(
+            function (string $extension_class): string {
+                return ltrim($extension_class, '\\');
+            },
+
+            $exclude_classes
+        );
+
+        return array_filter(
+            $all_extensions,
+            function (string $extension_class) use ($exclude_classes): bool {
+                $extension_class = ltrim($extension_class, '\\');
+                return !in_array($extension_class, $exclude_classes);
+            }
+        );
+    }
+
+    /**
      * This is to return all the extension classes that are introduced as a
      * part of the weka editor.
      *

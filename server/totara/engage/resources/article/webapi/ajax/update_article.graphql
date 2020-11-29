@@ -28,6 +28,7 @@ mutation engage_article_update_article(
       name(format: PLAIN)
       access
       time
+      context_id
       user {
         __typename
         id

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package container_workspace
  */
 namespace container_workspace\formatter\discussion;
@@ -26,8 +26,11 @@ use cache;
 use container_workspace\workspace;
 use totara_engage\formatter\field\date_field_formatter;
 use container_workspace\discussion\discussion;
-use core\webapi\formatter\formatter;
+use container_workspace\workspace;
 use core\webapi\formatter\field\text_field_formatter;
+use core\webapi\formatter\formatter;
+use stdClass;
+use totara_engage\formatter\field\date_field_formatter;
 
 /**
  * Class discussion_formatter
@@ -42,7 +45,7 @@ final class discussion_formatter extends formatter {
     public function __construct(discussion $discussion) {
         $workspace_id = $discussion->get_workspace_id();
 
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->id = $discussion->get_id();
         $record->workspace_id = $workspace_id;
         $record->content = $discussion->get_content();
@@ -54,7 +57,9 @@ final class discussion_formatter extends formatter {
         $record->deleted = $discussion->is_soft_deleted();
         $record->reason_deleted = $discussion->get_reason_deleted();
 
-        $context = \context_course::instance($workspace_id);
+        $context = $discussion->get_context();
+        $record->workspace_context_id = $context->id;
+
         parent::__construct($record, $context);
     }
 
@@ -100,6 +105,7 @@ final class discussion_formatter extends formatter {
             'total_reactions' => null,
             'total_comments' => null,
             'content_format' => null,
+            'workspace_context_id' => null,
             'time_description' => function (int $time_created, date_field_formatter $formatter) use ($that): string {
                 if (null !== $that->object->time_modified && 0 !== $that->object->time_modified) {
                     $formatter->set_timemodified($that->object->time_modified);

@@ -27,9 +27,11 @@ describe('totara_comment/components/form/CommentForm.vue', () => {
   beforeAll(() => {
     wrapper = shallowMount(CommentForm, {
       propsData: {
-        component: 'totara_comment',
-        area: 'comment',
-        instanceId: 42,
+        usageIdentifier: {
+          component: 'totara_comment',
+          area: 'comment',
+          instanceId: 42,
+        },
       },
 
       data() {

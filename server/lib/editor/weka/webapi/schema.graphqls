@@ -10,8 +10,27 @@ type editor_weka_extension {
 
 type editor_weka_editor {
   extensions(
+    """
+    The component where the editor weka is  used.
+    Deprecated in favour of usage_identifier.
+    """
     component: param_component
+    """
+    The specific area within the component where the editor weka is used.
+    Deprecated in favour of usage_identifier.
+    """
     area: param_area
+    """
+    Optional parameter to get the extensions. When the argument is passed, then it will
+    superceed the component/area to get the list of extension. Otherwise, by default the
+    list of extensions can be found by component/area
+    """
+    variant_name: param_alphaext
+    """
+    The parameter to pass down to the variant, as it can be treated as
+    extra data.
+    """
+    usage_identifier: core_editor_usage_identifier
   ): [editor_weka_extension!]!
   """
   To tell whether we are displaying toolbar or not.
@@ -22,6 +41,9 @@ type editor_weka_editor {
     # This field is deprecated, and no longer needed
     area: param_area
   ): Boolean!
+    @deprecated(
+      reason: "The showtoolbar field had been deprecated and no longer needed"
+    )
   """
   The upload repository data
   """
@@ -95,9 +117,23 @@ enum editor_weka_media_type {
 
 extend type Query {
   editor_weka_editor(
-    component: param_component!
-    area: param_area!
+    """
+    Deprecated - in favour of parameter usage_identifier
+    """
+    component: param_component
+    """
+    Deprecated - in favour of parameter usage_identifier
+    """
+    area: param_area
+    """
+    Deprecated - in favour of parameter usage_identifier
+    """
     instance_id: param_integer
+    """
+    To identifier where the editor is being used. The input includes the fields
+    component, area as required fields and optional for instance_id.
+    """
+    usage_identifier: core_editor_usage_identifier
     """
     Provide an optional context_id because sometimes instance_id is set to null, which means that the weka editor
     can be used to create a new instance. Hence, context_id will be a fallback option.

@@ -11,12 +11,12 @@ exports[`totara_comment/components/form/ReplyForm.vue Checks snapshot 1`] = `
     <!---->
      
     <weka-stub
-      area="reply"
       class="tui-commentReplyForm__editor"
-      component="totara_comment"
+      compact="true"
       data-file-item-id="100"
       fileitemid="100"
       placeholder="enterreply-totara_comment"
+      usageidentifier="[object Object]"
       value="[object Object]"
     />
      

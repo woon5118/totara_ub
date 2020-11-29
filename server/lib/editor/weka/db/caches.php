@@ -22,6 +22,7 @@
  */
 
 $definitions = [
+    // This cache definition is deprecated, please do not use.
     'editorconfig' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,

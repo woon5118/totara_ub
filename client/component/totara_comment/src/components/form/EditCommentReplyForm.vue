@@ -23,13 +23,17 @@
         :value="content"
       />
       <Weka
-        v-if="!$apollo.queries.editorOption.loading"
+        v-if="!$apollo.queries.item.loading"
         v-model="content"
-        :area="item.comment_area.toLowerCase()"
-        :instance-id="itemId"
         :file-item-id="item.file_draft_id"
-        component="totara_comment"
-        :options="editorOption"
+        :usage-identifier="{
+          component: 'totara_comment',
+          area: commentArea,
+          instanceId: itemId,
+        }"
+        :compact="editor.compact"
+        :context-id="editor.contextId"
+        :variant="editor.variant"
         class="tui-editCommentReplyForm__editor"
       />
 
@@ -55,7 +59,6 @@ import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesW
 
 // GraphQL query
 import getDraftItem from 'totara_comment/graphql/get_draft_item';
-import getEditorWeka from 'totara_comment/graphql/get_editor_weka_from_id';
 
 export default {
   components: {
@@ -83,29 +86,6 @@ export default {
         return draftitem;
       },
     },
-
-    editorOption: {
-      query: getEditorWeka,
-      variables() {
-        return {
-          comment_area: this.item.comment_area.toLowerCase(),
-          id: this.itemId,
-          draft_id: this.item.file_draft_id,
-        };
-      },
-
-      update({ editor }) {
-        return editor;
-      },
-
-      skip() {
-        return (
-          !this.item ||
-          this.item.file_draft_id === null ||
-          this.$apollo.queries.item.loading
-        );
-      },
-    },
   },
 
   props: {
@@ -128,15 +108,54 @@ export default {
       required: true,
     },
 
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          contextId: undefined,
+          variant: undefined,
+          compact: true,
+        };
+      },
+    },
+
     submitting: Boolean,
   },
 
   data() {
     return {
+      /**
+       * This data attribute had been deprecated and no longer used.
+       * @deprecated since Totara 13.3
+       */
       editorOption: null,
       item: {},
       content: WekaValue.empty(),
     };
+  },
+
+  computed: {
+    /**
+     * Returning the comment's area either it is 'comment' or 'reply'
+     * @return {String}
+     */
+    commentArea() {
+      if (!this.item.comment_area) {
+        // Default to comment
+        return 'comment';
+      }
+
+      return this.item.comment_area.toLowerCase();
+    },
+  },
+
+  watch: {
+    editorOption() {
+      console.warn(
+        "The data attribute 'editorOption' had been deprecated and no longer used"
+      );
+    },
   },
 
   methods: {

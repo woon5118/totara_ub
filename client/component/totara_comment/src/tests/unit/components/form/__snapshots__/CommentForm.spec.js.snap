@@ -3,6 +3,7 @@
 exports[`totara_comment/components/form/CommentForm.vue Checks snapshot 1`] = `
 <responsebox-stub
   class="tui-commentForm"
+  usageidentifier="[object Object]"
 >
   <form-stub
     class="tui-commentForm__form"
@@ -14,13 +15,13 @@ exports[`totara_comment/components/form/CommentForm.vue Checks snapshot 1`] = `
       class="tui-commentForm__input"
     >
       <weka-stub
-        area="comment"
         class="tui-commentForm__editor"
-        component="totara_comment"
+        compact="true"
         data-file-item-id="500"
         data-key="totara_comment_editor_weka_1"
         fileitemid="500"
         placeholder="entercomment-totara_comment"
+        usageidentifier="[object Object]"
         value="[object Object]"
       />
     </div>

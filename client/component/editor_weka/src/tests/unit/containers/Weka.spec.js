@@ -68,11 +68,23 @@ const EXTENSIONS = [
   },
 ];
 
-const factory = (option, instanceId) => {
+/**
+ *
+ * @param {Object} option
+ * @param {Number} instanceId
+ * @param {Boolean} compact
+ * @return {Wrapper<Vue>}
+ */
+const factory = (option, instanceId, compact) => {
   return shallowMount(Weka, {
     propsData: {
       options: option,
-      instanceId,
+      usageIdentifier: {
+        component: 'editor_weka',
+        area: 'default',
+        instanceId: instanceId,
+      },
+      compact: compact,
       ariaLabel: 'Weka label',
     },
     mocks: {
@@ -92,7 +104,7 @@ const factory = (option, instanceId) => {
 
 describe('editor_weka/components/Weka.vue', () => {
   it('toolbar is showing and render correctly', async () => {
-    const wrapper = factory({ showtoolbar: true, extensions: EXTENSIONS });
+    const wrapper = factory({ extensions: EXTENSIONS }, 42, false);
 
     // Since the editor would have to be mounted once all the elements within the component rendered, therefore,
     // this test should be waiting for that mounting event to be finished to run the assertion.
@@ -107,10 +119,7 @@ describe('editor_weka/components/Weka.vue', () => {
   });
 
   it('toolbar is hidden when showtoolbar is set to false no matter extension load or not', async () => {
-    const wrapper = factory(
-      { showtoolbar: false, extensions: EXTENSIONS },
-      null
-    );
+    const wrapper = factory({ extensions: EXTENSIONS }, null, true);
     wrapper.setData({ toolbarItems: [{ foo: 'bar' }] });
     await Vue.nextTick();
     expect(wrapper.find(Toolbar).exists()).toBeFalse();

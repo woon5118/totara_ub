@@ -1,6 +1,17 @@
 This files describes API changes in /client/component/editor_weka,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* Updates in Weka.vue:
+  * Deprecated optional prop "instanceId"
+  * Deprecated optional prop "component"
+  * Deprecated optional prop "area"
+  * Added new optional prop "compact"
+  * Added new optional prop "usageIdentifier"
+  * Added new optional prop "variantName"
+  * Data attribute "toolbarEnabled" had been deprecated in favour of prop "compact"
+
 === 13.2 ===
 
 * Added new optional prop "instanceId" for component User.vue

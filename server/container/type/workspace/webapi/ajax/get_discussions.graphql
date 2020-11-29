@@ -38,6 +38,7 @@ query container_workspace_get_discussions(
     }
     total_comments
     total_reactions
+    workspace_context_id
     discussion_interactor {
       __typename
       discussion_id

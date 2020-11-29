@@ -1,6 +1,20 @@
 This files describes API changes in /client/component/engage_article,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+* Updates in ArticleForm.vue:
+  * Template changes
+    * Replaced props "component" and "area" with "usage-identifier" for component editor_weka Weka.vue
+    * Added prop "variant" to component editor_weka Weka.vue
+
+* Updates in EditArticleContentForm.vue:
+  * Template changes
+    * Added prop "variant" to component editor_weka Weka.vue
+    * Replaced props "component", "area" and "instance-id" with "usage-identifier" for component editor_weka Weka.vue
+
+* Updated ArticleSidePanel.vue to add prop "editor-variant-name" and "editor-context-id" to component totara_comment SidePanelCommentBox.vue
+  * Template changes
+
 === 13.2 ===
 * Updated ArticleCard.vue to use a link here instead of in totara_engage BaseCard
     * Template & SCSS changes

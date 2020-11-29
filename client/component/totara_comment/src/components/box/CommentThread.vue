@@ -60,6 +60,7 @@
           :show-reply-button-text="showReplyButtonText"
           :inline-head="commentInlineHead"
           :can-view-author="comment.interactor.can_view_author"
+          :editor="editor"
           class="tui-commentThread__comment"
           :class="{
             'tui-commentThread__comment--large': isLarge,
@@ -129,6 +130,20 @@ export default {
     showReplyButtonText: Boolean,
     withBorder: Boolean,
     commentInlineHead: Boolean,
+    /**
+     * Editor setting, do not modify this object.
+     */
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          compact: true,
+          variant: undefined,
+          contextId: undefined,
+        };
+      },
+    },
   },
 
   apollo: {

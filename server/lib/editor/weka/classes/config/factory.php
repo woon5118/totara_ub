@@ -28,6 +28,7 @@ use core_component;
 
 /**
  * Config class for editor.
+ * @deprecated since Totara 13.3
  */
 final class factory {
     /**
@@ -40,6 +41,11 @@ final class factory {
      * editor_config constructor.
      */
     public function __construct() {
+        debugging(
+            "The class \\editor_weka\\config\\factory had been deprecated, please use \\editor_weka\\variant instead",
+            DEBUG_DEVELOPER
+        );
+
         $this->configuration = [];
     }
 

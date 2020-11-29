@@ -8,15 +8,14 @@ exports[`totara_comment/components/box/CommentBox.vue Checks snapshot 1`] = `
     area="comment"
     class="tui-commentBox__comments"
     component="totara_comment"
+    editor="[object Object]"
     instanceid="15"
     size="small"
   />
    
   <commentform-stub
-    area="comment"
     class="tui-commentBox__commentForm"
-    component="totara_comment"
-    instanceid="15"
+    editor="[object Object]"
     size="small"
     submitbuttontext="post-totara_comment"
   />

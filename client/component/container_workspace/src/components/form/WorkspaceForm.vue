@@ -50,10 +50,14 @@
                 :id="id"
                 v-model="description"
                 :aria-disabled="submitting"
-                :instance-id="workspaceId"
                 :context-id="contextId"
-                component="container_workspace"
-                area="description"
+                :compact="true"
+                :usage-identifier="{
+                  component: 'container_workspace',
+                  area: 'description',
+                  instanceId: workspaceId,
+                }"
+                variant="container_workspace-description"
                 @ready="editorReady = true"
               />
 

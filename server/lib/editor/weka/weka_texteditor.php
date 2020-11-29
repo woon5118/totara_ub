@@ -21,23 +21,20 @@
  * @package editor_weka
  */
 
+use core\editor\abstraction\context_aware_editor;
 use core\json_editor\helper\document_helper;
-use editor_weka\config\config_item;
 use editor_weka\config\factory;
 use editor_weka\extension\extension;
+use editor_weka\variant;
+use totara_core\identifier\component_area;
 use totara_tui\output\component;
 
-final class weka_texteditor extends texteditor {
+final class weka_texteditor extends texteditor implements context_aware_editor {
     /**
      * The context's id where this editor is used.
      * @var int
      */
-    private $contextid;
-
-    /**
-     * @var factory
-     */
-    private $factory;
+    private $context_id;
 
     /**
      * @var bool
@@ -46,31 +43,68 @@ final class weka_texteditor extends texteditor {
 
     /**
      * weka_texteditor constructor.
-     * @param factory|null $factory
+     * @param factory|null $factory - Deprecated
      */
     public function __construct(?factory $factory = null) {
-        if (null === $factory) {
-            $factory = new factory();
+        if (null !== $factory) {
+            debugging(
+                "The parameter '\$factory' had been deprecated and no longer used, please update all calls.",
+                DEBUG_DEVELOPER
+            );
         }
 
-        $this->contextid = null;
-        $this->factory = $factory;
+        $this->context_id = null;
         $this->show_toolbar = true;
     }
 
     /**
+     * This function had been deprecated, please use {@see weka_texteditor::set_context_id()} instead.
+     *
      * @param int $value
      * @return void
+     *
+     * @deprecated since Totara 13.3
      */
     public function set_contextid(int $value): void {
-        $this->contextid = $value;
+        debugging(
+            "The function \\weka_texteditor::set_contextid had been deprecated, " .
+            "please use \\weka_texteditor::set_context_id instead",
+            DEBUG_DEVELOPER
+        );
+
+        $this->set_context_id($value);
+    }
+
+    /**
+     * This function had been deprecated, please use {@see weka_texteditor::get_context_id()} instead.
+     *
+     * @return int|null
+     *
+     * @deprecated since Totara 13.3
+     */
+    public function get_contextid(): ?int {
+        debugging(
+            "The function \\weka_texteditor::get_contextid had been deprecated, " .
+            "please use \\weka_texteditor::get_context_id instead",
+            DEBUG_DEVELOPER
+        );
+
+        return $this->get_context_id();
+    }
+
+    /**
+     * @param int $context_id
+     * @return void
+     */
+    public function set_context_id(int $context_id): void {
+        $this->context_id = $context_id;
     }
 
     /**
      * @return int|null
      */
-    public function get_contextid(): ?int {
-        return $this->contextid;
+    public function get_context_id(): ?int {
+        return $this->context_id;
     }
 
     /**
@@ -102,49 +136,32 @@ final class weka_texteditor extends texteditor {
     }
 
     /**
-     * @param string|null $component
-     * @param string|null $area
-     *
-     * @return config_item
-     */
-    protected function get_config(?string $component = null, ?string $area = null): config_item {
-        if (empty($component)) {
-            $component = 'editor_weka';
-        }
-
-        if (empty($area)) {
-            $area = config_item::AREA_DEFAULT;
-        }
-
-        return $this->factory->get_configuration($component, $area);
-    }
-
-    /**
      * This function will try to invoke {@see extension::create()}
      *
      * @param string|null $component
      * @param string|null $area
      *
      * @return extension[]
+     * @deprecated since Totara 13.3
      */
     public function get_extensions(string $component = 'editor_weka', string $area = 'learn'): array {
-        $config = $this->get_config($component, $area);
-        $extension_classes = $config->get_extensions();
+        debugging(
+            "The function \\weka_texteditor::get_extensions had been deprecated, " .
+            "please use \\editor_weka\\variant::get_extensions instead",
+            DEBUG_DEVELOPER
+        );
 
-        $extensions = [];
-        $context_system_id = context_system::instance()->id;
+        $variant_name = "{$component}-{$area}";
 
-        foreach ($extension_classes as $extension_class) {
-            $options = [
-                'component' => $component,
-                'area' => $area,
-                'context_id' => $this->contextid ?? $context_system_id,
-            ];
-
-            $extensions[] = call_user_func_array([$extension_class, 'create'], [$options]);
+        $context_id = context_system::instance()->id;
+        if (!empty($this->context_id)) {
+            $context_id = $this->context_id;
         }
 
-        return $extensions;
+        $variant = variant::create($variant_name, $context_id);
+        $variant->set_component_area(new component_area($component, $area));
+
+        return $variant->get_extensions();
     }
 
     /**
@@ -189,10 +206,10 @@ final class weka_texteditor extends texteditor {
     public function use_editor($elementid, array $options = null, $fpoptions = null): void {
         global $PAGE;
 
-        if (null === $this->contextid) {
+        if (null === $this->context_id) {
             if (isset($options['context'])) {
                 $context = $options['context'];
-                $this->set_contextid($context->id);
+                $this->set_context_id($context->id);
             }
         }
 
@@ -281,7 +298,7 @@ final class weka_texteditor extends texteditor {
             DEBUG_DEVELOPER
         );
 
-        if (empty($this->contextid)) {
+        if (empty($this->context_id)) {
             // There is no chances to fetch the file without context.
             return [];
         }
@@ -290,7 +307,7 @@ final class weka_texteditor extends texteditor {
         $fs = get_file_storage();
 
         $files = $fs->get_area_files(
-            $this->contextid,
+            $this->context_id,
             $component,
             $area,
             $item_id
@@ -353,7 +370,7 @@ final class weka_texteditor extends texteditor {
             // Always shows the toolbar.
             'showtoolbar' => true,
             'file_item_id' => $options['item_id'] ?? null,
-            'context_id' => $this->contextid ?? context_system::instance()->id,
+            'context_id' => $this->context_id ?? context_system::instance()->id,
             'files' => [],
         ];
 
@@ -362,8 +379,11 @@ final class weka_texteditor extends texteditor {
 
         // Build up the extensions metadata for the editor. Note that the extension metadata has to match with the
         // type declared in the schema.graphqls for the editor's extension type.
-        $extensions = $this->get_extensions($component, $area);
+        $variant_name = "{$component}-{$area}";
+        $variant = variant::create($variant_name, $params['context_id']);
+        $variant->set_component_area(new component_area($component, $area));
 
+        $extensions = $variant->get_extensions();
         foreach ($extensions as $extension) {
             $opt = $extension->get_js_parameters();
             $json = null;

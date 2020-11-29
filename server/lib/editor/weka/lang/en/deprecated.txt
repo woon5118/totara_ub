@@ -1,3 +1,4 @@
 edit_link,editor_weka
 go_to_link,editor_weka
 insert_link,editor_weka
+cachedef_editorconfig,editor_weka

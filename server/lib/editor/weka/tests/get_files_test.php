@@ -64,7 +64,7 @@ class editor_weka_get_files_testcase extends advanced_testcase {
 
         // Fetch draft files with weka editor.
         $weka_editor = new weka_texteditor();
-        $weka_editor->set_contextid($context->id);
+        $weka_editor->set_context_id($context->id);
 
         $fetched_files = $weka_editor->get_draft_files($draft_item_id);
         self::assertNotEmpty($fetched_files);

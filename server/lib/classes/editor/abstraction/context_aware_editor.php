@@ -17,27 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Qingyang Liu <qingyang.liu@totaralearning.com>
- * @package engage_article
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package core
  */
+namespace core\editor\abstraction;
 
-$editor = [
-    'content' => [
-        'includeextensions' => [
-            '\editor_weka\extension\attachment',
-            '\editor_weka\extension\emoji',
-            '\editor_weka\extension\hashtag',
-            '\editor_weka\extension\list_extension',
-            '\editor_weka\extension\mention',
-            '\editor_weka\extension\media'
-        ],
-    ],
+/**
+ * Abstract layer that is used at core layer to get/set the context from/to the editor instance.
+ * Note that this interface is only used for {$plugin}_texteditor class.
+ */
+interface context_aware_editor {
+    /**
+     * Set the context's id for the editor instance.
+     *
+     * @param int $context_id
+     * @return void
+     */
+    public function set_context_id(int $context_id): void;
 
-    'comment' => [
-        'showtoolbar' => false,
-        'includeextensions' => [
-            '\editor_weka\extension\hashtag',
-            '\editor_weka\extension\mention'
-        ]
-    ]
-];
+    /**
+     * Returning the context's id that had been set to the editor instance.
+     * @return int|null
+     */
+    public function get_context_id(): ?int;
+}

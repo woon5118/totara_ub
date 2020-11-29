@@ -101,7 +101,9 @@
       <SidePanelCommentBox
         component="engage_article"
         area="comment"
+        editor-variant="engage_article-comment"
         :instance-id="resourceId"
+        :editor-context-id="article.resource.context_id"
       />
     </template>
 

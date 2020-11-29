@@ -24,9 +24,12 @@ namespace editor_weka\webapi\resolver\type;
 
 use coding_exception;
 use context_system;
+use core\editor\variant_name;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use editor_weka\local\file_helper;
+use editor_weka\variant;
+use totara_core\identifier\component_area;
 use weka_texteditor;
 
 /**
@@ -52,10 +55,45 @@ final class editor implements type_resolver {
 
         switch ($field) {
             case 'extensions':
-                $component = $args['component'] ?? 'editor_weka';
-                $area = $args['area'] ?? 'learn';
+                if (!empty($args['component'])) {
+                    debugging(
+                        "The parameter 'component' had been deprecated, please use 'usage_identifier' instead",
+                        DEBUG_DEVELOPER
+                    );
+                }
 
-                return $source->get_extensions($component, $area);
+                if (!empty($args['area'])) {
+                    debugging(
+                        "The parameter 'area' had been deprecated, please use 'usage_identifier' instead",
+                        DEBUG_DEVELOPER
+                    );
+                }
+
+                $variant_name = $args['variant'] ?? variant_name::STANDARD;
+                $context_id = $source->get_context_id();
+
+                if (empty($context_id)) {
+                    $context_id = context_system::instance()->id;
+
+                    if ($ec->has_relevant_context()) {
+                        $context_id = $ec->get_relevant_context()->id;
+                    }
+                }
+
+                $variant = variant::create($variant_name, $context_id);
+                if (isset($args['usage_identifier'])) {
+                    /** @var array $usage_identifier */
+                    $usage_identifier = $args['usage_identifier'];
+                    $variant->set_component_area(
+                        new component_area($usage_identifier['component'], $usage_identifier['area'])
+                    );
+
+                    if (isset($usage_identifier['instance_id'])) {
+                        $variant->set_instance_id($usage_identifier['instance_id']);
+                    }
+                }
+
+                return $variant->get_extensions();
 
             case 'showtoolbar':
                 if (!empty($args['component'])) {
@@ -76,7 +114,7 @@ final class editor implements type_resolver {
 
             case 'files':
                 $item_id = $args['item_id'] ?? null;
-            // Keep files working but use draft_files instead
+                // Keep files working but use draft_files instead
 
             case 'draft_files':
                 $item_id = $item_id ?? $args['draft_item_id'] ?? null;
@@ -87,7 +125,7 @@ final class editor implements type_resolver {
                 return $source->get_draft_files($item_id);
 
             case 'repository_data':
-                $context_id = $source->get_contextid();
+                $context_id = $source->get_context_id();
                 if (null === $context_id) {
                     $context_id = context_system::instance()->id;
                 }
@@ -95,7 +133,7 @@ final class editor implements type_resolver {
                 return file_helper::get_upload_repository($context_id);
 
             case 'context_id':
-                $context_id = $source->get_contextid();
+                $context_id = $source->get_context_id();
                 if (null === $context_id) {
                     return context_system::instance()->id;
                 }

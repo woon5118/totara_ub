@@ -24,7 +24,7 @@ namespace editor_weka\extension;
 
 use coding_exception;
 use context_system;
-use editor_weka\config\config_item;
+use JsonSerializable;
 
 /**
  * An extension is a collection of nodes of json_editor. Don't get mixed up between the extension and the node,
@@ -32,7 +32,7 @@ use editor_weka\config\config_item;
  * extension in this very context is to tell the weka editor which front-end component to be pulled, so that
  * at the front-end the editor can be constructed properly.
  */
-abstract class extension {
+abstract class extension implements JsonSerializable {
     /**
      * This property is no longer used. However, it is in here to allow PHPStorm trigger warning.
      *
@@ -115,7 +115,7 @@ abstract class extension {
                 );
 
                 // Default value for area
-                return config_item::AREA_DEFAULT;
+                return 'default';
 
             case 'contextid':
                 debugging(
@@ -196,7 +196,7 @@ abstract class extension {
     /**
      * @return string
      */
-    final public function get_extension_name(): string {
+    final public static function get_extension_name(): string {
         $cls = get_called_class();
         $parts = explode("\\", $cls);
 
@@ -212,5 +212,16 @@ abstract class extension {
         // Otherwise, prefixing the component in, as we do want prevent the chance for extensions
         // to get duplicated.
         return "{$first}_{$last}";
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array {
+        return [
+            'name' => static::get_extension_name(),
+            'tuicomponent' => $this->get_js_path(),
+            'options' => $this->get_js_parameters()
+        ];
     }
 }

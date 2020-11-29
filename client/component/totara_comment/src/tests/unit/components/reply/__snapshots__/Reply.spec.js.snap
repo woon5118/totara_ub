@@ -20,6 +20,7 @@ exports[`totara_comment/components/reply/Reply.vue Checks snapshot 1`] = `
    
   <replycontent-stub
     content="Hello world"
+    editor="[object Object]"
     isreply="true"
     itemid="12"
     size="small"

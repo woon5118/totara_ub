@@ -17,15 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package totara_engage
  */
 namespace totara_engage\formatter;
 
-use core\webapi\formatter\formatter;
-use totara_engage\resource\resource_item;
-use totara_engage\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
+use stdClass;
+use totara_engage\formatter\field\date_field_formatter;
+use totara_engage\resource\resource_item;
 
 /**
  * Class resource_formatter
@@ -34,14 +35,15 @@ use core\webapi\formatter\field\string_field_formatter;
 final class resource_formatter extends formatter {
     /**
      * resource_formatter constructor.
-     * @param resource_item     $item
+     * @param resource_item $item
      */
     public function __construct(resource_item $item) {
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->id = $item->get_id();
         $record->instanceid = $item->get_instanceid();
         $record->name = $item->get_name(false);
         $record->access = $item->get_access_code();
+        $record->context_id = $item->get_context_id();
 
         // Timestamp
         $record->timecreated = $item->get_timecreated();
@@ -84,7 +86,8 @@ final class resource_formatter extends formatter {
             'id' => null,
             'instanceid' => null,
             'access' => null,
-            'time' => function(?int $value, date_field_formatter $formatter) use ($that): string {
+            'context_id' => null,
+            'time' => function (?int $value, date_field_formatter $formatter) use ($that): string {
                 if (null !== $that->object->timemodified && 0 !== $that->object->timemodified) {
                     $formatter->set_timemodified($that->object->timemodified);
                 }
@@ -92,7 +95,7 @@ final class resource_formatter extends formatter {
                 return $formatter->format($value);
             },
 
-            'name' => string_field_formatter::class
+            'name' => string_field_formatter::class,
         ];
     }
 }

@@ -39,11 +39,14 @@
         >
           <Weka
             :id="id"
-            :instance-id="elementId"
             :context-id="activityContextId"
             :value="value"
-            component="performelement_static_content"
-            area="content"
+            :usage-identifier="{
+              component: 'performelement_static_content',
+              area: 'content',
+              instanceId: elementId,
+            }"
+            variant="performelement_static_content-content"
             :file-item-id="initialValues.draftId"
             :placeholder="
               $str('weka_enter_content', 'performelement_static_content')

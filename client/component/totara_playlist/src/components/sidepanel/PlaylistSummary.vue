@@ -49,8 +49,13 @@
       />
       <Weka
         v-model="content"
-        component="totara_playlist"
-        area="summary"
+        :usage-identifier="{
+          component: 'totara_playlist',
+          area: 'summary',
+          instanceId: instanceId,
+        }"
+        :compact="true"
+        variant="totara_playlist-summary"
         :placeholder="$str('adddescription', 'totara_playlist')"
         class="tui-playlistSummary__editor"
       />

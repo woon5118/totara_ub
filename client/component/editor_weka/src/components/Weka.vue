@@ -59,6 +59,10 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * This property had been deprecated, please use usageIdentifier instead.
+     * @deprecated since Totara 13.3
+     */
     instanceId: [Number, String],
     fileItemId: [Number, String],
     /**
@@ -70,34 +74,63 @@ export default {
      * prop and decide whether to fetch from the server or not.
      */
     contextId: [Number, String],
+    /**
+     * This property had been deprecated, please use usageIdentifier instead.
+     * @deprecated since Totara 13.3
+     */
     component: String,
+    /**
+     * This property had been deprecated, please use usageIdentifier instead.
+     * @deprecated since Totara 13.3
+     */
     area: String,
-
+    usageIdentifier: {
+      type: Object,
+      validator: prop => 'component' in prop && 'area' in prop,
+      default() {
+        // Backward compatible.
+        return {
+          component: this.component || 'editor_weka',
+          area: this.area || 'learn',
+          instanceId: this.instanceId || null,
+        };
+      },
+    },
+    variant: String,
     /**
      * @value {
      *   context_id: Number
-     *   showtoolbar: Boolean,
      *   extensions: Object[]
      * }
      */
     options: {
       type: Object,
-      validator: prop =>
-        prop.showtoolbar !== undefined && prop.extensions !== undefined,
+      validator: prop => prop.extensions !== undefined,
     },
     value: WekaValue,
+    /**
+     * The compact mode is to determine whether we are showing the tool bar or not.
+     */
+    compact: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
     return {
       toolbarItems: [],
-      toolbarEnabled: false,
+
+      /**
+       * @deprecated since Totara 13.3
+       */
+      toolbarEnabled: !this.compact,
     };
   },
 
   computed: {
     showToolbar() {
-      if (!this.toolbarEnabled) {
+      if (this.compact) {
         return false;
       }
 
@@ -118,6 +151,7 @@ export default {
 
     component: warnChange('component'),
     area: warnChange('area'),
+    variant: warnChange('variant'),
     instanceId: warnChange('instanceId'),
     options: warnChange('options'),
 
@@ -140,6 +174,24 @@ export default {
   },
 
   mounted() {
+    if (this.component) {
+      console.warn(
+        "The prop 'component' had been deprecated, please use 'usageIdentifier' instead"
+      );
+    }
+
+    if (this.area) {
+      console.warn(
+        "The prop 'area' had been deprecated, please use 'usageIdentifier' instead"
+      );
+    }
+
+    if (this.instanceId) {
+      console.warn(
+        "The prop 'instanceId' had been deprecated, please use 'usageIdentifier' instead"
+      );
+    }
+
     this.createEditor();
   },
 
@@ -156,7 +208,6 @@ export default {
     async setupOptions() {
       if (this.options) {
         this.finalOptions = Object.assign({}, this.options);
-        this.toolbarEnabled = this.finalOptions.showtoolbar;
         return;
       }
 
@@ -165,16 +216,18 @@ export default {
         query: editorWeka,
         fetchPolicy: 'no-cache',
         variables: {
-          instance_id: this.instanceId,
-          component: this.component,
-          area: this.area,
+          instance_id: this.usageIdentifier.instanceId,
+          component: this.usageIdentifier.component,
+          area: this.usageIdentifier.area,
           draft_id: this.fileItemId,
           context_id: this.contextId || undefined,
+          variant_name:
+            this.variant ||
+            `${this.usageIdentifier.component}-${this.usageIdentifier.area}`,
         },
       });
 
       this.finalOptions = Object.assign({}, result.data.editor);
-      this.toolbarEnabled = this.finalOptions.showtoolbar;
     },
 
     /**
@@ -262,9 +315,9 @@ export default {
         fileStorage: fileStorage,
         onUpdate: this.$_onUpdate.bind(this),
         contextId: this.finalOptions.context_id || null,
-        component: this.component || null,
-        area: this.area || null,
-        instanceId: this.instanceId || null,
+        component: this.usageIdentifier.component || null,
+        area: this.usageIdentifier.area || null,
+        instanceId: this.usageIdentifier.instanceId || null,
         onTransaction: () => {
           this.updateToolbarThrottled();
         },

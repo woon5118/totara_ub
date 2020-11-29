@@ -28,6 +28,11 @@
       :area="area"
       :size="size"
       :submitting="submitting"
+      :editor="{
+        compact: true,
+        variant: editorVariant,
+        contextId: editorContextId,
+      }"
       class="tui-sidePanelCommentBox__box"
       @update-total-comments="totalComments = $event"
       @update-submitting="submitting = $event"
@@ -61,6 +66,15 @@ export default {
       type: [String, Number],
       required: true,
     },
+
+    editorVariant: {
+      type: String,
+      default() {
+        return `${this.component}-${this.area}`;
+      },
+    },
+
+    editorContextId: [String, Number],
   },
 
   data() {

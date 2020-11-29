@@ -23,14 +23,18 @@
         :value="content"
       />
       <Weka
-        v-if="!$apollo.queries.editorOption.loading && draftId"
+        v-if="draftId"
         v-model="content"
-        component="totara_comment"
-        area="reply"
-        :options="editorOption"
+        :compact="editor.compact"
+        :variant="editor.variant"
+        :usage-identifier="{
+          component: 'totara_comment',
+          area: 'reply',
+        }"
         :placeholder="$str('enterreply', 'totara_comment')"
         :file-item-id="draftId"
         :data-file-item-id="draftId"
+        :context-id="editor.contextId"
         class="tui-commentReplyForm__editor"
         @ready="$emit('form-ready')"
       />
@@ -60,7 +64,6 @@ import ResponseBox from 'totara_comment/components/form/box/ResponseBox';
 import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
 
 // GraphQL queries
-import getEditorWeka from 'totara_comment/graphql/get_editor_weka_from_id';
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';
 
 export default {
@@ -101,6 +104,21 @@ export default {
       required: true,
     },
 
+    /**
+     * Editor setting, do not modify this object.
+     */
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          compact: true,
+          variant: undefined,
+          contextId: undefined,
+        };
+      },
+    },
+
     submitting: Boolean,
 
     replyTo: {
@@ -111,28 +129,13 @@ export default {
     },
   },
 
-  apollo: {
-    editorOption: {
-      query: getEditorWeka,
-      variables() {
-        return {
-          id: this.commentId,
-          comment_area: 'reply',
-          draft_id: this.draftId,
-        };
-      },
-      skip() {
-        return this.draftId === null;
-      },
-      update({ editor }) {
-        return editor;
-      },
-    },
-  },
-
   data() {
     return {
       draftId: null,
+      /**
+       * This data attribute had been deprecated and no longer used.
+       * @deprecated since Totara 13.3
+       */
       editorOption: null,
       content: WekaValue.empty(),
     };
@@ -159,6 +162,12 @@ export default {
 
         this.content = WekaValue.fromDoc(createMentionContent(value));
       },
+    },
+
+    editorOption() {
+      console.warn(
+        "The data attribute 'editorOption' had been deprecated and no longer used, please update all calls"
+      );
     },
   },
 

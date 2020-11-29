@@ -26,9 +26,12 @@
     <Weka
       v-if="!$apollo.loading"
       v-model="content"
-      component="engage_article"
-      area="content"
-      :instance-id="resourceId"
+      :usage-identifier="{
+        component: 'engage_article',
+        area: 'content',
+        instanceId: resourceId,
+      }"
+      variant="engage_article-content"
       :file-item-id="draft.file_item_id"
       class="tui-engageEditArticleContentForm__editor"
       @ready="editorMounted = true"

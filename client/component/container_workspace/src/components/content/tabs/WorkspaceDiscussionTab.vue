@@ -83,6 +83,7 @@
           :aria-setsize="setSize"
           :aria-labelledby="$id(`item-${item.id}`)"
           :label-id="$id(`item-${item.id}`)"
+          :workspace-context-id="item.workspace_context_id"
           class="tui-workspaceDiscussionTab__card"
           @update-discussion-react-status="updateDiscussionReactStatus"
           @update-discussion="updateDiscussion"

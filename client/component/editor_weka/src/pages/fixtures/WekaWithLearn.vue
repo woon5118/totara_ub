@@ -40,8 +40,11 @@
         <Weka
           :id="id"
           v-model="content"
-          component="editor_weka"
-          area="learn"
+          :usage-identifier="{
+            component: 'editor_weka',
+            area: 'learn',
+          }"
+          variant="editor_weka-learn"
           :instance-id="instanceId"
           :file-item-id="instanceId"
         />

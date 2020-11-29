@@ -8,6 +8,7 @@ query engage_article_get_article($id: param_integer!) {
       name(format: PLAIN)
       access
       time
+      context_id
       user {
         __typename
         id

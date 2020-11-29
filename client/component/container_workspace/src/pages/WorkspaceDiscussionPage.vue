@@ -88,6 +88,11 @@
             area="discussion"
             component="container_workspace"
             :instance-id="discussion.id"
+            :editor="{
+              variant: 'container_workspace-discussion',
+              compact: false,
+              contextId: discussion.workspace_context_id,
+            }"
             :size="size"
             :submit-form-button-text="$str('comment', 'container_workspace')"
             :show-like-button-text="true"

@@ -47,6 +47,7 @@
       :on-edit="editting"
       :content="content"
       :is-reply="true"
+      :editor="editor"
       :size="size"
       @cancel-editing="editting = false"
       @update-item="updateReply"
@@ -193,6 +194,17 @@ export default {
     showReplyButtonText: Boolean,
     inlineHead: Boolean,
     canViewAuthor: Boolean,
+    editor: {
+      type: Object,
+      validator: prop => 'compact' in prop && 'variant' in prop,
+      default() {
+        return {
+          compact: true,
+          variant: undefined,
+          contextId: undefined,
+        };
+      },
+    },
   },
 
   data() {

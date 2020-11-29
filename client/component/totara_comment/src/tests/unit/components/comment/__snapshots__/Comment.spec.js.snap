@@ -20,6 +20,7 @@ exports[`totara_comment/components/comment/Comment.vue Checks snapshot 1`] = `
    
   <commentcontent-stub
     content="Hello world"
+    editor="[object Object]"
     itemid="42"
     size="small"
   />
@@ -39,6 +40,7 @@ exports[`totara_comment/components/comment/Comment.vue Checks snapshot 1`] = `
     class="tui-comment__replyBox"
     commentid="42"
     component="totara_comment"
+    editor="[object Object]"
     replyable="true"
     size="small"
     totalreplies="21"

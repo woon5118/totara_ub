@@ -4,5 +4,6 @@ query container_workspace_get_discussion_draft_content($id: param_integer!) {
     draft_content(format: RAW)
     draft_id
     content_format
+    workspace_context_id
   }
 }

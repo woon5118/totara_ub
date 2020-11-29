@@ -17,12 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package core
  */
 namespace core\webapi\middleware;
 
 use Closure;
+use coding_exception;
 use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
@@ -48,7 +49,7 @@ final class clean_content_format implements middleware {
         FORMAT_HTML,
         FORMAT_PLAIN,
         FORMAT_MARKDOWN,
-        FORMAT_JSON_EDITOR
+        FORMAT_JSON_EDITOR,
     ];
 
     /**
@@ -84,10 +85,10 @@ final class clean_content_format implements middleware {
     /**
      * clean_content_format constructor.
      *
-     * @param string    $format_field_key
-     * @param int|null  $default_value
-     * @param array     $restricted_formats
-     * @param bool      $field_required
+     * @param string   $format_field_key
+     * @param int|null $default_value
+     * @param array    $restricted_formats
+     * @param bool     $field_required
      */
     public function __construct(string $format_field_key, ?int $default_value = null,
                                 array $restricted_formats = self::SYSTEM_DEFAULT_FORMATS,
@@ -97,7 +98,7 @@ final class clean_content_format implements middleware {
 
         foreach ($restricted_formats as $restricted_format) {
             if (!in_array($restricted_format, self::SYSTEM_DEFAULT_FORMATS)) {
-                throw new \coding_exception(
+                throw new coding_exception(
                     "One of the restricted format does not exist in system provided formats",
                     $restricted_format
                 );
@@ -107,7 +108,7 @@ final class clean_content_format implements middleware {
         $this->restricted_formats = $restricted_formats;
 
         if (null !== $default_value && !in_array($default_value, self::SYSTEM_DEFAULT_FORMATS)) {
-            throw new \coding_exception("Default value '{$default_value}' is invalid");
+            throw new coding_exception("Default value '{$default_value}' is invalid");
         }
 
         $this->default_value = $default_value;
@@ -127,7 +128,7 @@ final class clean_content_format implements middleware {
     public function handle(payload $payload, Closure $next): result {
         if (!$payload->has_variable($this->format_field_key)) {
             if ($this->field_required) {
-                throw new \coding_exception("Missing field {$this->format_field_key} in the payload");
+                throw new coding_exception("Missing field {$this->format_field_key} in the payload");
             }
 
             if (null !== $this->default_value) {
@@ -150,7 +151,7 @@ final class clean_content_format implements middleware {
 
         // Checking if its exist in the restricted formats or not.
         if (!in_array($format_value, $this->restricted_formats)) {
-            throw new \coding_exception("The format value is invalid");
+            throw new coding_exception("The format value is invalid");
         }
 
         return $next($payload);

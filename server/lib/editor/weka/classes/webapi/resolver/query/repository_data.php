@@ -17,11 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package editor_weka
  */
 namespace editor_weka\webapi\resolver\query;
 
+use context;
+use context_system;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
@@ -33,14 +35,14 @@ use editor_weka\local\file_helper;
  */
 final class repository_data implements query_resolver, has_middleware {
     /**
-     * @param array $args
+     * @param array             $args
      * @param execution_context $ec
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        $context_id = \context_system::instance()->id;
+        $context_id = context_system::instance()->id;
         if (isset($args['context_id'])) {
-            $context = \context::instance_by_id($args['context_id']);
+            $context = context::instance_by_id($args['context_id']);
 
             if (!$ec->has_relevant_context()) {
                 $ec->set_relevant_context($context);

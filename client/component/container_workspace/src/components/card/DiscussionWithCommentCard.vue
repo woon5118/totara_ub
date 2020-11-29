@@ -62,6 +62,11 @@
       :show-comment-form="showCommentForm"
       :first-cursor="firstCommentCursor"
       :comment-inline-head="true"
+      :editor="{
+        variant: 'container_workspace-discussion',
+        compact: false,
+        contextId: workspaceContextId,
+      }"
       class="tui-workspaceDiscussionWithCommentCard__comments"
       @form-ready="setFormElement"
       @create-comment="$emit('add-new-comment', discussionId)"
@@ -161,6 +166,7 @@ export default {
     edited: Boolean,
 
     labelId: String,
+    workspaceContextId: [String, Number],
   },
 
   data() {

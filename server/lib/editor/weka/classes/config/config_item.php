@@ -26,17 +26,22 @@ use editor_weka\factory\extension_loader;
 
 /**
  * A class for holding configuration data.
+ * @deprecated since Totara 13.3
  */
 final class config_item {
     /**
      * Area default.
      * @var string
+     *
+     * @deprecated since Totara 13.3
      */
     const AREA_DEFAULT = 'default';
 
     /**
      * Whether to use all the extensions or not.
      * @var string
+     *
+     * @deprecated since Totara 13.3
      */
     const EXTENSION_ALL = 'all';
 
@@ -66,6 +71,11 @@ final class config_item {
                 DEBUG_DEVELOPER
             );
         }
+
+        debugging(
+            'The class \\editor_weka\\config\\config_item had been deprecated, please \\editor_weka\\variant instead',
+            DEBUG_DEVELOPER
+        );
 
         $this->extensions = [];
     }

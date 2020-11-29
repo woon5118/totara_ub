@@ -1,6 +1,21 @@
 This files describes API changes in /client/component/container_workspace,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* Updated DiscussionWithCommentCard.vue to add prop "editor" for totara_comment CommentBox.vue
+  * Template changes
+* Updated WorkspaceDiscussionForm.vue to replace props "component", "area" and "instance-id" with "usage-identifier" for editor_weka Weka.vue
+  * Template changes
+* Updated WorkspaceDiscussionForm.vue to add prop "variant" to component editor_weka Weka.vue
+  * Template changes
+* Updated WorkspaceForm.vue to replace props "component", "area" and "instance-id" with "usage-identifier" for editor_weka Weka.vue
+  * Templace changes
+* Updated WorkspaceForm.vue to add prop "variant" to component editor_weka Weka.vue
+  * Template changes
+* Updated WorkspaceDiscussionPage.vue to add prop "editor" to component editor_weka Weka.vue
+  * Template changes
+
 === 13.2 ===
 
 * Added new optional prop "workspaceContextId" for component WorkspaceDiscussionForm.vue

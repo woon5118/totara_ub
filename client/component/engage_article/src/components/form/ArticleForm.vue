@@ -49,8 +49,11 @@
           :id="id"
           v-model="content"
           class="tui-engageArticleForm__editor"
-          component="engage_article"
-          area="content"
+          :usage-identifier="{
+            component: 'engage_article',
+            area: 'content',
+          }"
+          variant="engage_article-content"
           :file-item-id="draftId"
           :placeholder="$str('entercontent', 'engage_article')"
         />

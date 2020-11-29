@@ -26,6 +26,7 @@ mutation engage_article_create_article(
       name(format: PLAIN)
       access
       time
+      context_id
       user {
         id
         fullname

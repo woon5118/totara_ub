@@ -25,6 +25,7 @@ mutation container_workspace_post_discussion(
     }
     total_comments
     total_reactions
+    workspace_context_id
     discussion_interactor {
       __typename
       discussion_id

@@ -18,7 +18,14 @@
 
 <template>
   <div class="tui-fixture-wekaBasic">
-    <Weka component="editor_weka" area="behat" :context-id="contextId" />
+    <Weka
+      :usage-identifier="{
+        component: 'editor_weka',
+        area: 'behat',
+      }"
+      variant="editor_weka-behat"
+      :context-id="contextId"
+    />
   </div>
 </template>
 

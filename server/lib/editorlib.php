@@ -254,4 +254,11 @@ abstract class texteditor {
      */
     public function totara_form_use_editor(&$result, array $editoroptions, array $fpoptions, array $fptemplates) {
     }
+
+    /**
+     * @return string
+     */
+    public function get_interface_name(): string {
+        return 'fallback';
+    }
 }

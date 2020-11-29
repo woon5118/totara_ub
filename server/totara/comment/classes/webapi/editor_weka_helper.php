@@ -22,7 +22,6 @@
  */
 namespace totara_comment\webapi;
 
-use editor_weka\config\factory;
 use totara_core\identifier\component_area;
 use weka_texteditor;
 
@@ -47,30 +46,22 @@ class editor_weka_helper {
      * @param int               $context_id
      *
      * @return weka_texteditor
+     * @deprecated since Totara 13.3
      */
     public static function create_mask_editor(component_area $identifier,
                                               string $comment_area, int $context_id): weka_texteditor {
         global $CFG;
 
-        $factory = new factory();
-        $factory->load();
-
-        // Get the configuration of current component identifier
-        $configuration = $factory->get_configuration(
-            $identifier->get_component(),
-            $identifier->get_area()
+        debugging(
+            "The function \\totara_comment\\webapi\\editor_weka_helper::create_mask_editor had been deprecated " .
+            "and no longer used. The behaviour of this function had also been changed. Please update all calls",
+            DEBUG_DEVELOPER
         );
-
-        if (null !== $configuration) {
-            // Start mocking the configuration for our comment usage.
-            $factory->add_configuration('totara_comment', $comment_area, $configuration);
-        }
-
         require_once("{$CFG->dirroot}/lib/editor/weka/lib.php");
 
         // We want an editor of totara_comment with the area of comment.
-        $editor = new weka_texteditor($factory);
-        $editor->set_contextid($context_id);
+        $editor = new weka_texteditor();
+        $editor->set_context_id($context_id);
 
         return $editor;
     }
