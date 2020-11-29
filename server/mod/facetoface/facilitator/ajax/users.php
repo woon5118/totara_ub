@@ -26,8 +26,10 @@ define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/dialogs/seminar_dialog_content.php');
+require_once($CFG->dirroot . '/totara/core/searchlib.php');
 
 $userid = optional_param('userid', 0, PARAM_INT);
+$query  = optional_param('query', null, PARAM_TEXT); // search query
 
 require_login(null, false, null, false, true);
 
@@ -37,7 +39,15 @@ $PAGE->set_url('/mod/facetoface/facilitator/ajax/users.php');
 // Get guest user for exclusion purposes
 $guest = guest_user();
 // Load potential managers for this user.
-$usernamefields = get_all_user_name_fields(true, 'u');
+$limitfrom = TOTARA_DIALOG_MAXITEMS + 1;
+$keywords = totara_search_parse_keywords($query);
+$fields = get_all_user_name_fields();
+$usernamefields = implode(',', $fields);
+list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields, SQL_PARAMS_NAMED);
+if ($searchsql) {
+    $limitfrom = 0;
+    $searchsql = ' AND ' . $searchsql;
+}
 $sql = "SELECT u.id, {$usernamefields}
           FROM {user} u
          WHERE u.deleted = 0
@@ -46,11 +56,12 @@ $sql = "SELECT u.id, {$usernamefields}
            AND u.id NOT IN (
                 SELECT ff.userid FROM {facetoface_facilitator} ff
            )
+           {$searchsql}
       ORDER BY {$usernamefields}";
-$params = ['guestid' => $guest->id];
+$params['guestid'] = $guest->id;
 // Limit results to 1 more than the maximum number that might be displayed
 // there is no point returning any more as we will never show them.
-$users = $DB->get_records_sql($sql, $params, 0, TOTARA_DIALOG_MAXITEMS + 1);
+$users = $DB->get_records_sql($sql, $params, 0, $limitfrom);
 foreach ($users as $user) {
     $user->fullname = fullname($user);
 }
@@ -70,6 +81,6 @@ $dialog->search_code = '/mod/facetoface/dialogs/search.php';
 $dialog->searchtype = 'facetoface_facilitator';
 $dialog->string_nothingtodisplay = 'error:nopredefinedfacilitators';
 // Additional url parameters needed for pagination in the search tab.
-$dialog->urlparams = $params;
+$dialog->urlparams = [];
 
 echo $dialog->generate_markup();
