@@ -19,7 +19,10 @@
 <template>
   <div
     class="tui-popoverFrame"
-    :class="[side ? 'tui-popoverFrame--' + side : null]"
+    :class="[
+      side ? 'tui-popoverFrame--' + side : null,
+      size ? 'tui-popoverFrame--size-' + size : null,
+    ]"
   >
     <Arrow :relative-side="arrowSide" :distance="arrowDistance" />
     <CloseButton
@@ -31,6 +34,7 @@
       {{ title }}
     </div>
     <div
+      role="tooltip"
       :class="{
         'tui-popoverFrame__content': true,
         'tui-popoverFrame__content--nonClosable': !closeable,
@@ -58,6 +62,13 @@ export default {
   props: {
     title: String,
     side: String,
+    size: {
+      type: String,
+      validator(value) {
+        const allowedOptions = ['sm'];
+        return allowedOptions.indexOf(value) !== -1;
+      },
+    },
     arrowDistance: Number,
     closeable: {
       type: Boolean,
@@ -83,8 +94,22 @@ export default {
   padding: var(--gap-4);
   background: var(--color-background);
   background-clip: padding-box;
-  border: 1px solid var(--color-neutral-5);
   box-shadow: var(--shadow-3);
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 0 1px var(--color-neutral-5);
+    content: '';
+  }
+
+  &--size-sm {
+    width: 250px;
+    max-width: none;
+  }
 
   &__close {
     position: absolute;
@@ -102,6 +127,10 @@ export default {
 
   &__content {
     padding: var(--gap-2) var(--gap-4) var(--gap-2) 0;
+
+    & img {
+      max-width: 100%;
+    }
   }
 
   &__title + &__content,
@@ -111,9 +140,14 @@ export default {
 
   &__buttons {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-end;
-    padding-top: var(--gap-3);
+    padding-top: var(--gap-1);
     padding-bottom: var(--gap-3);
+
+    > * {
+      margin-top: var(--gap-2);
+    }
 
     > * + * {
       margin-left: var(--gap-4);

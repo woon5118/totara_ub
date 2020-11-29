@@ -60,7 +60,7 @@ exports[`ProgressTracker should check snapshot 1`] = `
           style="transform: translate3d(0px, 0px, 0); display: none;"
         >
           <div
-            class="tui-popoverFrame tui-popoverFrame--top"
+            class="tui-popoverFrame tui-popoverFrame--top tui-popoverFrame--size-sm"
           >
             <div
               class="tui-arrow tui-arrow--bottom tui-arrow--normal"
@@ -75,6 +75,7 @@ exports[`ProgressTracker should check snapshot 1`] = `
              
             <div
               class="tui-popoverFrame__content"
+              role="tooltip"
             >
               <div>
                 Basic knowledge description
@@ -145,7 +146,7 @@ exports[`ProgressTracker should check snapshot 1`] = `
           style="transform: translate3d(0px, 0px, 0); display: none;"
         >
           <div
-            class="tui-popoverFrame tui-popoverFrame--top"
+            class="tui-popoverFrame tui-popoverFrame--top tui-popoverFrame--size-sm"
           >
             <div
               class="tui-arrow tui-arrow--bottom tui-arrow--normal"
@@ -160,6 +161,7 @@ exports[`ProgressTracker should check snapshot 1`] = `
              
             <div
               class="tui-popoverFrame__content"
+              role="tooltip"
             >
               <div>
                 Competent with supervision description

@@ -163,11 +163,6 @@ $progress-tracker-half-circle: 14px !default;
   margin: 0;
   list-style: none;
 
-  // Edge case
-  .tui-popoverPositioner {
-    width: 250px;
-  }
-
   // Line styles
   & > * + * {
     &.tui-progressTrackerItem {

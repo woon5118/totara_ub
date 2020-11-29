@@ -61,6 +61,8 @@
       :open="open"
       :reference="$refs.trigger"
       position="top"
+      size="sm"
+      closeable="always"
       @request-close="setOpen(false)"
     >
       <slot name="popover-content" />

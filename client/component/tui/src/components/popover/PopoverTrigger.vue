@@ -43,6 +43,7 @@ class PopoverTriggerHelper {
     this._in = {};
     this._finalHandlers = this._getHandlers();
     this.onOpenChange = options.onOpenChange;
+    this.onTriggerChange = options.onTriggerChange;
     this.getExcludedElements = options.getExcludedElements;
   }
 
@@ -142,6 +143,7 @@ class PopoverTriggerHelper {
 
   _update() {
     const isOpen = this._calcOpen();
+    this.onTriggerChange(this._in);
     if (this.open === isOpen) {
       return;
     }
@@ -177,6 +179,9 @@ export default {
       ],
       onOpenChange: isOpen => {
         this.open = isOpen;
+      },
+      onTriggerChange: trigger => {
+        this.$emit('trigger-type-changed', trigger);
       },
     });
   },

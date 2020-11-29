@@ -11,11 +11,10 @@ exports[`totara_engage/components/form/RecipientsSelector.vue matches snapshot 1
       <!----></span></button>
     <div class="tui-popoverPositioner tui-popoverPositioner--transition-default" style="transform: translate3d(0px, 0px, 0); display: none;">
       <div class="tui-popoverFrame tui-popoverFrame--bottom">
-        <div class="tui-arrow tui-arrow--top tui-arrow--normal" style="left: 0px;"></div> <button aria-label="closebuttontitle, core" type="button" title="closebuttontitle, core" class="tui-iconBtn tui-popoverFrame__close tui-iconBtn--transparent"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
-          <!----></span>
-          <!----></span></button>
+        <div class="tui-arrow tui-arrow--top tui-arrow--normal" style="left: 0px;"></div>
         <!---->
-        <div class="tui-popoverFrame__content">
+        <!---->
+        <div role="tooltip" class="tui-popoverFrame__content tui-popoverFrame__content--nonClosable">
           sharehelpinfo, totara_engage
         </div>
         <!---->

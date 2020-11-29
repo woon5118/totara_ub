@@ -42,6 +42,7 @@ exports[`Popover matches snapshot when non-closeable 1`] = `
        
       <div
         class="tui-popoverFrame__content tui-popoverFrame__content--nonClosable"
+        role="tooltip"
       >
         <div>
           hello

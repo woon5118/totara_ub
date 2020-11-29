@@ -24,6 +24,7 @@
       :triggers="triggers"
       :ui-element="$refs.frame"
       @open-changed="setOpen"
+      @trigger-type-changed="setTriggerType"
     >
       <slot name="trigger" :is-open="isOpen" />
     </PopoverTrigger>
@@ -38,8 +39,9 @@
         ref="frame"
         :title="title"
         :side="side"
+        :size="size"
         :arrow-distance="arrowDistance"
-        :closeable="closeable"
+        :closeable="showCloseable"
         @close="handleClose"
       >
         <slot :close="handleClose" />
@@ -84,16 +86,30 @@ export default {
     },
     open: Boolean,
     closeable: {
-      type: Boolean,
+      type: [Boolean, String],
       default: true,
     },
+    size: String,
   },
 
   data() {
     return {
       isOpen: !!this.open,
       referenceElement: null,
+      activeClickTrigger: false,
     };
+  },
+
+  computed: {
+    showCloseable() {
+      if (this.closeable === 'always') {
+        return true;
+      }
+      if (!this.closeable || !this.activeClickTrigger) {
+        return false;
+      }
+      return true;
+    },
   },
 
   watch: {
@@ -111,6 +127,15 @@ export default {
     setOpen(visible) {
       this.isOpen = visible;
       this.$emit('open-changed', visible);
+    },
+
+    /**
+     * Track which triggers are currently active on an open popover
+     *
+     * @param {string} triggerType
+     */
+    setTriggerType(triggerType) {
+      this.activeClickTrigger = triggerType.click;
     },
 
     /**

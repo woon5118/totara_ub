@@ -4,6 +4,8 @@ information provided here is intended especially for developers.
 === 13.3 ===
 * Updated Input.vue, Button.vue and ButtonIcon.vue to handle prop "autofocus" in JS
   * Template changes
+* Adjusted PopoverFrame.vue to include border in positioning
+* Added size prop to Popover.vue to provide a minimum display width
 
 === 13.2 ===
 
