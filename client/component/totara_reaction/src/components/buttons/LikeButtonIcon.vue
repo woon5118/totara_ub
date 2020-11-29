@@ -19,7 +19,7 @@
   <ButtonIcon
     :aria-label="ariaLabel"
     :styleclass="{ transparent, small, transparentNoPadding }"
-    :disabled="submitting || disabled"
+    :disabled="disabled"
     :text="text"
     @click="$emit('click', $event)"
   >

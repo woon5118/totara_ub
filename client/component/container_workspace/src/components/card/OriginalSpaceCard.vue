@@ -34,6 +34,7 @@
     <div class="tui-originalSpaceCard__actions">
       <LoadingButton
         v-if="!joined && joinAble"
+        ref="joinButtonRef"
         class="tui-originalSpaceCard__actions-button"
         :text="$str('join_me', 'container_workspace')"
         :aria-label="$str('join_space', 'container_workspace', title)"
@@ -67,10 +68,11 @@
       >
         <template v-slot:trigger="{ isOpen, toggle }">
           <Button
+            ref="joinedButtonRef"
             :text="$str('joined', 'container_workspace')"
             :caret="!owned"
             :aria-expanded="isOpen"
-            :disabled="submitting || owned"
+            :disabled="owned"
             @click.stop="toggle"
           />
         </template>
@@ -152,6 +154,18 @@ export default {
     return {
       submitting: false,
     };
+  },
+
+  watch: {
+    joined(value) {
+      this.$nextTick(() => {
+        if (value) {
+          this.$refs.joinedButtonRef.$el.focus();
+        } else {
+          this.$refs.joinButtonRef.$el.focus();
+        }
+      });
+    },
   },
 
   methods: {
