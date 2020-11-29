@@ -27,6 +27,7 @@ use core\event\base;
 use core\event\course_deleted;
 use core\event\course_viewed;
 use core_ml\event\interaction_event;
+use core_ml\event\public_access_aware_event;
 use ml_recommender\entity\component;
 use ml_recommender\entity\interaction;
 use ml_recommender\entity\interaction_type;
@@ -50,6 +51,16 @@ final class interaction_observer {
     public static function watch_interaction(interaction_event $event): void {
         // Don't observe anything if recommender is disabled
         if (advanced_feature::is_disabled('ml_recommender')) {
+            return;
+        }
+
+        // Don't save any private interactions
+        if ($event instanceof public_access_aware_event &&  !$event->is_public()) {
+            return;
+        }
+
+        // Don't observe guest user interactions
+        if (isguestuser($event->get_user_id())) {
             return;
         }
 

@@ -26,8 +26,9 @@ use core\event\base;
 use core_ml\event\interaction_event;
 use totara_playlist\entity\playlist as entity;
 use totara_playlist\playlist;
+use core_ml\event\public_access_aware_event;
 
-abstract class base_playlist extends base implements interaction_event {
+abstract class base_playlist extends base implements interaction_event, public_access_aware_event {
     /**
      * @return void
      */
@@ -57,7 +58,8 @@ abstract class base_playlist extends base implements interaction_event {
             'objectid' => $playlist->get_id(),
             'userid' => $userid,
             'context' => $context,
-            'relateduserid' => $playlist->get_userid()
+            'relateduserid' => $playlist->get_userid(),
+            'other' => ['is_public' => $playlist->is_public()]
         ];
 
         if (CONTEXT_COURSE == $context->contextlevel) {
@@ -102,5 +104,12 @@ abstract class base_playlist extends base implements interaction_event {
      */
     public function get_area(): ?string {
         return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_public(): bool {
+        return $this->other['is_public'];
     }
 }

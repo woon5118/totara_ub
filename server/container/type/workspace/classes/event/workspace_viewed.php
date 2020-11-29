@@ -25,13 +25,14 @@ namespace container_workspace\event;
 use container_workspace\workspace;
 use core\event\base;
 use core_ml\event\interaction_event;
+use core_ml\event\public_access_aware_event;
 
 /**
  * Class workspace_viewed
  *
  * @package container_workspace\event
  */
-final class workspace_viewed extends base implements interaction_event {
+final class workspace_viewed extends base implements interaction_event, public_access_aware_event {
     /**
      * @return void
      */
@@ -63,7 +64,8 @@ final class workspace_viewed extends base implements interaction_event {
             'objectid' => $workspace_id,
             'userid' => $actor_id,
             'relateduserid' => $owner_id,
-            'context' => $workspace->get_context()
+            'context' => $workspace->get_context(),
+            'other' => ['is_public' => $workspace->is_public()]
         ]);
 
         return $event;
@@ -116,5 +118,12 @@ final class workspace_viewed extends base implements interaction_event {
      */
     public function get_item_id(): int {
         return $this->objectid;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_public(): bool {
+        return $this->other['is_public'];
     }
 }

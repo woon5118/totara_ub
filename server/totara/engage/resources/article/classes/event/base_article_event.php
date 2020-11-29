@@ -26,8 +26,9 @@ use core\event\base;
 use engage_article\entity\article as article_entity;
 use engage_article\totara_engage\resource\article;
 use core_ml\event\interaction_event;
+use core_ml\event\public_access_aware_event;
 
-abstract class base_article_event extends base implements interaction_event{
+abstract class base_article_event extends base implements interaction_event, public_access_aware_event {
     /**
      * @return void
      */
@@ -64,7 +65,8 @@ abstract class base_article_event extends base implements interaction_event{
             'other' => [
                 'name' => $resource->get_name(false),
                 'resourceid' => $resource->get_id(),
-                'owner_id' => $ownerid
+                'owner_id' => $ownerid,
+                'is_public' => $resource->is_public()
             ]
         ];
 
@@ -106,5 +108,12 @@ abstract class base_article_event extends base implements interaction_event{
      */
     public function get_area(): ?string {
         return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_public(): bool {
+        return $this->other['is_public'];
     }
 }

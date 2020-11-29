@@ -26,8 +26,9 @@ use core\event\base;
 use engage_survey\totara_engage\resource\survey;
 use engage_survey\entity\survey as survey_entity;
 use core_ml\event\interaction_event;
+use core_ml\event\public_access_aware_event;
 
-abstract class base_survey_event extends base implements interaction_event {
+abstract class base_survey_event extends base implements interaction_event, public_access_aware_event {
     /**
      * @return void
      */
@@ -63,7 +64,8 @@ abstract class base_survey_event extends base implements interaction_event {
             'other' => [
                 'name' => $resource->get_name(false),
                 'resourceid' => $resource->get_id(),
-                'owner_id' => $resource->get_userid()
+                'owner_id' => $resource->get_userid(),
+                'is_public' => $resource->is_public()
             ]
         ];
 
@@ -106,4 +108,12 @@ abstract class base_survey_event extends base implements interaction_event {
     public function get_area(): ?string {
         return null;
     }
+
+    /**
+     * @return bool
+     */
+    public function is_public(): bool {
+        return $this->other['is_public'];
+    }
+
 }
