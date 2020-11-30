@@ -30,8 +30,7 @@ Feature: Custom article images
     And I click on "Only you" "text" in the ".tui-engageAccessForm" "css_element"
     And I press "Done"
     And I click on "Your Library" in the totara menu
-
-    Then "//img[@alt='DefaultResource' and contains(@src, '/default')]" "xpath_element" should exist
+    Then "//img[@role='presentation' and contains(@src, '/default')]" "xpath_element" should exist
 
   Scenario: Articles with an external image will use it
     Given I log in as "user1"
