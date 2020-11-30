@@ -25,6 +25,7 @@ namespace mod_facetoface\rb\traits;
 
 use rb_column_option;
 use rb_filter_option;
+use rb_filter_type;
 use rb_join;
 
 defined('MOODLE_INTERNAL') || die();
@@ -195,7 +196,10 @@ trait rooms {
             'room',
             'name',
             $roomonly ? get_string('name', 'rb_source_facetoface_rooms') : get_string('roomname', 'rb_source_facetoface_rooms'),
-            'text'
+            'text',
+            array(
+                'hiddenoperator' => array(rb_filter_type::RB_FILTER_ISEMPTY, rb_filter_type::RB_FILTER_ISNOTEMPTY)
+            )
         );
 
         $filteroptions[] = new rb_filter_option(

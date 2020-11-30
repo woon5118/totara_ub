@@ -1,6 +1,10 @@
 This file describes API changes in reportbuilder,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* rb_filter_text::setupForm() now receives a new optional parameter 'hiddenoperator' which allows change an array of comparison operators
+
 === 13.2 ===
 
 * template_helper::get_template_groups() now by default excludes groups which only contain templates belonging

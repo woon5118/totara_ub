@@ -51,17 +51,25 @@ class rb_filter_text extends rb_filter_type {
         $label = format_string($this->label);
         $advanced = $this->advanced;
         $defaultvalue = $this->defaultvalue;
+        // Disable operators if not needed
+        $hiddenoperators = isset($this->options['hiddenoperator']) && is_array($this->options['hiddenoperator']) ? $this->options['hiddenoperator'] : null;
+        $operators = $this->getOperators();
+        if ($hiddenoperators) {
+            foreach ($hiddenoperators as $hiddenoperator) {
+                unset($operators[$hiddenoperator]);
+            }
+        }
+        // Custom help language string to be displayed in the help button of this filter (Expected an array as follow: ['sitewide', 'rb_source_facetoface_asset']).
+        $customhelptext = isset($this->options['customhelptext']) && is_array($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
 
         $objs = array();
-        $objs['select'] = $mform->createElement('select', $this->name.'_op', null, $this->getOperators());
+        $objs['select'] = $mform->createElement('select', $this->name.'_op', null, $operators);
         $objs['text'] = $mform->createElement('text', $this->name, null);
         $objs['select']->setLabel(get_string('limiterfor', 'filters', $label));
         $objs['text']->setLabel(get_string('valuefor', 'filters', $label));
         $mform->setType($this->name . '_op', PARAM_INT);
         $mform->setType($this->name, PARAM_TEXT);
         $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
-        // Custom help language string to be displayed in the help button of this filter (Expected an array as follow: ['sitewide', 'rb_source_facetoface_asset']).
-        $customhelptext = isset($this->options['customhelptext']) && is_array($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
         $this->add_help_button($mform, $grp->_name, 'filtertext', 'filters', $customhelptext);
         $mform->disabledIf($this->name, $this->name . '_op', 'eq', self::RB_FILTER_ISEMPTY);
         $mform->disabledIf($this->name, $this->name . '_op', 'eq', self::RB_FILTER_ISNOTEMPTY);
