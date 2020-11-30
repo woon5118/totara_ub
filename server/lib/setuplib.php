@@ -838,18 +838,24 @@ function initialise_cfg(bool $usecache) {
             $cache = cache::make('core', 'config');
             $localcfg = $cache->get('core');
             $updatecache = empty($localcfg);
-            if ($localcfg !== false || isset($localcfg['siteidentifier'])) {
-                $localcfg = (array)$localcfg;
+
+            $localcfg = empty($localcfg)
+                ? $DB->get_records_menu('config', [], '', 'name, value')
+                : (array) $localcfg;
+
+            $cached_siteidentifier = $localcfg['siteidentifier'] ?? null;
+            // If we have a siteidentifier cached make sure it matches the one in the database.
+            // If not, make sure we update the cache from the database entries
+            if (!$updatecache) {
                 // In theory fetching just one record to validate cache should be faster
                 // than fetching all config values...
                 $siteidentifier = $DB->get_field('config', 'value', ['name' => 'siteidentifier']);
-                if ($siteidentifier !== $localcfg['siteidentifier']) {
+                if ($siteidentifier !== $cached_siteidentifier) {
                     $localcfg = $DB->get_records_menu('config', [], '', 'name, value');
+                    $updatecache = true;
                 }
-            } else {
-                // Fallback to DB read.
-                $localcfg = $DB->get_records_menu('config', [], '', 'name, value');
             }
+
             if ($updatecache && $localcfg) {
                 $cache->set('core', $localcfg);
             }
