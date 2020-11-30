@@ -25,6 +25,7 @@
     :default-url="metadata.default_url"
     :accepted-types="metadata.type.valid_extensions"
     :aria-describedby="ariaDescribedby"
+    :aria-label-extension="ariaLabelExtension"
     :context-id="parseInt(contextId)"
     :show-delete="showDelete"
     @update="updateImage"
@@ -45,6 +46,7 @@ export default {
     ariaDescribedby: String,
     contextId: [Number, String],
     showDelete: Boolean,
+    ariaLabelExtension: String,
   },
 
   methods: {
