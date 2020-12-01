@@ -98,7 +98,7 @@ class card implements base_card {
         $image = $this->article->get_image();
         if (!$image) {
             // No image, use the default
-            return $OUTPUT->image_url("default" . (!$tile_view ? '_square' : ''), 'engage_article');
+            return $OUTPUT->image_url('default', 'engage_article');
         }
 
         return $image;

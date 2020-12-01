@@ -59,11 +59,11 @@
             {{/is_tile}}
             {{^is_tile}}
                 <div class="block-trv-image-wrapper">
-                    <img class="block-trv-image" src="{{image}}" />
+                    <div class="block-trv-image" style="background-image: url({{image}})"></div>
                 </div>
             {{/is_tile}}
             <div class="block-trv-content">
-                <p class="block-trv-title"><a href="{{ url }}">{{ title }}</a></p>
+                <h3 class="block-trv-title"><a href="{{ url }}">{{ title }}</a></h3>
                 {{^is_tile}}
                     <p class="block-trv-subtitle">{{ subtitle }}</p>
                 {{/is_tile}}

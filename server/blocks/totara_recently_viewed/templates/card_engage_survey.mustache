@@ -61,13 +61,13 @@
           {{/is_tile}}
             <div class="block-trv-content">
               {{#is_tile}}
-                  <p class="block-trv-title"><a href="{{url}}">{{ title }}</a></p>
+                  <h3 class="block-trv-title"><a href="{{url}}">{{ title }}</a></h3>
               {{/is_tile}}
               {{^is_tile}}
                 <h5 class="block-trv-name-vertical">
                   {{#str}} survey, engage_survey {{/str}}
                 </h5>
-                <p class="block-trv-title"><a href="{{url}}">{{ title }}</a></p>
+                <h3 class="block-trv-title"><a href="{{url}}">{{ title }}</a></h3>
               {{/is_tile}}
               {{#extra}}
                 <div class="block-trv-footer-text">
