@@ -44,16 +44,21 @@ function engage_article_pluginfile($course, $cm, $context, $filearea, $args, $fo
     require_once("{$CFG->dirroot}/lib/filelib.php");
 
     if (!in_array($filearea, ['content', 'image'])) {
-        // Invalid file area.
+         // Invalid file area.
         return;
     }
 
-    require_login();
+    if (empty($CFG->publishgridcatalogimage) || !in_array($filearea, ['image']) || empty($options['preview']) || $options['preview'] !== 'totara_catalog_medium') {
+        //check just login as engage does not support guests
+        if (!isloggedin()) {
+            send_file_not_found();
+        }
 
-    /** @var article $article */
-    $article = article::from_resource_id((int) $args[0]);
-    if (!access_manager::can_access($article, $USER->id)) {
-        send_file_not_found();
+        /** @var article $article */
+        $article = article::from_resource_id((int)$args[0]);
+        if (!access_manager::can_access($article, $USER->id)) {
+            send_file_not_found();
+        }
     }
 
     $relativepath = implode("/", $args);

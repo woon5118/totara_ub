@@ -43,19 +43,23 @@ function totara_playlist_pluginfile($course, $cm, $context, $filearea, $args, $f
     global $CFG, $USER;
     require_once("{$CFG->dirroot}/lib/filelib.php");
 
-    if (playlist::IMAGE_AREA !== $filearea) {
+    if (!in_array($filearea, [playlist::IMAGE_AREA])) {
         // Invalid file area.
         return;
     }
 
-    require_login();
+    if (empty($CFG->publishgridcatalogimage) || $filearea !== playlist::IMAGE_AREA || empty($options['preview']) || $options['preview'] !== 'totara_catalog_medium') {
+        //check just login as engage does not support guests
+        if (!isloggedin()) {
+            send_file_not_found();
+        }
 
-    /** @var playlist $playlist */
-    $playlist = playlist::from_id((int) $args[0]);
-    if (!access_manager::can_access($playlist, $USER->id)) {
-        send_file_not_found();
+        /** @var playlist $playlist */
+        $playlist = playlist::from_id((int)$args[0]);
+        if (!access_manager::can_access($playlist, $USER->id)) {
+            send_file_not_found();
+        }
     }
-
 
     $component = playlist::get_resource_type();
     $relativepath = implode("/", $args);

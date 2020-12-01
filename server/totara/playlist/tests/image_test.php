@@ -21,11 +21,16 @@
  * @package totara_playlist
  */
 
+use core\json_editor\node\image;
+use engage_article\totara_engage\resource\article;
+use totara_engage\timeview\time_view;
 use totara_playlist\local\image_processor;
+use totara_playlist\playlist;
 
 defined('MOODLE_INTERNAL') || die();
 
 class totara_playlist_image_testcase extends advanced_testcase {
+
     /**
      * Validate the following:
      *   1. Default uses the correct cells
@@ -202,5 +207,170 @@ class totara_playlist_image_testcase extends advanced_testcase {
             $val[] = $transparency;
         }
         return $val;
+    }
+
+    /**
+     * Asserts that the variable contains a raw PNG file data.
+     *
+     * @param string $actual
+     * @param string $message
+     */
+    private static function assert_png(string $actual, $message = ''): void {
+        // Just verify the PNG file signature.
+        static::assertEquals("\x89PNG\r\n\x1a\n", substr($actual, 0, 8), $message);
+    }
+
+    /**
+     * Call totara_playlist_pluginfile() without any disruption.
+     *
+     * @param context $context
+     * @param integer $itemid
+     * @param string $filearea
+     * @param string $filename
+     * @param string|null $theme
+     * @param string|null $preview
+     * @return string
+     */
+    private static function call_playlist_pluginfile(context $context, int $itemid, string $filearea, string $filename, string $theme = null, string $preview = null): string {
+        // Install a custom error handler to shut up an error message when header() is called.
+        set_error_handler(function (int $errno, string $errstr) {
+            if (strpos($errstr, 'Cannot modify header information - headers already sent by') === false) {
+                return false;
+            }
+        }, E_WARNING);
+        ob_start();
+        try {
+            // send_file_not_found() just throws moodle_exception.
+            // send_stored_file() does not die if 'dontdie' is set.
+            totara_playlist_pluginfile(null, null, $context, $filearea, [$itemid, $filename], false, ['theme' => $theme, 'preview' => $preview, 'dontdie' => true]);
+            return ob_get_contents();
+        } finally {
+            ob_end_clean();
+            restore_error_handler();
+        }
+    }
+
+    /**
+     * Test totara_playlist_pluginfile() with publishgridcatalogimage disabled.
+     *
+     */
+    public function test_pluginfile_visibility_unpublish() {
+
+        $gen = $this->getDataGenerator();
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $gen->get_plugin_generator('totara_playlist');
+        $admin = $gen->create_user();
+        $user1 = $gen->create_user();
+        $this->setUser($admin);
+
+        $playlist1 = $playlist_generator->create_playlist_with_image('totara1', 1);
+        $playlist2 = $playlist_generator->create_playlist_with_image('totara2', 0);
+
+        $image1args = [$playlist1->get_context(), $playlist1->get_id(), playlist::IMAGE_AREA, 'card.png', 'ventura', 'totara_catalog_medium'];
+        $image2args = [$playlist2->get_context(), $playlist2->get_id(), playlist::IMAGE_AREA, 'card.png', 'ventura', 'totara_catalog_medium'];
+
+        // Do not expose catalogue images.
+        set_config('publishgridcatalogimage', 0);
+
+        // Admin should be able to access any image of article.
+        $this->setAdminUser();
+        $contents = self::call_playlist_pluginfile(...$image1args);
+        $this->assert_png($contents);
+
+        $contents = self::call_playlist_pluginfile(...$image2args);
+        $this->assert_png($contents);
+
+        // User should be able to access only images of a public article.
+        $this->setUser($user1->id);
+        $contents = self::call_playlist_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        try {
+            $contents = self::call_playlist_pluginfile(...$image2args);
+            $this->fail('moodle_exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+
+        // Guest user should not be able to access any image of any workspace.
+        $this->setGuestUser();
+        try {
+            $contents = self::call_playlist_pluginfile(...$image1args);
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+
+        try {
+            $contents = self::call_playlist_pluginfile(...$image2args);
+            $this->fail('moodle_exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+
+        // Unauthorised user should not be able to access any image of any workspace.
+        $this->setUser(null);
+        try {
+            $contents = self::call_playlist_pluginfile(...$image1args);
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+
+        try {
+            $contents = self::call_playlist_pluginfile(...$image2args);
+            $this->fail('moodle_exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+    }
+
+    /**
+     * Test totara_playlist_pluginfile() with publishgridcatalogimage enabled.
+     *
+     */
+    public function test_pluginfile_visibility_publish() {
+
+        $gen = $this->getDataGenerator();
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $gen->get_plugin_generator('totara_playlist');
+        $admin = $gen->create_user();
+        $user1 = $gen->create_user();
+        $this->setUser($admin);
+
+        $playlist1 = $playlist_generator->create_playlist_with_image('totara1', 1);
+        $playlist2 = $playlist_generator->create_playlist_with_image('totara2', 0);
+
+        $image1args = [$playlist1->get_context(), $playlist1->get_id(), playlist::IMAGE_AREA, 'card.png', 'ventura', 'totara_catalog_medium'];
+        $image2args = [$playlist2->get_context(), $playlist2->get_id(), playlist::IMAGE_AREA, 'card.png', 'ventura', 'totara_catalog_medium'];
+
+
+        // Expose catalogue images.
+        set_config('publishgridcatalogimage', 1);
+
+        // Admin should be able to access any image of any workspace.
+        $this->setAdminUser();
+        $contents = self::call_playlist_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        $contents = self::call_playlist_pluginfile(...$image2args);
+        $this->assert_png($contents);
+
+        // User should be able to access catalogue images.
+        $this->setUser($user1->id);
+        $contents = self::call_playlist_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        $contents = self::call_playlist_pluginfile(...$image2args);
+        $this->assert_png($contents);
+
+        // Guest user should be able to access catalog images.
+        $this->setGuestUser();
+        $contents = self::call_playlist_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        $contents = self::call_playlist_pluginfile(...$image2args);
+        $this->assert_png($contents);
+
+        // Unauthorised user should be able to access catalog images.
+        $this->setUser(null);
+        $contents = self::call_playlist_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        $contents = self::call_playlist_pluginfile(...$image2args);
+        $this->assert_png($contents);
     }
 }

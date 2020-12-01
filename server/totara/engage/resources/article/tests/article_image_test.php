@@ -23,7 +23,6 @@
 
 use core\theme\settings;
 use engage_article\theme\file\article_image;
-use engage_article\totara_engage\resource\article;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -128,65 +127,20 @@ class engage_article_image_testcase extends advanced_testcase {
         global $CFG;
 
         $generator = $this->getDataGenerator();
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $generator->get_plugin_generator('engage_article');
         $user_one = $generator->create_user();
         $this->setUser($user_one);
 
-        $doc = [
-            'type' => 'doc',
-            'content' => [
-                [
-                    'type' => 'paragraph',
-                    'content' => [
-                        [
-                            'type' => 'text',
-                            'text' =>  'This is an article'
-                        ]
-                    ],
-                ]
-            ]
-        ];
-
-        $draft_id = file_get_unused_draft_itemid();
-        $article = article::create(
-            [
-                'format' => FORMAT_JSON_EDITOR,
-                'content' => json_encode($doc),
-                'draft_id' => $draft_id,
-                'name' => 'test article',
-            ]
-        );
-
-        require_once("{$CFG->dirroot}/lib/filelib.php");
-        $fs = get_file_storage();
-        $record = $this->create_image_record_for_article($article->get_context_id(), $draft_id, $user_one->id, 'test.png');
-
-        $file = $fs->create_file_from_string($record, 'file');
-        $url = \moodle_url::make_draftfile_url(
-            $file->get_itemid(),
-            $file->get_filepath(),
-            $file->get_filename()
-        );
-
-        $doc['content'][] = [
-            'type' => 'image',
-            'attrs' => [
-                'filename' => $file->get_filename(),
-                'url' => $url->out(),
-                'alttext' => 'test alt'
-            ],
-        ];
-
-        // Upload image to article.
-        $article->update([
-            'content' => json_encode($doc),
-            'draft_id' => $draft_id,
-            'format' => FORMAT_JSON_EDITOR,
-        ]);
-
+        $article = $article_generator->create_article_with_image('totara1', '/totara/engage/resources/article/tests/fixtures/green.png', 1, 'test alt');
         $extra = json_decode($article->get_extra(), true);
         self::assertEquals('test alt', $extra['alt_text']);
 
-        $record = $this->create_image_record_for_article($article->get_context_id(), $draft_id, $user_one->id, 'test1.png');
+        // Remove old image, upload new image and image text.
+        $draft_id = file_get_unused_draft_itemid();
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $fs = get_file_storage();
+        $record = $article_generator->create_image_record_for_article($article->get_context_id(), $draft_id, $user_one->id, 'test1.png');
         $file = $fs->create_file_from_string($record, 'file');
         $url = \moodle_url::make_draftfile_url(
             $file->get_itemid(),
@@ -207,11 +161,9 @@ class engage_article_image_testcase extends advanced_testcase {
                 ]
             ]
         ];
-
-        // Remove old image, upload new one.
         $article->update([
             'content' => json_encode($doc),
-            'draft_id' => $draft_id,
+            'draft_id' => $record->itemid,
             'format' => FORMAT_JSON_EDITOR,
         ]);
 
@@ -220,22 +172,168 @@ class engage_article_image_testcase extends advanced_testcase {
     }
 
     /**
-     * @param int $context_id
-     * @param int $draft_id
-     * @param int $user_id
-     * @param string $name
-     * @return stdClass
+     * Asserts that the variable contains a raw PNG file data.
+     *
+     * @param string $actual
+     * @param string $message
      */
-    private function create_image_record_for_article(int $context_id, int $draft_id, int $user_id, string $name): stdClass {
-        $record = new \stdClass();
-        $record->contextid = $context_id;
-        $record->component = 'user';
-        $record->filearea = 'draft';
-        $record->itemid = $draft_id;
-        $record->filename = $name;
-        $record->userid = $user_id;
-        $record->filepath = '/';
+    private static function assert_png(string $actual, $message = ''): void {
+        // Just verify the PNG file signature.
+        static::assertEquals("\x89PNG\r\n\x1a\n", substr($actual, 0, 8), $message);
+    }
 
-        return $record;
+    /**
+     * Call engage_article_pluginfile() without any disruption.
+     *
+     * @param context $context
+     * @param integer $itemid
+     * @param string $filearea
+     * @param string $filename
+     * @param string|null $theme
+     * @param string|null $preview
+     * @return string
+     */
+    private static function call_engage_article_pluginfile(context $context, int $itemid, string $filearea, string $filename, string $theme = null, string $preview = null): string {
+        // Install a custom error handler to shut up an error message when header() is called.
+        set_error_handler(function (int $errno, string $errstr) {
+            if (strpos($errstr, 'Cannot modify header information - headers already sent by') === false) {
+                return false;
+            }
+        }, E_WARNING);
+        ob_start();
+        try {
+            // send_file_not_found() just throws moodle_exception.
+            // send_stored_file() does not die if 'dontdie' is set.
+            engage_article_pluginfile(null, null, $context, $filearea, [$itemid, $filename], false, ['theme' => $theme, 'preview' => $preview, 'dontdie' => true]);
+            return ob_get_contents();
+        } finally {
+            ob_end_clean();
+            restore_error_handler();
+        }
+    }
+
+    /**
+     * Test engage_article_pluginfile() with publishgridcatalogimage disabled.
+     *
+     */
+
+    public function test_pluginfile_visibility_unpublish() {
+
+        $gen = $this->getDataGenerator();
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $gen->get_plugin_generator('engage_article');
+        $user1 = $gen->create_user();
+        $this->setAdminUser();
+
+        $article1 = $article_generator->create_article_with_image('totara1', '/totara/engage/resources/article/tests/fixtures/green.png', 1);
+        $article2 = $article_generator->create_article_with_image('totara2', '/totara/engage/resources/article/tests/fixtures/blue.png', 0);
+
+        $image1args = [$article1->get_context(), $article1->get_id(), 'image', 'totara1.png', 'ventura', 'totara_catalog_medium'];
+        $image2args = [$article2->get_context(), $article2->get_id(), 'image', 'totara2.png', 'ventura', 'totara_catalog_medium'];
+
+        // Do not expose catalogue images.
+        set_config('publishgridcatalogimage', 0);
+
+        // Admin should be able to access any image of article.
+
+        $contents = self::call_engage_article_pluginfile(...$image1args);
+        $this->assert_png($contents);
+
+        $contents = self::call_engage_article_pluginfile(...$image2args);
+        $this->assert_png($contents);
+
+        // User should be able to access only images of a public article.
+        $this->setUser($user1->id);
+        $contents = self::call_engage_article_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        try {
+            $contents = self::call_engage_article_pluginfile(...$image2args);
+            $this->fail('moodle_exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+
+        // Guest user should not be able to access any image of any article.
+        $this->setGuestUser();
+        try {
+            $contents = self::call_engage_article_pluginfile(...$image1args);
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+
+        try {
+            $contents = self::call_engage_article_pluginfile(...$image2args);
+            $this->fail('moodle_exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+
+        // Unauthorised user should not be able to access any image of any article.
+        $this->setUser(null);
+        try {
+            $contents = self::call_engage_article_pluginfile(...$image1args);
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+
+        try {
+            $contents = self::call_engage_article_pluginfile(...$image2args);
+            $this->fail('moodle_exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Sorry, the requested file could not be found', $ex->getMessage());
+        }
+    }
+
+    /**
+     * Test engage_article_pluginfile() with publishgridcatalogimage enabled.
+     *
+     */
+    public function test_pluginfile_visibility_publish() {
+
+        $gen = $this->getDataGenerator();
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $gen->get_plugin_generator('engage_article');
+        $user1 = $gen->create_user();
+        $this->setAdminUser();
+
+        $article1 = $article_generator->create_article_with_image('totara1', '/totara/engage/resources/article/tests/fixtures/green.png', 1);
+        $article2 = $article_generator->create_article_with_image('totara2', '/totara/engage/resources/article/tests/fixtures/blue.png', 0);
+
+        $image1args = [$article1->get_context(), $article1->get_id(), 'image', 'totara1.png', 'ventura', 'totara_catalog_medium'];
+        $image2args = [$article2->get_context(), $article2->get_id(), 'image', 'totara2.png', 'ventura', 'totara_catalog_medium'];
+
+
+        // Expose catalogue images.
+        set_config('publishgridcatalogimage', 1);
+
+        // Admin should be able to access any image of any article.
+        $this->setAdminUser();
+        $contents = self::call_engage_article_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        $contents = self::call_engage_article_pluginfile(...$image2args);
+        $this->assert_png($contents);
+
+        // Guest user should be able to access catalog images.
+        $this->setUser($user1->id);
+        $contents = self::call_engage_article_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        $contents = self::call_engage_article_pluginfile(...$image2args);
+        $this->assert_png($contents);
+
+
+        // Guest user should be able to access catalog images.
+        $this->setGuestUser();
+        $contents = self::call_engage_article_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        $contents = self::call_engage_article_pluginfile(...$image2args);
+        $this->assert_png($contents);
+
+
+        // Unauthorised user should be able to access catalog images.
+        $this->setUser(null);
+        $contents = self::call_engage_article_pluginfile(...$image1args);
+        $this->assert_png($contents);
+        $contents = self::call_engage_article_pluginfile(...$image2args);
+        $this->assert_png($contents);
     }
 }

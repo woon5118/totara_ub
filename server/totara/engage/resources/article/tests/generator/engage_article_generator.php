@@ -271,4 +271,96 @@ final class engage_article_generator extends component_generator_base {
 
         return $this->create_article($data);
     }
+
+    /**
+     * Create a article with a catalogue image.
+     *
+     * @param string $name
+     * @param string $path
+     * @param int $access
+     * @param string $alttext
+     * @throws coding_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
+    public function create_article_with_image(string $name, string $path, int $access, string $alttext = null) {
+        global $CFG, $USER;
+
+        $userid = $USER->id;
+        $draft_id = file_get_unused_draft_itemid();
+
+        $doc = [
+            'type' => 'doc',
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' =>  'This is an article'
+                        ]
+                    ],
+                ]
+            ]
+        ];
+
+        $article = article::create(
+            [
+                'format' => FORMAT_JSON_EDITOR,
+                'content' => json_encode($doc),
+                'timeview' => time_view::LESS_THAN_FIVE,
+                'draft_id' => $draft_id,
+                'name' => $name,
+                'access' => $access
+            ],
+            $userid
+        );
+
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $fs = get_file_storage();
+
+        $record = $this->create_image_record_for_article($article->get_context_id(), $draft_id, $userid, $name);
+        $sourcefile = $CFG->dirroot . $path;
+
+        $file = $fs->create_file_from_pathname($record, $sourcefile);
+        $url = \moodle_url::make_draftfile_url(
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename()
+        );
+        $doc['content'][] = [
+            'type' => 'image',
+            'attrs' => [
+                'filename' => $file->get_filename(),
+                'url' => $url->out(),
+                'alttext' => $alttext
+            ],
+        ];
+        $article->update([
+            'content' => json_encode($doc),
+            'draft_id' => $draft_id,
+        ]);
+
+        return $article;
+    }
+    /**
+     * @param int $context_id
+     * @param int $draft_id
+     * @param int $user_id
+     * @param string $name
+     * @return stdClass
+     */
+    public function create_image_record_for_article(int $context_id, $draft_id, int $user_id, string $name): stdClass {
+
+        $record = new \stdClass();
+        $record->contextid = $context_id;
+        $record->component = 'user';
+        $record->filearea = 'draft';
+        $record->itemid = $draft_id;
+        $record->filename = "{$name}.png";
+        $record->userid = $user_id;
+        $record->filepath = '/';
+
+        return $record;
+    }
 }

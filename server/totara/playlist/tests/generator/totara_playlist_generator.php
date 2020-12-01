@@ -333,4 +333,40 @@ final class totara_playlist_generator extends component_generator_base {
         $parameters['access'] = access::RESTRICTED;
         return $this->create_playlist($parameters);
     }
+    /**
+     * Create a workspace with a catalogue image.
+     *
+     * @param string $name
+     * @param int $access
+     * @throws coding_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
+    public function create_playlist_with_image(string $name, int $access) {
+        global $USER;
+        $userid = $USER->id;
+
+        $generator = \advanced_testcase::getDataGenerator();
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $generator->get_plugin_generator('engage_article');
+
+        $article1 = $article_generator->create_article_with_image('totara1','/totara/playlist/tests/fixtures/red.png', 1);
+        $article2 = $article_generator->create_article_with_image('totara2','/totara/playlist/tests/fixtures/yellow.png', 1);
+        $article3 = $article_generator->create_article_with_image('totara3','/totara/playlist/tests/fixtures/blue.png', 1);
+        $article4 = $article_generator->create_article_with_image('totara4','/totara/playlist/tests/fixtures/green.png', 1);
+
+        $playlist = totara_playlist\playlist::create(
+            $name,
+            $access,
+            $contextid = null,
+            $userid
+        );
+
+        $playlist->add_resource($article1, $userid);
+        $playlist->add_resource($article2, $userid);
+        $playlist->add_resource($article3, $userid);
+        $playlist->add_resource($article4, $userid);
+
+        return $playlist;
+    }
 }
