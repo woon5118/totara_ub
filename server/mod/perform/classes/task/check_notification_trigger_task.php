@@ -25,10 +25,9 @@ namespace mod_perform\task;
 
 use core\task\scheduled_task;
 use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\entity\activity\track as track_entity;
 use mod_perform\entity\activity\track_user_assignment as track_user_assignment_entity;
-use mod_perform\entity\activity\subject_instance as subject_instance_entity;
-use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
@@ -36,7 +35,6 @@ use mod_perform\notification\factory;
 use mod_perform\notification\loader;
 use mod_perform\notification\triggerable;
 use mod_perform\state\activity\active;
-use totara_core\entity\relationship as relationship_entity;
 
 /**
  * Periodically check notification event triggers.
@@ -67,9 +65,9 @@ class check_notification_trigger_task extends scheduled_task {
             }
         }
 
-        $clock = factory::create_clock();
-
         $page = 1;
+        $processed_notifications = [];
+
         do {
             $paginator = subject_instance_entity::repository()
                 ->as('si')
@@ -111,11 +109,16 @@ class check_notification_trigger_task extends scheduled_task {
                     $dealer = factory::create_dealer_on_participant_instances($subject_instance->participant_instances->all());
                     $dealer->dispatch($class_key);
 
-                    $notification->set_last_run_at($clock->get_time());
+                    $processed_notifications[$notification->id] = $notification;
                 }
             }
 
             $page++;
         } while ($paginator->get_next() !== null);
+
+        $now = factory::create_clock()->get_time();
+        foreach ($processed_notifications as $notification) {
+            $notification->set_last_run_at($now);
+        }
     }
 }
