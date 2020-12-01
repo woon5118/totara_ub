@@ -20,6 +20,7 @@ exports[`totara_comment/components/form/CommentForm.vue Checks snapshot 1`] = `
         data-file-item-id="500"
         data-key="totara_comment_editor_weka_1"
         fileitemid="500"
+        isloggedin="true"
         placeholder="entercomment-totara_comment"
         usageidentifier="[object Object]"
         value="[object Object]"

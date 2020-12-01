@@ -42,6 +42,7 @@ import Editor from '../js/Editor';
 import Toolbar from 'editor_weka/components/toolbar/Toolbar';
 import { loadLangStrings } from 'tui/i18n';
 import editorWeka from 'editor_weka/graphql/weka';
+import editorWekaNoSession from 'editor_weka/graphql/weka_nosession';
 import FileStorage from '../js/helpers/file';
 import WekaValue from '../js/WekaValue';
 import { createImmutablePropWatcher } from 'tui/vue_util';
@@ -112,6 +113,13 @@ export default {
      * The compact mode is to determine whether we are showing the tool bar or not.
      */
     compact: Boolean,
+    /**
+     * If false, loads the editor without a user logged in and disables file support.
+     */
+    isLoggedIn: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data() {
@@ -156,7 +164,7 @@ export default {
      * @param {Number|String} value
      */
     fileItemId(value) {
-      if (this.editor) {
+      if (this.editor && this.isLoggedIn) {
         this.editor.updateFileItemId(value);
       }
     },
@@ -212,7 +220,7 @@ export default {
 
       // Start populating the options from the graphql call.
       const result = await this.$apollo.query({
-        query: editorWeka,
+        query: this.isLoggedIn ? editorWeka : editorWekaNoSession,
         fetchPolicy: 'no-cache',
         variables: {
           instance_id: this.usageIdentifier.instanceId,

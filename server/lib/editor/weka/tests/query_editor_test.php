@@ -42,4 +42,19 @@ class editor_weka_query_editor_testcase extends advanced_testcase {
         $this->assertEmpty($result->errors);
         $this->assertNotEmpty($result->data);
     }
+
+    /**
+     * Make sure the query can be run without a user in session.
+     */
+    public function test_query_editor_nosession_via_graphql(): void {
+        $ec = execution_context::create('ajax', 'editor_weka_weka');
+        $result = graphql::execute_operation($ec, [
+            'component' => 'editor_weka',
+            'area' => 'phpunit'
+        ]);
+
+        $this->assertEmpty($result->errors);
+        $this->assertNotEmpty($result->data);
+    }
+
 }

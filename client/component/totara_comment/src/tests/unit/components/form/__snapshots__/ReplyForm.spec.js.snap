@@ -15,6 +15,7 @@ exports[`totara_comment/components/form/ReplyForm.vue Checks snapshot 1`] = `
       compact="true"
       data-file-item-id="100"
       fileitemid="100"
+      isloggedin="true"
       placeholder="enterreply-totara_comment"
       usageidentifier="[object Object]"
       value="[object Object]"

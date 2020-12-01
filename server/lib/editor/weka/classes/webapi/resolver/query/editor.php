@@ -118,7 +118,7 @@ final class editor implements query_resolver, has_middleware {
      */
     public static function get_middleware(): array {
         return [
-            new require_login(),
+            // We don't require logging in, as the editor can be used with or without a user in the session.
         ];
     }
 
