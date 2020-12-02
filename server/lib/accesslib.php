@@ -7935,7 +7935,7 @@ class context_course extends context {
         } else {
             if ($course = $DB->get_record('course', array('id'=>$this->_instanceid))) {
                 if ($withprefix){
-                    $name = get_string('course').': ';
+                    $name = get_string('pluginname', $course->containertype) . ': ';
                 }
                 if ($short){
                     $name .= format_string($course->shortname, true, array('context' => $this));

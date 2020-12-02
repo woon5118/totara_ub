@@ -23,4 +23,4 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Course container';
+$string['pluginname'] = 'Course';
