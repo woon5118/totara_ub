@@ -260,7 +260,7 @@ if ($node && $post->id != $discussion->firstpost) {
     $node->add(format_string($post->subject), $PAGE->url);
 }
 
-$PAGE->set_title("$course->shortname: ".format_string($discussionname));
+$PAGE->set_title(format_string($forum->name) ." - ". format_string($discussionname));
 $PAGE->set_heading($course->fullname);
 $PAGE->set_button($searchform);
 $renderer = $PAGE->get_renderer('mod_forum');

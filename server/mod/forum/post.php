@@ -384,7 +384,13 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum
 
         forum_set_return();
         $PAGE->navbar->add(get_string('delete', 'forum'));
-        $PAGE->set_title($course->shortname);
+
+        // Set title for deletion.
+        $a = new stdClass();
+        $a->forum = format_string($forum->name);
+        $a->discussion = format_string($discussion->name);
+
+        $PAGE->set_title(get_string('forum_delete', 'forum', $a));
         $PAGE->set_heading($course->fullname);
 
         if ($replycount) {
@@ -1037,7 +1043,17 @@ if ($edit) {
     $PAGE->navbar->add(get_string('edit', 'forum'));
 }
 
-$PAGE->set_title("$course->shortname: $strdiscussionname ".format_string($toppost->subject));
+$a = new stdClass();
+$a->forum = format_string($forum->name);
+$a->discussion = format_string($discussion->name);
+if (!empty($edit)) {
+    $PAGE->set_title(get_string('forum_edit', 'forum', $a));
+} else if (!empty($reply)) {
+    $PAGE->set_title(get_string('forum_reply', 'forum', $a));
+} else {
+    $PAGE->set_title("$course->shortname: $strdiscussionname ".format_string($toppost->subject));
+}
+
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
