@@ -38,5 +38,9 @@ $watchers = [
     [
         'hookname' => \editor_weka\hook\search_users_by_pattern::class,
         'callback' => [\totara_engage\watcher\editor_weka_watcher::class, 'on_search_users']
+    ],
+    [
+        'hookname' => '\core\hook\phpunit_reset',
+        'callback' =>  [\totara_engage\watcher\phpunit_reset_watcher::class, 'reset_data']
     ]
 ];

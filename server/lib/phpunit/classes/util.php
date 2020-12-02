@@ -327,22 +327,7 @@ class phpunit_util extends testing_util {
             http_message_sink::clear();
         }
 
-        if (class_exists('totara_comment_default_resolver')) {
-            totara_comment_default_resolver::reset_callbacks();
-        }
-
-        if (class_exists('\totara_topic\resolver\resolver_factory')) {
-            // Reset cache for totara_topic
-            \totara_topic\resolver\resolver_factory::phpunit_clear_resolver();
-        }
-
-        if (class_exists('\totara_engage\question\question_resolver_factory')) {
-            \totara_engage\question\question_resolver_factory::clear_default_resolver();
-        }
-
-        if (class_exists('\totara_reaction\resolver\resolver_factory')) {
-            \totara_reaction\resolver\resolver_factory::phpunit_clear_resolver();
-        }
+        (new \core\hook\phpunit_reset())->execute();
 
         if ($warnings) {
             $warnings = implode("\n", $warnings);
