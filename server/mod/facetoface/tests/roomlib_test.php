@@ -27,6 +27,7 @@
 
 use mod_facetoface\room;
 use mod_facetoface\room_helper;
+use mod_facetoface\room_virtualmeeting;
 use mod_facetoface\seminar_session;
 use mod_facetoface\seminar_event;
 use mod_facetoface\signup;
@@ -1679,6 +1680,46 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
 
         $this->assertTrue($room1->is_available($timestart1, $timefinish1, $seminarevent2));
         $this->assertTrue($room2->is_available($timestart2, $timefinish2, $seminarevent2));
+    }
+
+    /**
+     * Create room_virtualmeeting record
+     */
+    public static function create_room_virtualmeeting(int $roomid, int $userid): room_virtualmeeting {
+
+        $virtual_meeting = new room_virtualmeeting();
+        $virtual_meeting->set_plugin('msteams')->set_roomid($roomid)->set_userid($userid);
+        $virtual_meeting->save();
+
+        return $virtual_meeting;
+    }
+
+    /**
+     * Test to make sure user cannot update an another user's virtual meeting room
+     */
+    public function test_can_update_virtualmeeting(){
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $customroom = $this->facetoface_generator->add_custom_room(['name' => 'virtual', 'url' => 'link', 'usercreated' => $user2->id]);
+        $customroom2 = $this->facetoface_generator->add_custom_room(['name' => 'casual', 'usercreated' => $user2->id]);
+        $room = new \mod_facetoface\room($customroom->id);
+        $room2 = new \mod_facetoface\room($customroom2->id);
+        self::create_room_virtualmeeting($room->get_id(), $user2->id);
+
+        // Non-creator cannot update virtualmeeting
+        $this->setUser($user1);
+        $can_manage = room_helper::can_update_virtualmeeting($room);
+        $this->assertEquals(false, $can_manage);
+
+        // And can update casual room
+        $can_manage = room_helper::can_update_virtualmeeting($room2);
+        $this->assertEquals(true, $can_manage);
+
+        // Creator can update virtualmeeting
+        $this->setUser($user2);
+        $can_manage = room_helper::can_update_virtualmeeting($room);
+        $this->assertEquals(true, $can_manage);
     }
 
     protected function prepare_date($timestart, $timeend, $roomid) {

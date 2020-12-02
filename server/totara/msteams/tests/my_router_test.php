@@ -23,6 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use totara_core\util\base64url;
 use totara_msteams\botfw\activity;
 use totara_msteams\botfw\auth\default_authoriser;
 use totara_msteams\botfw\bot;
@@ -36,7 +37,6 @@ use totara_msteams\botfw\exception\unexpected_exception;
 use totara_msteams\botfw\notification\default_notification;
 use totara_msteams\botfw\resolver\v3_resolver;
 use totara_msteams\botfw\storage\memory_storage;
-use totara_msteams\botfw\util\base64url;
 use totara_msteams\botfw\validator\default_validator;
 use totara_msteams\botfw\validator\validator;
 use totara_msteams\my\dispatcher\cant_hear_you;

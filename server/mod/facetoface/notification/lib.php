@@ -23,11 +23,7 @@
  * @subpackage facetoface
  */
 
-use mod_facetoface\{
-    attendees_helper,
-    seminar_event,
-    output\session_time
-};
+use mod_facetoface\{attendees_helper, seminar_event, output\session_time, seminar_event_helper};
 use mod_facetoface\signup\state\{
     attendance_state,
     booked,
@@ -102,6 +98,7 @@ define('MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION',    1 << 21);
 define('MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE', 1 << 22);
 define('MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED',        1 << 23);
 define('MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED',      1 << 24);
+define('MDL_F2F_CONDITION_VIRTUALMEETING_CREATION_FAILURE',     1 << 25);
 
 /**
  * Notification sent state
@@ -757,6 +754,58 @@ class facetoface_notification extends data_object {
     }
 
     /**
+     * Sends the 'Event virtual meeting creation failure' notification to users
+     *
+     * @param $session
+     */
+    public function send_notification_virtual_meeting_creation_failure(seminar_event $seminarevent) {
+        global $DB, $CFG;
+
+        $facetoface = $DB->get_record('facetoface', array('id' => $seminarevent->get_facetoface()));
+        $seminar = new \mod_facetoface\seminar();
+        $seminar->map_instance($facetoface);
+        $cm = $seminar->get_coursemodule();
+
+        // Workaround to build the seminar_event record, that has mintimestart, maxtimefinish and
+        // sessiondates properties
+        $sessions = [];
+        $session = $seminarevent->to_record();
+        $session->mintimestart = $seminarevent->get_mintimestart();
+        $session->maxtimefinish = $seminarevent->get_maxtimefinish();
+        $session->sessiondates = array_values($seminarevent->get_sessions()->to_records());
+        $session->cntdates = count($session->sessiondates);
+        $sessions[$session->id] = $session;
+
+        if (CLI_SCRIPT && !PHPUNIT_TEST) {
+            $info = new \stdClass();
+            $info->name = format_string($seminar->get_name());
+            mtrace(
+                "Virtual meeting creation in facetoface '{$info->name}' in course {$seminar->get_course()} failed" .
+                " - emailing room creator."
+            );
+        }
+
+        // Get all the users who need to receive the under capacity warning.
+        $modcontext = \context_module::instance($cm->id);
+
+        $recipients = \mod_facetoface\room_virtualmeeting::get_virtualmeeting_creators_in_all_sessions($seminarevent->get_id());
+        $notificationparams = array(
+            "facetofaceid" => $seminar->get_id(),
+            "type" => MDL_F2F_NOTIFICATION_AUTO,
+            "conditiontype" => MDL_F2F_CONDITION_VIRTUALMEETING_CREATION_FAILURE,
+        );
+
+        // And send them the notification.
+        foreach ($recipients as $recipient) {
+            $notice = new facetoface_notification($notificationparams);
+            $notice->set_facetoface($facetoface);
+            $notice->_sessions = $sessions;
+            $notice->set_newevent($recipient, $session->id);
+            $notice->send_to_user($recipient, $session->id);
+        }
+    }
+
+    /**
      * Send to all matching users
      *
      * @access  public
@@ -1384,6 +1433,9 @@ class facetoface_notification extends data_object {
         if (in_array($this->conditiontype, [MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION, MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE, MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED, MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED])) {
             return get_string('facilitator', 'mod_facetoface');
         }
+        if (in_array($this->conditiontype, [MDL_F2F_CONDITION_VIRTUALMEETING_CREATION_FAILURE])){
+            return get_string('virtualroom_creator', 'mod_facetoface');
+        }
         $recips = array();
         if ($this->booked) {
             switch ($this->booked) {
@@ -1507,6 +1559,7 @@ class facetoface_notification extends data_object {
             'facilitatortimechange' => MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE,
             'facilitatorassigned' => MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED,
             'facilitatorunassigned' => MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED,
+            'virtualmeetingfailure' => MDL_F2F_CONDITION_VIRTUALMEETING_CREATION_FAILURE,
         );
     }
 
@@ -2622,6 +2675,23 @@ function facetoface_get_default_notifications($facetofaceid) {
     } else {
         $missingtemplates[] = 'undercapacity';
     }
+
+    if (isset($templates['virtualmeetingfailure'])) {
+        $template = $templates['virtualmeetingfailure'];
+        $virtualmeetingfailure = new facetoface_notification($defaults, false);
+        $virtualmeetingfailure->title = $template->title;
+        $virtualmeetingfailure->body = $template->body;
+        $virtualmeetingfailure->managerprefix = $template->managerprefix;
+        $virtualmeetingfailure->conditiontype = MDL_F2F_CONDITION_VIRTUALMEETING_CREATION_FAILURE;
+        $virtualmeetingfailure->ccmanager = $template->ccmanager;
+        $virtualmeetingfailure->status = $template->status;
+        $virtualmeetingfailure->requested = 1;
+        $virtualmeetingfailure->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_VIRTUALMEETING_CREATION_FAILURE] = $virtualmeetingfailure;
+    } else {
+        $missingtemplates[] = 'virtualmeetingfailure';
+    }
+
 
     $facreferences = [
         'facilitatorcancel' => MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION,

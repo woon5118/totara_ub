@@ -759,5 +759,36 @@
         <INDEX NAME="sessionsdateid-facilitatorid" UNIQUE="true" FIELDS="sessionsdateid, facilitatorid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="facetoface_room_dates_virtualmeeting" COMMENT="Session date to virtual meeting room relationship">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="roomdateid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="virtualmeetingid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="roomdatevm_date_fk" TYPE="foreign" FIELDS="roomdateid" REFTABLE="facetoface_room_dates" REFFIELDS="id"/>
+        <KEY NAME="roomdatevm_meet_fk" TYPE="foreign" FIELDS="virtualmeetingid" REFTABLE="virtualmeeting" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="facetoface_room_virtualmeeting" COMMENT="Facetoface room to virtual meeting plugin type relationship">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="plugin" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="options" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="roomvm_room_fk" TYPE="foreign" FIELDS="roomid" REFTABLE="facetoface_room" REFFIELDS="id"/>
+        <KEY NAME="roomvm_user_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="roomvm_plugin" UNIQUE="false" FIELDS="plugin"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

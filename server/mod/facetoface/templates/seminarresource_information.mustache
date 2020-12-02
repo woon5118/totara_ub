@@ -20,6 +20,31 @@
    @package mod_facetoface
 }}
 
+{{!
+
+    @template mod_facetoface/seminarresource_information
+
+    This template generates the seminar resource page.
+
+    Context variables required for this template:
+    * headeraction: template data of seminarevent_actionbar
+    * heading: heading text
+    * card: template data of seminarresource_card
+    * details: resource details html
+    * report: reportbulder data
+    * report.header: heading text
+    * report.debughtml: debug html
+    * report.description: description
+    * report.searchoptions: saved search options
+    * report.search: search
+    * report.sidebar: sidebar search
+    * report.reporthtml: report html
+    * footeraction: template data of seminarevent_actionbar
+
+    Example content (json):
+    * not yet provided :)
+}}
+
 {{#headeraction}}{{> mod_facetoface/seminarevent_actionbar }}{{/headeraction}}
 
 <h2>{{heading}}</h2>

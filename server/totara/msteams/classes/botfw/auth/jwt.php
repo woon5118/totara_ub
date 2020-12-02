@@ -24,8 +24,8 @@
 namespace totara_msteams\botfw\auth;
 
 use stdClass;
+use totara_core\util\base64url;
 use totara_msteams\botfw\exception\jwt_exception;
-use totara_msteams\botfw\util\base64url;
 
 /**
  * A class that manages a JSON Web Token.

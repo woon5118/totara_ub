@@ -406,6 +406,7 @@ $string['confirmation'] = 'Confirmation';
 $string['confirmationmessage'] = 'Confirmation message';
 $string['confirmationsent'] = 'You will receive a booking confirmation email shortly.';
 $string['confirmationsentmgr'] = 'You will be notified about their decision.';
+$string['connectedas'] = 'Connected as {$a}';
 $string['completionstatusrequired'] = 'Require status';
 $string['completionstatusrequired_help'] = 'Checking one or more statuses will require a user to achieve at least one of the checked statuses in order to be marked complete in this seminar activity, as well as any other Activity Completion requirements.';
 $string['completiondelay'] = 'Require event over for';
@@ -414,6 +415,7 @@ $string['completiondelay_help'] = 'Checking this completion criteria will requir
 
 Use this setting to allow trainers to mark attendance and/or grades without triggering activity completions. The setting of 0 days will delay activity completion until the event is over.';
 $string['completiondelaydays'] = 'days';
+$string['connectionfailed'] = 'Connnection failed';
 $string['copyingsession'] = 'Copying as a new event in {$a}';
 $string['copynotification'] = 'Copy notification';
 $string['copynotificationcreated'] = 'Copy of the notification is created.';
@@ -713,6 +715,7 @@ $string['error:shortnamecustomfield'] = 'This shortname is reserved by Totara se
 $string['error:takeattendance'] = 'An error occurred while taking attendance';
 $string['error:therearexconflicts'] = 'There are ({$a}) conflicts with the proposed time period.';
 $string['error:thereisaconflict'] = 'There is a conflict with the proposed time period.';
+$string['error:toomanyvirtualmeetings'] = 'Too many virtual meetings. Please ensure that <strong>only one</strong> virtual meeting is assigned per session';
 $string['error:unrecognisedapprovaltype'] = 'Unrecognised approval type passed to facetoface_get_approvaltype_string()';
 $string['error:unknownbuttonclicked'] = 'No action associated with the button that was clicked';
 $string['error:unknownuserfield'] = 'This field is not supported for user search.';
@@ -939,6 +942,7 @@ $string['inactive'] = 'Inactive';
 $string['individuals'] = 'Individuals';
 $string['info'] = 'Info';
 $string['inprogress'] = 'In progress';
+$string['internal'] = 'Custom virtual room link';
 $string['itemstoadd'] = 'Items to add';
 $string['jobassignment'] = 'Job assignment';
 $string['joinwaitlist'] = 'Join waitlist';
@@ -1167,6 +1171,7 @@ $string['roomdescription'] = 'Room description';
 $string['roomdescriptionedit'] = 'Description';
 $string['roomdetails'] = 'Room details';
 $string['roomgoto'] = 'Go to room';
+$string['roomgotox'] = 'Go to \'{$a}\'';
 $string['roomhidden'] = 'Room hidden successfully';
 $string['roomhide'] = 'Hide from users when choosing a room on the Add/Edit event page';
 $string['roomidentifier_nameonly'] = 'Room name';
@@ -2269,6 +2274,22 @@ Duration: [session:duration]
 [session:facilitators]
 [/sessions]';
 $string['setting:defaultvalue'] = 'Default value';
+$string['setting:defaultvirtualmeetingfailuresubjectdefault'] = 'Virtual meeting creation failure';
+$string['setting:defaultvirtualmeetingfailuremessagedefault'] = 'This is to advise that the system failed to create virtual meetings for the following event. Please try again by deleting and recreating these virtual rooms in the event. If the error persists check your connection to the virtual meeting service provider or contact site administrators:
+
+
+***VIRTUAL MEETING CREATION FAILURE***
+
+Course: [coursename]
+Seminar: [facetofacename]
+
+Event times and virtual meeting details:
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
+Room: [session:room:name]
+[session:room:link]
+[/sessions]';
 $string['setting:defaultwaitlistautocleansubjectdefault'] = 'Waitlisted signup expired';
 $string['setting:defaultwaitlistautocleanmessagedefault'] = 'This is to advise you that your waitlisted signup for the following course has been cancelled due to the event starting:
 
@@ -2639,9 +2660,17 @@ $string['viewdetails'] = 'View details';
 $string['viewresults'] = 'View results';
 $string['viewroom'] = 'View room';
 $string['viewsubmissions'] = 'View submissions';
+$string['virtual_meeting'] = 'Virtual meeting';
+$string['virtual_meeting_add'] = 'Add virtual room link';
+$string['virtual_meeting_connect'] = 'Connect';
+$string['virtual_meeting_disconnect'] = 'Disconnect';
+$string['virtual_meeting_service_provider'] = 'Service provider account';
+$string['virtual_meeting_service_provider_help'] = 'Once you connect your service provider account and save this virtual room, the session will appear as a scheduled meeting under your authorised service provider account.';
+$string['virtual_meetings'] = 'Virtual meetings';
 $string['virtualroom_card_willopen'] = 'Virtual room will open 15 minutes before next session';
 $string['virtualroom_card_unavailable'] = 'Virtual room is unavailable';
 $string['virtualroom_card_over'] = 'Virtual room is no longer available';
+$string['virtualroom_creator'] = 'Virtual room creator';
 $string['virtualroom_heading'] = 'Virtual room';
 $string['virtualroom_details_seminar'] = 'Seminar';
 $string['virtualroom_details_session_time'] = 'Session time';

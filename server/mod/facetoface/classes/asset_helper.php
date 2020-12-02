@@ -93,29 +93,7 @@ final class asset_helper {
      * @return bool
      */
     public static function sync(int $date, array $assets = []): bool {
-        global $DB;
-
-        if (empty($assets)) {
-            return $DB->delete_records('facetoface_asset_dates', ['sessionsdateid' => $date]);
-        }
-
-        $oldassets = $DB->get_fieldset_select('facetoface_asset_dates', 'assetid', 'sessionsdateid = :date_id', ['date_id' => $date]);
-
-        // WIPE THEM AND RECREATE if certain conditions have been met.
-        if ((count($assets) == count($oldassets)) && empty(array_diff($assets, $oldassets))) {
-            return true;
-        }
-
-        $res = $DB->delete_records('facetoface_asset_dates', ['sessionsdateid' => $date]);
-
-        foreach ($assets as $asset) {
-            $res &= $DB->insert_record('facetoface_asset_dates', (object) [
-                'sessionsdateid' => $date,
-                'assetid' => intval($asset)
-            ],false);
-        }
-
-        return !!$res;
+        return resource_helper::sync_resources($date, $assets, 'asset');
     }
 
     /**

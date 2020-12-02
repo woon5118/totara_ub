@@ -25,7 +25,8 @@ namespace mod_facetoface;
 
 use coding_exception;
 use context_course;
-use moodle_url;
+use core\entity\user;
+use core\orm\query\exceptions\record_not_found_exception;
 use external_api;
 use external_description;
 use external_function_parameters;
@@ -33,13 +34,9 @@ use external_single_structure;
 use external_value;
 use mod_facetoface\dashboard\filter_list;
 use mod_facetoface\dashboard\filters\filter;
-use mod_facetoface\dashboard\render_session_option;
 use mod_facetoface\output\seminarevent_dashboard_sessions;
-use mod_facetoface\output\session_list;
-use mod_facetoface\output\show_previous_events;
-use mod_facetoface\query\query_helper;
-use mod_facetoface_renderer;
 use moodle_exception;
+use totara_core\virtualmeeting\virtual_meeting_auth;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -51,7 +48,6 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
  * This is the external API for mod_facetoface.
  */
 class external extends external_api {
-
     /**
      * Parameter definitions of render_session_list.
      *
@@ -138,5 +134,51 @@ class external extends external_api {
     public static function render_session_list_returns(): ?external_description {
         // It's not possible to define variable structures in this function.
         return null;
+    }
+
+    /**
+     * Parameter definitions of user_profile.
+     *
+     * @return external_function_parameters
+     */
+    public static function user_profile_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'plugin' => new external_value(PARAM_PLUGIN, 'Plugin name'),
+            'update' => new external_value(PARAM_BOOL, 'Tell plugin to update auth token', VALUE_DEFAULT, false),
+        ]);
+    }
+
+    /**
+     * Get the user's external profile provided by the given virtual meeting plugin.
+     *
+     * @param string $pluginname
+     * @param boolean|null $update
+     * @return array
+     */
+    public static function user_profile(string $pluginname, ?bool $update): array {
+        /** @var user */
+        $user = user::logged_in();
+        try {
+            $auth = virtual_meeting_auth::load_by_plugin_user($pluginname, $user);
+            return $auth->get_user_profile($update ?? false);
+        } catch (record_not_found_exception $ex) {
+            return [];
+        }
+    }
+
+    /**
+     * Returns an object that describes the structure of the return from user_auth_status.
+     *
+     * @return external_description|null
+     */
+    public static function user_profile_returns(): ?external_description {
+        return new external_single_structure(
+            [
+                'name' => new external_value(PARAM_RAW, 'username', VALUE_OPTIONAL),
+                'email' => new external_value(PARAM_EMAIL, 'email address', VALUE_OPTIONAL),
+                'friendly_name' => new external_value(PARAM_RAW, "user's name", VALUE_OPTIONAL)
+            ],
+            'response data'
+        );
     }
 }

@@ -21,11 +21,11 @@
  * @package totara_msteams
  */
 
+use totara_core\http\exception\auth_exception;
+use totara_core\http\response;
 use totara_msteams\botfw\auth\token\bot_token;
 use totara_msteams\botfw\bot;
 use totara_msteams\botfw\builder;
-use totara_msteams\botfw\http\exception\auth_exception;
-use totara_msteams\botfw\http\response;
 use totara_msteams\botfw\logger\stdout_logger;
 use totara_msteams\botfw\router\null_router;
 use totara_msteams\botfw\storage\memory_storage;

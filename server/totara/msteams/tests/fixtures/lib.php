@@ -21,6 +21,11 @@
  * @package totara_msteams
  */
 
+use totara_core\http\client;
+use totara_core\http\clients\simple_mock_client;
+use totara_core\http\request;
+use totara_core\http\response;
+use totara_core\util\base64url;
 use totara_msteams\botfw\account\channel_account;
 use totara_msteams\botfw\activity;
 use totara_msteams\botfw\auth\authoriser;
@@ -31,9 +36,6 @@ use totara_msteams\botfw\entity\user;
 use totara_msteams\botfw\exception\auth_required_exception;
 use totara_msteams\botfw\exception\not_implemented_exception;
 use totara_msteams\botfw\hook\hook;
-use totara_msteams\botfw\http\client;
-use totara_msteams\botfw\http\request;
-use totara_msteams\botfw\http\response;
 use totara_msteams\botfw\logger\logger;
 use totara_msteams\botfw\notification\notification;
 use totara_msteams\botfw\notification\subscription;
@@ -42,8 +44,8 @@ use totara_msteams\botfw\router\route;
 use totara_msteams\botfw\router\router;
 use totara_msteams\botfw\storage\memory_storage;
 use totara_msteams\botfw\storage\storage;
-use totara_msteams\botfw\util\base64url;
 use totara_msteams\botfw\validator\validator;
+
 
 class mock_authoriser implements authoriser {
     /** @var user|null */
@@ -88,50 +90,7 @@ class mock_resolver implements resolver {
     }
 }
 
-class mock_client implements client {
-    /** @var response[] */
-    private $responses = [];
-
-    /** @var request[] */
-    private $requests = [];
-
-    /**
-     * @param response $response
-     */
-    public function mock_queue(response $response): void {
-        $this->responses[] = $response;
-    }
-
-    /**
-     * @return request[]
-     */
-    public function get_requests(): array {
-        return $this->requests;
-    }
-
-    public function reset(): void {
-        $this->requests = [];
-    }
-
-    public function reset_queue(): void {
-        $this->responses = [];
-    }
-
-    public function set_connect_timeout(int $timeout): client {
-        return $this;
-    }
-
-    public function set_timeout(int $timeout): client {
-        return $this;
-    }
-
-    public function execute(request $request): response {
-        $this->requests[] = $request;
-        if (empty($this->responses)) {
-            throw new coding_exception('no mock response found');
-        }
-        return array_shift($this->responses);
-    }
+class mock_client extends simple_mock_client {
 }
 
 class mock_router implements router, dispatchable {

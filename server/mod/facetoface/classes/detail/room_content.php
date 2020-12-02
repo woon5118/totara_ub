@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 use stdClass;
 use context;
 use context_system;
+use core\orm\query\builder;
 use mod_facetoface\output\seminarevent_detail_section;
 use mod_facetoface\output\seminarresource_card;
 use mod_facetoface\output\session_time;
@@ -39,6 +40,9 @@ use mod_facetoface\room_helper;
 use mod_facetoface\seminar_attachment_item;
 use mod_facetoface\seminar_session;
 use mod_facetoface\signup;
+use totara_core\entity\virtual_meeting as virtual_meeting_entity;
+use totara_core\virtualmeeting\exception\meeting_exception;
+use totara_core\virtualmeeting\virtual_meeting as virtual_meeting_model;
 
 /**
  * Generate room details.
@@ -84,13 +88,60 @@ class room_content extends content_generator {
         return get_string('reports:selectroom', 'mod_facetoface', $manageurl->out());
     }
 
+    /**
+     * @param seminar_session|null $session
+     * @param room $room
+     * @return string[]
+     */
+    private function get_virtual_room_info(?seminar_session $session, room $room): array {
+        if (!$session) {
+            return [];
+        }
+        if (!builder::table('facetoface_room_virtualmeeting')->where('roomid', $room->get_id())->exists()) {
+            return ['url' => $room->get_url()];
+        }
+        $entity = virtual_meeting_entity::repository()
+            ->as('vm')
+            ->join(['facetoface_room_dates_virtualmeeting', 'frdvm'], 'frdvm.virtualmeetingid', 'vm.id')
+            ->join(['facetoface_room_dates', 'frd'], 'frdvm.roomdateid', 'frd.id')
+            ->where('frd.roomid', $room->get_id())
+            ->one();
+        if (!$entity) {
+            // probably waiting for adhoc task or has failed to create a virtual meeting
+            throw new meeting_exception('virtual meeting not available');
+        }
+        /** @var virtual_meeting_entity $entity */
+        $model = virtual_meeting_model::load_by_entity($entity);
+        $result = [
+            'url' => $model->get_join_url(true)
+        ];
+        // TODO: host url and invitation will be dealt when the zoom plugin is available
+        // if (($host_url = $model->get_host_url(false)) !== '') {
+        //     $result['host_url'] = $host_url;
+        // }
+        // if (($invitation = $model->get_invitation(false)) !== '') {
+        //     $result['invitation'] = $invitation;
+        // }
+        if (($info = $model->get_preview(false)) !== '') {
+            $result['preview'] = $info;
+        }
+        return $result;
+    }
+
     protected function render_card(?seminar_session $session, seminar_attachment_item $item, stdClass $user, mod_facetoface_renderer $renderer): ?seminarresource_card {
         /** @var room $item */
-        $roomurl = $item->get_url();
-        if (empty($roomurl)) {
-            // No virtual room link, no virtual room card.
-            return null;
+        try {
+            $info = $this->get_virtual_room_info($session, $item);
+            if (empty($info['url'])) {
+                // No virtual room info, no virtual room card.
+                return null;
+            }
+        } catch (meeting_exception $ex) {
+            // Unavailable virtual room card.
+            // TODO: display information for creator?
+            return seminarresource_card::create_simple(get_string('virtualroom_card_unavailable', 'mod_facetoface'), true);
         }
+        $roomurl = $info['url'];
         if ($session === null) {
             // Special case for direct access.
             if ($item->get_custom()) {
@@ -111,7 +162,16 @@ class room_content extends content_generator {
             return seminarresource_card::create_simple(get_string('virtualroom_card_unavailable', 'mod_facetoface'), true);
         }
         if (room_helper::has_access_at_any_time($session)) {
-            return seminarresource_card::create(get_string('virtualroom_heading', 'mod_facetoface'), get_string('roomgoto', 'mod_facetoface'), new moodle_url($roomurl), false, null, false);
+            return seminarresource_card::create(
+                get_string('virtualroom_heading', 'mod_facetoface'),
+                get_string('roomgoto', 'mod_facetoface'),
+                new moodle_url($roomurl),
+                false,
+                null,
+                false,
+                get_string('roomgotox', 'mod_facetoface', $item->get_name()),
+                $info['preview'] ?? null
+            );
         }
         if ($session->is_over($time)) {
             return seminarresource_card::create_simple(get_string('virtualroom_card_over', 'mod_facetoface'), true);
@@ -124,7 +184,15 @@ class room_content extends content_generator {
             ->add_detail_unsafe(get_string('virtualroom_details_session_time', 'mod_facetoface'), session_time::to_html($session->get_timestart(), $session->get_timefinish(), $session->get_sessiontimezone()))
             ->build();
         if (room_helper::has_time_come($event, $session, $time)) {
-            return seminarresource_card::create(get_string('virtualroom_heading', 'mod_facetoface'), get_string('roomjoinnow', 'mod_facetoface'), new moodle_url($roomurl), true, $details, false);
+            return seminarresource_card::create(
+                get_string('virtualroom_heading', 'mod_facetoface'),
+                get_string('roomjoinnow', 'mod_facetoface'),
+                new moodle_url($roomurl),
+                true,
+                $details,
+                false,
+                get_string('roomjoinnowx', 'mod_facetoface', $item->get_name())
+            );
         }
         return seminarresource_card::create_details(get_string('virtualroom_card_willopen', 'mod_facetoface'), $details, false);
     }

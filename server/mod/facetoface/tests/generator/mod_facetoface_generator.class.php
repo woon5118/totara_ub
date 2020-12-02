@@ -318,6 +318,43 @@ class mod_facetoface_generator extends testing_module_generator {
     }
 
     /**
+     * Add a virtualmeeting room.
+     *
+     * @param stdClass|array $record
+     * @return stdClass
+     */
+    public function add_virtualmeeting_room($record): stdClass {
+        global $DB, $USER;
+
+        // Insert a room.
+        $record = (object)$record;
+        $record->custom = 1;
+        $room = $this->add_room($record);
+
+        // Insert room_virtualmeeting
+        $frvm = new stdClass();
+        $frvm->userid = $USER->id;
+        $frvm->plugin = 'poc_app';
+        $frvm->roomid = $room->id;
+        $DB->insert_record('facetoface_room_virtualmeeting', $frvm);
+
+        return $room;
+    }
+
+    public function create_room_dates_virtualmeeting($room, $sessionid, $virtualmeetingid) {
+        global $DB;
+
+        $room_dates = $DB->get_records('facetoface_room_dates', ['roomid' => $room->id, 'sessionsdateid' => $sessionid]);
+        $room_date = array_shift($room_dates);
+
+        $frdvm = new stdClass();
+        $frdvm->roomid = $room->id;
+        $frdvm->roomdateid = $room_date->id;
+        $frdvm->virtualmeetingid = $virtualmeetingid;
+        $DB->insert_record('facetoface_room_dates_virtualmeeting', $frdvm);
+    }
+
+    /**
      * Validate record fields for behat.
      *
      * @param array $record

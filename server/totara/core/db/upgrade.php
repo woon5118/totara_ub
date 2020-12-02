@@ -1403,5 +1403,74 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020100108, 'totara', 'core');
     }
 
+    if ($oldversion < 2020100109) {
+        // Define table virtualmeeting to be created, for storing virtual meetings.
+        $table = new xmldb_table('virtualmeeting');
+
+        // Adding fields to table
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('plugin', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys and indexes to table
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'), 'cascade');
+        $table->add_index('plugin', XMLDB_INDEX_NOTUNIQUE, array('plugin'));
+
+        // Conditionally launch create table
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table virtualmeeting_config to be created, for storing virtual meeting config data.
+        $table = new xmldb_table('virtualmeeting_config');
+
+        // Adding fields to table
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('value', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null);
+        $table->add_field('virtualmeetingid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null);
+
+        // Adding keys and indexes to table
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('vmconfig_fk', XMLDB_KEY_FOREIGN, array('virtualmeetingid'), 'virtualmeeting', array('id'), 'cascade');
+        $table->add_index('vmid_name_ix', XMLDB_INDEX_UNIQUE, array('virtualmeetingid', 'name'));
+
+        // Conditionally launch create table
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table virtualmeeting_auth to be created, for storing virtual meeting auth tokens.
+        $table = new xmldb_table('virtualmeeting_auth');
+
+        // Adding fields to table
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('plugin', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('access_token', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('refresh_token', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('timeexpiry', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null);
+
+        // Adding keys and indexes to table
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('user_fk', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'), 'cascade');
+        $table->add_index('pluginuser_ix', XMLDB_INDEX_UNIQUE, array('plugin', 'userid'));
+
+        // Conditionally launch create table
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100109, 'totara', 'core');
+    }
+
     return true;
 }

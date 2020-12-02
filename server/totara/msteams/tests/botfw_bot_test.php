@@ -21,6 +21,9 @@
  * @package totara_msteams
  */
 
+use totara_core\http\exception\auth_exception;
+use totara_core\http\exception\bad_format_exception;
+use totara_core\http\exception\request_exception;
 use totara_msteams\botfw\activity;
 use totara_msteams\botfw\auth\token\bot_token;
 use totara_msteams\botfw\bot;
@@ -32,9 +35,6 @@ use totara_msteams\botfw\entity\user as user_entity;
 use totara_msteams\botfw\exception\bot_unavailable_exception;
 use totara_msteams\botfw\exception\botfw_exception;
 use totara_msteams\botfw\hook\null_hook;
-use totara_msteams\botfw\http\exception\auth_exception;
-use totara_msteams\botfw\http\exception\bad_format_exception;
-use totara_msteams\botfw\http\exception\request_exception;
 use totara_msteams\botfw\notification\default_notification;
 use totara_msteams\botfw\storage\memory_storage;
 

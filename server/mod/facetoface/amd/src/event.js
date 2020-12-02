@@ -452,6 +452,10 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
                     if (that.updateCapacity) {
                         that.updateCapacity(offset);
                     }
+
+                    if (that.resourcesUpdated) {
+                        that.resourcesUpdated(offset);
+                    }
                 }).catch(NotificationLib.exception);
             }
 
@@ -510,6 +514,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
         listItem.setAttribute('data-id', resource.id);
         listItem.setAttribute('data-custom', resource.custom);
         listItem.setAttribute('data-capacity', resource.capacity);
+        listItem.setAttribute('data-can-manage', resource.can_manage);
         listItem.classList.add(this.cssClass);
     };
 
@@ -556,6 +561,25 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
         }
 
         document.getElementById('id_defaultcapacity').disabled = !capacityButton;
+    };
+
+    Rooms.prototype.resourcesUpdated = function(offset) {
+        var roomnames = document.querySelectorAll('#roomlist' + offset + ' .roomname');
+        var dateLink = document.getElementById('show-selectdate' + offset + '-dialog');
+        var row = dateLink.closest('tr');
+        var canManage = true;
+
+        roomnames.forEach(function (name) {
+            if (name.getAttribute('data-can-manage') === 'false') {
+                canManage = false;
+            }
+        });
+
+        if (!canManage) {
+            row.classList.add('mod_facetoface-date-other-virtual-room');
+        } else {
+            row.classList.remove('mod_facetoface-date-other-virtual-room');
+        }
     };
 
     return {
@@ -713,6 +737,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
             list.removeChild(listItem);
             if (listItem.classList.contains('roomname')) {
                 this.roomLib.updateCapacity(list.getAttribute('data-offset'));
+                this.roomLib.resourcesUpdated(list.getAttribute('data-offset'));
             }
         },
 

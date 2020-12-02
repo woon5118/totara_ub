@@ -24,14 +24,14 @@
 namespace totara_msteams\botfw\auth\token;
 
 use stdClass;
+use totara_core\http\exception\auth_exception;
+use totara_core\http\exception\request_exception;
+use totara_core\http\formdata;
+use totara_core\http\request;
+use totara_core\http\response;
 use totara_msteams\botfw\auth\jwt;
 use totara_msteams\botfw\context;
 use totara_msteams\botfw\exception\jwt_exception;
-use totara_msteams\botfw\http\exception\auth_exception;
-use totara_msteams\botfw\http\exception\request_exception;
-use totara_msteams\botfw\http\formdata;
-use totara_msteams\botfw\http\request;
-use totara_msteams\botfw\http\response;
 
 /**
  * A class to manage the authorization token of the Totara bot.

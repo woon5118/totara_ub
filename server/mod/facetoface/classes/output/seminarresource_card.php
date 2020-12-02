@@ -72,9 +72,11 @@ final class seminarresource_card extends template {
      * @param boolean $accent
      * @param seminarevent_detail_section|null $details
      * @param boolean $inactive
+     * @param string|null $buttonhint
+     * @param string|null $preview
      * @return self
      */
-    public static function create(string $heading, string $buttonlabel, $url, bool $accent, ?seminarevent_detail_section $details, bool $inactive): self {
+    public static function create(string $heading, string $buttonlabel, $url, bool $accent, ?seminarevent_detail_section $details, bool $inactive, ?string $buttonhint = null, ?string $preview = null): self {
         if ($url instanceof moodle_url) {
             $url = $url->out(false);
         }
@@ -86,8 +88,10 @@ final class seminarresource_card extends template {
                 'text' => $buttonlabel,
                 'url' => (string)$url,
                 'accent' => $accent,
+                'hint' => $buttonhint,
             ],
             'inactive' => $inactive,
+            'preview' => $preview,
         ]);
     }
 }

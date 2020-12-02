@@ -59,7 +59,13 @@ if ($room->get_custom()) {
     redirect($returnurl, get_string('error:incorrectroomid', 'mod_facetoface'), null, notification::ERROR);
 }
 
-$mform = new room_edit(null, ['room' => $room, 'backurl' => $returnurl], 'post', '', ['class' => 'dialog-nobind'], true, null, 'mform_modal');
+$customdata = [
+    'room' => $room,
+    'virtual_meeting' => new \mod_facetoface\room_virtualmeeting(),
+    'backurl' => $returnurl,
+    'adhoc' => false
+];
+$mform = new room_edit(null, $customdata, 'post', '', ['class' => 'dialog-nobind'], true, null, 'mform_modal');
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);

@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 use html_writer;
 use mod_facetoface\user_helper;
+use mod_facetoface\room_virtualmeeting;
+use totara_core\virtualmeeting\virtual_meeting;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -38,12 +40,14 @@ class editroom extends \moodleform {
      * Definition of the room form
      */
     public function definition() {
-        global $TEXTAREA_OPTIONS;
+        global $TEXTAREA_OPTIONS, $PAGE;
 
         $mform = $this->_form;
 
         /** @var \mod_facetoface\room $room */
         $room = $this->_customdata['room'];
+        /** @var room_virtualmeeting $virtual_meeting */
+        $virtual_meeting = $this->_customdata['virtual_meeting'];
         /** @var \mod_facetoface\seminar $seminar */
         $seminar = empty($this->_customdata['seminar']) ? null : $this->_customdata['seminar'];
         /** @var \mod_facetoface\seminar_event $seminarevent */
@@ -81,11 +85,6 @@ class editroom extends \moodleform {
         $mform->addRule('roomcapacity', null, 'required', null, 'client');
         $mform->addRule('roomcapacity', null, 'numeric', null, 'client');
 
-        // Virtual room link.
-        $mform->addElement('text', 'url', get_string('roomurl', 'mod_facetoface'), ['maxlength' => '1024', 'size' => '45']);
-        $mform->addHelpButton('url', 'roomurl', 'mod_facetoface');
-        $mform->setType('url', PARAM_URL);
-
         // 'Allow room booking conflicts' checkbox
         $mform->addElement('advcheckbox', 'allowconflicts', get_string('allowroomconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'allowroomconflicts', 'mod_facetoface');
@@ -97,13 +96,72 @@ class editroom extends \moodleform {
         // Room Description.
         $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'mod_facetoface'), null, $editoropts);
 
+        // Virtual meeting room.
+        $adhoc = $this->_customdata['adhoc'];
+        if ($adhoc && defined('AJAX_SCRIPT') || AJAX_SCRIPT) {
+            $mform->addElement('header', 'virtualroom', get_string('virtualroom_heading', 'mod_facetoface'));
+            $meeting_options = [
+                room_virtualmeeting::VIRTUAL_MEETING_NONE => get_string('none', 'mod_facetoface'),
+                room_virtualmeeting::VIRTUAL_MEETING_INTERNAL => get_string('internal', 'mod_facetoface')
+            ];
+            $plugindata = virtual_meeting::get_availale_plugins_info();
+            $conditions_no_auth = array_keys($meeting_options);
+            foreach ($plugindata as $pluginname => $info) {
+                $meeting_options[$pluginname] = $info['name'];
+                if (!empty($info['auth_endpoint'])) {
+                    $auth_ep_id = $pluginname . '_auth_endpoint';
+                    $mform->addElement('hidden', $auth_ep_id, $info['auth_endpoint']);
+                    $mform->setType($auth_ep_id, PARAM_RAW);
+                    $mform->hideIf('sitewide', 'plugin', 'eq', $pluginname);
+                    $auth_plugins[] = $pluginname;
+                } else {
+                    $mform->hideIf('connections', 'plugin', 'eq', $pluginname);
+                    $conditions_no_auth[] = $pluginname;
+                }
+            }
+            if ($virtual_meeting->get_plugin()) {
+                $default = $virtual_meeting->get_plugin();
+            } else if (!empty($room->get_url())) {
+                $default = room_virtualmeeting::VIRTUAL_MEETING_INTERNAL;
+            } else {
+                $default = room_virtualmeeting::VIRTUAL_MEETING_NONE;
+            }
+            $mform->addElement('select', 'plugin', get_string('virtual_meeting_add', 'mod_facetoface'), $meeting_options);
+            $mform->setDefault('plugin', $default);
+            $mform->setType('plugin', PARAM_TEXT);
+
+            // Virtual room link.
+            $mform->addElement('text', 'url', get_string('roomurl', 'mod_facetoface'), ['maxlength' => '1024', 'size' => '45']);
+            $mform->addHelpButton('url', 'roomurl', 'mod_facetoface');
+            $mform->setType('url', PARAM_URL);
+            $mform->hideIf('url', 'plugin', 'noteq', room_virtualmeeting::VIRTUAL_MEETING_INTERNAL);
+
+            $connections = [];
+            $connections[] =& $mform->createElement('static', 'connected_text', '', html_writer::span('', 'mod_facetoface-connected'));
+            $connections[] =& $mform->createElement('button', 'virtual_meeting_authorise',
+                 get_string('virtual_meeting_connect', 'mod_facetoface'), ['id' => 'show-authorise-dialog']);
+            $mform->addGroup($connections, 'connections', get_string('virtual_meeting_service_provider', 'mod_facetoface'), null, false);
+            $mform->addHelpButton('connections', 'virtual_meeting_service_provider', 'mod_facetoface');
+            foreach ($conditions_no_auth as $condition) {
+                $mform->hideIf('connections', 'plugin', 'eq', $condition);
+            }
+            $PAGE->requires->js_call_amd('mod_facetoface/room_integration', 'init');
+        } else {
+            $mform->addElement('hidden', 'plugin', room_virtualmeeting::VIRTUAL_MEETING_NONE);
+            $mform->setType('plugin', PARAM_TEXT);
+            $mform->addElement('hidden', 'url');
+            $mform->setType('url', PARAM_URL);
+        }
+
         // Custom fields: Building and Location.
         customfield_definition($mform, (object)['id' => $room->get_id()], 'facetofaceroom', 0, 'facetoface_room');
 
         // Add to sitewide list.
         $capability = has_capability('mod/facetoface:managesitewiderooms', \context_system::instance());
         if ($capability and !empty($seminar) and $room->get_custom()) {
-            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
+            $sitewide = [];
+            $sitewide[] =& $mform->createElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
+            $mform->addGroup($sitewide, 'sitewide', get_string('addtositewidelist', 'mod_facetoface'), null, false);
         } else {
             $mform->addElement('hidden', 'notcustom');
         }
@@ -146,6 +204,7 @@ class editroom extends \moodleform {
             'roomcapacity' => $room->get_capacity(),
             'allowconflicts' => $room->get_allowconflicts(),
             'url' => $room->get_url(),
+            'plugin' => $virtual_meeting->get_plugin(),
             'description_editor' => ['text' => $room->get_description()],
             'notcustom' => $room->get_custom() ? 0 : 1,
             'description' => $room->get_description(),

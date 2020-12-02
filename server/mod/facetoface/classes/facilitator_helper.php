@@ -102,28 +102,7 @@ final class facilitator_helper {
      * @return bool
      */
     public static function sync(int $date, array $facilitators = []): bool {
-        global $DB;
-
-        if (empty($facilitators)) {
-            return $DB->delete_records('facetoface_facilitator_dates', ['sessionsdateid' => $date]);
-        }
-
-        $oldfacilitators = $DB->get_fieldset_select('facetoface_facilitator_dates', 'facilitatorid', 'sessionsdateid = :date_id', ['date_id' => $date]);
-
-        // WIPE THEM AND RECREATE if certain conditions have been met.
-        if ((count($facilitators) == count($oldfacilitators)) && empty(array_diff($facilitators, $oldfacilitators))) {
-            return true;
-        }
-
-        $res = $DB->delete_records('facetoface_facilitator_dates', ['sessionsdateid' => $date]);
-
-        foreach ($facilitators as $facilitator) {
-            $res &= $DB->insert_record('facetoface_facilitator_dates', (object)[
-                'sessionsdateid' => (int)$date,
-                'facilitatorid'  => (int)$facilitator
-            ], false);
-        }
-        return $res;
+        return resource_helper::sync_resources($date, $facilitators, 'facilitator');
     }
 
     /**

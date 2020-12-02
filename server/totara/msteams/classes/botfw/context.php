@@ -23,7 +23,7 @@
 
 namespace totara_msteams\botfw;
 
-use totara_msteams\botfw\http\client;
+use totara_core\http\client;
 use totara_msteams\botfw\logger\logger;
 use totara_msteams\botfw\storage\storage;
 

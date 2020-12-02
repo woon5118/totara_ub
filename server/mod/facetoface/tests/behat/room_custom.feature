@@ -25,7 +25,6 @@ Feature: Manage custom rooms by admin and non-admin user
     When I click on "Select rooms" "link"
     And I click on "Create" "link"
     Then I should see "Create new room" in the "Create new room" "totaradialogue"
-    And the field "Add to sitewide list" matches value "0"
     When I set the following fields to these values:
       | Name         | Room created    |
       | Building     | That house      |
@@ -58,7 +57,6 @@ Feature: Manage custom rooms by admin and non-admin user
     # Edit
     When I click on "Edit custom room Room created in session" "link"
     Then I should see "Edit room" in the "Edit room" "totaradialogue"
-    And the field "Add to sitewide list" matches value "0"
     When I set the following fields to these values:
       | Name         | Room edited |
       | Capacity     | 10          |
@@ -90,11 +88,10 @@ Feature: Manage custom rooms by admin and non-admin user
     # Publish a custom room i.e. make it a site-wide room
     When I click on "Edit custom room Room edited in session" "link"
     Then I should see "Edit room" in the "Edit room" "totaradialogue"
-    And the field "Add to sitewide list" matches value "0"
     When I set the following fields to these values:
       | Name         | Room published |
       | Capacity     | 15             |
-    And I set the field "Add to sitewide list" to "1"
+    And I set the field "notcustom" to "1"
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Edit room" "totaradialogue"
     Then I should see "Room published"
     When I should not see "Edit custom room Room published in session" in the "Room published" "table_row"
@@ -124,13 +121,12 @@ Feature: Manage custom rooms by admin and non-admin user
     When I click on "Select rooms" "link"
     And I click on "Create" "link"
     Then I should see "Create new room" in the "Create new room" "totaradialogue"
-    And the field "Add to sitewide list" matches value "0"
     When I set the following fields to these values:
       | Name         | Site-wide room      |
       | Building     | This building       |
       | Address      | 456 there boulevard |
       | Capacity     | 20                  |
-    And I set the field "Add to sitewide list" to "1"
+    And I set the field "notcustom" to "1"
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Create new room" "totaradialogue"
     Then I should see "Site-wide room"
     And I should not see "Edit room" in the "Site-wide room" "table_row"

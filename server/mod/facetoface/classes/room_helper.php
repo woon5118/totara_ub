@@ -26,6 +26,7 @@ namespace mod_facetoface;
 use coding_exception;
 use context_course;
 use context_module;
+use core\orm\collection;
 use core\orm\query\builder;
 
 /**
@@ -53,7 +54,7 @@ final class room_helper {
      * @return room
      */
     public static function save(\stdClass $data): room {
-        global $TEXTAREA_OPTIONS;
+        global $TEXTAREA_OPTIONS, $USER;
 
         $data->custom = $data->notcustom ? 0 : 1;
 
@@ -95,7 +96,39 @@ final class room_helper {
         );
         $room->set_description($data->description);
         $room->save();
-        // Return new/updated asset.
+
+        // Set room virtual meeting record.
+        if (!empty($data->plugin)) {
+
+            /** @var room_virtualmeeting $virtual_meeting */
+            $virtual_meeting = room_virtualmeeting::get_virtual_meeting($room);
+            // Lets check if this room a new or an update.
+            if ($data->id) {
+                // Nobody can update or delete another user's virtual meeting room
+                if ($virtual_meeting->exists() && !self::can_update_virtualmeeting($room)) {
+                    throw new coding_exception("you cannot update or delete virtual meeting!");
+                }
+                // This is the update.
+                // We want to check if the update is changing the value
+                // from 'zoom/msteams/etc' plugin to 'none/internal'
+                // we must remove virtual meeting record then
+                if ($virtual_meeting->exists() &&
+                    (room_virtualmeeting::VIRTUAL_MEETING_NONE == $data->plugin ||
+                     room_virtualmeeting::VIRTUAL_MEETING_INTERNAL == $data->plugin)
+                ) {
+                        $virtual_meeting->delete();
+                }
+            }
+            if (room_virtualmeeting::VIRTUAL_MEETING_NONE != $data->plugin &&
+                room_virtualmeeting::VIRTUAL_MEETING_INTERNAL != $data->plugin) {
+                $virtual_meeting->set_plugin($data->plugin)
+                    ->set_roomid($room->get_id())
+                    ->set_userid($USER->id)
+                    ->save();
+            }
+        }
+
+        // Return new/updated room.
         return $room;
     }
 
@@ -106,29 +139,7 @@ final class room_helper {
      * @return bool
      */
     public static function sync(int $date, array $rooms = []): bool {
-        global $DB;
-
-        if (empty($rooms)) {
-            return $DB->delete_records('facetoface_room_dates', ['sessionsdateid' => $date]);
-        }
-
-        $oldrooms = $DB->get_fieldset_select('facetoface_room_dates', 'roomid', 'sessionsdateid = :date_id', ['date_id' => $date]);
-
-        // WIPE THEM AND RECREATE if certain conditions have been met.
-        if ((count($rooms) == count($oldrooms)) && empty(array_diff($rooms, $oldrooms))) {
-            return true;
-        }
-
-        $res = $DB->delete_records('facetoface_room_dates', ['sessionsdateid' => $date]);
-
-        foreach ($rooms as $room) {
-            $res &= $DB->insert_record('facetoface_room_dates', (object) [
-                'sessionsdateid' => $date,
-                'roomid' => intval($room)
-            ],false);
-        }
-
-        return !!$res;
+        return resource_helper::sync_resources($date, $rooms, 'room');
     }
 
     /**
@@ -201,6 +212,26 @@ final class room_helper {
             throw new coding_exception('foreign $signup is not allowed');
         }
         return self::has_time_come($seminarevent, $session, $time) && self::show_room_link($session, $signup);
+    }
+
+    /**
+     * Is the current user capable to update the virtual room?
+     *
+     * @param room $room
+     * @return boolean
+     */
+    public static function can_update_virtualmeeting(room $room): bool {
+        global $USER;
+
+        /** @var room_virtualmeeting $virtual_meeting */
+        $virtual_meeting = room_virtualmeeting::get_virtual_meeting($room);
+        $can_manage = true;
+        if ($virtual_meeting->exists()) {
+            if ($virtual_meeting->get_userid() != $USER->id) {
+                $can_manage = false;
+            }
+        }
+        return $can_manage;
     }
 
     /**

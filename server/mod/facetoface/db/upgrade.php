@@ -945,5 +945,56 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020100101, 'facetoface');
     }
 
+    // Virtual room updates.
+    if ($oldversion < 2020100103) {
+        // Create the room dates virtual meeting table to link room dates to virtual meetings.
+        $table = new xmldb_table('facetoface_room_dates_virtualmeeting');
+        // Fields.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('roomdateid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('virtualmeetingid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        // Keys.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('roomdatevm_date_fk', XMLDB_KEY_FOREIGN, array('roomdateid'), 'facetoface_room_dates', array('id'));
+        $table->add_key('roomdatevm_meet_fk', XMLDB_KEY_FOREIGN, array('virtualmeetingid'), 'virtualmeeting', array('id'));
+
+        // Add the meetingid field to room dates.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Create the room virtual meeting table, to link a room with a wirtual meeting plugin type.
+        $table = new xmldb_table('facetoface_room_virtualmeeting');
+        // Fields.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('roomid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('plugin', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
+        $table->add_field('options', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        // Keys.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('roomvm_room_fk', XMLDB_KEY_FOREIGN, array('roomid'), 'facetoface_room', array('id'));
+        $table->add_key('roomvm_user_fk', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        // Indexs.
+        $table->add_index('roomvm_plugin', XMLDB_INDEX_NOTUNIQUE, array('plugin'));
+
+        // Add the meetingid field to room dates.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Create the default notification template for virtualmeetingfailure.
+        facetoface_upgradelib_add_new_template(
+            'virtualmeetingfailure',
+            get_string('setting:defaultvirtualmeetingfailuresubjectdefault', 'facetoface'),
+            get_string('setting:defaultvirtualmeetingfailuremessagedefault', 'facetoface'),
+            1 << 25 // MDL_F2F_CONDITION_VIRTUALMEETING_CREATION_FAILURE
+        );
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020100103, 'facetoface');
+    }
     return true;
 }

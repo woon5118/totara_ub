@@ -1445,6 +1445,10 @@ class core_plugin_manager {
                 'html5audio', 'html5video', 'swf', 'videojs', 'vimeo', 'youtube'
             ),
 
+            'virtualmeeting' => array(
+                'msteams'
+            ),
+
             'message' => array(
                 'email', 'jabber', 'popup'
                 // Totara

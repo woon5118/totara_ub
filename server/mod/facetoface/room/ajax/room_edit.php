@@ -30,6 +30,7 @@ require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 use mod_facetoface\room;
 use mod_facetoface\seminar;
 use mod_facetoface\room_helper;
+use mod_facetoface\room_virtualmeeting;
 use mod_facetoface\seminar_event;
 use mod_facetoface\form\editroom as room_edit;
 
@@ -48,7 +49,7 @@ if (!$seminarevent->exists()) {
 
 ajax_require_login($seminar->get_course(), false, $cm, false, true);
 if (!has_capability('mod/facetoface:manageadhocrooms', $context)) {
-    throw new required_capability_exception($context, $capability, 'nopermissions');
+    throw new required_capability_exception($context, 'mod/facetoface:manageadhocrooms', 'nopermissions');
 }
 require_sesskey();
 
@@ -72,7 +73,14 @@ send_headers('text/html; charset=utf-8', false);
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/room/ajax/room_edit.php', ['id' => $id, 'f' => $facetofaceid]);
 
-$customdata = ['room' => $room, 'seminar' => $seminar, 'seminarevent' => $seminarevent];
+$virtual_meeting = room_virtualmeeting::get_virtual_meeting($room);
+$customdata = [
+    'room' => $room,
+    'virtual_meeting' => $virtual_meeting,
+    'seminar' => $seminar,
+    'seminarevent' => $seminarevent,
+    'adhoc' => true
+];
 $form = new room_edit(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($data = $form->get_data()) {

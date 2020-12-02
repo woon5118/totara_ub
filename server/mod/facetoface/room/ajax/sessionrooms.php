@@ -87,6 +87,7 @@ $selectedids = explode(',', $selected);
 $allrooms = [];
 $selectedrooms = [];
 $unavailablerooms = [];
+$possible_virtual_meetings = [];
 /** @var \mod_facetoface\room $room */
 foreach ($roomlist as $room) {
 
@@ -99,6 +100,9 @@ foreach ($roomlist as $room) {
     if (!$availablerooms->contains($room->get_id()) && $seminarevent->get_cancelledstatus() == 0) {
         $unavailablerooms[$room->get_id()] = $room->get_id();
         $roomdata->fullname .= get_string('roomalreadybooked', 'mod_facetoface');
+    } else {
+        // Collect the ids which are still available.
+        $possible_virtual_meetings[$room->get_id()] = $room->get_id();
     }
     if ($roomdata->custom && $seminarevent->get_cancelledstatus() == 0) {
         $roomdata->fullname .= ' (' . get_string('facetoface', 'mod_facetoface') . ': ' . format_string($seminar->get_name()) . ')';
@@ -110,7 +114,17 @@ foreach ($roomlist as $room) {
 
     $allrooms[$room->get_id()] = $roomdata;
 }
-
+if ($possible_virtual_meetings) {
+    $virtual_meetings = \mod_facetoface\room_virtualmeeting_list::from_roomids($possible_virtual_meetings);
+    if (!is_null($virtual_meetings)) {
+        foreach ($availablerooms as $room) {
+            if ($virtual_meetings->contains($room->get_id()) &&
+                $virtual_meetings->get($room->get_id())->get_userid() != $USER->id) {
+                $unavailablerooms[$room->get_id()] = $room->get_id();
+            }
+        }
+    }
+}
 // Display page.
 $dialog = new \seminar_dialog_content();
 $dialog->baseurl = '/mod/facetoface/room/ajax/sessionrooms.php';

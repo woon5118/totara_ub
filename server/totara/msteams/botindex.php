@@ -28,12 +28,12 @@ define('NO_MOODLE_COOKIES', true);
 
 require_once(__DIR__ . '/../../config.php');
 
+use totara_core\http\clients\curl_client;
 use totara_msteams\botfw\activity;
 use totara_msteams\botfw\builder;
 use totara_msteams\botfw\auth\default_authoriser;
 use totara_msteams\botfw\exception\auth_required_exception;
 use totara_msteams\botfw\exception\unexpected_exception;
-use totara_msteams\botfw\http\clients\curl_client;
 use totara_msteams\botfw\logger\syslog_logger;
 use totara_msteams\botfw\notification\default_notification;
 use totara_msteams\botfw\resolver\v3_resolver;

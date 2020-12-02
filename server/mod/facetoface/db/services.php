@@ -33,4 +33,16 @@ $functions = [
         'ajax'              => true,
         'capabilities'      => ''
     ],
+
+    // Get the user's profile from external sources for virtual meetings.
+    'mod_facetoface_user_profile' => [
+        'classname'         => 'mod_facetoface\external',
+        'methodname'        => 'user_profile',
+        'classpath'         => 'mod/facetoface/classes/external.php',
+        'description'       => 'Get the user profile from external sources',
+        'type'              => 'read',
+        'loginrequired'     => true,
+        'ajax'              => true,
+        'capabilities'      => ''
+    ],
 ];

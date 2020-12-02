@@ -35,6 +35,7 @@ use mod_facetoface\seminar_event;
 use mod_facetoface\attendees_helper;
 use mod_facetoface\signup\state\{booked, waitlisted};
 use mod_facetoface\facilitator;
+use mod_facetoface\room_virtualmeeting;
 
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
@@ -380,7 +381,12 @@ class event extends \moodleform {
         $streditdate = get_string('editdate', 'facetoface');
 
         $editicon = $OUTPUT->action_icon('#', new \pix_icon('t/edit', $streditdate), null,
-            array('id' => "show-selectdate{$offset}-dialog", 'class' => 'action-icon mod_facetoface-show-selectdate-dialog', 'data-offset' => $offset));
+            array(
+                'id' => "show-selectdate{$offset}-dialog",
+                'class' => 'action-icon mod_facetoface-show-selectdate-dialog mod_facetoface-date-has-virtual-room',
+                'data-offset' => $offset
+            )
+        );
         $row[] = $editicon . \html_writer::span($dateshtml, 'timeframe-text', array('id' => 'timeframe-text' . $offset));
 
         // Room.
@@ -462,10 +468,25 @@ class event extends \moodleform {
             $facilitatorids = $data["facilitatorids"][$i];
             $facilitatorlist = [];
 
-
             if (!empty($roomids)) {
                 $roomlist = explode(',', $roomids);
+
+                // Verify the date only has 1 virtual meeting associated with it.
+                $vmcount = 0;
+                foreach ($roomlist as $roomid) {
+                    $room = new \mod_facetoface\room($roomid);
+                    $vmwhitelist = [
+                        room_virtualmeeting::VIRTUAL_MEETING_NONE,
+                        room_virtualmeeting::VIRTUAL_MEETING_INTERNAL
+                    ];
+
+                    $virtualmeeting = room_virtualmeeting::from_roomid($roomid);
+                    if ($virtualmeeting->exists() && !in_array($virtualmeeting->get_plugin(), $vmwhitelist) && ++$vmcount > 1) {
+                        $errdates['virtualmeetingmax'] = get_string('error:toomanyvirtualmeetings', 'facetoface');
+                    }
+                }
             }
+
             if (!empty($assetids)) {
                 $assetlist = explode(',', $assetids);
             }

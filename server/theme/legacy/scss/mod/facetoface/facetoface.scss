@@ -187,6 +187,14 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*='id_booked_type'] {
   float: right;
 }
 
+.mod_facetoface-date-other-virtual-room {
+  .mod_facetoface-show-selectdate-dialog,
+  [data-action="clonedate"],
+  [data-can-manage="false"] [data-action="editresource"] {
+    display: none;
+  }
+}
+
 .mod_facetoface-assetlist,
 .mod_facetoface-roomlist,
 .mod_facetoface-facilitatorlist {
@@ -942,10 +950,6 @@ select.menuf2f-select {
         > .mform {
           .fdescription.required {
             margin-right: calc(var(--gap-10) - var(--gap-6));
-          }
-
-          #id_submitbutton {
-            width: 100%;
           }
 
           .fitem {

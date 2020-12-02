@@ -607,6 +607,7 @@ $string['permittedcrossdomainpolicies'] = 'Permitted cross domain policies';
 $string['permittedcrossdomainpolicies_desc'] = 'If set to "none" browsers are instructed to prevent embedding of content from this server in extenal Flash or PDF files. If set to "master-only" the policies can be defined in main crossdomain.xml file.';
 $string['pluginname'] = 'Totara core';
 $string['pluginnamewithkey'] = 'Self enrolment with key';
+$string['plugintype_virtualmeetings'] = 'Virtual meetings';
 $string['pos_description'] = 'Description';
 $string['pos_description_help'] = 'Description of the position.';
 $string['position_typeicon'] = 'Position type icon';

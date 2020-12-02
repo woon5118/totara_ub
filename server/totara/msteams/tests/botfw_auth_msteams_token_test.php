@@ -21,9 +21,9 @@
  * @package totara_msteams
  */
 
+use totara_core\util\base64url;
 use totara_msteams\botfw\auth\jwt;
 use totara_msteams\botfw\auth\token\msteams_token;
-use totara_msteams\botfw\util\base64url;
 
 require_once(__DIR__.'/fixtures/lib.php');
 

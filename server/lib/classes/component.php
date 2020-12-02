@@ -539,6 +539,7 @@ $cache = '.var_export($cache, true).';
             'elementlibrary' => $CFG->dirroot.'/elementlibrary',
             'container'     => $CFG->dirroot . '/container',
             'ml'            => $CFG->dirroot.'/ml',
+            'virtualmeeting' => $CFG->dirroot.'/integrations/virtualmeeting',
         );
 
         return $info;
@@ -586,7 +587,8 @@ $cache = '.var_export($cache, true).';
             'cachestore'    => $CFG->dirroot.'/cache/stores',
             'cachelock'     => $CFG->dirroot.'/cache/locks',
             'container'     => $CFG->dirroot . '/container/type',
-            'ml'            => $CFG->dirroot.'/ml'
+            'ml'            => $CFG->dirroot.'/ml',
+            'virtualmeeting' => $CFG->dirroot.'/integrations/virtualmeeting',
         );
         $parents = array();
         $subplugins = array();

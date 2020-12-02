@@ -51,6 +51,7 @@ function xmldb_facetoface_install() {
         'setting:defaultfacilitatortimechangesubjectdefault' => get_string('setting:defaultfacilitatortimechangesubjectdefault', 'facetoface'),
         'setting:defaultfacilitatorassignedsubjectdefault' => get_string('setting:defaultfacilitatorassignedsubjectdefault', 'facetoface'),
         'setting:defaultfacilitatorunassignedsubjectdefault' => get_string('setting:defaultfacilitatorunassignedsubjectdefault', 'facetoface'),
+        'setting:defaultvirtualmeetingfailuresubjectdefault' => get_string('setting:defaultvirtualmeetingfailuresubjectdefault', 'facetoface'),
     );
 
     foreach ($titles as $key => $title) {
@@ -224,6 +225,14 @@ function xmldb_facetoface_install() {
     $tpl_undercapacity->body = text_to_html(get_string('setting:defaultundercapacitymessagedefault', 'facetoface'));
     $tpl_undercapacity->ccmanager = 0;
     $DB->insert_record('facetoface_notification_tpl', $tpl_undercapacity);
+
+    $tpl_virtualmeetingfailure = new stdClass();
+    $tpl_virtualmeetingfailure->status = 1;
+    $tpl_virtualmeetingfailure->reference = 'virtualmeetingfailure';
+    $tpl_virtualmeetingfailure->title = $titles['setting:defaultvirtualmeetingfailuresubjectdefault'];
+    $tpl_virtualmeetingfailure->body = text_to_html(get_string('setting:defaultvirtualmeetingfailuremessagedefault', 'facetoface'));
+    $tpl_virtualmeetingfailure->ccmanager = 0;
+    $DB->insert_record('facetoface_notification_tpl', $tpl_virtualmeetingfailure);
 
     $references = [
         'facilitatorcancel' => ['setting:defaultfacilitatorcancelsubjectdefault', 'setting:defaultfacilitatorcancelmessagedefault'],

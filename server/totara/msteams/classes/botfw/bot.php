@@ -24,6 +24,11 @@
 namespace totara_msteams\botfw;
 
 use dml_exception;
+use totara_core\http\client;
+use totara_core\http\exception\bad_format_exception;
+use totara_core\http\exception\http_exception;
+use totara_core\http\request;
+use totara_core\http\response;
 use totara_msteams\botfw\account\channel_account;
 use totara_msteams\botfw\account\conversation_account;
 use totara_msteams\botfw\auth\authoriser;
@@ -33,11 +38,6 @@ use totara_msteams\botfw\exception\bot_unavailable_exception;
 use totara_msteams\botfw\exception\botfw_exception;
 use totara_msteams\botfw\hook\hook;
 use totara_msteams\botfw\hook\null_hook;
-use totara_msteams\botfw\http\client;
-use totara_msteams\botfw\http\exception\bad_format_exception;
-use totara_msteams\botfw\http\exception\http_exception;
-use totara_msteams\botfw\http\request;
-use totara_msteams\botfw\http\response;
 use totara_msteams\botfw\logger\logger;
 use totara_msteams\botfw\notification\notification;
 use totara_msteams\botfw\notification\subscription;

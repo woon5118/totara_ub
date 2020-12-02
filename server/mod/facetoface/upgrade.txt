@@ -1,6 +1,12 @@
 This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* Added new notification template for virtual meeting creation failure
+* Added new facetoface_room_virtualmeeting table to link rooms to a virtual meeting plugin type
+* Added new facetoface_room_dates_virtualmeeting table to link room dates to an instance of a virtual meeting
+
 === 13.2 ===
 
 * mod_facetoface_renderer::get_room_details_html() has been deprecated; please use mod_facetoface_renderer::get_session_room_details_html() instead

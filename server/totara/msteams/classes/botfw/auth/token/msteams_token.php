@@ -24,10 +24,10 @@
 namespace totara_msteams\botfw\auth\token;
 
 use stdClass;
+use totara_core\http\exception\http_exception;
+use totara_core\http\request;
 use totara_msteams\botfw\auth\jwt;
 use totara_msteams\botfw\context;
-use totara_msteams\botfw\http\exception\http_exception;
-use totara_msteams\botfw\http\request;
 
 /**
  * A class to verify an token coming through the authorization header.

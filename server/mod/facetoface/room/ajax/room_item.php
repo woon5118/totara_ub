@@ -27,6 +27,7 @@ require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 use mod_facetoface\room;
+use mod_facetoface\room_helper;
 
 $facetofaceid = required_param('facetofaceid', PARAM_INT);
 $itemseq = required_param('itemids', PARAM_SEQUENCE);
@@ -50,13 +51,15 @@ $PAGE->set_url('/mod/facetoface/room/ajax/room_item.php', ['facetofaceid' => $fa
 $rooms = array();
 foreach($itemids as $itemid) {
     $room = new room($itemid);
+    $can_manage = room_helper::can_update_virtualmeeting($room);
     $res = (object)[
         'id' => $room->get_id(),
         'name' => $room->get_name(),
         'name_only' => $room->get_name(),
         'hidden' => $room->get_hidden(),
         'custom' => $room->get_custom(),
-        'capacity' => $room->get_capacity()
+        'capacity' => $room->get_capacity(),
+        'can_manage' => $can_manage,
     ];
     $rooms[] = $res;
 }

@@ -21,9 +21,9 @@
  * @package totara_msteams
  */
 
+use totara_core\util\base64url;
 use totara_msteams\botfw\auth\jwt;
 use totara_msteams\botfw\exception\jwt_exception;
-use totara_msteams\botfw\util\base64url;
 
 class totara_msteams_botfw_auth_jwt_testcase extends advanced_testcase {
     /**

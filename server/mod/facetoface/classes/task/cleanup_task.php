@@ -186,4 +186,23 @@ class cleanup_task extends \core\task\scheduled_task {
             $facilitator->delete();
         }
     }
+
+    protected function remove_orphaned_virtualmeetings() {
+        global $DB;
+
+        return;
+
+        /**
+         * TODO: TL-29046
+        // Get instances of any room_dates_virtualmeeting records that do not have a valid roomdateid
+        $sql = "SELECT frdvm.*
+                  FROM {facetoface_room_dates_virtualmeeting} frdvm
+             LEFT JOIN {facetoface_room_dates} frd ON frd.id = frdvm.roomdateid
+                 WHERE frd.id IS NULL
+              ORDER BY frdvm.id ASC";
+
+        $deleted_room_dates = $DB->get_records_sql($sql);
+         */
+
+    }
 }
