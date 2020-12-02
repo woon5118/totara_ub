@@ -46,10 +46,10 @@ Feature: Theme settings basic validations for tenants
     And "Images" "link" should not exist in the ".tui-tabs__tabs" "css_element"
     And "Custom" "link" should not exist in the ".tui-tabs__tabs" "css_element"
     And I should see "Logo" in the ".tui-tabContent" "css_element"
-    And the URL for image nested in ".tui-formImageUpload:aria-label-extension=Logo" should match "/theme\/image.php\/ventura\/totara_core\/[0-9]+\/logo/"
+    And the URL for image nested in ".tui-tabs .tui-form .tui-formRow:nth-child(1)" should match "/theme\/image.php\/ventura\/totara_core\/[0-9]+\/logo/"
     And I should see "Logo alternative text" in the ".tui-tabContent" "css_element"
     And I should see "Favicon" in the ".tui-tabContent" "css_element"
-    And the URL for image nested in ".tui-formImageUpload:aria-label-extension=Favicon" should match "/theme\/image.php\/ventura\/theme\/[0-9]+\/favicon/"
+    And the URL for image nested in ".tui-tabs .tui-form .tui-formRow:nth-child(3)" should match "/theme\/image.php\/ventura\/theme\/[0-9]+\/favicon/"
 
     When I click on "Colours" "link" in the ".tui-tabs__tabs" "css_element"
     And I click on "More colours" "button"

@@ -78,19 +78,8 @@ class behat_styles extends behat_base {
      * @param string $regex Regex to match
      */
     public function nested_image_url_should_match(string $element, string $regex) {
-        // If element can explode it means that we need to find element with attribute.
-        if (stripos($element, ':')) {
-            $data = explode(':', $element);
-            $attribute = explode('=', $data[1]);
-            $node_element = $this->find_element_with_attribute_value(
-                $data[0],
-                $attribute[0],
-                $attribute[1]
-            );
-        } else {
-            $page = $this->getSession()->getPage();
-            $node_element = $page->find('css', $element);
-        }
+        $page = $this->getSession()->getPage();
+        $node_element = $page->find('css', $element);
 
         // Element not found.
         if (empty($node_element)) {
