@@ -22,8 +22,6 @@
  */
 namespace ml_recommender\local\export;
 
-use coding_exception;
-use dml_exception;
 use ml_recommender\local\csv\writer;
 use ml_recommender\local\unique_id;
 use moodle_recordset;
@@ -90,8 +88,8 @@ class item_data extends export {
 
         foreach ($recordset as $item) {
             $cells = [$item->uniqueid];
-            [$component] = unique_id::normalise_unique_id($item->uniqueid);
-            $component_onehot = $component_names[$component];
+            [$component, $item_id, $raw_component] = unique_id::normalise_unique_id($item->uniqueid);
+            $component_onehot = $component_names[$raw_component];
 
             foreach ($component_onehot as $onehot) {
                 $cells[] = $onehot;
@@ -108,7 +106,6 @@ class item_data extends export {
                 );
             } else {
                 $select = 'itemid = ? and component = ?';
-                $component = ($component == 'engage_microlearning') ? 'engage_article' : $component;
                 $this_item_topics = $DB->get_fieldset_select('tag_instance', 'tagid', $select, [$item->id, $component]);
             }
 

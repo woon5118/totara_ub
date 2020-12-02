@@ -36,7 +36,7 @@ class unique_id {
      * We are only expecting a string with the pattern as "hello_world42"
      *
      * @param string $unique_id
-     * @return array [$component, $id_number]
+     * @return array [$component, $id_number, $raw_component]
      */
     public static function normalise_unique_id(string $unique_id): array {
         $matches = [];
@@ -46,14 +46,19 @@ class unique_id {
             throw new coding_exception("Cannot extract the component name from unique id string");
         }
 
-        $component = $matches[1];
+        $raw_component = $component = $matches[1];
         $id_number = $matches[2];
 
         if ('' === clean_param($component, PARAM_COMPONENT)) {
             throw new coding_exception("Invalid component name '{$component}'");
         }
 
+        // The engine refers to microlearning recommendations independently, but we need to
+        if ($component === 'engage_microlearning') {
+            $component = 'engage_article';
+        }
+
         $id_number = clean_param($id_number, PARAM_INT);
-        return [$component, $id_number];
+        return [$component, $id_number, $raw_component];
     }
 }

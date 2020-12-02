@@ -30,15 +30,16 @@ class ml_recommender_unique_id_testcase extends advanced_testcase {
      */
     public function test_get_component_from_unique_id(): void {
         $valid_data = [
-            ['data_xoz', 45],
-            ['data_dc', 44],
-            ['data_cc', 43],
-            ['data_dd', 42],
-            ['data_juiji', 41],
+            ['data_xoz', 45, 'data_xoz'],
+            ['data_dc', 44, 'data_dc'],
+            ['data_cc', 43, 'data_cc'],
+            ['data_dd', 42, 'data_dd'],
+            ['data_juiji', 41, 'data_juiji'],
+            ['engage_article', 55, 'engage_microlearning'],
         ];
 
         foreach ($valid_data as $valid_datum) {
-            $valid_str = implode('', $valid_datum);
+            $valid_str = implode('', [$valid_datum[2], $valid_datum[1]]);
             self::assertEquals($valid_datum, unique_id::normalise_unique_id($valid_str));
         }
     }
