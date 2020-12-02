@@ -21,6 +21,7 @@
     class="tui-iconBtn"
     :aria-describedby="ariaDescribedby"
     :aria-expanded="ariaExpanded"
+    :aria-haspopup="ariaHaspopup"
     :aria-label="ariaLabel"
     :class="{
       'tui-formBtn--alert': styleclass.alert,
@@ -76,6 +77,7 @@ export default {
       type: [Boolean, String],
       default: false,
     },
+    ariaHaspopup: [Boolean, String],
     ariaLabel: {
       type: [Boolean, String],
       required: true,

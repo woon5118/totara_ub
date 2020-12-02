@@ -94,6 +94,7 @@
                   :text="$str('add', 'totara_core')"
                   :styleclass="{ primary: true }"
                   :aria-describedby="$id('items-added')"
+                  :aria-haspopup="ariaHaspopup"
                   @click="$emit('added', allSelectedItems)"
                 />
                 <ButtonCancel @click="$emit('cancel')" />
@@ -132,6 +133,7 @@ export default {
   },
 
   props: {
+    ariaHaspopup: [Boolean, String],
     // Customized item-selected context
     customSelected: Function,
     // Pre-selected items

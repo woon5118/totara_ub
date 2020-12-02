@@ -22,6 +22,7 @@
     :aria-expanded="ariaExpanded"
     :aria-disabled="ariaDisabled"
     :aria-describedby="ariaDescribedby"
+    :aria-haspopup="ariaHaspopup"
     :class="{
       'tui-formBtn--alert': styleclass.alert,
       'tui-formBtn--prim': styleclass.primary,
@@ -63,6 +64,7 @@ export default {
       type: [Boolean, String],
       default: false,
     },
+    ariaHaspopup: [Boolean, String],
     autofocus: Boolean,
     caret: Boolean,
     styleclass: {
