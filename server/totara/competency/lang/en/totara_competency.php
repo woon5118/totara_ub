@@ -378,6 +378,7 @@ $string['user_assignment_page_heading_other'] = 'Assign competencies';
 $string['user_assignment_page_heading_self'] = 'Self-assign competencies';
 $string['user_assignment_page_title_other'] = 'Competency assignment';
 $string['user_assignment_page_title_self'] = 'Self assignment';
+$string['user_competency_profile'] = '{$a}\' competency profile';
 $string['user_group_name'] = 'Assigned user group';
 $string['user_group_type_cohort'] = 'Audience';
 $string['user_group_type_organisation'] = 'Organisation';

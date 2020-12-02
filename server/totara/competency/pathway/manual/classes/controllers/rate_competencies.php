@@ -155,7 +155,7 @@ class rate_competencies extends controller {
         $parent_page_url = new \moodle_url('/totara/competency/rate_users.php');
         $this->set_url('/totara/competency/rate_competencies.php', ['user_id' => $this->user->id]);
 
-        $parent_page_title = get_string('rate_competencies', 'pathway_manual');
+        $parent_page_title = get_string('rate_competencies_for_user', 'pathway_manual', $this->user->fullname);
 
         if ($this->user->is_logged_in()) {
             $page_title = $parent_page_title;

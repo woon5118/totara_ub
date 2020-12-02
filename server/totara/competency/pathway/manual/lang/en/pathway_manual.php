@@ -72,6 +72,7 @@ $string['notification_ratings_saved_singular'] = 'Your rating has been saved.';
 $string['number_of_people'] = '{$a} people';
 $string['rate'] = 'Rate';
 $string['rate_competencies'] = 'Rate competencies';
+$string['rate_competencies_for_user'] = 'Rate competencies for {$a}';
 $string['rate_competency_a11y'] = 'Rate competency: {$a}';
 $string['rate_user'] = 'Rate {$a}';
 $string['rater_details_removed'] = ' (rater details removed)';

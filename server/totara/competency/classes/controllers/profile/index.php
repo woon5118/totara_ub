@@ -54,7 +54,7 @@ class index extends base {
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyProfile', $props)
-            ->set_title(get_string('competency_profile', 'totara_competency'));
+            ->set_title(get_string('user_competency_profile', 'totara_competency',  $this->user->fullname));
     }
 
 }

@@ -51,7 +51,7 @@ class user_assignment extends base {
         ];
 
         return tui_view::create('totara_competency/pages/UserAssignment', $props)
-            ->set_title(get_string('assign_competencies', 'totara_competency'));
+            ->set_title(get_string('self_assign_competencies', 'totara_competency'));
     }
 
     protected function get_frameworks(): array {
