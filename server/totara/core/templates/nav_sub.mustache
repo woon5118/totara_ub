@@ -56,7 +56,8 @@
                 {{#class_isselected}} totaraNav_sub--list_item_selected{{/class_isselected}}
                 {{#class_child_isselected}} totaraNav_sub--list_item_childSelected{{/class_child_isselected}}"
                  data-tw-totaraNav-item="true"
-                {{#haschildren}} data-tw-totaraNav-hasChildren="true"{{/haschildren}}>
+                {{#haschildren}} data-tw-totaraNav-hasChildren="true"{{/haschildren}}
+                role="presentation">
                 <a href="{{url}}" class="totaraNav_sub--list_item_link" role="menuitem" tabindex="0" target="{{target}}"
                     {{#haschildren}} aria-haspopup="true" aria-expanded="false"{{/haschildren}}>
                     <div class="totaraNav--expand_indent" {{#haschildren}}data-tw-totaraNav-chevron=""{{/haschildren}}></div>{{!
