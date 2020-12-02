@@ -291,20 +291,26 @@ export default {
      * inheritance chain.
      **/
     async loadCSSVariableData() {
-      this.rawCSSVariableData = await Promise.all(
-        this.totara_tui_themes_with_variables.map(theme => {
-          return fetch(
+      let result = await Promise.all(
+        this.totara_tui_themes_with_variables.map(async theme => {
+          const response = await fetch(
             this.$url('/totara/tui/json.php', {
               bundle: 'theme_' + theme,
               file: 'css_variables',
             })
-          )
-            .then(response => response.json())
-            .then(data => {
-              return data.vars;
-            });
+          );
+          const data = await response.json();
+          if (!data) {
+            console.error(
+              `[ThemeSettings] Configuration error: 'css_variables' file is missing for the selected theme.` +
+                `Please follow the TUI build instructions in order to generate the required file.`
+            );
+            return {};
+          }
+          return data.vars;
         })
       );
+      this.rawCSSVariableData = result.filter(response => response !== null);
     },
 
     /**

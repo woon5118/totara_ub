@@ -113,7 +113,7 @@ class totara_tui_local_mediation_json_resolver_testcase extends advanced_testcas
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringContainsString('/** File not found */', $json);
+        self::assertStringContainsString('null', $json);
     }
 
     private function get_resolver(int $rev, $component, $file = 'p') {

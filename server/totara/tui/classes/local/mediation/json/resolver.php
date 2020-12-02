@@ -115,14 +115,13 @@ final class resolver extends \totara_tui\local\mediation\resolver {
 
     /**
      * @inheritDoc
-     * @return string|file
      */
     protected function get_content_to_cache() {
         $file = $this->get_file();
         if ($file && $file->exists()) {
             return $file;
         }
-        return '/** File not found */';
+        return 'null';
     }
 
     /**

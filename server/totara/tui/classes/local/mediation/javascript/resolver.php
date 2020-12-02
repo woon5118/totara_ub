@@ -150,7 +150,6 @@ final class resolver extends \totara_tui\local\mediation\resolver {
 
     /**
      * @inheritDoc
-     * @return string|file
      */
     protected function get_content_to_cache() {
         if ($this->get_theme_config()) {

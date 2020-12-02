@@ -335,7 +335,7 @@ abstract class resolver {
      * Delivers the resource for production mode.
      */
     protected function deliver_production_mode() {
-        // Make sure that only one client is generating CSS at a time.
+        // Make sure that only one client is generating content at a time.
         // All other clients who got to this path can wait until the first completes.
         $lock = $this->get_generation_lock();
 
@@ -346,11 +346,10 @@ abstract class resolver {
         }
 
         $content = $this->get_content_to_cache();
-
         $this->store_in_cache($this->get_cachefile(), $content);
 
-        // Now that the CSS has been generated and/or stored, release the lock.
-        // This will allow waiting clients to use the newly generated and stored CSS.
+        // Now that the content has been generated and/or stored, release the lock.
+        // This will allow waiting clients to use the newly generated and stored content.
         $lock->release();
 
         // Real browsers - this is the expected result!
