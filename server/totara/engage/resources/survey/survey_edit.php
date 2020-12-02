@@ -66,7 +66,7 @@ if (!$survey->is_available()) {
     $context = $survey->get_context();
 
     $PAGE->set_context($context);
-    $PAGE->set_title($survey->get_name());
+    $PAGE->set_title(get_string('edit_survey', 'engage_survey', $survey->get_name()));
 
     // Build the back button & nav buttons
     [$back_button, $navigation_buttons] = nav_helper::build_resource_nav_buttons(

@@ -28,6 +28,7 @@ $string['defaultlabel'] = "Survey";
 $string['deletesurvey'] = "Delete survey";
 $string['deletewarningmsg'] = 'Are you sure you want to delete this survey?';
 $string['created'] = 'Survey successfully created';
+$string['edit_survey'] = 'Edit {$a}';
 $string['editsetting'] = "Edit settings";
 $string['editsurvey'] = "Edit survey";
 $string['editsurveyaccessiblename'] = 'Edit survey {$a}';

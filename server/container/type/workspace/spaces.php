@@ -43,7 +43,7 @@ $context = \context_coursecat::instance($category_id);
 
 $PAGE->set_context($context);
 $PAGE->set_url("/container/type/workspace/spaces.php");
-$PAGE->set_title(get_string('spaces', 'container_workspace'));
+$PAGE->set_title(get_string('find_spaces', 'container_workspace'));
 $PAGE->set_pagelayout('legacynolayout');
 $PAGE->set_totara_menu_selected(find_spaces::class);
 
