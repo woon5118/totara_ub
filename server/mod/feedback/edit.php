@@ -109,7 +109,11 @@ $strfeedback  = get_string('modulename', 'feedback');
 
 $PAGE->set_url('/mod/feedback/edit.php', array('id'=>$cm->id, 'do_show'=>$do_show));
 $PAGE->set_heading($course->fullname);
-$PAGE->set_title($feedback->name);
+if (!empty($do_show)) {
+    $PAGE->set_title(get_string('feedback_'.$do_show, 'feedback', $feedback->name));
+} else {
+    $PAGE->set_title($feedback->name);
+}
 
 //Adding the javascript module for the items dragdrop.
 if (count($feedbackitems) > 1) {

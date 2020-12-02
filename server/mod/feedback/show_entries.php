@@ -84,7 +84,7 @@ if ($data = $courseselectform->get_data()) {
 // Print the page header.
 navigation_node::override_active_url($baseurl);
 $PAGE->set_heading($course->fullname);
-$PAGE->set_title($feedback->name);
+$PAGE->set_title(get_string('show_entries_title', 'feedback', $feedback->name));
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($feedback->name));
 

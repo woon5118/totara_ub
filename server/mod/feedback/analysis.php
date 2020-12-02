@@ -47,7 +47,8 @@ if (!$feedbackstructure->can_view_analysis()) {
 /// Print the page header
 
 $PAGE->set_heading($course->fullname);
-$PAGE->set_title($feedback->name);
+
+$PAGE->set_title(get_string('analysis_title', 'feedback', $feedback->name));
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($feedback->name));
 
