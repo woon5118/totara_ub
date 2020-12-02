@@ -140,7 +140,11 @@ if ($usertype == 'manager') {
 }
 $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', array('userid' => $userid)));
 $PAGE->navbar->add($strsubheading);
-$PAGE->set_title($strheading);
+if ($USER->id != $userid) {
+    $PAGE->set_title($strheading);
+} else {
+    $PAGE->set_title($strheading.' : '.$strsubheading);
+}
 $PAGE->set_button($report->edit_button());
 $PAGE->set_heading($SITE->fullname);
 
