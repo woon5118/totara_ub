@@ -154,8 +154,7 @@ if (!empty($grading_info->items)) {
     }
 }
 
-$title = $course->shortname . ': ' . format_string($quiz->name);
-$PAGE->set_title($title);
+$PAGE->set_title(format_string($quiz->name));
 $PAGE->set_heading($course->fullname);
 $output = $PAGE->get_renderer('mod_quiz');
 

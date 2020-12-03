@@ -122,7 +122,12 @@ $PAGE->blocks->add_fake_block($navbc, $region);
 
 $title = get_string('attempt', 'quiz', $attemptobj->get_attempt_number());
 $headtags = $attemptobj->get_html_head_contributions($page);
-$PAGE->set_title($attemptobj->get_quiz_name());
+
+$obj = new stdClass();
+$obj->title = $attemptobj->get_quiz_name();
+$obj->page = $page + 1;
+
+$PAGE->set_title(get_string('attempt_title', 'quiz', $obj));
 $PAGE->set_heading($attemptobj->get_course()->fullname);
 
 if ($attemptobj->is_last_page($page)) {
