@@ -154,8 +154,6 @@ class block_totara_report_graph extends block_base {
         if ($data === null) {
             if (!empty($this->config->graph_height)) {
                 $templatecontext['height'] = $this->config->graph_height;
-            } else {
-                $templatecontext['height'] = 400;
             }
         }
 

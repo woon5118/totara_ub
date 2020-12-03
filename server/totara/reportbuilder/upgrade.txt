@@ -4,6 +4,7 @@ information provided here is intended especially for developers.
 === 13.3 ===
 
 * rb_filter_text::setupForm() now receives a new optional parameter 'hiddenoperator' which allows change an array of comparison operators
+* totara_reportbuilder/chartjs had been modified, adding resizer auto initalization code
 
 === 13.2 ===
 

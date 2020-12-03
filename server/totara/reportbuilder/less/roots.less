@@ -343,21 +343,47 @@ form[id^="toolbarsearch"].mform .fsubmit {
     &__chart {
         margin: 0 1rem;
         width: 100%;
+        position: relative;
+        min-height: 400px;
 
         &--progress {
             display: block;
             float: left;
-            margin: unset;
-            width: 33%;
-            height: 200px;
-
-            @media (min-width: @totara_style-screen_sm_min) {
-                width: 25%;
+            margin: 0;
+            min-height: 200px;
+      
+            [data-items-per-row="1"] & {
+              width: 100%;
             }
-
-            .rb-chartjs__chart__canvas {
-                margin: 0 auto;
+      
+            [data-items-per-row="2"] & {
+              width: 50%;
             }
+      
+            [data-items-per-row="3"] & {
+              width: 33.33%;
+            }
+      
+            [data-items-per-row="4"] & {
+              width: 25%;
+            }
+      
+            [data-items-per-row="5"] & {
+              width: 20%;
+            }
+      
+            [data-items-per-row="6"] & {
+              width: 16.66%;
+            }
+      
+            [data-items-per-row="7"] & {
+              width: 14.28%;
+            }
+      
+            [data-items-per-row="8"] & {
+              width: 12.5%;
+            }
+      
         }
     }
 

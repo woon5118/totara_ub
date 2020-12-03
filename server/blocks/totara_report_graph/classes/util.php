@@ -32,6 +32,7 @@ namespace block_totara_report_graph;
 class util {
     /**
      * Default height for graphs in blocks.
+     * @deprecated since 13.3
      */
     const DEFAULT_HEIGHT = 400;
 
@@ -55,7 +56,7 @@ class util {
         if (!empty($config->graph_height) && $config->graph_height > 0) {
             $height = (int)$config->graph_height;
         } else {
-            $height = self::DEFAULT_HEIGHT;
+            $height = null;
         }
 
         return 'b' . $blockid . 'f' . $reportfor . 'h' . $height . 'l' . current_language();
@@ -162,7 +163,7 @@ class util {
             if (!empty($config->graph_height) && $config->graph_height > 0) {
                 $height = (int)$config->graph_height;
             } else {
-                $height = self::DEFAULT_HEIGHT;
+                $height = null;
             }
             $data = $graph->get_render_data(null, $height);
 
