@@ -224,7 +224,9 @@ class rb_source_course_completion_by_org extends rb_base_source {
             "(SELECT COUNT('x')
                 FROM {course_completions} cc
                 $global_restriction_join_cc
-               WHERE base.id = cc.organisationid AND cc.timestarted > 0 AND (cc.rpl IS NULL OR cc.timecompleted = 0))",
+                WHERE cc.timestarted > 0
+                AND (cc.timecompleted = 0 OR cc.timecompleted is NULL)
+                AND EXISTS (SELECT 1 FROM {job_assignment} ja where ja.userid = cc.userid AND ja.organisationid = base.id))",
             array(
                 'displayfunc' => 'integer',
                 'iscompound' => true,
