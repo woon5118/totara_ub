@@ -1443,18 +1443,6 @@ function data_add_fields_contents_to_new_record($data, $context, $recordid, $fie
     foreach ($processeddata->fields as $fieldname => $field) {
         $field->update_content($recordid, $datarecord->$fieldname, $fieldname);
     }
-
-    // Trigger an event for updating this record.
-    $event = \mod_data\event\record_created::create(array(
-        'objectid' => $recordid,
-        'context' => $context,
-        'courseid' => $data->course,
-        'other' => array(
-            'dataid' => $data->id
-        )
-    ));
-    $event->add_record_snapshot('data', $data);
-    $event->trigger();
 }
 
 /**
