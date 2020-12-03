@@ -177,6 +177,7 @@
                     "
                     :accessible-label="sectionElement.element.title"
                     :required="sectionElement.element.is_required"
+                    :aria-describedby="checkboxGroupId"
                   >
                     <template v-slot:content="{ labelId }">
                       <component
@@ -188,6 +189,7 @@
                           sectionElement.response_data_formatted_lines
                         "
                         :aria-labelledby="labelId"
+                        :label-id="checkboxGroupId"
                       />
                       <component
                         :is="sectionElement.formComponent"
@@ -197,6 +199,7 @@
                         :path="['sectionElements', sectionElement.id]"
                         :error="errors && errors[sectionElement.id]"
                         :aria-labelledby="labelId"
+                        :label-id="checkboxGroupId"
                       />
                     </template>
                   </ElementParticipantForm>
@@ -500,6 +503,7 @@ export default {
       selectedParticipantSectionId: this.participantSectionId,
       selectedSectionId: this.selectedSectionId || null,
       isDraft: false,
+      checkboxGroupId: this.$id('label'),
     };
   },
   computed: {

@@ -18,9 +18,11 @@
 <template>
   <FormScope :path="path" :process="process">
     <div class="tui-multiChoiceMultiParticipantForm">
-      <span v-for="(settingString, i) in settingStrings" :key="i">
-        {{ settingString }} <br v-if="i < settingString.length" />
-      </span>
+      <FormRowDetails :id="labelId">
+        <span v-for="(settingString, i) in settingStrings" :key="i">
+          {{ settingString }} <br v-if="i < settingString.length" />
+        </span>
+      </FormRowDetails>
       <FormCheckboxGroup :validations="validations" name="response">
         <Checkbox
           v-for="item in element.data.options"
@@ -38,6 +40,7 @@
 import FormScope from 'tui/components/reform/FormScope';
 import FormCheckboxGroup from 'tui/components/uniform/FormCheckboxGroup';
 import Checkbox from 'tui/components/form/Checkbox';
+import FormRowDetails from 'tui/components/form/FormRowDetails';
 import { v as validation } from 'tui/validation';
 
 export default {
@@ -45,12 +48,14 @@ export default {
     Checkbox,
     FormScope,
     FormCheckboxGroup,
+    FormRowDetails,
   },
   props: {
     path: [String, Array],
     error: String,
     isDraft: Boolean,
     element: Object,
+    labelId: String,
   },
   computed: {
     /**

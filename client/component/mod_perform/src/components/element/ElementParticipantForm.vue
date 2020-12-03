@@ -24,6 +24,7 @@
       :accessible-label="accessibleLabel"
       :required="required"
       :optional="optional"
+      :aria-describedby="ariaDescribedby"
     >
       <slot name="content" :labelId="labelId" />
     </FormRow>
@@ -42,6 +43,7 @@ export default {
     accessibleLabel: String,
     required: Boolean,
     optional: Boolean,
+    ariaDescribedby: String,
   },
 };
 </script>
