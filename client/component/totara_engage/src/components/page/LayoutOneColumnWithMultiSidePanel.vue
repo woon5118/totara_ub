@@ -53,6 +53,7 @@ This layout is capable of the following:
             :initially-open="leftSidePanelInitiallyOpen"
             :overflows="leftSidePanelOverflows"
             :show-button-control="showLeftSidePanelControl"
+            :min-height="minSidePanelHeight"
             @sidepanel-expanding="expandLeftRequest"
             @sidepanel-collapsing="collapseLeftRequest"
           >
@@ -423,6 +424,33 @@ export default {
         return this.rightSidePanelGrowHeightOnScroll;
       }
       return this.currentBoundaryName !== 'small';
+    },
+
+    /**
+     * Get the minimum side panel length, based on the main page container height.
+     * The reason for this work around is that the side panel is only bound to the
+     * height of the main vue container which has a minimum height based on its content.
+     *
+     * If the contents of the main vue container are relatively short and the page
+     * footer is also short (no performance data or customizations), then on some
+     * screen resolutions the side panel will not reach the bottom of the main page container.
+     *
+     * There are several layers of container divs that are defined in php meaning to
+     * fix this problem with markup and css, it would require significant page restructuring.
+     */
+    minSidePanelHeight() {
+      // Don't specify a min height when the side panel is stack on top of the content.
+      if (this.gridDirection === 'vertical') {
+        return null;
+      }
+
+      const mainContent = document.querySelector('#page');
+
+      if (mainContent === null) {
+        return null;
+      }
+
+      return mainContent.scrollHeight - 1 || null;
     },
   },
 
