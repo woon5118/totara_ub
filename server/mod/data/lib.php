@@ -599,6 +599,7 @@ function data_generate_default_template(&$data, $template, $recordid=0, $form=fa
 
         $table = new html_table();
         $table->attributes['class'] = 'mod-data-default-template ##approvalstatus##';
+        $table->attributes['role'] = 'presentation';
         $table->colclasses = array('template-field', 'template-token');
         $table->data = array();
         foreach ($fields as $field) {
@@ -1842,7 +1843,7 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
 
     echo '<br />';
     echo '<div class="' . $advancedsearchclass . '" id="data_adv_form">';
-    echo '<table class="boxaligncenter">';
+    echo '<table class="boxaligncenter" role="presentation">';
 
     // print ASC or DESC
     echo '<tr><td colspan="2">&nbsp;</td></tr>';
@@ -1904,8 +1905,9 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
     // actual replacement of the tags
 
     $options = new stdClass();
-    $options->para=false;
-    $options->noclean=true;
+    $options->para = false;
+    $options->noclean = true;
+    $options->allowrole = ['tag' => 'table', 'role' => true];
     echo '<tr><td>';
     echo preg_replace($patterns, $replacement, format_text($data->asearchtemplate, FORMAT_HTML, $options));
     echo '</td></tr>';

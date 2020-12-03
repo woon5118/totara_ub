@@ -1064,4 +1064,31 @@ class core_weblib_format_text_testcase extends advanced_testcase {
 
         $this->assertEquals($expected, $output);
     }
+
+    /**
+     * A test to make sure the new configure option 'allowrole' behaves as expected.
+     * @return void
+     */
+    public function test_with_allowrole_config(): void {
+        purge_all_caches();
+        $text = '<table class="mod-data-default-template" role="presentation"><tbody><tr><th>Test</th></tr></tbody></table>';
+        self::assertEquals($text, format_text($text, FORMAT_HTML, ['allowrole' => ['tag' => 'table', 'role' => 1]]));
+        self::assertEquals($text, format_text($text, FORMAT_HTML, ['allowrole' => ['tag' => 'table', 'role' => true]]));
+
+        purge_all_caches();
+        $text = '<span role="presentation">Test</span>';
+        self::assertEquals($text, format_text($text, FORMAT_HTML, ['allowrole' => ['tag' => 'span', 'role' => 1]]));
+
+        purge_all_caches();
+        $text = '<table class="mod-data-default-template" role="presentation"><tbody><tr><th>Test</th></tr></tbody></table>';
+        $expect_html = '<table class="mod-data-default-template"><tbody><tr><th>Test</th></tr></tbody></table>';
+        self::assertEquals($expect_html, format_text($text, FORMAT_HTML));
+        self::assertEquals($expect_html, format_text($text, FORMAT_HTML, ['allowrole' => ['tag' => 'table', 'role' => 0]]));
+
+        format_text($text, FORMAT_HTML, ['allowrole' => ['tag' => 'table', 'role' => 1], 'allowxss' => 1]);
+        self::assertDebuggingCalled('Option allowrole can not be set with option allowxss');
+
+        format_text($text, FORMAT_HTML, ['allowrole' => ['role' => 1]]);
+        self::assertDebuggingCalled('Tag has to be set for option allowrole');
+    }
 }

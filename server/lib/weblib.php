@@ -1240,6 +1240,9 @@ function format_text_menu() {
  *      formatter   :   Totara: the formatter's component, which is for telling the json editor to use which formatter
  *                      within the system. Fallback to default formatter if none is provided.
  *
+ *      allowrole   :   Totara: If true then role attributes will be kept, otherwise role attributes will be removed.
+ *                      @example allowrole = ['tag' = 'span', 'role' => true]
+ *
  * Deprecated options:
  *      trusted     :   If set to true, and trusttext is enabled, and totara_core_legacy_noclean_trusttext_enabled() returns true
  *                      then the given text will not be passed through clean_text to remove XSS nasties.
@@ -1290,6 +1293,15 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
     if (!isset($options['overflowdiv'])) {
         $options['overflowdiv'] = false;
     }
+
+    if (!isset($options['allowrole'])) {
+        $options['allowrole'] = ['role' => false];
+    } else {
+        if (empty($options['allowrole']['tag'])) {
+            debugging('Tag has to be set for option allowrole', DEBUG_DEVELOPER);
+        }
+    }
+
     $options['blanktarget'] = !empty($options['blanktarget']);
 
     // Totara: if set text will not be passed through clean_text.
@@ -1299,6 +1311,10 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
         $allowxss = true;
     } else if (!empty($options['noclean']) && !empty($CFG->disableconsistentcleaning)) {
         $allowxss = true;
+    }
+
+    if ($allowxss && $options['allowrole']['role']) {
+        debugging('Option allowrole can not be set with option allowxss', DEBUG_DEVELOPER);
     }
 
     // Totara: legacy options to prevent cleaning. We don't use these any more.
@@ -1417,7 +1433,14 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
         }
         // Totara: text cleaning must be done at the very end, unsafe filters are the only exception.
         if ($cleantext) {
-            $text = clean_text($text, FORMAT_HTML, ['allowid' => !empty($options['allowid'])]);
+            $text = clean_text(
+                $text,
+                FORMAT_HTML,
+                [
+                    'allowid' => !empty($options['allowid']),
+                    'allowrole' => $options['allowrole']
+                ]
+            );
             $cleantext = false;
         }
 
@@ -2036,13 +2059,17 @@ function purify_html($text, $options = array()) {
 
         // Allow safe CSS extensions - http://htmlpurifier.org/live/configdoc/plain.html#CSS.Proprietary
         $config->set('CSS.Proprietary', true);
-
         if ($def = $config->maybeGetRawHTMLDefinition()) {
             $def->addElement('nolink', 'Block', 'Flow', array());                       // Skip our filters inside.
             $def->addElement('tex', 'Inline', 'Inline', array());                       // Tex syntax, equivalent to $$xx$$.
             $def->addElement('algebra', 'Inline', 'Inline', array());                   // Algebra syntax, equivalent to @@xx@@.
             $def->addElement('lang', 'Block', 'Flow', array(), array('lang'=>'CDATA')); // Original multilang style - only our hacked lang attribute.
             $def->addAttribute('span', 'xxxlang', 'CDATA');                             // Current very problematic multilang.
+
+            // Add role attributes to table element.
+            if (!empty($options['allowrole']) && $options['allowrole']['role']) {
+                $def->addAttribute($options['allowrole']['tag'], 'role', 'Text');
+            }
 
             // Media elements.
             // https://html.spec.whatwg.org/#the-video-element

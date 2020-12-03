@@ -265,6 +265,7 @@ if (($mode == 'new') && (!empty($newtype)) && confirm_sesskey()) {          /// 
     } else {    //else print quiz style list of fields
 
         $table = new html_table();
+        $table->attributes['role'] = 'presentation';
         $table->head = array(
             get_string('fieldname', 'data'),
             get_string('type', 'data'),
