@@ -58,7 +58,7 @@ local_js(array(
     TOTARA_JS_TREEVIEW
 ));
 $PAGE->set_url('/mod/facetoface/events/add.php', array('f' => $f, 'backtoallsessions' => $backtoallsessions));
-$PAGE->set_title($seminar->get_name());
+$PAGE->set_title(get_string('addingseminarsession', 'facetoface', format_string($seminar->get_name())));
 $PAGE->set_heading($course->fullname);
 
 $PAGE->requires->strings_for_js(array('save', 'delete'), 'totara_core');

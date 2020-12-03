@@ -40,10 +40,9 @@ if (optional_param('setdefaulthome', 0, PARAM_BOOL)) {
 
 // Set page context.
 $systemcontext = context_system::instance();
-$title = get_string('catalog_title', 'totara_catalog');
 $heading = get_string('catalog_heading', 'totara_catalog');
 $PAGE->set_context($systemcontext);
-$PAGE->set_title($title);
+$PAGE->set_title($heading);
 $PAGE->set_heading($heading);
 $PAGE->set_pagelayout('columnpage');
 $PAGE->set_url($pageurl);

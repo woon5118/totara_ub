@@ -223,7 +223,7 @@ class mod_assign_renderer extends plugin_renderer_base {
             $this->page->navbar->add($header->subpage);
         }
 
-        $this->page->set_title(get_string('pluginname', 'assign'));
+        $this->page->set_title(format_string($header->assign->name));
         $this->page->set_heading($this->page->course->fullname);
 
         $o .= $this->output->header();

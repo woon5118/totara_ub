@@ -37,6 +37,7 @@ $string['addeditattendeessuccess'] = 'Add/edit attendees success';
 $string['addedsuccessfully'] = 'Added successfully';
 $string['addfacilitator'] = 'Add a facilitator';
 $string['addingsession'] = 'Adding a new event in {$a}';
+$string['addingseminarsession'] = 'Adding a new Seminar to {$a}';
 $string['additionalfeaturesheading'] = 'Additional features';
 $string['addnewasset'] = 'Add a new asset';
 $string['addnewfacilitator'] = 'Add a new facilitator';

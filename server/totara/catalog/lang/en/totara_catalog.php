@@ -43,7 +43,6 @@ $string['catalog_enhanced'] = 'Report';
 $string['catalog_heading'] = 'Find learning';
 $string['catalog_old'] = 'Category';
 $string['catalog_totara'] = 'Grid';
-$string['catalog_title'] = 'Catalogue';
 $string['catalogtype'] = 'Catalogue default view';
 $string['category'] = 'Category';
 $string['changes_saved'] = 'Changes have been saved. {$a->link}';
@@ -167,3 +166,6 @@ $string['filters_subheading'] = 'Define the available Filter Sources which allow
 
 // Deprecated since Totara 13.2.
 $string['redirect_message_go_to_active_catalog_link'] = 'Find Learning';
+
+// Deprecated since Totara 13.3
+$string['catalog_title'] = 'Catalogue';

@@ -78,7 +78,7 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot($cm->modname, $seminar->get_properties());
 $event->trigger();
 
-$title = $course->shortname . ': ' . format_string($seminar->get_name());
+$title = format_string($seminar->get_name());
 
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
