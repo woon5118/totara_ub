@@ -1582,6 +1582,11 @@ abstract class enrol_plugin {
     protected $config = null;
 
     /**
+     * @var string
+     */
+    protected $user_full_name = '';
+
+    /**
      * Returns name of this enrol plugin
      * @return string
      */
@@ -3277,6 +3282,24 @@ abstract class enrol_plugin {
             }
         }
         return $errors;
+    }
+
+    /**
+     * Set the user's full name.
+     *
+     * @param string $user_full_name
+     */
+    public function set_user_full_name(string $user_full_name): void {
+        $this->user_full_name = $user_full_name;
+    }
+
+    /**
+     * Get user's full name.
+     *
+     * @return string
+     */
+    public function get_user_full_name(): string {
+        return $this->user_full_name;
     }
 
     /**

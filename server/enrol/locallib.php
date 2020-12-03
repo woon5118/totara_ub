@@ -1108,6 +1108,10 @@ class course_enrolment_manager {
             // Enrolments
             $details['enrolments'] = array();
             foreach ($this->get_user_enrolments($user->id) as $ue) {
+                /** @var enrol_plugin $enrolmentplugin */
+                $enrolmentplugin = $ue->enrolmentplugin;
+                $enrolmentplugin->set_user_full_name($details['userfullnamedisplay']);
+
                 if (!isset($enabledplugins[$ue->enrolmentinstance->enrol])) {
                     $details['enrolments'][$ue->id] = array(
                         'text' => $ue->enrolmentinstancename,
@@ -1134,7 +1138,7 @@ class course_enrolment_manager {
                     'text' => $ue->enrolmentinstancename,
                     'period' => $period,
                     'dimmed' =>  ($periodoutside or $ue->status != ENROL_USER_ACTIVE or $ue->enrolmentinstance->status != ENROL_INSTANCE_ENABLED),
-                    'actions' => $ue->enrolmentplugin->get_user_enrolment_actions($manager, $ue)
+                    'actions' => $enrolmentplugin->get_user_enrolment_actions($manager, $ue)
                 );
             }
             $userdetails[$user->id] = $details;

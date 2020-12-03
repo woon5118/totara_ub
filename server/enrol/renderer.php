@@ -190,15 +190,20 @@ class core_enrol_renderer extends plugin_renderer_base {
      * @param array $roles
      * @param array $assignableroles
      * @param moodle_url $pageurl
+     * @param string $user_full_name
+     *
      * @return string
      */
-    public function user_roles_and_actions($userid, $roles, $assignableroles, $canassign, $pageurl) {
+    public function user_roles_and_actions($userid, $roles, $assignableroles, $canassign, $pageurl, $user_full_name) {
+        $a = new stdClass();
+        $a->fullname = $user_full_name;
 
         // Get list of roles.
         $rolesoutput = '';
         foreach ($roles as $roleid=>$role) {
             if ($canassign and (is_siteadmin() or isset($assignableroles[$roleid])) and !$role['unchangeable']) {
-                $strunassign = get_string('unassignarole', 'role', $role['text']);
+                $a->role = $role['text'];
+                $strunassign = get_string('unassignarolefor', 'role', $a);
                 $icon = $this->output->flex_icon('delete', array('alt'=>$strunassign));
                 $url = new moodle_url($pageurl, array('action'=>'unassign', 'roleid'=>$roleid, 'user'=>$userid));
                 $rolesoutput .= html_writer::tag('div', $role['text'] . html_writer::link($url, $icon, array('class'=>'unassignrolelink', 'rel'=>$roleid, 'title'=>$strunassign)), array('class'=>'role role_'.$roleid));
@@ -218,7 +223,7 @@ class core_enrol_renderer extends plugin_renderer_base {
             }
             if (!$hasallroles) {
                 $url = new moodle_url($pageurl, array('action' => 'assign', 'user' => $userid));
-                $roleicon = $this->output->pix_icon('i/assignroles', get_string('assignroles', 'role'));
+                $roleicon = $this->output->pix_icon('i/assignroles', get_string('assignrolesto', 'role', $a));
                 $link = html_writer::link($url, $roleicon, array('class' => 'assignrolelink'));
                 $output = html_writer::tag('div', $link, array('class'=>'addrole'));
             }

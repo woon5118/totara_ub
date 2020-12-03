@@ -83,7 +83,7 @@ $users = $manager->get_other_users_for_display($renderer, $PAGE->url, $table->so
 $assignableroles = $manager->get_assignable_roles(true);
 foreach ($users as $userid=>&$user) {
     $user['picture'] = $OUTPUT->render($user['picture']);
-    $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'], $assignableroles, $canassign, $PAGE->url);
+    $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'], $assignableroles, $canassign, $PAGE->url, $user['userfullnamedisplay']);
 }
 
 $table->set_total_users($manager->get_total_other_users());

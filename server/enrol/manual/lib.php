@@ -437,13 +437,17 @@ class enrol_manual_plugin extends enrol_plugin {
         $params['ue'] = $ue->id;
         if ($this->allow_unenrol_user($instance, $ue) && has_capability("enrol/manual:unenrol", $context)) {
             $url = new moodle_url('/enrol/unenroluser.php', $params);
-            $strunenrol = get_string('unenrol', 'enrol');
+            $strunenrol = rtrim(get_string('unenroluser', 'enrol', $this->user_full_name));
             $actions[] = new user_enrolment_action(new pix_icon('t/delete', $strunenrol),
                 $strunenrol, $url, array('class' => 'unenrollink', 'rel' => $ue->id));
         }
         if ($this->allow_manage($instance) && has_capability("enrol/manual:manage", $context)) {
             $url = new moodle_url('/enrol/editenrolment.php', $params);
-            $stredit = get_string('editenrolment', 'enrol');
+            if (!empty($this->user_full_name)) {
+                $stredit = get_string('editenrolmentfor', 'enrol', $this->user_full_name);
+            } else {
+                $stredit = get_string('editenrolment', 'enrol');
+            }
             $actions[] = new user_enrolment_action(new pix_icon('t/edit', $stredit, 'moodle', array('title' => $stredit)),
                 $stredit, $url, array('class' => 'editenrollink', 'rel' => $ue->id));
         }

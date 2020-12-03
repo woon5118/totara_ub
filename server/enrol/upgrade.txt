@@ -1,6 +1,10 @@
 This files describes API changes in /enrol/* - plugins,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* Added "user_full_name" parameter of type string to core_enrol_renderer::user_roles_and_actions
+
 === 13.0 ===
 
 * Added a new optional argument $preventredirect to the try_autoenrol functions.
