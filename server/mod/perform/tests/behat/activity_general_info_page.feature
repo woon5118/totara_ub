@@ -44,7 +44,8 @@ Feature: Create and update activity general info fields
     And I click on "Add activity" "button"
     And I set the field "Title" to "  "
     And I set the field "Type" to "Feedback"
-    Then the "Create" "button" should be disabled
+    And I click on "Create" "button"
+    Then I should see "Required"
 
   Scenario: Edit the general info fields for an existing activity
     Given I log in as "admin"
