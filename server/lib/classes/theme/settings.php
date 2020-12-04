@@ -63,33 +63,25 @@ final class settings {
     public function get_categories($tenant_enabled = true): array {
         global $DB;
 
-        // Get theme inheritance.
-        $themes = $this->theme_config->parents;
-        $themes = array_reverse($themes);
+        $theme = $this->theme_config->name;
 
-        // Add current theme to array.
-        array_push($themes, $this->theme_config->name);
-
-        // For each theme in hierarchy get the settings for tenant.
         $categories = $this->get_default_categories();
-        foreach ($themes as $theme) {
-            // Get all variables for site.
-            $values = $DB->get_field('config_plugins', 'value', [
-                'name' => "tenant_0_settings",
-                'plugin' => "theme_{$theme}"
-            ]);
+        // Get all variables for site.
+        $values = $DB->get_field('config_plugins', 'value', [
+            'name' => "tenant_0_settings",
+            'plugin' => "theme_{$theme}"
+        ]);
+        if (!empty($values)) {
+            $theme_categories = json_decode($values, true);
+            $this->merge_categories($categories, $theme_categories);
+        }
+
+        // Get all variables for current tenant and override site.
+        if ($tenant_enabled && $this->tenant_id > 0) {
+            $values = $DB->get_field('config_plugins', 'value', $this->get_config_parameters($this->tenant_id, $theme));
             if (!empty($values)) {
                 $theme_categories = json_decode($values, true);
                 $this->merge_categories($categories, $theme_categories);
-            }
-
-            // Get all variables for current tenant and override site.
-            if ($tenant_enabled && $this->tenant_id > 0) {
-                $values = $DB->get_field('config_plugins', 'value', $this->get_config_parameters($this->tenant_id, $theme));
-                if (!empty($values)) {
-                    $theme_categories = json_decode($values, true);
-                    $this->merge_categories($categories, $theme_categories);
-                }
             }
         }
 

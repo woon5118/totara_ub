@@ -1052,6 +1052,35 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertNotNull($tenant_file_record);
         $this->assertNotEqualsCanonicalizing($site_file_record, $tenant_file_record);
     }
+    
+    public function test_get_categories() {
+        $this->setAdminUser();
+        $ventura_config = theme_config::load('ventura');
+        $base_config = theme_config::load('base');
+        $ventura_settings = new settings($ventura_config, 0);
+        $base_settings = new settings($base_config, 0);
+        
+        $test_base_categories = [
+            [
+                'name' => 'test_base_category',
+                'properties' => [
+                    [
+                        'name' => 'test_category',
+                        'type' => 'text',
+                        'value' => '123',
+                    ],
+                ],
+            ]
+        ];
+        $base_settings->update_categories($test_base_categories);
+        $categories = $ventura_settings->get_categories(false);
+        
+        $category_names = array_map(function ($category) {
+            return $category['name'];
+        }, $categories);
+        
+        $this->assertFalse(in_array('test_base_category', $category_names));
+    }
 
     /**
      * @param int $item_id
