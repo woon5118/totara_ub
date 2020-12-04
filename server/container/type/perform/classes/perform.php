@@ -24,7 +24,8 @@
 namespace container_perform;
 
 use core\orm\query\builder;
-use core_container\{container, facade\category_name_provider};
+use core_container\container;
+use core_container\facade\category_name_provider;
 use mod_perform\models\activity\activity;
 
 /**
@@ -125,14 +126,25 @@ class perform extends container implements category_name_provider {
      * @inheritDoc
      */
     protected static function pre_create(\stdClass $data): void {
-        parent::pre_create($data);
-
         // Shortname is not relevant to performance containers, just generate a unique one.
         $name = $data->name ?? '';
         $data->shortname = self::get_unique_shortname($name);
 
         // TODO will be able to remove this once it's been implemented in parent method.
         $data->containertype = self::get_type();
+
+        parent::pre_create($data);
+    }
+
+    /**
+     * @param container|static $container
+     * @param \stdClass $data
+     */
+    protected static function post_create(container $container, \stdClass $data): void {
+        // Create the container_perform enrollment plugin for this perform instance.
+        perform_enrollment::create_container_instance($container);
+
+        parent::post_create($container, $data);
     }
 
     /**
@@ -157,6 +169,9 @@ class perform extends container implements category_name_provider {
             // Delete the mod perform specific records first because the context
             // record is required to create the activity deleted event.
             activity::load_by_container_id($this->get_id())->delete();
+
+            // Delete the container_perform enrollment plugin for this perform instance.
+            perform_enrollment::delete_container_instance($this);
 
             parent::delete();
         });

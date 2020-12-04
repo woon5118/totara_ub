@@ -1573,6 +1573,7 @@ class mod_perform_generator extends component_generator_base {
         }
 
         $element = $this->create_element([
+            'context' => $activity->get_context(),
             'title' => 'Question one',
             'is_required' => (bool) $required_question,
             'identifier' => $reporting_id1,
@@ -1580,6 +1581,7 @@ class mod_perform_generator extends component_generator_base {
         $this->create_section_element($section1, $element);
 
         $element2 = $this->create_element([
+            'context' => $activity->get_context(),
             'title' => 'Question two',
             'is_required' => (bool) $required_question,
             'identifier' => $reporting_id2
@@ -1588,6 +1590,7 @@ class mod_perform_generator extends component_generator_base {
 
         if ($data['include_static_content'] ?? false) {
             $element3 = $this->create_element([
+                'context' => $activity->get_context(),
                 'title' => 'Static content title',
                 'plugin_name' => 'static_content',
                 'data' => '{"wekaDoc":"{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This content is static\"}]}]}","format":"HTML","docFormat":"FORMAT_JSON_EDITOR","element_id":1}'
@@ -1615,4 +1618,66 @@ class mod_perform_generator extends component_generator_base {
             );
         }
     }
+
+    /**
+     * Create an external user, with corresponding participant instance and sections
+     *
+     * @param array $data E.g: ['subject' => Subject instance username, 'fullname' => 'XYZ', 'email' => 'xyz@abc.com']
+     * @return array [participant_instance, ]
+     */
+    public function create_external_participant_instances(array $data): array {
+        return builder::get_db()->transaction(function () use ($data) {
+            $external_relationship_id = core_relationship::load_by_idnumber(
+                constants::RELATIONSHIP_EXTERNAL
+            )->id;
+
+            $subject_instance_entity = subject_instance_entity::repository()
+                ->join([user::TABLE, 'u'], 'subject_user_id', 'id')
+                ->where('u.username', $data['subject'])
+                ->one(true);
+            $subject_instance_model = subject_instance::load_by_entity($subject_instance_entity);
+
+            $section_ids = \mod_perform\entity\activity\section::repository()
+                ->select('id')
+                ->where('activity_id', $subject_instance_model->get_activity()->id)
+                ->join([\mod_perform\entity\activity\section_relationship::TABLE, 'rel'], 'id', 'section_id')
+                ->where('rel.core_relationship_id', $external_relationship_id)
+                ->get()
+                ->pluck('id');
+            if (empty($section_ids)) {
+                throw new coding_exception('There are no sections that the external respondent can participate in');
+            }
+
+            $external_user = new \mod_perform\entity\activity\external_participant();
+            $external_user->name = $data['fullname'];
+            $external_user->email = $data['email'];
+            $external_user->token = hash('sha256', microtime());
+            $external_user->save();
+
+            $participant_instance = new participant_instance_entity();
+            $participant_instance->core_relationship_id = $external_relationship_id;
+            $participant_instance->participant_source = participant_source::EXTERNAL;
+            $participant_instance->participant_id = $external_user->id;
+            $participant_instance->subject_instance_id = $subject_instance_model->id;
+            $participant_instance->progress = participant_section_not_started::get_code();
+            $participant_instance->availability = open::get_code();
+            $participant_instance->save();
+
+            $participant_sections = [];
+            foreach ($section_ids as $section_id) {
+                $participant_section = new participant_section_entity();
+                $participant_section->participant_instance_id = $participant_instance->id;
+                $participant_section->section_id = $section_id;
+                $participant_section->progress = participant_section_not_started::get_code();
+                $participant_section->availability = particiant_section_open::get_code();
+                $participant_sections[] = $participant_section->save();
+            }
+
+            // Ensures the external user token hash is unique
+            usleep(1);
+
+            return [$participant_instance, $external_user, $participant_sections];
+        });
+    }
+
 }

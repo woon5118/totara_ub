@@ -29,6 +29,7 @@
  */
 function xmldb_container_perform_upgrade($oldversion) {
     global $CFG, $DB;
+    require_once(__DIR__ . '/upgradelib.php');
 
     $dbman = $DB->get_manager();
 
@@ -37,6 +38,12 @@ function xmldb_container_perform_upgrade($oldversion) {
         \core\task\manager::queue_adhoc_task(new \container_perform\task\create_missing_categories());
 
         upgrade_plugin_savepoint(true, 2020100101, 'container', 'perform');
+    }
+
+    if ($oldversion < 2020100102) {
+        container_perform_create_enrollment_plugin_records();
+
+        upgrade_plugin_savepoint(true, 2020100102, 'container', 'perform');
     }
 
     return true;

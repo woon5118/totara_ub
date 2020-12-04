@@ -26,7 +26,9 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\collection;
 use mod_perform\entity\activity\element as element_entity;
+use mod_perform\models\activity\helpers\element_response_has_files;
 use mod_perform\models\response\element_validation_error;
+use mod_perform\models\response\section_element_response;
 
 /**
  * Class element_plugin
@@ -116,6 +118,15 @@ abstract class respondable_element_plugin extends element_plugin {
     }
 
     /**
+     * Do any required actions after the response has been submitted and saved.
+     *
+     * @param section_element_response $element_response
+     */
+    public function post_response_submission(section_element_response $element_response): void {
+        // Can be overridden if necessary.
+    }
+
+    /**
      * Returns example response data that is in a format valid for the element. Used for generating records during testing.
      *
      * @return string
@@ -201,6 +212,21 @@ abstract class respondable_element_plugin extends element_plugin {
         }
 
         return $decoded_response;
+    }
+
+    /**
+     * Get all element plugins that have files.
+     *
+     * @return element_response_has_files[] Keyed by plugin_name, value is instance of element model.
+     */
+    final public static function get_element_plugins_with_files(): array {
+        $file_plugins = [];
+        foreach (static::get_element_plugins() as $plugin_name => $plugin_instance) {
+            if ($plugin_instance instanceof element_response_has_files) {
+                $file_plugins[$plugin_name] = $plugin_instance;
+            }
+        }
+        return $file_plugins;
     }
 
 }

@@ -24,7 +24,6 @@
  */
 
 use container_perform\perform as perform_container;
-use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\participant_source;
 use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\element_trait;
@@ -32,8 +31,8 @@ use mod_perform\rb\traits\participant_instance_trait;
 use mod_perform\rb\traits\section_element_trait;
 use mod_perform\rb\traits\section_trait;
 use mod_perform\rb\traits\subject_instance_trait;
-use totara_core\advanced_feature;
 use mod_perform\state\participant_section\complete;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -188,12 +187,12 @@ class rb_source_perform_response_base extends rb_base_source {
                     'joins' => ['perform_element'],
                     'displayfunc' => 'element_response',
                     'extrafields' => [
+                        'element_id' => "perform_element.id",
                         'element_type' => "perform_element.plugin_name",
                         'element_data' => "perform_element.data",
+                        'element_context_id' => "perform_element.context_id",
+                        'response_id' => "base.id",
                     ],
-                    'extracontext' => [
-                        'default_category_context' => $this->default_category_context,
-                    ]
                 ]
             ),
             // Column for sorting that combines activity name, section and element sorts, relationship and participant

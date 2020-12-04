@@ -20,7 +20,19 @@
   <div class="tui-longTextAdminView">
     <Form input-width="full" :vertical="true">
       <FormRow>
-        <Textarea :rows="6" name="answer_text" :char-length="50" />
+        <!--
+          We pass a dummy file ID, so the file attachment options are shown.
+          They can't be interacted with due to the pointer-events: none css
+        -->
+        <Weka
+          :value="emptyValue"
+          :usage-identifier="{
+            component: 'performelement_long_text',
+            area: 'response',
+          }"
+          variant="description"
+          :file-item-id="1"
+        />
       </FormRow>
     </Form>
   </div>
@@ -29,15 +41,28 @@
 <script>
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
-import Textarea from 'tui/components/form/Textarea';
+import Weka from 'editor_weka/components/Weka';
+import WekaValue from 'editor_weka/WekaValue';
 
 export default {
   components: {
     Form,
     FormRow,
-    Textarea,
+    Weka,
   },
 
   inheritAttrs: false,
+
+  data() {
+    return {
+      emptyValue: WekaValue.empty(),
+    };
+  },
 };
 </script>
+
+<style lang="scss">
+.tui-longTextAdminView {
+  pointer-events: none;
+}
+</style>

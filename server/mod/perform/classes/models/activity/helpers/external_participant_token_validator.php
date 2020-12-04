@@ -23,11 +23,13 @@
 
 namespace mod_perform\models\activity\helpers;
 
+use mod_perform\entity\activity\element_response;
 use mod_perform\entity\activity\external_participant;
 use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\response\participant_section as participant_section_model;
+use mod_perform\models\response\section_element_response;
 use mod_perform\state\subject_instance\closed;
 
 class external_participant_token_validator {
@@ -106,6 +108,39 @@ class external_participant_token_validator {
     public function is_valid_for_section(int $participant_section_id): bool {
         $participant_section = participant_section_model::load_by_id($participant_section_id);
         return $this->participant_instance && $participant_section->participant_instance_id == $this->participant_instance->id;
+    }
+
+    /**
+     * Returns true if the specified element response can be viewed by the external user with this token.
+     *
+     * @param element_response $element_response
+     * @return bool
+     */
+    public function is_valid_for_response(element_response $element_response): bool {
+        return $this->is_valid()
+            && section_element_response::can_participant_view_response($element_response, $this->participant_instance);
+    }
+
+    /**
+     * Find an external participant token in the current session.
+     * Checks the 'wantsurl' URL in the session for the token param.
+     *
+     * @return string|null
+     */
+    public static function find_token_in_session(): ?string {
+        global $SESSION;
+
+        if (empty($SESSION->wantsurl)) {
+            return null;
+        }
+
+        $matches = [];
+        $found = preg_match("/token=([a-f0-9]{64})/", $SESSION->wantsurl, $matches);
+        if ($found > 0 && !empty($matches[1])) {
+            return $matches[1];
+        }
+
+        return null;
     }
 
 }

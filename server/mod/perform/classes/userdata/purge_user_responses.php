@@ -24,9 +24,14 @@
 namespace mod_perform\userdata;
 
 use context;
+use core\orm\query\builder;
 use Exception;
+use mod_perform\entity\activity\element_response;
 use mod_perform\entity\activity\participant_instance;
+use mod_perform\models\activity\participant_source;
+use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\models\activity\subject_instance;
+use mod_perform\userdata\helpers\userdata_file_helper;
 use mod_perform\userdata\traits\purge_trait;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
@@ -44,10 +49,14 @@ class purge_user_responses extends item {
         global $DB;
 
         try {
-            $DB->transaction(function () use ($DB, $user, $context) {
+            $DB->transaction(function () use ($user, $context) {
+                static::purge_files($user->id);
+
                 participant_instance::repository()
                     ->filter_by_context($context)
-                    ->filter_by_participant_user($user->id)->get()->map(function ($participant_instance) {
+                    ->filter_by_participant_user($user->id)
+                    ->get()
+                    ->map(function (participant_instance $participant_instance) {
                         $subject_instance_model = subject_instance::load_by_entity($participant_instance->subject_instance);
 
                         // Delete cascades to include responses etc.
@@ -62,6 +71,27 @@ class purge_user_responses extends item {
         }
 
         return self::RESULT_STATUS_SUCCESS;
+    }
+
+    /**
+     * Purge the response files for the given participant user.
+     *
+     * @param int $user_id
+     */
+    protected static function purge_files(int $user_id): void {
+        $fs = get_file_storage();
+        builder::table('files')
+            ->when(true, function (builder $builder) {
+                userdata_file_helper::apply_respondable_element_file_restrictions($builder);
+            })
+            ->join([element_response::TABLE, 'er'], 'itemid', 'id')
+            ->join([participant_instance::TABLE, 'pi'], 'er.participant_instance_id', 'id')
+            ->where('pi.participant_id', $user_id)
+            ->where('pi.participant_source', participant_source::INTERNAL)
+            ->get()
+            ->map(function (object $file) use ($fs) {
+                $fs->get_file_instance($file)->delete();
+            });
     }
 
     /**

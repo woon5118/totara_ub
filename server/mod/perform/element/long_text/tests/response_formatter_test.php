@@ -18,66 +18,65 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Murali Nair <murali.nair@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package performelement_long_text
  * @category test
  */
 
+use core\entity\user;
 use core\format;
 use mod_perform\formatter\response\element_response_formatter;
+use mod_perform\models\activity\element;
 use mod_perform\models\activity\element_plugin;
 use performelement_long_text\formatter\response_formatter;
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/perform/tests/weka_testcase.php');
 
 /**
  * @group perform
  * @group perform_element
  */
-class performelement_long_text_response_formatter_testcase extends advanced_testcase {
-    /**
-     * @covers ::format
-     */
-    public function test_format(): void {
-        $plugin = element_plugin::load_by_plugin('long_text');
-        $formatter_class = element_response_formatter::for_plugin($plugin);
-        $this->assertEquals(response_formatter::class, $formatter_class);
-
-        $context = context_system::instance();
-        $answer = '<h1>This is a test heading</h1>With some <strong>capital</strong> text<script>alert(1);</script><&\'';
-        $incoming = json_encode($answer);
-
-        // When converted to RAW, we need to get back exactly what we put in.
-        $formatter = new $formatter_class(format::FORMAT_RAW, $context);
-        $expected = json_encode($answer);
-        $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
-
-        // When converted to PLAIN, the h1 and string cause capitalisation, and the h1 causes some line returns after it.
-        // The script and script content is removed. The symbols come out unencoded.
-        $formatter = new $formatter_class(format::FORMAT_PLAIN, $context);
-        $expected = json_encode("THIS IS A TEST HEADING\n\nWith some CAPITAL text<&'");
-        $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
-
-        // To convert from MOODLE to HTML, the "text_to_html" div is added around the text.
-        // The script and script content is removed. The symbols come out html-encoded.
-        $formatter = new $formatter_class(null, $context);
-        $expected = json_encode("<div class=\"text_to_html\"><h1>This is a test heading</h1>With some <strong>capital</strong> text&lt;&amp;'</div>");
-        $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
-    }
+class performelement_long_text_response_formatter_testcase extends mod_perform_weka_testcase {
 
     /**
-     * @covers ::format
-     * @dataProvider non_json_value_provider
-     * @param string|null|bool $value
+     * @dataProvider format_provider
+     * @param string $format
+     * @param string $input
+     * @param string $expected_output
      */
-    public function test_non_json_value($value): void {
-        $formatter = new response_formatter(format::FORMAT_PLAIN, context_system::instance());
+    public function test_format(string $format, string $input, string $expected_output): void {
+        self::setAdminUser();
 
-        $this->assertEquals($value, $formatter->format($value), 'wrong formatting');
+        $formatter = new class($this->getMockClass(element::class), context_system::instance()) extends response_formatter {
+            public function set_format(string $format): void {
+                $this->format = $format;
+            }
+        };
+        $formatter->set_format($format);
+
+        $actual_output = $formatter->format($input);
+        $this->assertEquals($expected_output, $actual_output);
     }
 
-    public function non_json_value_provider(): array {
+    public function format_provider(): array {
         return [
-            'non json encoded string' => ['<h1>This is a <strong>test</strong> answer</h1>'],
-            'null' => [null],
-            'false' => [false],
+            'Plain text' => [
+                'format' => format::FORMAT_PLAIN,
+                'input' => $this->create_weka_document_with_text(true, 'Test!'),
+                'expected_output' => json_encode("Test!"),
+            ],
+            'HTML' => [
+                'format' => format::FORMAT_HTML,
+                'input' => $this->create_weka_document_with_text(true, 'Test!'),
+                'expected_output' => json_encode("<div class=\"tui-rendered\"><p>Test!</p></div>"),
+            ],
+            'Raw' => [
+                'format' => format::FORMAT_RAW,
+                'input' => $this->create_weka_document_with_text(true, 'Test!'),
+                'expected_output' => $this->create_weka_document_with_text(true, 'Test!'),
+            ],
         ];
     }
+
 }

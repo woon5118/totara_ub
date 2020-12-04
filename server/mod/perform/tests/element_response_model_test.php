@@ -24,15 +24,19 @@
 
 use core\collection;
 
+use core\orm\query\builder;
+use mod_perform\constants;
 use mod_perform\entity\activity\element_response as element_response_entity;
 use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\entity\activity\section as section_entity;
 use mod_perform\entity\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\section_relationship;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\element_validation_error;
 use performelement_short_text\answer_length_exceeded_error;
+use totara_core\relationship\relationship;
 
 /**
  * @group perform
@@ -247,4 +251,176 @@ class mod_perform_response_model_testcase extends advanced_testcase {
         self::assertEquals('Question text exceeds the maximum length', $validation_errors[0]->error_message);
         self::assertEquals(answer_length_exceeded_error::LENGTH_EXCEEDED, $validation_errors[0]->error_code);
     }
+
+    public function test_user_can_view_response(): void {
+        self::setAdminUser();
+        $generator = self::getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container();
+
+        $subject_user = $generator->create_user();
+        $manager_user = $generator->create_user();
+        $other_user = $generator->create_user();
+        $admin_user = $generator->create_user();
+
+        $subject_instance = $perform_generator->create_subject_instance([
+            'activity_id' => $activity->id,
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject_user->id,
+            'other_participant_id' => $manager_user->id,
+            'include_questions' => true,
+        ]);
+        $subject_section = section_entity::repository()->get()->first();
+        $subject_section_element = section_element_entity::repository()->get()->first();
+        /** @var section_relationship $subject_section_relationship */
+        $subject_section_relationship = section_relationship::repository()->get()->first();
+        // Make it so the subject relationship isn't allowed to view other's responses
+        $subject_section_relationship->can_view = false;
+        $subject_section_relationship->save();
+
+        /** @var participant_instance_entity $subject_user_participant_instance */
+        $subject_user_participant_instance = $subject_instance->participant_instances->first();
+        $subject_user_response_model = new section_element_response(
+            participant_instance::load_by_entity($subject_user_participant_instance),
+            section_element::load_by_entity($subject_section_element),
+            null,
+            new collection()
+        );
+        $subject_user_response_model->set_response_data(json_encode('Subject response'));
+        $subject_user_response_model->save();
+        $subject_user_response = new element_response_entity($subject_user_response_model->id);
+
+        /** @var participant_instance_entity $manager_user_participant_instance */
+        $manager_user_participant_instance = $subject_instance->participant_instances->last();
+        $manager_user_response_model = new section_element_response(
+            participant_instance::load_by_entity($manager_user_participant_instance),
+            section_element::load_by_entity($subject_section_element),
+            null,
+            new collection()
+        );
+        $manager_user_response_model->set_response_data(json_encode('Manager response'));
+        $manager_user_response_model->save();
+        $manager_user_response = new element_response_entity($manager_user_response_model->id);
+
+        $other_subject_instance = $perform_generator->create_subject_instance([
+            'activity_id' => $activity->id,
+            'subject_is_participating' => true,
+            'subject_user_id' => $other_user->id,
+            'include_questions' => true,
+        ]);
+        $other_section_element = section_element_entity::repository()->get()->last();
+        /** @var participant_instance_entity $other_user_participant_instance */
+        $other_user_participant_instance = $other_subject_instance->participant_instances->first();
+        $other_user_response_model = new section_element_response(
+            participant_instance::load_by_entity($other_user_participant_instance),
+            section_element::load_by_entity($other_section_element),
+            null,
+            new collection()
+        );
+        $other_user_response_model->set_response_data(json_encode('Other response'));
+        $other_user_response_model->save();
+        $other_user_response = new element_response_entity($other_user_response_model->id);
+
+        \mod_perform\models\activity\section_relationship::create(
+            $subject_section->id,
+            relationship::load_by_idnumber(constants::RELATIONSHIP_EXTERNAL)->id,
+            true,
+            true
+        );
+        [$external_participant_instance] = $perform_generator->create_external_participant_instances([
+            'subject' => $subject_instance->subject_user->username,
+            'fullname' => 'A name',
+            'email' => 'A email',
+        ]);
+        $external_participant_instance = participant_instance::load_by_entity($external_participant_instance);
+        $external_user_response_model = new section_element_response(
+            $external_participant_instance,
+            section_element::load_by_entity($subject_section_element),
+            null,
+            new collection()
+        );
+        $external_user_response_model->set_response_data(json_encode('External response'));
+        $external_user_response_model->save();
+        $external_user_response = new element_response_entity($external_user_response_model->id);
+
+        self::setUser(null);
+
+        // Test as subject user
+        // User can always view their own response
+        $this->assertTrue(section_element_response::can_user_view_response($subject_user_response, $subject_user->id));
+        // Can't view their manager's response because the section_relationship can_view field is false
+        $this->assertFalse(section_element_response::can_user_view_response($manager_user_response, $subject_user->id));
+        // Can't view the external response because the section_relationship can_view field is false
+        $this->assertFalse(section_element_response::can_user_view_response($external_user_response, $subject_user->id));
+        // Can't view the other user's response because they aren't participating in the same subject instance
+        $this->assertFalse(section_element_response::can_user_view_response($other_user_response, $subject_user->id));
+
+        // Test as manager user
+        // User can always view their own response
+        $this->assertTrue(section_element_response::can_user_view_response($manager_user_response, $manager_user->id));
+        // Can view their manager's response because the section_relationship can_view field is true
+        $this->assertTrue(section_element_response::can_user_view_response($subject_user_response, $manager_user->id));
+        // Can view the external response because the section_relationship can_view field is true
+        $this->assertTrue(section_element_response::can_user_view_response($external_user_response, $manager_user->id));
+        // Can't view the other user's response because they aren't participating in the same subject instance
+        $this->assertFalse(section_element_response::can_user_view_response($other_user_response, $manager_user->id));
+
+        // Test as other user
+        // User can always view their own response
+        $this->assertTrue(section_element_response::can_user_view_response($other_user_response, $other_user->id));
+        // Can't view the other subject's response because they aren't participating in the same subject instance
+        $this->assertFalse(section_element_response::can_user_view_response($subject_user_response, $other_user->id));
+        // Can't view the other subject's response because they aren't participating in the same subject instance
+        $this->assertFalse(section_element_response::can_user_view_response($external_user_response, $other_user->id));
+        // Can't view the other manager's response because they aren't participating in the same subject instance
+        $this->assertFalse(section_element_response::can_user_view_response($manager_user_response, $other_user->id));
+
+        // Test as external user
+        // User can always view their own response
+        $this->assertTrue(
+            section_element_response::can_participant_view_response($external_user_response, $external_participant_instance)
+        );
+        // Can view the subject response
+        $this->assertTrue(
+            section_element_response::can_participant_view_response($subject_user_response, $external_participant_instance)
+        );
+        // Can't view the other user's response because they aren't participating in the same subject instance
+        $this->assertFalse(
+            section_element_response::can_participant_view_response($other_user_response, $external_participant_instance)
+        );
+
+        // Test as admin
+        // Doesn't have the proper reporting capabilities yet
+        $this->assertFalse(section_element_response::can_user_view_response($subject_user_response, $admin_user->id));
+        $this->assertFalse(section_element_response::can_user_view_response($manager_user_response, $admin_user->id));
+        $this->assertFalse(section_element_response::can_user_view_response($other_user_response, $admin_user->id));
+
+        self::setUser($admin_user);
+        $role_id = builder::table('role')->where('shortname', 'user')->value('id');
+        assign_capability(
+            'mod/perform:report_on_subject_responses',
+            CAP_ALLOW,
+            $role_id,
+            context_user::instance($subject_user->id)
+        );
+
+        // Now has the reporting capability for the subject instance, but not the other user
+        $this->assertTrue(section_element_response::can_user_view_response($subject_user_response, $admin_user->id));
+        $this->assertTrue(section_element_response::can_user_view_response($manager_user_response, $admin_user->id));
+        $this->assertFalse(section_element_response::can_user_view_response($other_user_response, $admin_user->id));
+
+        assign_capability(
+            'mod/perform:report_on_all_subjects_responses',
+            CAP_ALLOW,
+            $role_id,
+            context_system::instance()
+        );
+
+        // Now has the reporting capability for everyone
+        $this->assertTrue(section_element_response::can_user_view_response($subject_user_response, $admin_user->id));
+        $this->assertTrue(section_element_response::can_user_view_response($manager_user_response, $admin_user->id));
+        $this->assertTrue(section_element_response::can_user_view_response($other_user_response, $admin_user->id));
+    }
+
 }

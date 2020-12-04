@@ -22,19 +22,13 @@
 */
 
 use container_perform\perform;
-use mod_perform\entity\activity\activity;
 use mod_perform\entity\activity\element;
-use mod_perform\entity\activity\element_response;
 use mod_perform\entity\activity\participant_instance;
 use mod_perform\entity\activity\participant_section;
 use mod_perform\entity\activity\section;
-use mod_perform\entity\activity\section_element;
-use mod_perform\entity\activity\subject_instance;
-use mod_perform\entity\activity\track;
-use mod_perform\userdata\export_user_responses;
-use mod_perform\userdata\export_other_visible_responses;
 use mod_perform\userdata\export_other_hidden_responses;
-use totara_userdata\userdata\item;
+use mod_perform\userdata\export_other_visible_responses;
+use mod_perform\userdata\export_user_responses;
 use totara_userdata\userdata\target_user;
 
 /**
@@ -373,4 +367,64 @@ class mod_perform_userdata_export_responses_testcase  extends advanced_testcase 
             $this->assertEquals($participant->id, $response['participant_id']);
         }
     }
+
+    public function test_export_files_are_exported_correctly(): void {
+        global $DB;
+        self::setAdminUser();
+        $fs = get_file_storage();
+
+        $user1 = self::getDataGenerator()->create_user();
+        $user2 = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $activity = $generator->create_activity_in_container();
+        $context_id = $activity->get_context()->id;
+        $user1_subject_instance = $generator->create_subject_instance([
+            'activity_id' => $activity->id,
+            'subject_is_participating' => true,
+            'subject_user_id' => $user1->id,
+            'include_questions' => true,
+        ]);
+        $user2_subject_instance = $generator->create_subject_instance([
+            'activity_id' => $activity->id,
+            'subject_is_participating' => true,
+            'subject_user_id' => $user2->id,
+            'include_questions' => true,
+        ]);
+
+        $generator->create_responses($user1_subject_instance);
+        $generator->create_responses($user2_subject_instance);
+        $DB->set_field(element::TABLE, 'plugin_name', 'long_text');
+        $user1_response = $user1_subject_instance->participant_instances->first()->element_responses->first();
+        $user2_response = $user2_subject_instance->participant_instances->first()->element_responses->first();
+
+
+        $file_record = [
+            'component' => \performelement_long_text\long_text::get_response_files_component_name(),
+            'filearea' => \performelement_long_text\long_text::get_response_files_filearea_name(),
+            'filepath' => '/',
+            'filename' => 'test.txt'
+        ];
+        $user1_file = $fs->create_file_from_string(array_merge($file_record, [
+            'contextid' => $context_id,
+            'itemid' => $user1_response->id,
+        ]), 'Test 1');
+        $user2_file = $fs->create_file_from_string(array_merge($file_record, [
+            'contextid' => $context_id,
+            'itemid' => $user2_response->id,
+        ]), 'Test 2');
+
+        $user1_export = export_user_responses::execute_export(new target_user($user1), context_system::instance());
+        $this->assertCount(1, $user1_export->files);
+        $this->assertEquals($user1_file->get_id(), reset($user1_export->files)->get_id());
+        $this->assertNotEquals($user2_file->get_id(), reset($user1_export->files)->get_id());
+
+        $user2_export = export_user_responses::execute_export(new target_user($user2), context_system::instance());
+        $this->assertCount(1, $user2_export->files);
+        $this->assertEquals($user2_file->get_id(), reset($user2_export->files)->get_id());
+        $this->assertNotEquals($user1_file->get_id(), reset($user2_export->files)->get_id());
+    }
+
 }

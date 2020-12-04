@@ -25,8 +25,6 @@ namespace mod_perform\userdata;
 
 use context;
 use mod_perform\entity\activity\element_response;
-use mod_perform\models\activity\element_plugin;
-use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\userdata\traits\export_trait;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
@@ -63,11 +61,11 @@ class export_user_responses extends item {
             ->get(true)
             ->map(function ($response) use ($user) {
                 return self::process_response_record($response, $user->id);
-            })
-            ->to_array();
+            });
 
         $export = new export();
-        $export->data = $responses;
+        $export->data = $responses->to_array();
+        $export->files = static::get_response_files($responses->pluck('id'));
         return $export;
     }
 }

@@ -115,6 +115,8 @@
                       :response-lines="
                         elementResponse.response_data_formatted_lines
                       "
+                      :section-element-id="elementResponse.id"
+                      :participant-instance-id="participantInstanceId"
                     />
                     <component
                       :is="elementResponse.printComponent"
@@ -126,6 +128,8 @@
                       :response-lines="
                         elementResponse.response_data_formatted_lines
                       "
+                      :section-element-id="elementResponse.id"
+                      :participant-instance-id="participantInstanceId"
                     />
                   </template>
                 </ElementParticipantForm>
@@ -175,7 +179,6 @@ import ParticipantGeneralInformation from 'mod_perform/components/user_activitie
 import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';
 import { Uniform } from 'tui/components/uniform';
 import PrintedTodoIcon from 'tui/components/icons/PrintedTodo';
-
 // graphQL
 import participantSectionsForPrintQuery from 'mod_perform/graphql/participant_sections_for_print';
 

@@ -3076,6 +3076,12 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
                     $params = array('courseid' => $course->id, 'status' => ENROL_INSTANCE_ENABLED);
                     $instances = $DB->get_records('enrol', $params, 'sortorder, id ASC');
                     $enrols = enrol_get_plugins(true);
+
+                    // Get additional enrollment plugins for this specific course.
+                    $enrol_plugins_hook = new \totara_core\hook\enrol_plugins($course, $enrols);
+                    $enrol_plugins_hook->execute();
+                    $enrols = array_merge($enrols, $enrol_plugins_hook->get_enrol_plugins());
+
                     // First ask all enabled enrol instances in course if they want to auto enrol user.
                     foreach ($instances as $instance) {
                         if (!isset($enrols[$instance->enrol])) {

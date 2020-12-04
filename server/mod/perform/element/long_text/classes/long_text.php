@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -18,17 +18,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package performelement_long_text
  */
 
 namespace performelement_long_text;
 
-use coding_exception;
 use core\collection;
+use core\json_editor\formatter\default_formatter;
+use core\json_editor\helper\document_helper;
 use mod_perform\models\activity\element;
+use mod_perform\models\activity\helpers\element_response_has_files;
 use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\models\response\section_element_response;
 
-class long_text extends respondable_element_plugin {
+class long_text extends respondable_element_plugin implements element_response_has_files {
 
     /**
      * @inheritDoc
@@ -43,7 +47,18 @@ class long_text extends respondable_element_plugin {
 
         $errors = new collection();
 
-        if ($this->fails_required_validation(trim($answer_text) === '', $element, $is_draft_validation)) {
+        $is_empty_answer = empty($answer_text) || $answer_text === 'null';
+        if (!$is_empty_answer) {
+            // Check that the actual format of the submitted data is correct.
+            $parsed_weka_json = json_decode($answer_text, true);
+            if (isset($parsed_weka_json['weka'])) {
+                $parsed_weka_json = $parsed_weka_json['weka'];
+            }
+
+            $is_empty_answer = self::is_weka_response_empty($parsed_weka_json);
+        }
+
+        if ($this->fails_required_validation($is_empty_answer, $element, $is_draft_validation)) {
             $errors->append(new answer_required_error());
         }
 
@@ -58,7 +73,15 @@ class long_text extends respondable_element_plugin {
      * @return string|null
      */
     public function decode_response(?string $encoded_response_data, ?string $encoded_element_data): ?string {
-        return $this->decode_simple_string_response($encoded_response_data);
+        // The response data could be double encoded json, so decode it so it's only encoded once
+        $decoded_response_data = json_decode($encoded_response_data, true);
+        if (is_string($decoded_response_data)) {
+            return $decoded_response_data;
+        }
+
+        // The data isn't double encoded, so just return the original single encoded data.
+        // We must always return a JSON encoded string because response data is always decoded in the front end.
+        return $encoded_response_data;
     }
 
     /**
@@ -74,4 +97,86 @@ class long_text extends respondable_element_plugin {
     public function get_sortorder(): int {
         return 10;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function format_response_lines(?string $encoded_response_data, ?string $encoded_element_data): array {
+        // The response is displayed as HTML instead of individual lines, so nothing is returned here.
+        return [];
+    }
+
+    /**
+     * Check if the user uploaded files, and if so save them to permanent storage for the specified response.
+     *
+     * @param section_element_response $element_response
+     */
+    public function post_response_submission(section_element_response $element_response): void {
+        global $CFG, $TEXTAREA_OPTIONS;
+        require_once($CFG->dirroot . '/lib/filelib.php');
+        require_once($CFG->dirroot . '/lib/formslib.php');
+
+        $data = json_decode($element_response->response_data, true);
+        $draft_id = $data['draft_id'];
+
+        if (!isset($data['weka']) || self::is_weka_response_empty($data['weka'])) {
+            $element_response->set_empty_response();
+            return;
+        }
+
+        $response = document_helper::json_encode_document($data['weka']);
+
+        if (!empty($draft_id)) {
+            $response = file_save_draft_area_files(
+                $draft_id,
+                $element_response->get_element()->context_id,
+                self::get_response_files_component_name(),
+                self::get_response_files_filearea_name(),
+                $element_response->get_id(),
+                $TEXTAREA_OPTIONS,
+                $response
+            );
+        }
+
+        $element_response->set_response_data($response);
+    }
+
+    /**
+     * Does the response actually have any content?
+     *
+     * @param array|string|null $response
+     * @return bool
+     */
+    private static function is_weka_response_empty($response): bool {
+        if (document_helper::is_document_empty($response)) {
+            return true;
+        }
+
+        if (is_string($response)) {
+            $response = json_decode($response);
+        }
+
+        $formatter = new default_formatter();
+        $text = $formatter->to_text($response);
+        return trim($text) === '';
+    }
+
+    /**
+     * Get the component name for where response files are to be stored.
+     *
+     * @return string
+     */
+    public static function get_response_files_component_name(): string {
+        return 'performelement_long_text';
+    }
+
+    /**
+     * Get the file area name for where response files are to be stored.
+     *
+     * @return string
+     */
+    public static function get_response_files_filearea_name(): string {
+        return 'response';
+    }
+
 }

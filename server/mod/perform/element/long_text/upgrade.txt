@@ -1,6 +1,12 @@
 This files describes API changes in /mod/perform/element/long_text/*,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* This element now uses the Weka WYSIWYG editor (including file support) rather than a simple textbox.
+  JSON response data and files are now handled by long_text class rather than just plain text.
+* answer_length_exceeded_error is now deprecated as there is now no limit on the response length
+
 === 13.2 ===
 
 * Renamed element from "Long text" to "Text: Long response"

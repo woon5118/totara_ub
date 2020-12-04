@@ -23,8 +23,14 @@
 
 namespace mod_perform\entity\activity;
 
+use coding_exception;
+use context;
+use context_course;
+use context_coursecat;
+use context_system;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use Dompdf\FrameReflower\Page;
 use mod_perform\models\activity\participant_source;
 
 class participant_instance_repository extends repository {
@@ -87,31 +93,67 @@ class participant_instance_repository extends repository {
     }
 
     /**
-     * Filter to participant instances at or below a specified context.
+     * Filter participant instances by the specified activity.
      *
-     * @param \context $context
+     * @param int $activity_id
      * @return $this
      */
-    public function filter_by_context(\context $context): self {
+    public function filter_by_activity(int $activity_id): self {
+        return $this
+            ->add_activity_joins()
+            ->where(activity::TABLE . '.id', $activity_id);
+    }
+
+    /**
+     * Filter participant instances by the specified course container for the activity.
+     *
+     * @param int $course_id
+     * @return $this
+     */
+    public function filter_by_course(int $course_id): self {
+        return $this
+            ->add_activity_joins()
+            ->where(activity::TABLE . '.course', $course_id);
+    }
+
+    /**
+     * Filter to participant instances at or below a specified context.
+     *
+     * @param context $context System, Course Category or Course context instance
+     * @return $this
+     */
+    public function filter_by_context(context $context): self {
         // No need for restrictions for system context.
-        if (get_class($context) == 'context_system') {
+        if ($context instanceof context_system) {
             return $this;
         }
-        if (!$this->has_join('context')) {
-            $this->join('perform_subject_instance', 'perform_participant_instance.subject_instance_id', '=', 'id')
-                ->join('perform_track_user_assignment', 'perform_subject_instance.track_user_assignment_id', '=', 'id')
-                ->join('perform_track', 'perform_track_user_assignment.track_id', '=', 'id')
-                ->join('perform', 'perform_track.activity_id', '=', 'id')
-                ->join('course', 'perform.course', '=', 'id')
-                ->join('context', function (builder $joining) {
-                    $joining->where_field('course.id', 'context.instanceid')
-                        ->where('context.contextlevel', '=', CONTEXT_COURSE);
-                });
+
+        if ($this->has_join('context')) {
+            throw new coding_exception('context join has already been applied to this repository instance.');
         }
-        return $this->where(function (builder $builder) use ($context) {
-            $builder->where('context.id', $context->id)
-                ->or_where_like_starts_with('context.path', "{$context->path}/");
-        });
+
+        $this->add_activity_joins();
+
+        if ($context instanceof context_coursecat) {
+            $this->join('course', activity::TABLE . '.course', 'id');
+            $context_instance_field = 'course.category';
+        } else if ($context instanceof context_course) {
+            $context_instance_field = activity::TABLE . '.course';
+        } else {
+            throw new coding_exception('filter_by_context() does not support filtering by ' . get_class($context));
+        }
+
+        return $this
+            ->join('context', function (builder $builder) use ($context, $context_instance_field) {
+                $builder
+                    ->where_field($context_instance_field, 'context.instanceid')
+                    ->where('context.contextlevel', $context->contextlevel);
+            })
+            ->where(function (builder $builder) use ($context) {
+                $builder
+                    ->where('context.id', $context->id)
+                    ->or_where_like_starts_with('context.path', "{$context->path}/");
+            });
     }
 
     /**
@@ -133,6 +175,31 @@ class participant_instance_repository extends repository {
                 }
             );
         }
+    }
+
+    /**
+     * Add the joins required to get activity fields.
+     *
+     * @return $this
+     */
+    private function add_activity_joins(): self {
+        if (!$this->has_join(subject_instance::TABLE)) {
+            $this->join(subject_instance::TABLE, 'subject_instance_id', 'id');
+        }
+
+        if (!$this->has_join(track_user_assignment::TABLE)) {
+            $this->join(track_user_assignment::TABLE, subject_instance::TABLE . '.track_user_assignment_id', 'id');
+        }
+
+        if (!$this->has_join(track::TABLE)) {
+            $this->join(track::TABLE, track_user_assignment::TABLE . '.track_id', 'id');
+        }
+
+        if (!$this->has_join(activity::TABLE)) {
+            $this->join(activity::TABLE, track::TABLE . '.activity_id', 'id');
+        }
+
+        return $this;
     }
 
 }

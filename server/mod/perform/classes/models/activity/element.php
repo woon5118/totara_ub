@@ -214,10 +214,7 @@ class element extends model {
      * @param element $element
      */
     public static function post_create(element $element): void {
-        $element_plugin = element_plugin::load_by_plugin($element->plugin_name);
-        if (method_exists($element_plugin, 'post_create')) {
-            $element_plugin->post_create($element);
-        }
+        element_plugin::load_by_plugin($element->plugin_name)->post_create($element);
     }
 
     /**
@@ -227,10 +224,7 @@ class element extends model {
      * @param element $element
      */
     public static function post_update(element $element): void {
-        $element_plugin = element_plugin::load_by_plugin($element->plugin_name);
-        if (method_exists($element_plugin, 'post_update')) {
-            $element_plugin->post_update($element);
-        }
+        element_plugin::load_by_plugin($element->plugin_name)->post_update($element);
     }
 
     /**

@@ -351,4 +351,124 @@ class mod_perform_userdata_purge_responses_testcase  extends advanced_testcase {
         // Progress in the subject instance should now be complete (because only incomplete participant instance was purged).
         $this->assertEquals(complete::get_name(), $new_subject_instance_model->get_progress_status());
     }
+
+    public function test_purge_user_response_files_are_purged_correctly(): void {
+        global $DB;
+        self::setAdminUser();
+        $fs = get_file_storage();
+
+        $user1 = self::getDataGenerator()->create_user();
+        $user2 = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $activity = $generator->create_activity_in_container();
+        $context_id = $activity->get_context()->id;
+        $subject_instance = $generator->create_subject_instance([
+            'activity_id' => $activity->id,
+            'subject_is_participating' => true,
+            'subject_user_id' => $user1->id,
+            'other_participant_id' => $user2->id,
+            'include_questions' => true,
+        ]);
+
+        $generator->create_responses($subject_instance);
+
+        $DB->set_field(element::TABLE, 'plugin_name', 'long_text');
+        $user1_response = $subject_instance->participant_instances->first()->element_responses->first();
+        $user2_response = $subject_instance->participant_instances->last()->element_responses->first();
+
+
+        $file_record = [
+            'component' => \performelement_long_text\long_text::get_response_files_component_name(),
+            'filearea' => \performelement_long_text\long_text::get_response_files_filearea_name(),
+            'filepath' => '/',
+            'filename' => 'test.txt'
+        ];
+        $user1_file = $fs->create_file_from_string(array_merge($file_record, [
+            'contextid' => $context_id,
+            'itemid' => $user1_response->id,
+        ]), 'Test 1');
+        $user2_file = $fs->create_file_from_string(array_merge($file_record, [
+            'contextid' => $context_id,
+            'itemid' => $user2_response->id,
+        ]), 'Test 2');
+
+        $this->assertTrue($fs->file_exists_by_hash($user1_file->get_pathnamehash()));
+        $this->assertTrue($fs->file_exists_by_hash($user2_file->get_pathnamehash()));
+
+        purge_user_responses::execute_purge(new target_user($user1), context_system::instance());
+
+        $this->assertFalse($fs->file_exists_by_hash($user1_file->get_pathnamehash()));
+        $this->assertTrue($fs->file_exists_by_hash($user2_file->get_pathnamehash()));
+
+        purge_user_responses::execute_purge(new target_user($user2), context_system::instance());
+
+        $this->assertFalse($fs->file_exists_by_hash($user1_file->get_pathnamehash()));
+        $this->assertFalse($fs->file_exists_by_hash($user2_file->get_pathnamehash()));
+    }
+
+    public function test_purge_other_response_files_are_purged_correctly(): void {
+        global $DB;
+        self::setAdminUser();
+        $fs = get_file_storage();
+
+        $user1 = self::getDataGenerator()->create_user();
+        $user2 = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $activity = $generator->create_activity_in_container();
+        $context_id = $activity->get_context()->id;
+        $user1_subject_instance = $generator->create_subject_instance([
+            'activity_id' => $activity->id,
+            'subject_is_participating' => true,
+            'subject_user_id' => $user1->id,
+            'include_questions' => true,
+        ]);
+        $user2_subject_instance = $generator->create_subject_instance([
+            'activity_id' => $activity->id,
+            'subject_is_participating' => true,
+            'subject_user_id' => $user2->id,
+            'include_questions' => true,
+        ]);
+
+        $generator->create_responses($user1_subject_instance);
+        $generator->create_responses($user2_subject_instance);
+        $DB->set_field(element::TABLE, 'plugin_name', 'long_text');
+        $user1_response = $user1_subject_instance->participant_instances->first()->element_responses->first();
+        $user2_response = $user2_subject_instance->participant_instances->first()->element_responses->first();
+
+
+        $file_record = [
+            'component' => \performelement_long_text\long_text::get_response_files_component_name(),
+            'filearea' => \performelement_long_text\long_text::get_response_files_filearea_name(),
+            'filepath' => '/',
+            'filename' => 'test.txt'
+        ];
+        $user1_file = $fs->create_file_from_string(array_merge($file_record, [
+            'contextid' => $context_id,
+            'itemid' => $user1_response->id,
+        ]), 'Test 1');
+        $user2_file = $fs->create_file_from_string(array_merge($file_record, [
+            'contextid' => $context_id,
+            'itemid' => $user2_response->id,
+        ]), 'Test 2');
+
+        $this->assertTrue($fs->file_exists_by_hash($user1_file->get_pathnamehash()));
+        $this->assertTrue($fs->file_exists_by_hash($user2_file->get_pathnamehash()));
+
+        purge_other_responses::execute_purge(new target_user($user1), context_system::instance());
+
+        $this->assertFalse($fs->file_exists_by_hash($user1_file->get_pathnamehash()));
+        $this->assertTrue($fs->file_exists_by_hash($user2_file->get_pathnamehash()));
+
+        purge_other_responses::execute_purge(new target_user($user2), context_system::instance());
+
+        $this->assertFalse($fs->file_exists_by_hash($user1_file->get_pathnamehash()));
+        $this->assertFalse($fs->file_exists_by_hash($user2_file->get_pathnamehash()));
+    }
+
 }

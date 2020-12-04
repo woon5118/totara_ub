@@ -6,6 +6,7 @@ information provided here is intended especially for developers.
     * Template, SCSS changes & lang string changes
 * Updated Activities.vue page for filtering and pagination.
     * Template
+* HtmlResponseDisplay.vue now supports rendering Weka HTML responses
 
 === 13.2 ===
 * Reworked several components to centralise common functionality improving consistency and reducing duplication

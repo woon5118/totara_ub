@@ -67,4 +67,12 @@ trait purge_trait {
             CONTEXT_COURSE
         ];
     }
+
+    /**
+     * Purge the files for the given user.
+     *
+     * @param int $user_id
+     */
+    abstract protected function purge_files(int $user_id): void;
+
 }

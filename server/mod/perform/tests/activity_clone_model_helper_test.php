@@ -369,6 +369,23 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         );
     }
 
+    public function test_clone_enroll_plugins_are_cloned(): void {
+        global $DB;
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+        self::setAdminUser();
+        $activity = $generator->create_activity_in_container();
+
+        $this->assertEquals(1, $DB->count_records('enrol', [
+            'courseid' => $activity->course, 'enrol' => 'container_perform'
+        ]));
+
+        $activity_cloned = $activity->clone();
+        $this->assertEquals(1, $DB->count_records('enrol', [
+            'courseid' => $activity_cloned->course, 'enrol' => 'container_perform'
+        ]));
+    }
+
     private function get_tables_from_backup(backup_nested_element $element): array {
         /** @var backup_nested_element[] $children */
         $children = $element->get_children();

@@ -25,13 +25,13 @@ namespace performelement_short_text\formatter;
 
 use coding_exception;
 use core\format;
-use core\webapi\formatter\field\base;
 use core\webapi\formatter\field\string_field_formatter;
+use mod_perform\formatter\response\element_response_formatter;
 
 /**
  * Formats user entered responses for this element.
  */
-class response_formatter extends base {
+class response_formatter extends element_response_formatter {
 
     /**
      * {@inheritdoc}

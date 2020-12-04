@@ -23,6 +23,8 @@
 
 namespace mod_perform\models\activity\helpers;
 
+use container_perform\perform;
+use container_perform\perform_enrollment;
 use mod_perform\models\activity\activity;
 
 /**
@@ -105,12 +107,8 @@ class activity_clone {
         }
 
         // Do restore to new course with default settings.
-        $new_course_id = \restore_dbops::create_new_course(
-            $course->fullname,
-            $course->shortname . '_2',
-            $course->category
-        );
-        $DB->set_field('course', 'containertype', 'container_perform', ['id' => $new_course_id]);
+        $new_course = perform::create(clone $course);
+        $new_course_id = $new_course->id;
 
         $context = \context_course::instance($new_course_id);
         if (!empty($CFG->performanceactivitycreatornewroleid) && !is_viewing($context, null, 'mod/perform:manage_activity')) {

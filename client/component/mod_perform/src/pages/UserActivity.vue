@@ -77,7 +77,7 @@ export default {
       default: null,
     },
     userActivitiesUrl: {
-      required: true,
+      required: false,
       type: String,
     },
     participantInstanceId: {

@@ -23,15 +23,15 @@
 
 namespace performelement_multi_choice_single\formatter;
 
-use core\webapi\formatter\field\base;
 use core\webapi\formatter\field\string_field_formatter;
+use mod_perform\formatter\response\element_response_formatter;
 
 /**
  * This formatter runs the names of the options through the string field formatter
  *
  * @package performelement_multi_choice_single\formatter
  */
-class data_field_formatter extends base {
+class data_field_formatter extends element_response_formatter {
 
     /**
      * Goes through all options and runs format on all names

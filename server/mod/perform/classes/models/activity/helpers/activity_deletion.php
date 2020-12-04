@@ -26,15 +26,9 @@ namespace mod_perform\models\activity\helpers;
 use core\orm\query\builder;
 use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\entity\activity\element as element_entity;
-use mod_perform\entity\activity\element_response as element_response_entity;
 use mod_perform\entity\activity\manual_relationship_selection;
-use mod_perform\entity\activity\participant_section as participant_section_entity;
-use mod_perform\entity\activity\section as section_entity;
-use mod_perform\entity\activity\section_element as section_element_entity;
 use mod_perform\entity\activity\section_relationship as section_relationship_entity;
-use mod_perform\entity\activity\track as track_entity;
 use mod_perform\entity\activity\track_user_assignment;
-use mod_perform\entity\activity\track_user_assignment_via;
 use mod_perform\event\activity_deleted;
 use mod_perform\models\activity\activity;
 
@@ -85,6 +79,9 @@ class activity_deletion {
             // - perform_section
             // - perform_section_element
             activity_entity::repository()->where('id', $this->activity->get_id())->delete();
+
+            // Delete any and every file uploaded to this activity.
+            get_file_storage()->delete_area_files($this->activity->get_context()->id);
 
             $delete_event->trigger();
         });

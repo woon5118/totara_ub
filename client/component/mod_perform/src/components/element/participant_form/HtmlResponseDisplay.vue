@@ -17,7 +17,7 @@
 -->
 <template>
   <div class="tui-participantFormHtmlResponseDisplay">
-    <div v-if="data && data.length > 0" v-html="data" />
+    <div v-if="data && data.length > 0" ref="content" v-html="data" />
     <NoResponseSubmitted v-else />
   </div>
 </template>
@@ -29,6 +29,30 @@ export default {
   components: { NoResponseSubmitted },
   props: {
     data: String,
+  },
+
+  mounted() {
+    this.$_scan();
+  },
+
+  updated() {
+    this.$_scan();
+  },
+
+  methods: {
+    /**
+     * Required to handle Weka HTML.
+     */
+    $_scan() {
+      this.$nextTick().then(() => {
+        let content = this.$refs.content;
+        if (!content) {
+          return;
+        }
+
+        tui.scan(content);
+      });
+    },
   },
 };
 </script>

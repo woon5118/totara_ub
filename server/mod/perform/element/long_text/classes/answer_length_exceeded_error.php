@@ -25,11 +25,21 @@ namespace performelement_long_text;
 
 use mod_perform\models\response\element_validation_error;
 
+/**
+ * @deprecated since Totara 13.3
+ */
 class answer_length_exceeded_error extends element_validation_error {
 
+    /**
+     * @deprecated since Totara 13.3
+     */
     public const LENGTH_EXCEEDED = 'LENGTH_EXCEEDED';
 
+    /**
+     * @deprecated since Totara 13.3
+     */
     public function __construct() {
+        debugging(__CLASS__ . ' is deprecated and should no longer be used. There is no alternative.', DEBUG_DEVELOPER);
         $error_code = self::LENGTH_EXCEEDED;
         $error_message = get_string('error_question_length_exceed', 'performelement_short_text');
 

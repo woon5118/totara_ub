@@ -25,13 +25,21 @@ namespace mod_perform\models\response;
 
 use coding_exception;
 use core\collection;
+use core\entity\user;
 use core\orm\entity\model;
-use mod_perform\entity\activity\section_element as section_element_entity;
+use core\orm\query\builder;
+use mod_perform\entity\activity\element_response;
 use mod_perform\entity\activity\element_response as element_response_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\section_relationship;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\participant_instance;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\models\activity\section_element;
+use mod_perform\util;
 
 /**
  * Represents the responses (or lack of) to an element from the
@@ -57,6 +65,7 @@ class section_element_response extends model implements section_element_response
     protected $entity_attribute_whitelist = [];
 
     protected $model_accessor_whitelist = [
+        'id',
         'section_element_id',
         'section_element',
         'section_element_id',
@@ -104,7 +113,7 @@ class section_element_response extends model implements section_element_response
     /**
      * element_response constructor.
      *
-     * @param participant_instance $participant_instance
+     * @param participant_instance|element_response_entity $participant_instance Participant instance or element response entity
      * @param section_element $section_element
      * @param element_response_entity|null $element_response_entity
      * @param collection|responder_group[] $other_responder_groups
@@ -231,6 +240,16 @@ class section_element_response extends model implements section_element_response
     }
 
     /**
+     * Set the response to be empty.
+     *
+     * @return self
+     */
+    public function set_empty_response(): self {
+        $this->entity->response_data = null;
+        return $this;
+    }
+
+    /**
      * Run the element plugin specific validation on the response data.
      *
      * This function has the side-effect of setting the validation_errors
@@ -268,9 +287,18 @@ class section_element_response extends model implements section_element_response
      * @return $this
      */
     public function save(): self {
-        $this->entity->save();
+        return builder::get_db()->transaction(function () {
+            // Need to save first in case the response ID is required.
+            $this->entity->save();
 
-        return $this;
+            $element_plugin = $this->get_element()->get_element_plugin();
+            if ($element_plugin instanceof respondable_element_plugin) {
+                $element_plugin->post_response_submission($this);
+                $this->entity->save();
+            }
+
+            return $this;
+        });
     }
 
     /**
@@ -297,4 +325,115 @@ class section_element_response extends model implements section_element_response
     public function get_other_responder_groups(): ?collection {
         return $this->other_responder_groups;
     }
+
+    /**
+     * Does this response exist yet?
+     *
+     * @return bool
+     */
+    public function exists(): bool {
+        return $this->entity->exists();
+    }
+
+    /**
+     * Is the specified user allowed to view this response?
+     *
+     * @param element_response_entity $response
+     * @param int|null $viewing_user_id Defaults to the current user if a user isn't specified.
+     * @return bool
+     */
+    public static function can_user_view_response(element_response_entity $response, int $viewing_user_id = null): bool {
+        if (!$response->exists()) {
+            throw new coding_exception('Can not call user_can_view_response() on a non-existent response.');
+        }
+        $viewing_user_id = $viewing_user_id ?? user::logged_in()->id;
+
+        $participant_instance = participant_instance::load_by_entity($response->participant_instance);
+
+        if ($participant_instance->is_for_user($viewing_user_id)) {
+            return true;
+        }
+
+        $participating_in_same_subject_instance_and_can_view = section_relationship::repository()
+            // Join on the response record
+            ->join('perform_section_element', 'section_id', 'section_id')
+            ->join('perform_element_response', 'perform_section_element.id', 'section_element_id')
+            ->where('perform_element_response.id', $response->id)
+            // Check that the user also has a participant instance in the same section
+            ->join(['perform_participant_instance', 'subject_pi'], 'perform_element_response.participant_instance_id', 'id')
+            ->join('perform_subject_instance', 'subject_pi.subject_instance_id', 'id')
+            ->join(['perform_participant_instance', 'viewer_pi'], 'perform_subject_instance.id', 'subject_instance_id')
+            ->where('viewer_pi.participant_source', participant_source::INTERNAL)
+            ->where('viewer_pi.participant_id', $viewing_user_id)
+            ->where_field('subject_pi.participant_id', '!=', 'viewer_pi.participant_id')
+            ->where_field('core_relationship_id', 'viewer_pi.core_relationship_id')
+            // Must have can view other's responses enabled for the section's relationship
+            ->where('can_view', 1)
+            ->exists();
+
+        if ($participating_in_same_subject_instance_and_can_view) {
+            return true;
+        }
+
+        if (util::can_report_on_user($participant_instance->subject_instance->subject_user_id, $viewing_user_id)) {
+            return true;
+        }
+
+        // TODO: Add hook to allow redisplay responses to be loaded
+
+        return false;
+    }
+
+    /**
+     * Is the specified participant instance allowed to view this response?
+     *
+     * @param element_response_entity $response
+     * @param participant_instance $viewing_participant_instance
+     * @return bool
+     */
+    public static function can_participant_view_response(
+        element_response_entity $response,
+        participant_instance $viewing_participant_instance
+    ): bool {
+        if (!$response->exists()) {
+            throw new coding_exception('Can not call user_can_view_response() on a non-existent response.');
+        }
+
+        if ($viewing_participant_instance->participant_source == participant_source::INTERNAL) {
+            // Can just rely on the above method.
+            return static::can_user_view_response($response, $viewing_participant_instance->participant_id);
+        }
+
+        $response_participant_instance = $response->participant_instance;
+
+        if ($viewing_participant_instance->participant_id == $response_participant_instance->participant_id &&
+            $response_participant_instance->participant_source == participant_source::EXTERNAL) {
+            // Is the same (external) participant user.
+            return true;
+        }
+
+        $participating_in_same_subject_instance_and_can_view = section_relationship::repository()
+            // Join on the response record
+            ->join('perform_section_element', 'section_id', 'section_id')
+            ->join('perform_element_response', 'perform_section_element.id', 'section_element_id')
+            ->where('perform_element_response.id', $response->id)
+            // Check that the user also has a participant instance in the same section
+            ->join(['perform_participant_instance', 'subject_pi'], 'perform_element_response.participant_instance_id', 'id')
+            ->join('perform_subject_instance', 'subject_pi.subject_instance_id', 'id')
+            ->join(['perform_participant_instance', 'viewer_pi'], 'perform_subject_instance.id', 'subject_instance_id')
+            ->where('viewer_pi.id', $viewing_participant_instance->id)
+            ->where_field('core_relationship_id', 'viewer_pi.core_relationship_id')
+            // Must have can view other's responses enabled for the section's relationship
+            ->where('can_view', 1)
+            ->exists();
+
+        if ($participating_in_same_subject_instance_and_can_view) {
+            return true;
+        }
+
+        // TODO: Add hook to allow redisplay responses to be loaded
+
+        return false;
+    }
+
 }

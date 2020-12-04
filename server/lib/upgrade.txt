@@ -1,6 +1,10 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* Enrollment plugins used in require_login() can now be overridden via the \totara_core\hook\enrol_plugins hook.
+
 === 13.2 ===
 
 * phpFlickr::getFriendlyGeodata(), which relied on a non-working web service, has been deprecated

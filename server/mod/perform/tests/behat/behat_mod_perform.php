@@ -56,7 +56,7 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR = '.tui-performRequiredOptionalIndicator--optional';
     public const PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR = '.tui-performRequiredOptionalIndicator--required';
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'input';
-    public const LONG_TEXT_RESPONSE_LOCATOR = 'textarea';
+    public const LONG_TEXT_RESPONSE_LOCATOR = '.tui-weka';
     public const DATE_PICKER_RESPONSE_LOCATOR = '.tui-dateSelector';
     public const MULTI_CHOICE_MULTI_RESPONSE_LOCATOR = '.tui-checkboxGroup';
     public const MULTI_CHOICE_SINGLE_RESPONSE_LOCATOR = '.tui-radioGroup';
@@ -97,7 +97,7 @@ class behat_mod_perform extends behat_base {
     public const ADMIN_FORM_TITLE_INPUT = 'input[name=rawTitle]';
     public const ADMIN_FORM_DONE_BUTTON = '.tui-performAdminCustomElementEdit__submit';
     public const ADMIN_FORM = '.tui-performAdminCustomElement';
-    public const ADMIN_FORM_STATIC_CONTENT_WEKA = '.tui-weka';
+    public const ADMIN_FORM_STATIC_CONTENT_WEKA = '.tui-staticContentAdminEdit .tui-weka';
     public const FORM_BUILDER_ADD_ELEMENT_BUTTONS = '.tui-dropdownButton';
     public const FORM_BUILDER_RAW_TITLE_NAME = 'rawTitle';
     public const TUI_NOTEPAD_LINES = '.tui-notepadLines';
@@ -817,6 +817,12 @@ class behat_mod_perform extends behat_base {
                 } else {
                     $this->fail("No '{$new_answer}' option found for '{$element_type}' question");
                 }
+                break;
+            case 'long text':
+                $this->execute(
+                    'behat_weka::i_set_the_weka_editor_with_css_to',
+                    [self::LONG_TEXT_RESPONSE_LOCATOR, $new_answer]
+                );
                 break;
             default:
                 $response->setValue($new_answer);

@@ -1,6 +1,12 @@
 This file describes API changes in /client/component/performelement_long_text,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* LongTextParticipantForm.vue and LongTextAdminView.vue have been refactored to use the Weka editor,
+  and now longer use a textarea element
+* LongTextParticipantPrint.vue now supports rendering Weka HTML responses
+
 === 13.2 ===
 * Replaced several components to centralise common functionality improving consistency and reducing duplication
     * LongTextElementAdminDisplay.vue replaced with LongTextAdminView.vue

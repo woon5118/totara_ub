@@ -23,7 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-abstract class performelement_static_content_testcase extends advanced_testcase {
+global $CFG;
+require_once($CFG->dirroot . '/mod/perform/tests/weka_testcase.php');
+
+abstract class performelement_static_content_testcase extends mod_perform_weka_testcase {
 
     protected function create_element_data(): string {
         global $USER;
@@ -33,7 +36,7 @@ abstract class performelement_static_content_testcase extends advanced_testcase 
         $context = \context_user::instance($USER->id);
 
         // Create a file in draft area.
-        $data['wekaDoc'] = $this->create_document($draft_id, $context);
+        $data['wekaDoc'] = $this->create_weka_document_with_file($draft_id, $context);
         $data['docFormat'] = 'FORMAT_JSON_EDITOR';
         $data['format'] = 'HTML';
         $data['draftId'] = $draft_id;
@@ -42,44 +45,4 @@ abstract class performelement_static_content_testcase extends advanced_testcase 
         return $data;
     }
 
-    protected function create_document(int $draft_id, context $context): string {
-        // Create a draft image.
-        $draft = new \stdClass();
-        $draft->filename = "test_file.png";
-        $draft->filepath = '/';
-        $draft->component = 'user';
-        $draft->filearea = 'draft';
-        $draft->itemid = $draft_id;
-        $draft->contextid = $context->id;
-
-        $fs = get_file_storage();
-        $file = $fs->create_file_from_string($draft, 'blah blah');
-        $url = \moodle_url::make_draftfile_url(
-            $draft_id,
-            $draft->filepath,
-            $draft->filename
-        )->out(false);
-
-        return json_encode(
-            [
-                'type' => 'doc',
-                'content' => [
-                    [
-                        'type' => 'attachments',
-                        'content' => [
-                            [
-                                'type' => 'attachment',
-                                'attrs' => [
-                                    'url' => $url,
-                                    'filename' => $draft->filename,
-                                    'size' => $file->get_filesize(),
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            JSON_UNESCAPED_SLASHES
-        );
-    }
 }

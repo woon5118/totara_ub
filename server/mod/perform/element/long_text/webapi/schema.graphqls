@@ -1,0 +1,9 @@
+extend type Mutation {
+  """
+  Prepare draft area for Weka editor
+  """
+  performelement_long_text_prepare_draft_area(
+    section_element_id: core_id!
+    participant_instance_id: core_id!
+  ): core_id!
+}

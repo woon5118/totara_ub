@@ -24,10 +24,14 @@
 namespace mod_perform\userdata;
 
 use context;
+use core\orm\query\builder;
 use Exception;
+use mod_perform\entity\activity\element_response;
+use mod_perform\entity\activity\participant_instance;
 use mod_perform\entity\activity\subject_instance;
-use mod_perform\entity\activity\track;
 use mod_perform\entity\activity\track_user_assignment;
+use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\userdata\helpers\userdata_file_helper;
 use mod_perform\userdata\traits\purge_trait;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
@@ -45,12 +49,14 @@ class purge_other_responses extends item {
         global $DB;
 
         try {
-            $DB->transaction(function () use ($DB, $user, $context) {
-                (subject_instance::repository())
+            $DB->transaction(function () use ($user, $context) {
+                static::purge_files($user->id);
+
+                subject_instance::repository()
                     ->filter_by_context($context)
                     ->filter_by_subject_user($user->id)
                     ->get()
-                    ->map(function ($subject_instance) {
+                    ->map(function (subject_instance $subject_instance) {
                         $track_user_assignment_id = $subject_instance->track_user_assignment_id;
                         $track_user_assignment = new track_user_assignment($track_user_assignment_id);
                         $track_user_assignment->deleted = 1;
@@ -65,6 +71,27 @@ class purge_other_responses extends item {
         }
 
         return self::RESULT_STATUS_SUCCESS;
+    }
+
+    /**
+     * Purge the response files for the given subject user.
+     *
+     * @param int $user_id
+     */
+    protected static function purge_files(int $user_id): void {
+        $fs = get_file_storage();
+        builder::table('files')
+            ->when(true, function (builder $builder) {
+                userdata_file_helper::apply_respondable_element_file_restrictions($builder);
+            })
+            ->join([element_response::TABLE, 'er'], 'itemid', 'id')
+            ->join([participant_instance::TABLE, 'pi'], 'er.participant_instance_id', 'id')
+            ->join([subject_instance::TABLE, 'si'], 'pi.subject_instance_id', 'id')
+            ->where('si.subject_user_id', $user_id)
+            ->get()
+            ->map(function (object $file) use ($fs) {
+                $fs->get_file_instance($file)->delete();
+            });
     }
 
     /**

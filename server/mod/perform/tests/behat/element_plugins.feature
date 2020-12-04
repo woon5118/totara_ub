@@ -1,4 +1,4 @@
-@totara @perform @mod_perform @javascript @vuejs
+@totara @perform @mod_perform @perform_element @javascript @vuejs
 Feature: I can create and use performance activities with any and every custom element type
 
   Background:

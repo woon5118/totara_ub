@@ -48,6 +48,7 @@ use totara_core\entity\relationship;
  * @property-read collection|participant_section[] $participant_sections
  * @property-read user $participant_user
  * @property-read external_participant $external_participant
+ * @property-read collection|element_response[] $element_responses
  *
  * @method static participant_instance_repository repository
  *
@@ -107,4 +108,12 @@ class participant_instance extends entity {
             ->join([self::TABLE, 'pi'], 'id', 'participant_id')
             ->where('pi.participant_source', participant_source::EXTERNAL);
     }
+
+    /**
+     * @return has_many
+     */
+    public function element_responses(): has_many {
+        return $this->has_many(element_response::class, 'participant_instance_id');
+    }
+
 }

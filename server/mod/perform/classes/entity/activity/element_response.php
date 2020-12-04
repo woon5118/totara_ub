@@ -35,6 +35,7 @@ use core\orm\entity\relations\belongs_to;
  * @property int participant_instance_id $plugin_name the participant instance for the person making this answer
  * @property string $response_data JSON encoded question response data
  * @property-read section_element $section_element
+ * @property-read participant_instance $participant_instance
  *
  * @method static element_response_repository repository()
  *
@@ -51,4 +52,14 @@ class element_response extends entity {
     public function section_element(): belongs_to {
         return $this->belongs_to(section_element::class, 'section_element_id');
     }
+
+    /**
+     * Get the participant instance.
+     *
+     * @return belongs_to
+     */
+    public function participant_instance(): belongs_to {
+        return $this->belongs_to(participant_instance::class, 'participant_instance_id');
+    }
+
 }

@@ -1,4 +1,4 @@
-@totara @perform @mod_perform @javascript @vuejs
+@totara @perform @mod_perform @perform_element @performelement_long_text @javascript @vuejs
 Feature: Manage performance activity long text elements
 
   Background:

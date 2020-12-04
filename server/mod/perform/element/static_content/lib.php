@@ -22,6 +22,7 @@
  */
 
 use mod_perform\models\activity\helpers\external_participant_token_validator;
+use totara_core\advanced_feature;
 
 /**
  * This is a callback from the file system. Use for serving the file to the user.
@@ -38,8 +39,7 @@ use mod_perform\models\activity\helpers\external_participant_token_validator;
  * @return void
  */
 function performelement_static_content_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options) {
-    global $CFG, $DB, $SESSION;
-
+    global $CFG, $DB;
     require_once("{$CFG->dirroot}/lib/filelib.php");
 
     // Whitelisted file areas.
@@ -47,27 +47,14 @@ function performelement_static_content_pluginfile($course, $cm, $context, $filea
         send_file_not_found();
     }
 
-    // It could be a request from an external respondent.
-    // The only way at the moment to determine this is to extract
-    // the token from the wantsurl and validate it.
-    $token = null;
-    $wantsurl = $SESSION->wantsurl ?? '';
-    if ($wantsurl) {
-        $found = preg_match("/token=([a-z0-9]{64})/", $wantsurl, $matches);
-        if ($found > 0 && !empty($matches[1])) {
-            $token = $matches[1];
-        }
+    if (advanced_feature::is_disabled('performance_activities')) {
+        send_file_not_found();
     }
 
-    if ($token) {
-        $validator = new external_participant_token_validator($token);
-        if (!$validator->is_valid()) {
-            send_file_not_found();
-        }
-        $token_context = $validator->get_participant_instance()->get_context();
-        if ($token_context->id !== $context->id) {
-            send_file_not_found();
-        }
+    // Handle external participant.
+    $token = external_participant_token_validator::find_token_in_session();
+    if ($token && !(new external_participant_token_validator($token))->is_valid_for_context($context->id)) {
+        send_file_not_found();
     } else {
         require_login();
 

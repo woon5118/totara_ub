@@ -24,10 +24,12 @@
 
 namespace mod_perform\userdata\traits;
 
+use core\orm\query\builder;
 use mod_perform\entity\activity\element_response;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\userdata\helpers\userdata_file_helper;
 
 /**
  * Trait export_trait
@@ -103,6 +105,26 @@ trait export_trait {
         unset($record['element_type']);
         return $record;
     }
+
+    /**
+     * Append any files that are part of the responses to the export object.
+     *
+     * @param int[] $response_ids
+     * @return \stored_file[] Array of stored_files, keyed by the file ID
+     */
+    protected static function get_response_files(array $response_ids): array {
+        $fs = get_file_storage();
+        return builder::table('files')
+            ->when(true, function (builder $builder) {
+                userdata_file_helper::apply_respondable_element_file_restrictions($builder);
+            })
+            ->where_in('itemid', $response_ids)
+            ->where('filename', '!=', '.') // Exclude directories
+            ->get()
+            ->map(function (object $file) use ($fs) {
+                return $fs->get_file_instance($file);
+            })
+            ->all(true);
+    }
+
 }
-
-

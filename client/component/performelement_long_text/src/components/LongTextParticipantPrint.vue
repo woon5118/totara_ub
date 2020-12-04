@@ -17,7 +17,12 @@
 -->
 <template>
   <div class="tui-longTextParticipantPrint">
-    <div v-if="hasBeenAnswered" v-html="data" />
+    <div
+      v-if="hasBeenAnswered"
+      ref="content"
+      class="tui-longTextParticipantPrint__wekaContent"
+      v-html="data"
+    />
     <NotepadLines v-else :lines="6" />
   </div>
 </template>
@@ -40,6 +45,30 @@ export default {
      */
     hasBeenAnswered() {
       return this.data && this.data.length > 0;
+    },
+  },
+
+  mounted() {
+    this.$_scan();
+  },
+
+  updated() {
+    this.$_scan();
+  },
+
+  methods: {
+    /**
+     * Required to handle Weka HTML.
+     */
+    $_scan() {
+      this.$nextTick().then(() => {
+        let content = this.$refs.content;
+        if (!content) {
+          return;
+        }
+
+        tui.scan(content);
+      });
     },
   },
 };

@@ -200,6 +200,9 @@
                         :error="errors && errors[sectionElement.id]"
                         :aria-labelledby="labelId"
                         :label-id="checkboxGroupId"
+                        :section-element-id="sectionElement.id"
+                        :participant-instance-id="participantInstanceId"
+                        :is-external-participant="isExternalParticipant"
                       />
                     </template>
                   </ElementParticipantForm>
@@ -213,6 +216,9 @@
                       :element="sectionElement.element"
                       :path="['sectionElements', sectionElement.id]"
                       :error="errors && errors[sectionElement.id]"
+                      :section-element-id="sectionElement.id"
+                      :participant-instance-id="participantInstanceId"
+                      :is-external-participant="isExternalParticipant"
                     />
                   </div>
                   <OtherParticipantResponses
@@ -316,7 +322,7 @@
 
 <script>
 // Util
-import { uniqueId } from 'tui/util';
+import { formatParams, getQueryStringParam, uniqueId } from 'tui/util';
 import { RELATIONSHIP_SUBJECT } from 'mod_perform/constants';
 import { redirectWithPost } from 'mod_perform/redirect';
 import { notify } from 'tui/notifications';
@@ -348,14 +354,12 @@ import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import { Uniform } from 'tui/components/uniform';
 import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import ParticipantGeneralInformation from 'mod_perform/components/user_activities/participant/ParticipantGeneralInformation';
-
 // graphQL
 import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
 import viewOnlyReportModeSectionResponsesQuery from 'mod_perform/graphql/view_only_section_responses';
 import SectionResponsesQueryExternal from 'mod_perform/graphql/participant_section_external_participant_nosession';
 import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';
 import UpdateSectionResponsesMutationExternalParticipant from 'mod_perform/graphql/update_section_responses_external_participant_nosession';
-import { formatParams, getQueryStringParam } from 'tui/util';
 
 const PARTICIPANT_SECTION_STATUS_COMPLETE = 'COMPLETE';
 
@@ -937,11 +941,14 @@ export default {
         //assign errors to individual elements
         this.errors = submittedParticipantSection.section_element_responses
           .filter(item => item.validation_errors)
-          .reduce((acc, cur) => {
-            cur.validation_errors.forEach(error => {
-              acc[cur.section_element.id] = error.error_message;
+          .reduce((accumulator, current) => {
+            current.validation_errors.forEach(error => {
+              if (accumulator == null) {
+                accumulator = {};
+              }
+              accumulator[current.section_element_id] = error.error_message;
             });
-            return acc;
+            return accumulator;
           }, null);
 
         //show validation if no errors

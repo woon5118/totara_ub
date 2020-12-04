@@ -21,12 +21,21 @@
  * @package container_perform
  */
 
+use container_perform\perform_enrollment;
 use container_perform\watcher\course as course_watcher;
 
 defined('MOODLE_INTERNAL') || die();
 
 // This is a long list - try keep it alphabetical
 $watchers = [
+    /*
+     * The following hook is for handling container enrollment.
+     */
+    [
+        'hookname' => \totara_core\hook\enrol_plugins::class,
+        'callback' => [perform_enrollment::class, 'append_perform_enrollment_plugin'],
+    ],
+
     /*
      * The following hooks are for showing the page but without the course navigation and settings blocks.
      */

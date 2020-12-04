@@ -1,4 +1,4 @@
-@totara @perform @mod_perform @perform_element @javascript @vuejs
+@totara @perform @mod_perform @perform_element @performelement_long_text @javascript @vuejs
 Feature: Text: Long response element supports multi-lang filters in titles
 
   Background:

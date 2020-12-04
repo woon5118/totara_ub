@@ -63,11 +63,11 @@ class export_other_hidden_responses extends item {
             ->get(true)
             ->map(function ($response) use ($user) {
                 return self::process_response_record($response, $user->id);
-            })
-            ->to_array();
+            });
 
         $export = new export();
-        $export->data = $responses;
+        $export->data = $responses->to_array();
+        $export->files = static::get_response_files($responses->pluck('id'));
         return $export;
     }
 

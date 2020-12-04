@@ -26,7 +26,6 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use context_module;
 use core\collection;
-use core\entity\user;
 use core\orm\entity\model;
 use mod_perform\controllers\activity\view_external_participant_activity;
 use mod_perform\controllers\activity\view_user_activity;
@@ -242,8 +241,18 @@ class participant_instance extends model {
     public function get_is_for_current_user(): bool {
         global $USER;
 
+        return $this->is_for_user($USER->id);
+    }
+
+    /**
+     * Returns true of this participant instance is for the specified user
+     *
+     * @param int $user_id
+     * @return bool
+     */
+    public function is_for_user(int $user_id): bool {
         return (int) $this->entity->participant_source === participant_source::INTERNAL
-            && $this->participant_id == $USER->id;
+            && (int) $this->participant_id === $user_id;
     }
 
     /**

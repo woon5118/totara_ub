@@ -204,6 +204,38 @@ class mod_perform_activity_deletion_model_helper_testcase extends advanced_testc
         self::assertTrue(activity_entity::repository()->where('id', $other_activity2_id)->exists());
     }
 
+    public function test_files_are_deleted(): void {
+        self::setAdminUser();
+        $fs = get_file_storage();
+
+        $activity_to_delete = $this->perform_generator()->create_activity_in_container();
+        $activity_to_keep = $this->perform_generator()->create_activity_in_container();
+
+        $file_record = [
+            'component' => 'test',
+            'filearea' => 'mod_perform',
+            'itemid' => 0,
+            'filepath' => '/',
+            'filename' => 'test.txt'
+        ];
+        $file_to_delete = $fs->create_file_from_string(
+            array_merge($file_record, ['contextid' => $activity_to_delete->context_id]),
+            'Test text'
+        );
+        $file_to_keep = $fs->create_file_from_string(
+            array_merge($file_record, ['contextid' => $activity_to_keep->context_id]),
+            'Test text'
+        );
+
+        $this->assertTrue($fs->file_exists_by_hash($file_to_delete->get_pathnamehash()));
+        $this->assertTrue($fs->file_exists_by_hash($file_to_keep->get_pathnamehash()));
+
+        $activity_to_delete->delete();
+
+        $this->assertFalse($fs->file_exists_by_hash($file_to_delete->get_pathnamehash()));
+        $this->assertTrue($fs->file_exists_by_hash($file_to_keep->get_pathnamehash()));
+    }
+
     protected function assert_row_counts($expectations): void {
         /** @var Constraint $constraint */
         foreach ($expectations as $entity_class => $constraint) {

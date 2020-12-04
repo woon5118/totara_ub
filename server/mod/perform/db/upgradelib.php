@@ -154,3 +154,85 @@ function mod_perform_upgrade_unwrap_response_data() {
         }
     }
 }
+
+/**
+ * Converts any existing long text responses to the new Weka JSON format.
+ */
+function mod_perform_upgrade_long_text_responses_to_weka_format() {
+    global $DB;
+    $transaction = $DB->start_delegated_transaction();
+    $responses = $DB->get_recordset_sql("
+        SELECT response.id, response.response_data
+        FROM {perform_element_response} response
+        INNER JOIN {perform_section_element} section_element ON response.section_element_id = section_element.id
+        INNER JOIN {perform_element} element ON section_element.element_id = element.id
+        WHERE element.plugin_name = 'long_text'
+    ");
+
+    // Wrap the text from each response in the proper Weka JSON
+    foreach ($responses as $response) {
+        if (empty($response->response_data)) {
+            // Response is completely empty, so don't need to do anything.
+            continue;
+        }
+
+        if ($response->response_data === 'null') {
+            // A string with the value 'null' that is not encoded with JSON is invalid, and will cause problems.
+            // Because it isn't encoded with JSON, it wouldn't have been entered in by the user and is safe to delete.
+            $DB->set_field('perform_element_response', 'response_data', null, ['id' => $response->id]);
+            continue;
+        }
+
+        $response_text = json_decode($response->response_data);
+        if (!is_string($response_text)) {
+            // Response has already been converted into Weka JSON
+            continue;
+        }
+
+        $text_elements = [];
+
+        // Analyse the response string and insert breaks where there are newline characters
+        $unbroken_string = '';
+        $response_length = strlen($response_text);
+        for ($i = 0; $i < $response_length; $i++) {
+            $char = $response_text[$i];
+
+            if ($char === "\n" || $char === "\r") {
+                if (!empty($unbroken_string)) {
+                    $text_elements[] = ['type' => 'text', 'text' => $unbroken_string];
+                    $unbroken_string = '';
+                }
+                $text_elements[] = ['type' => 'hard_break'];
+                continue;
+            }
+
+            $unbroken_string .= $char;
+        }
+        $text_elements[] = ['type' => 'text', 'text' => $unbroken_string];
+
+        $weka_response = [
+            'type' => 'doc',
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => $text_elements,
+                ],
+            ],
+        ];
+
+        // Must encode it in the same way javascript does with JSON.stringify()
+        // Must be equivalent to \core\json_editor\helper\document_helper::json_encode_document()
+        $encoded_response = json_encode(
+            $weka_response,
+            JSON_PRESERVE_ZERO_FRACTION | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+        );
+        $DB->set_field(
+            'perform_element_response',
+            'response_data',
+            $encoded_response,
+            ['id' => $response->id]
+        );
+    }
+
+    $transaction->allow_commit();
+}

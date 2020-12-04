@@ -26,6 +26,7 @@ namespace mod_perform\formatter\response;
 use core\webapi\formatter\field\base;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\element_plugin;
+use mod_perform\models\response\section_element_response;
 
 /**
  * Generic element response formatter.
@@ -37,6 +38,24 @@ use mod_perform\models\activity\element_plugin;
  * on how to use it
  */
 class element_response_formatter extends base {
+
+    /**
+     * @var int|null
+     */
+    private $response_id;
+
+    /**
+     * Create a formatter instance for the specific element and format.
+     *
+     * @param element $element_model
+     * @param string|null $format
+     * @return static
+     */
+    public static function get_instance(element $element_model, ?string $format): self {
+        $classname = static::for_element($element_model);
+        return new $classname($format, $element_model->get_context());
+    }
+
     /**
      * Returns the specified element's response formatter classname.
      *
@@ -73,6 +92,28 @@ class element_response_formatter extends base {
         }
 
         return $formatter_class;
+    }
+
+    /**
+     * Set the ID of the response for use in the formatter.
+     * This is particularly useful when using file related functions.
+     *
+     * @param int $response_id
+     * @return $this
+     */
+    final public function set_response_id(int $response_id): self {
+        $this->response_id = $response_id;
+        return $this;
+    }
+
+    /**
+     * Get the ID of the actual response record.
+     * This is particularly useful when using file related functions.
+     *
+     * @return int|null Returns the response ID, or null if there is no record yet.
+     */
+    final public function get_response_id(): ?int {
+        return $this->response_id;
     }
 
 }

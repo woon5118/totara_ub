@@ -24,9 +24,9 @@
 namespace mod_perform\rb\display;
 
 use core\format;
+use mod_perform\entity\activity\element as element_entity;
 use mod_perform\formatter\response\element_response_formatter;
-use mod_perform\models\activity\element_plugin;
-use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\models\activity\element;
 use totara_reportbuilder\rb\display\base;
 
 class element_response extends base {
@@ -44,7 +44,18 @@ class element_response extends base {
     public static function display($response_data, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $extrafields = self::get_extrafields_row($row, $column);
 
-        $default_category_context = $column->extracontext['default_category_context'];
+        $element = element::load_by_entity(new element_entity([
+            'id' => $extrafields->element_id,
+            'context_id' => $extrafields->element_context_id,
+            'plugin_name' => $extrafields->element_type,
+            'data' => $extrafields->element_data,
+        ]));
+        $element_plugin = $element->get_element_plugin();
+
+        if (!$element_plugin->get_is_respondable()) {
+            // Nothing to display!
+            return '';
+        }
 
         if ($format === 'html') {
             $output_format = format::FORMAT_HTML;
@@ -53,19 +64,18 @@ class element_response extends base {
         }
 
         // Convert response data into actual answer.
-        /** @var respondable_element_plugin $element_plugin */
-        $element_plugin = element_plugin::load_by_plugin($extrafields->element_type);
-        if ($element_plugin instanceof respondable_element_plugin) {
-            $formatter_class = element_response_formatter::for_plugin($element_plugin);
-            $formatter = new $formatter_class($output_format, $default_category_context);
-            $response_data = $formatter->format($response_data);
+        $formatted_response_data = element_response_formatter::get_instance($element, $output_format)
+            ->set_response_id($extrafields->response_id)
+            ->format($response_data);
+        $response = $element_plugin->decode_response($formatted_response_data, $element->data);
 
-            $response = $element_plugin->decode_response($response_data, $extrafields->element_data);
-            $a = is_array($response) ? implode(', ', $response) : $response;
-            return $a;
+        if (is_array($response)) {
+            $response = implode(', ', $response);
+        } else if (is_string($response)) {
+            $response = trim($response);
         }
 
-        return '';
+        return $response;
     }
 
     /**
