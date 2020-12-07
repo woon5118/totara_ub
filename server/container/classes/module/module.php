@@ -663,12 +663,6 @@ abstract class module {
             return false;
         }
 
-        $newsectionid = $newsection->get_id();
-        if ($this->entity->section == $newsectionid && (empty($beforemod) || $beforemod == $this->entity->id)) {
-            // No moving happens as the module is in the same section and no $beforemod was provided.
-            return false;
-        }
-
         // Remove the module from old section first.
         $oldsection = $this->get_section();
         $result = $oldsection->remove_module($this->entity->id);
@@ -677,17 +671,20 @@ abstract class module {
             throw new \coding_exception("Could not delete module from existing section");
         }
 
-        $newvisible = $newsection->get_visible();
-        //If moving to a hidden section, then hide module.
-        if (!$newvisible && $this->entity->visible) {
-            // Module was visible but must become hidden after moving to hidden section.
-            // Set visibleold to 1 so module will be visible when section is made visible.
-            $this->update_visible(0);
-            $this->update_visible_old(1);
-        } else if ($newvisible && !$this->entity->visible) {
-            // Hidden module was moved to the visible section, restore the module visibility from visibleold.
-            $visibleold = $this->entity->visibleold;
-            $this->update_visible($visibleold);
+        $newsectionid = $newsection->get_id();
+        if ($this->entity->section != $newsectionid) {
+            //If moving to a hidden section, then hide module.
+            $newvisible = $newsection->get_visible();
+            if (!$newvisible && $this->entity->visible) {
+                // Module was visible but must become hidden after moving to hidden section.
+                // Set visibleold to 1 so module will be visible when section is made visible.
+                $this->update_visible(0);
+                $this->update_visible_old(1);
+            } else if ($newvisible && !$this->entity->visible) {
+                // Hidden module was moved to the visible section, restore the module visibility from visibleold.
+                $visibleold = $this->entity->visibleold;
+                $this->update_visible($visibleold);
+            }
         }
 
         $newsectionumber = $newsection->get_section_number();
