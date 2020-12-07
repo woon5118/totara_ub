@@ -2160,30 +2160,39 @@ function totara_get_all_user_name_fields($returnsql = false, $tableprefix = null
 
     $fields = get_all_user_name_fields();
 
-    // Find the fields that are used by fullname() and sort them as they would appear.
+    // Get the setting for user name display format.
+    if (!empty($SESSION->fullnamedisplay)) {
+        $CFG->fullnamedisplay = $SESSION->fullnamedisplay;
+    }
+    $fullnamedisplay = $CFG->fullnamedisplay;
+
+    // Check if fullnamedisplay is set to 'language' and look for the real fields inside the lang string.
+    if ((empty($fullnamedisplay) || $fullnamedisplay == 'language')) {
+        $fullnamedisplay = clean_string(get_string('fullnamedisplay', null));
+    }
+
+    // Find the fields that are used in the fullnamedisplay setting.
+    $usedfields = array();
+    foreach ($fields as $field) {
+        $posfound = strpos($fullnamedisplay, $field);
+        if ($posfound !== false) {
+            $usedfields[$posfound] = $field;
+        }
+    }
+
     if ($onlyused) {
-        // Get the setting for user name display format.
-        if (!empty($SESSION->fullnamedisplay)) {
-            $CFG->fullnamedisplay = $SESSION->fullnamedisplay;
-        }
-        $fullnamedisplay = $CFG->fullnamedisplay;
-
-        // Find the fields that are used.
-        $usedfields = array();
-        foreach ($fields as $field) {
-            $posfound = strpos($fullnamedisplay, $field);
-            if ($posfound !== false) {
-                $usedfields[$posfound] = $field;
-            }
-        }
-
-        // Sorts the fields.
+        // Sorts the fields that are used by fullname() as they would appear.
         ksort($usedfields);
         $fields = $usedfields;
 
         // Make sure that something is returned.
         if (empty($fields)) {
             $fields = array('firstname', 'lastname');
+        }
+    } else {
+        // Lets sort the array putting first the fields used in the fullnamedisplay setting.
+        if (!empty($usedfields)) {
+            $fields = $usedfields + array_diff($fields, $usedfields);
         }
     }
 

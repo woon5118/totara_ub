@@ -219,7 +219,7 @@ class user_repository extends repository {
      * @return string[]
      */
     private function get_user_full_name_fields(): array {
-        return totara_get_all_user_name_fields(false, $this->get_alias_sql(), null, null, true);
+        return totara_get_all_user_name_fields(false, $this->get_alias_sql(), null, null);
     }
 
     /**
