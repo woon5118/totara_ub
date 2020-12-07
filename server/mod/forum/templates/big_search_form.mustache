@@ -93,7 +93,7 @@
                     {{#str}}searchdatefrom, forum{{/str}}
                 </td>
                 <td class="c1">
-                    <input type="checkbox" name="timefromrestrict" value="1" {{#datefromchecked}}checked{{/datefromchecked}}>
+                    <input type="checkbox" name="timefromrestrict" value="1" aria-label="{{#str}}searchdatefrom, forum{{/str}}" {{#datefromchecked}}checked{{/datefromchecked}}>
                     {{{datefromfields}}}
                     <input type="hidden" name="hfromday" value="0">
                     <input type="hidden" name="hfrommonth" value="0">
@@ -107,7 +107,7 @@
                     {{#str}}searchdateto, forum{{/str}}
                 </td>
                 <td class="c1">
-                    <input type="checkbox" name="timetorestrict" value="1" {{#datetochecked}}checked{{/datetochecked}}>
+                    <input type="checkbox" name="timetorestrict" value="1" aria-label="{{#str}}searchdateto, forum{{/str}}" {{#datetochecked}}checked{{/datetochecked}}>
                     {{{datetofields}}}
                     <input type="hidden" name="htoday" value="0">
                     <input type="hidden" name="htomonth" value="0">
