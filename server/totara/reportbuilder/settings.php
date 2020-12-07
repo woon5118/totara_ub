@@ -155,8 +155,19 @@ if ($ADMIN->fulltree) {
             $options
         )
     );
-}
 
+    // Default graph colours.
+    $rb->add(
+        new admin_setting_configtext(
+            'totara_reportbuilder/defaultgraphcolors',
+            new lang_string('defaultgraphcolors', 'totara_reportbuilder'),
+            new lang_string('defaultgraphcolorsdescription', 'totara_reportbuilder'),
+            implode(',', totara_reportbuilder\local\graph\settings\base::DEFAULT_COLORS),
+            PARAM_RAW,
+            255
+        )
+    );
+}
 
 // Add links to report builder reports.
 $ADMIN->add('reportsmain', new admin_externalpage('rbmanagereports', new lang_string('manageuserreports','totara_reportbuilder'),

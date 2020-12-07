@@ -105,7 +105,7 @@ class totara_reportbuilder_svggraph_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
             'pad_top' => 1,
             'pad_left' => 2,
             'pad_bottom' => 3,
@@ -168,7 +168,7 @@ class totara_reportbuilder_svggraph_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
             'pad_top' => 10,
             'pad_left' => 10,
             'pad_bottom' => 10,
@@ -193,7 +193,7 @@ class totara_reportbuilder_svggraph_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
             'pad_top' => 2,
             'auto_fit' => true
         ];
@@ -261,14 +261,14 @@ class totara_reportbuilder_svggraph_settings_testcase extends \basic_testcase {
             'colors' => ' ',
         ];
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
         ];
         $chartsettings = svggraph::create($settings);
         $this->assertSame($expected, $chartsettings);
 
         $settings = [];
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
         ];
         $chartsettings = svggraph::create($settings);
         $this->assertSame($expected, $chartsettings);

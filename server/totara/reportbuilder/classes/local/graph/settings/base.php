@@ -49,6 +49,21 @@ abstract class base {
     abstract public static function create(array $settings): array;
 
     /**
+     * Return the default colours
+     *
+     * @return array
+     */
+    public static function get_default_colors(): array {
+        $saveddefaults = get_config('totara_reportbuilder', 'defaultgraphcolors');
+
+        if (!empty($saveddefaults)) {
+            return self::parse_colors($saveddefaults);
+        }
+
+        return self::DEFAULT_COLORS;
+    }
+
+    /**
      * Matches the user settings with a translation object to produce a list of settings
      * @param $key string object key to check
      * @param $input array user settings

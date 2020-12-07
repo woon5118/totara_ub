@@ -121,7 +121,7 @@ final class chartjs extends base {
             $options['colors'] = static::parse_colors($settings['custom']['colours']);
         }
         if (empty($options['colors'])) {
-            $options['colors'] = self::DEFAULT_COLORS;
+            $options['colors'] = self::get_default_colors();
         }
         unset($settings['colors']);
         unset($settings['colours']);

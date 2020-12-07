@@ -113,7 +113,7 @@ class totara_reportbuilder_chartjs_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
             'layout' => [
                 'padding' => [
                     'top' => 1,
@@ -220,7 +220,7 @@ class totara_reportbuilder_chartjs_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
             'layout' => [
                 'padding' => 10
             ],
@@ -311,14 +311,14 @@ class totara_reportbuilder_chartjs_settings_testcase extends \basic_testcase {
             'colors' => ' ',
         ];
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
         ];
         $chartsettings = chartjs::create($settings);
         $this->assertSame($expected, $chartsettings);
 
         $settings = [];
         $expected = [
-            'colors' => base::DEFAULT_COLORS,
+            'colors' => base::get_default_colors(),
         ];
         $chartsettings = chartjs::create($settings);
         $this->assertSame($expected, $chartsettings);
