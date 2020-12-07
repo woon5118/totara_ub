@@ -162,6 +162,13 @@ export default {
           { people: [], workspaces: [] }
         );
       },
+      skip() {
+        //  We don't want the share recipients for workspaces and items that don't exist yet.
+        return (
+          this.shareToVariables.component === 'container_workspace' ||
+          String(this.shareToVariables.itemid) === '0'
+        );
+      },
     },
   },
 
@@ -251,7 +258,7 @@ export default {
     // Resource needs to inherit the container's shares.
     shareToVariables() {
       return {
-        itemid: this.containerValues.instance || this.itemId,
+        itemid: this.containerValues.instanceId || this.itemId,
         component: this.containerValues.component || this.component,
       };
     },
