@@ -1685,7 +1685,7 @@ body.jsenabled .formlisting {
       line-height: $line-height-base;
       &:hover {
         color: $dropdown-link-active-color;
-        background-color: $dropdown-link-active-bg;
+        background-color: var(--color-primary);
         text-decoration: none;
       }
     }

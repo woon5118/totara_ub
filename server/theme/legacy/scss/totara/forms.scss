@@ -470,13 +470,20 @@ input[type='checkbox'] {
     cursor: pointer;
     color: var(--color-text);
   }
-  li:hover {
-    background-color: $dropdown-link-active-bg;
+  li:hover,
+  li[aria-selected='true']  {
+    background-color: var(--color-primary);
     color: $dropdown-link-active-color;
   }
-  li[aria-selected='true'] {
-    background-color: var(--color-neutral-2);
-    color: $gray;
+
+  &:hover li[aria-selected='true'] {
+    background-color: inherit;
+    color: var(--color-text);
+
+    &:hover {
+      background-color: var(--color-primary);
+      color: $dropdown-link-active-color;
+    }
   }
 }
 
