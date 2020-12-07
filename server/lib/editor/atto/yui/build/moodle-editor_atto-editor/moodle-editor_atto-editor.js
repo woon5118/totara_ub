@@ -1403,8 +1403,53 @@ Y.Base.mix(Y.M.editor_atto.Editor, [EditorAutosaveIo]);
  * @namespace M.editor_atto
  * @class EditorClean
  */
+function EditorClean() {
+    this._domPurify = new Y.DOMPurify();
 
-function EditorClean() {}
+    this._domPurify.addHook('afterSanitizeAttributes', function(node) {
+        // if element has target set, change it to '_blank'
+        if (node.target) {
+            node.setAttribute('target', '_blank');
+            // prevent https://www.owasp.org/index.php/Reverse_Tabnabbing
+            var rels = node.getAttribute('rel');
+            rels = rels ? rels.split(' ') : [];
+            if (!rels.includes('noopener')) {
+                rels.push('noopener');
+            }
+            if (!rels.includes('noreferrer')) {
+                rels.push('noreferrer');
+            }
+            node.setAttribute('rel', rels.join(' '));
+        }
+    });
+
+    this._domPurifyConfig = {
+        // match URI.AllowedSchemes in purify_html() in weblib.php
+        ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|irc|nntp|news|rtsp|rtmp|teamspeak|mms|mailto|skype|meet|sip|xmpp):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
+        ADD_TAGS: [
+            'nolink',
+            'tex',
+            'algebra',
+            'lang',
+            'font',
+            'rb',
+            'rbc',
+            'rtc',
+        ],
+        ADD_ATTR: [
+            'autoplay',
+            'muted',
+            'controls',
+            'rel',
+            'rev',
+            'rbspan',
+            'frame',
+            'rules',
+            'charoff',
+            'target',
+        ],
+    };
+}
 
 EditorClean.ATTRS = {
     /**
@@ -1491,7 +1536,7 @@ EditorClean.prototype = {
         content = this._filterContentWithRules(content, rules);
 
         if (this.get('sanitize') !== false) {
-            content = Y.DOMPurify.sanitize(content);
+            content = this._domPurify.sanitize(content, this._domPurifyConfig);
         }
 
         return content;
