@@ -327,7 +327,8 @@ export default {
       "schedule_repeating_limit_maximum_of",
       "schedule_repeating_limit_maximum_of_a11y",
       "schedule_repeating_limit_none",
-      "schedule_repeating_limit_none_open_ended"
+      "schedule_repeating_limit_none_open_ended",
+      "trigger"
     ]
   }
 </lang-strings>
