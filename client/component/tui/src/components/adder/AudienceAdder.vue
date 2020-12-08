@@ -35,7 +35,7 @@
       >
         <template v-slot:filters-left="{ stacked }">
           <SearchFilter
-            v-model="filters.search"
+            v-model="searchDebounce"
             :label="$str('filter_audiences_search_label', 'totara_core')"
             :show-label="false"
             :placeholder="$str('search', 'totara_core')"
@@ -138,6 +138,7 @@ import SearchFilter from 'tui/components/filters/SearchFilter';
 import SelectTable from 'tui/components/datatable/SelectTable';
 // Queries
 import cohorts from 'core/graphql/cohorts';
+import { debounce } from 'tui/util';
 
 export default {
   components: {
@@ -181,6 +182,7 @@ export default {
       },
       nextPage: false,
       skipQueries: true,
+      searchDebounce: '',
     };
   },
 
@@ -191,11 +193,15 @@ export default {
      */
     open() {
       if (this.open) {
-        this.filters.search = '';
+        this.searchDebounce = '';
         this.skipQueries = false;
       } else {
         this.skipQueries = true;
       }
+    },
+
+    searchDebounce(newValue) {
+      this.updateFilterDebounced(newValue);
     },
   },
 
@@ -335,6 +341,15 @@ export default {
       }
       return this.audienceSelectedItems;
     },
+
+    /**
+     * Update the search filter (which re-triggers the query) if the user stopped typing >500 milliseconds ago.
+     *
+     * @param {String} input Value from search filter input
+     */
+    updateFilterDebounced: debounce(function(input) {
+      this.filters.search = input;
+    }, 500),
   },
 };
 </script>

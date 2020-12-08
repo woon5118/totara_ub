@@ -43,7 +43,7 @@
         </template>
         <template v-slot:filters-right="{ stacked }">
           <SearchFilter
-            v-model="filters.name"
+            v-model="searchDebounce"
             :label="$str('search_hierarchy', 'totara_core')"
             :show-label="false"
             :placeholder="$str('search', 'totara_core')"
@@ -127,6 +127,8 @@
 </template>
 
 <script>
+import { debounce } from 'tui/util';
+
 // Components
 import Adder from 'tui/components/adder/Adder';
 import Cell from 'tui/components/datatable/Cell';
@@ -210,16 +212,22 @@ export default {
       hierarchicalList: [],
       selectedHierarchicalList: [],
       cachedFilters: {},
+      searchDebounce: '',
     };
   },
 
   watch: {
     open() {
       if (this.open) {
+        this.searchDebounce = '';
         this.skipQueries = false;
       } else {
         this.skipQueries = true;
       }
+    },
+
+    searchDebounce(newValue) {
+      this.updateFilterDebounced(newValue);
     },
   },
 
@@ -407,6 +415,15 @@ export default {
       };
       this.$emit('cancel');
     },
+
+    /**
+     * Update the search filter (which re-triggers the query) if the user stopped typing >500 milliseconds ago.
+     *
+     * @param {String} input Value from search filter input
+     */
+    updateFilterDebounced: debounce(function(input) {
+      this.filters.name = input;
+    }, 500),
   },
 };
 </script>
