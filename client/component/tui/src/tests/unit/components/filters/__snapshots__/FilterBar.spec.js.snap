@@ -61,6 +61,8 @@ exports[`FilterBar.vue matches snapshot 1`] = `
           </span>
            
           <!---->
+           
+          <!---->
         </span>
       </button>
     </div>

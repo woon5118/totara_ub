@@ -25,6 +25,7 @@
         :aria-label="'Add'"
         :disabled="disabled"
         :caret="caret"
+        :loading="loading"
         :styleclass="{
           alert: alertStyle,
           circle: circleStyle,
@@ -50,6 +51,7 @@
             :aria-label="'Add'"
             :disabled="disabled"
             :caret="caret"
+            :loading="loading"
             :styleclass="{
               alert: alertStyle,
               circle: circleStyle,
@@ -139,6 +141,13 @@
         </RadioGroup>
       </FormRow>
 
+      <FormRow label="Loading">
+        <RadioGroup v-model="loading" :horizontal="true">
+          <Radio :value="true">True</Radio>
+          <Radio :value="false">False</Radio>
+        </RadioGroup>
+      </FormRow>
+
       <FormRow label="Text first">
         <RadioGroup v-model="textFirstStyle" :horizontal="true">
           <Radio :value="true">True</Radio>
@@ -218,9 +227,11 @@ export default {
       toolbarStyle: false,
       selectedStyle: false,
       caret: false,
+      loading: false,
       codeTemplate: `<ButtonIcon
   :aria-label="Add"
   :disabled="disabled"
+  :loading="loading"
   :styleclass="{
     alert: alertStyle,
     circle: circleStyle,

@@ -46,6 +46,8 @@ exports[`FilterSidePanel.vue matches snapshot 1`] = `
   tempstring
   
       <!---->
+       
+      <!---->
     </button>
   </div>
    

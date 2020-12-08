@@ -26,6 +26,7 @@
         :text="text"
         :disabled="disabled"
         :caret="caret"
+        :loading="loading"
         :styleclass="{
           primary: primaryStyle,
           small: smallStyle,
@@ -45,6 +46,7 @@
             :text="text"
             :disabled="disabled"
             :caret="caret"
+            :loading="loading"
             :styleclass="{
               primary: primaryStyle,
               small: smallStyle,
@@ -88,6 +90,13 @@
 
       <FormRow label="Caret (for dropdown)">
         <RadioGroup v-model="caret" :horizontal="true">
+          <Radio :value="true">True</Radio>
+          <Radio :value="false">False</Radio>
+        </RadioGroup>
+      </FormRow>
+
+      <FormRow label="Loading">
+        <RadioGroup v-model="loading" :horizontal="true">
           <Radio :value="true">True</Radio>
           <Radio :value="false">False</Radio>
         </RadioGroup>
@@ -172,6 +181,7 @@ export default {
     return {
       caret: false,
       disabled: false,
+      loading: false,
       primaryStyle: false,
       smallStyle: false,
       screenReaderStyle: false,
@@ -185,6 +195,7 @@ export default {
   :text="text"
   :disabled="disabled"
   :caret="caret"
+  :loading="loading"
   :styleclass="{
     primary: primaryStyle,
     small: smallStyle,

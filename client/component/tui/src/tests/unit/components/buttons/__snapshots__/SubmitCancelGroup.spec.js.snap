@@ -12,6 +12,8 @@ exports[`presentation/buttons/SubmitCancelGroup.vue Checks snapshot 1`] = `
   fff
   
     <!---->
+     
+    <!---->
   </button>
    
   <button
@@ -21,6 +23,8 @@ exports[`presentation/buttons/SubmitCancelGroup.vue Checks snapshot 1`] = `
     
   fff
   
+    <!---->
+     
     <!---->
   </button>
 </div>

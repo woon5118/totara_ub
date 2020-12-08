@@ -31,7 +31,6 @@
       'tui-formBtn--transparent': styleclass.transparent,
       'tui-formBtn--reveal': styleclass.reveal,
       'tui-formBtn--stealth': styleclass.stealth,
-      'tui-formBtn--toolbar': styleclass.toolbar,
     }"
     :disabled="disabled"
     :formaction="formaction"
@@ -46,15 +45,22 @@
   >
     {{ text }}
     <Caret v-if="caret" class="tui-formBtn__caret" />
+    <Loading
+      v-if="loading"
+      class="tui-formBtn__loading"
+      :alt="'(' + $str('loading', 'core') + ')'"
+    />
   </button>
 </template>
 
 <script>
 import Caret from 'tui/components/decor/Caret';
+import Loading from 'tui/components/icons/Loading';
 
 export default {
   components: {
     Caret,
+    Loading,
   },
 
   props: {
@@ -96,6 +102,7 @@ export default {
       type: String,
       validator: x => ['_blank', '_parent', '_self', '_top'].includes(x),
     },
+    loading: Boolean,
     name: String,
     text: {
       required: true,
@@ -120,6 +127,14 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+  "core": [
+    "loading"
+  ]
+}
+</lang-strings>
 
 <style lang="scss">
 // Reset
@@ -190,6 +205,10 @@ export default {
 
   > .tui-formBtn__caret {
     margin-left: var(--gap-2);
+  }
+
+  > .tui-formBtn__loading {
+    margin-left: var(--gap-1);
   }
 
   &:active,

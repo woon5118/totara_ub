@@ -56,6 +56,8 @@ exports[`presentation/tag/TagList.vue Checks snapshot 1`] = `
                 </span>
                  
                 <!---->
+                 
+                <!---->
               </span>
             </button>
           </div>
@@ -104,6 +106,8 @@ exports[`presentation/tag/TagList.vue Checks snapshot 1`] = `
              
             <!---->
           </span>
+           
+          <!---->
            
           <!---->
         </span>

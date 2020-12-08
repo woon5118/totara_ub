@@ -1,4 +1,4 @@
-This files describes API changes in /client/component/tui,
+This file describes API changes in /client/component/tui,
 information provided here is intended especially for developers.
 
 === 13.3 ===
@@ -8,6 +8,14 @@ information provided here is intended especially for developers.
 * Added size prop to Popover.vue to provide a minimum display width
 * Updated AttachmentNode.vue, AudioBlock.vue, Hashtag.vue, ImageBlock.vue, and VideoBlock.vue to deprecate the attributes computed property
   * Template changes
+* Updated Input.vue, Button.vue and ButtonIcon.vue to handle prop "autofocus" in JS
+  * Template changes
+* Updated Button.vue and ButtonIcon.vue to support a loading indicator prop
+  * Template & CSS changes
+* Removed overridden focus styles from SearchBox.vue submit button, now uses default IconButton.vue focus styles
+* Update Tui Theme Settings Custom and Colour Uniforms to include new fields and make rows solution more generic
+  * Langstring, template, SCSS and script block changes
+
 
 === 13.2 ===
 
@@ -20,9 +28,3 @@ information provided here is intended especially for developers.
 * Converted Loader.vue emptySlot computed property to a isEmptySlot method so it correctly updates for subsequent requests
 * Updated Form.vue to prevent native submit behavior unless native-submit prop or action/method attributes are passed
   * Template changes
-
-=== 13.3 ===
-
-* Removed overridden focus styles from SearchBox.vue submit button, now uses default IconButton.vue focus styles
-* Update Tui Theme Settings Custom and Colour Uniforms to include new fields and make rows solution more generic
-  * Langstring, template, SCSS and script block changes

@@ -9,5 +9,7 @@ exports[`presentation/buttons/Cancel.vue Checks snapshot 1`] = `
   fff
   
   <!---->
+   
+  <!---->
 </button>
 `;

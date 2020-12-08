@@ -55,6 +55,8 @@ exports[`presentation/form/SearchBox.vue matches snapshot 1`] = `
       </span>
        
       <!---->
+       
+      <!---->
     </span>
   </button>
 </div>

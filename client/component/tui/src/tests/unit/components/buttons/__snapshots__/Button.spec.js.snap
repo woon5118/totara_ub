@@ -9,5 +9,7 @@ exports[`presentation/form/Button.vue Checks snapshot 1`] = `
   btn text
   
   <!---->
+   
+  <!---->
 </button>
 `;
