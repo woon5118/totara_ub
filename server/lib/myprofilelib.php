@@ -137,7 +137,13 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     }
 
     // Login as ...
-    if ($access_controller->can_loginas()) {
+    if (\core_user\access_controller::for($user, null)->can_loginas()) {
+        $url = new moodle_url('/course/loginas.php',
+            array('id' => SITEID, 'user' => $user->id, 'sesskey' => sesskey()));
+        $node = new  core_user\output\myprofile\node('administration', 'loginas', get_string('loginas'), null, $url);
+        $tree->add_node($node);
+    } else if ($access_controller->can_loginas()) {
+        // NOTE: course level login-as is broken and cannot be fixed, it will be deprecated.
         $url = new moodle_url('/course/loginas.php',
                 array('id' => $courseid, 'user' => $user->id, 'sesskey' => sesskey()));
         $node = new  core_user\output\myprofile\node('administration', 'loginas', get_string('loginas'), null, $url);

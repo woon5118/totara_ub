@@ -40,6 +40,7 @@ $userid = required_param('user', PARAM_INT);
 $user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0]);
 
 if ($id and $id != SITEID) {
+    // NOTE: course level login-as is broken and cannot be fixed, it will be deprecated.
     $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
     require_login($course);
     $context = context_course::instance($course->id);

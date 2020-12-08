@@ -250,7 +250,14 @@ class participant_details implements \renderable {
             );
         }
 
-        if ($access_controller->can_loginas()) {
+        if (\core_user\access_controller::for($user, null)->can_loginas()) {
+            // NOTE: course level login-as is broken and cannot be fixed, it will be deprecated.
+            $links[] = array(
+                'url' => new \moodle_url('/course/loginas.php?id='. SITEID .'&user='. $user->id .'&sesskey='. sesskey()),
+                'text' => get_string('loginas')
+            );
+        } else if ($access_controller->can_loginas()) {
+            // NOTE: course level login-as is broken and cannot be fixed, it will be deprecated.
             $links[] = array(
                 'url' => new \moodle_url('/course/loginas.php?id='. $course->id .'&user='. $user->id .'&sesskey='. sesskey()),
                 'text' => get_string('loginas')
