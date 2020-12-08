@@ -75,6 +75,13 @@
       @add-members="handleAddMembers"
     />
 
+    <AudienceAdder
+      :open="modal.audienceAdder"
+      :context-id="workspaceContextId"
+      @added="selection => onAudiencesSelectedFromAdder(selection)"
+      @cancel="modal.audienceAdder = false"
+    />
+
     <Loading v-if="$apollo.loading" />
 
     <template v-else>
@@ -120,6 +127,13 @@
 
         <DropdownItem @click="modal.adder = true">
           {{ $str('add_members', 'container_workspace') }}
+        </DropdownItem>
+
+        <DropdownItem
+          v-if="interactor.can_add_audiences"
+          @click="modal.audienceAdder = true"
+        >
+          {{ $str('bulk_add_audiences', 'container_workspace') }}
         </DropdownItem>
 
         <DropdownItem v-if="interactor.can_update" @click="modal.edit = true">
@@ -238,6 +252,7 @@
 </template>
 
 <script>
+import AudienceAdder from 'tui/components/adder/AudienceAdder';
 import Button from 'tui/components/buttons/Button';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
@@ -265,6 +280,7 @@ import { PUBLIC, PRIVATE, HIDDEN } from 'container_workspace/access';
 
 export default {
   components: {
+    AudienceAdder,
     Button,
     ConfirmationModal,
     ModalPresenter,
@@ -296,6 +312,10 @@ export default {
         return [PUBLIC, HIDDEN, PRIVATE].includes(prop);
       },
     },
+
+    workspaceContextId: {
+      type: Number,
+    },
   },
 
   apollo: {
@@ -315,6 +335,7 @@ export default {
       innerSubmitting: false,
       deleting: false,
       modal: {
+        audienceAdder: false,
         leaveConfirm: false,
         deleteConfirm: false,
         edit: false,
@@ -614,6 +635,17 @@ export default {
         this.innerSubmitting = false;
       }
     },
+
+    /**
+     * Receives the selection of audiences selected in the audience adder
+     *
+     * @param selection
+     */
+    async onAudiencesSelectedFromAdder(selection) {
+      console.log(selection);
+
+      this.modal.audienceAdder = false;
+    },
   },
 };
 </script>
@@ -623,6 +655,7 @@ export default {
   "container_workspace": [
     "actions",
     "actions_label",
+    "bulk_add_audiences",
     "member",
     "joined",
     "join_workspace",

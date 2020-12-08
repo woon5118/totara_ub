@@ -115,6 +115,9 @@ final class workspace_interactor implements type_resolver {
             case 'can_leave':
                 return $source->can_leave_workspace();
 
+            case 'can_add_audiences':
+                return $source->can_add_audiences();
+
             default:
                 debugging("Invalid field '{$field}' that is not in supported yet", DEBUG_DEVELOPER);
                 return null;

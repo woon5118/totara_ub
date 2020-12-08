@@ -51,6 +51,7 @@
             :workspace-id="workspace.id"
             :workspace-name="workspace.name"
             :workspace-access="workspace.access"
+            :workspace-context-id="workspace.context_id"
             class="tui-workspacePage__primaryAction-action"
             @update-workspace="updateWorkspace"
             @request-to-join-workspace="reloadWorkspace"

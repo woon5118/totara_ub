@@ -24,6 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use container_workspace\member\member;
 use container_workspace\interactor\workspace\interactor;
+use core\orm\query\builder;
 
 class container_workspace_workspace_interactor_testcase extends advanced_testcase {
     /**
@@ -275,4 +276,37 @@ class container_workspace_workspace_interactor_testcase extends advanced_testcas
             "User should not be able to invite members to workspace after deletion"
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_check_if_user_can_add_audiences(): void {
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        $this->setUser($user);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Admins always should be able to add audiences
+        $this->setAdminUser();
+
+        $interactor = new interactor($workspace);
+        $this->assertTrue($interactor->can_add_audiences());
+
+        $this->setUser($user);
+
+        $interactor = new interactor($workspace, $user->id);
+        $this->assertFalse($interactor->can_add_audiences());
+
+        // Now give the user the capability
+        $user_role = builder::table('role')->where('shortname', 'user')->one();
+        assign_capability('moodle/cohort:view', CAP_ALLOW, $user_role->id, SYSCONTEXTID);
+
+        $interactor = new interactor($workspace, $user->id);
+        $this->assertTrue($interactor->can_add_audiences());
+    }
+
 }

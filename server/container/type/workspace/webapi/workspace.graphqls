@@ -143,6 +143,10 @@ type container_workspace_workspace_interactor {
   Whether the current user is able to transfer the ownership of workspace or not.
   """
   can_transfer_ownership: Boolean!
+  """
+  Whether the current user can add audiences to the workspace
+  """
+  can_add_audiences: Boolean!
 }
 
 """

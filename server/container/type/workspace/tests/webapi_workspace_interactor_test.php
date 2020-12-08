@@ -22,6 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use core\orm\query\builder;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use container_workspace\workspace;
 
@@ -136,6 +137,32 @@ class container_workspace_webapi_workspace_interactor_testcase extends advanced_
         self::assertTrue($interactor->can_view_members());
         self::assertFalse($interactor->can_share_resources());
         self::assertFalse($interactor->can_unshare_resources());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_check_if_user_can_add_audiences(): void {
+        $user = $this->setup_user();
+        $workspace = $this->create_workspace();
+
+        // Admins always should be able to add audiences
+        $this->setAdminUser();
+
+        $interactor = $this->execute_query(['workspace_id' => $workspace->get_id()]);
+        $this->assertTrue($interactor->can_add_audiences());
+
+        $this->setUser($user);
+
+        $interactor = $this->execute_query(['workspace_id' => $workspace->get_id()]);
+        $this->assertFalse($interactor->can_add_audiences());
+
+        // Now give the user the capability
+        $user_role = builder::table('role')->where('shortname', 'user')->one();
+        assign_capability('moodle/cohort:view', CAP_ALLOW, $user_role->id, SYSCONTEXTID);
+
+        $interactor = $this->execute_query(['workspace_id' => $workspace->get_id()]);
+        $this->assertTrue($interactor->can_add_audiences());
     }
 
     /**

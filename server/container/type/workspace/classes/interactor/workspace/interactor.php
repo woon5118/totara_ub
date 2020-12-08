@@ -568,6 +568,14 @@ final class interactor {
     }
 
     /**
+     * Returns true if the current users has the capabilities
+     * to add audiences to this workspace or any above it
+     */
+    public function can_add_audiences(): bool {
+        return has_capability('moodle/cohort:view', $this->workspace->get_context());
+    }
+
+    /**
      * Referesh workspace cache.
      *
      * @return void
@@ -575,4 +583,5 @@ final class interactor {
     public function reload_workspace(): void {
         $this->workspace->reload();
     }
+
 }

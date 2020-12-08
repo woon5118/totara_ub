@@ -22,6 +22,7 @@ query container_workspace_workspace_interactor($workspace_id: param_integer!) {
     can_share_resources
     can_unshare_resources
     can_transfer_ownership
+    can_add_audiences
     muted
     has_seen
     user {

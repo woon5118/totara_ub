@@ -38,6 +38,7 @@ $string['back_button'] = '{$a}';
 $string['back_to_discussions'] = "Back to discussions";
 $string['bracket_number'] = '({$a})';
 $string['browse_files'] = 'Browse files';
+$string['bulk_add_audiences'] = 'Bulk add audience(s)';
 $string['cachedef_draft_id'] = 'Draft IDs';
 $string['category_name'] = 'Space category';
 $string['cancel_request'] = 'Cancel request';
