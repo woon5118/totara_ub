@@ -25,6 +25,7 @@ require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
 
 use Behat\Mink\Element\NodeElement as NodeElement,
     Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
+use Behat\Mink\Exception\ExpectationException;
 
 class behat_weka extends behat_base {
     private const EDITOR_SELECT_HELPER = "
@@ -479,4 +480,130 @@ if (" . ($expected ? '!' : '') . "domNode) {
 }());";
         $this->getSession()->executeScript($js);
     }
+
+    /**
+     * Simulates selecting a file from the weka file picker dialog.
+     *
+     * @When /^I upload (embedded media|attachment) to the weka editor using the file "([^"]*)"$/
+     * @param string $type Attachment or Embedded media
+     * @param string $file_path
+     */
+    public function i_upload_file_to_weka_editor(string $type, string $file_path): void {
+        global $CFG;
+        \behat_hooks::set_step_readonly(false);
+        $this->validate_common();
+        $type = ucfirst($type);
+
+        $full_file_path = $CFG->dirroot . DIRECTORY_SEPARATOR . $file_path;
+        if (!file_exists($full_file_path)) {
+            throw new coding_exception('No file exists at ' . $full_file_path);
+        }
+
+        $this->i_click_on_the_toolbar_button_in_the_weka_editor($type);
+
+        $this->wait_for_pending_js();
+
+        $file_inputs = $this->current_weka->findAll('css', '[type="file"]');
+        end($file_inputs)->attachFile($full_file_path);
+
+        // For some reason this is the only way to close the file picker window - don't question it :)
+        $this->getSession()->switchToWindow($this->getSession()->getWindowName());
+    }
+
+    /**
+     * Find the given embedded image within the parent node and check if they are the same (via filesize)
+     *
+     * @param NodeElement $parent
+     * @param string $file_name
+     * @return NodeElement|null Returns the image node if they match.
+     * @throws coding_exception Thrown if the file sizes don't match
+     */
+    private function find_and_compare_embedded_image(NodeElement $parent, string $file_name): ?NodeElement {
+        global $CFG;
+        $images = $parent->findAll('css', 'img');
+        foreach ($images as $image) {
+            $image_src = $image->getAttribute('src');
+            if (!str_contains($image_src, $file_name)) {
+                continue;
+            }
+
+            $image_src = str_replace($CFG->wwwroot . '/pluginfile.php/', '', $image_src);
+            $image_src = str_replace($CFG->wwwroot . '/draftfile.php/', '', $image_src);
+            [$context_id, $component, $filearea, $itemid, $filename] = explode('/', $image_src);
+            $real_file = get_file_storage()->get_file($context_id, $component, $filearea, $itemid, '/', $filename);
+
+            if (!$real_file) {
+                throw new coding_exception("The image with URL {$image_src} doesn't seem to exist.");
+            }
+
+            return $image;
+        }
+
+        return null;
+    }
+
+    /**
+     * Find the given embedded image within the parent node and check if they are the same (via filesize)
+     *
+     * @param NodeElement $parent
+     * @param string $file_name
+     * @return NodeElement|null Returns the image node if they match.
+     * @throws coding_exception Thrown if the file sizes don't match
+     */
+    private function find_and_compare_file_attachment(NodeElement $parent, string $file_name): ?NodeElement {
+        $attachments = $parent->findAll('css', '.tui-attachmentNode');
+        foreach ($attachments as $attachment) {
+            $file_name_node = $attachment->find('css', '.tui-attachmentNode__filename');
+            if ($file_name_node === null) {
+                throw new coding_exception('filename not present on weka attachment node');
+            }
+
+            if ($file_name_node->getText() === $file_name) {
+                return $attachment;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @Then /^I (should|should not) see a weka (embedded image|attachment) with the name "([^"]*)" in the "([^"]*)" "([^"]*)"$/
+     *
+     * @param string $should
+     * @param string $embedded_type
+     * @param string $file_name
+     * @param string $locator
+     * @param string $selector
+     */
+    public function i_see_weka_embedded_in(
+        string $should,
+        string $embedded_type,
+        string $file_name,
+        string $locator,
+        string $selector
+    ): void {
+        \behat_hooks::set_step_readonly(true);
+
+        $should_exist = $should === 'should';
+
+        $parent = $this->find(...$this->transform_selector($selector, $locator));
+        if ($parent === null) {
+            throw new ExpectationException("Couldn't find the {$locator} element.", $this->getSession());
+        }
+
+        if ($embedded_type === 'embedded image') {
+            $result = $this->find_and_compare_embedded_image($parent, $file_name);
+        } else if ($embedded_type === 'attachment') {
+            $result = $this->find_and_compare_file_attachment($parent, $file_name);
+        } else {
+            throw new coding_exception("'$embedded_type' is not supported by " . __FUNCTION__);
+        }
+
+        if ($should_exist && $result === null) {
+            throw new ExpectationException("No files matching {$file_name} found.", $this->getSession());
+        } else if (!$should_exist && $result !== null) {
+            throw new ExpectationException("File {$file_name} exists when it shouldn't.", $this->getSession());
+        }
+    }
+
 }
