@@ -23,6 +23,17 @@ $CFG->perfdebug = 15;
 $CFG->debugdisplay = 1;
 ```
 
+### Disabling caching
+
+```php
+// For better performance, keep this off when only working on tui (Vue) files
+$CFG->themedesignermode = false;
+
+$CFG->cachejs = false;
+// Preferred method
+$CFG->forced_plugin_settings['totara_tui'] = ['cache_js' => false, 'cache_scss' => false, 'development_mode' => true];
+```
+
 ### Useful settings
 
 ```php
