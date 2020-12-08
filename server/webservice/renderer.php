@@ -370,6 +370,7 @@ class core_webservice_renderer extends plugin_renderer_base {
     public function detailed_description_html($params, array $parents = array()) {
         // retrieve the description of the description object
         $paramdesc = "";
+        $required = "";
         if (!empty($params->desc)) {
             $paramdesc .= html_writer::start_tag('span', array('style' => "color:#2A33A6"));
             if ($params->required == VALUE_REQUIRED) {
