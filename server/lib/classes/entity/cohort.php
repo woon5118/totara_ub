@@ -23,7 +23,6 @@
 
 namespace core\entity;
 
-use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\has_many;
 
@@ -89,5 +88,4 @@ class cohort extends entity implements expandable {
     public function members(): has_many {
         return $this->has_many(cohort_member::class, 'cohortid');
     }
-
 }

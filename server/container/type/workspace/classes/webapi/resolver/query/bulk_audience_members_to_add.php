@@ -25,9 +25,6 @@ namespace container_workspace\webapi\resolver\query;
 use container_workspace\interactor\workspace\interactor as workspace_interactor;
 use container_workspace\loader\member\audience_loader;
 use container_workspace\workspace;
-use core\entity\cohort_member;
-use core\entity\user_enrolment;
-use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -72,7 +69,7 @@ final class bulk_audience_members_to_add implements query_resolver, has_middlewa
         }
 
         // Get all users from given audiences who are not yet enrolled in the workspace
-        $members_to_add = audience_loader::get_bulk_members_to_add($workspace, $audience_ids);
+        $members_to_add = audience_loader::get_bulk_members_to_add_count($workspace, $audience_ids);
 
         return ['members_to_add' => $members_to_add];
     }

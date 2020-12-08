@@ -41,17 +41,44 @@ final class audience_loader {
     }
 
     /**
+     * Returns users who are members of the given audiences but not yet enrolled in the workspace
+     *
+     * @param workspace $workspace
+     * @param array $audience_ids
+     *
+     * @return int[] the user ids of unenrolled members.
+     */
+    public static function get_bulk_members_to_add(workspace $workspace, array $audience_ids): array {
+        return self::unenrolled_member_query($workspace, $audience_ids)
+            ->get()
+            ->pluck('userid');
+    }
+
+    /**
      * Returns number of users who are members of the given audiences but not yet enrolled in the workspace
      *
      * @param workspace $workspace
      * @param array $audience_ids
      * @return int
      */
-    public static function get_bulk_members_to_add(workspace $workspace, array $audience_ids): int {
+    public static function get_bulk_members_to_add_count(workspace $workspace, array $audience_ids): int {
+        return self::unenrolled_member_query($workspace, $audience_ids)->count();
+    }
+
+    /**
+     * Formulates the ORM builder to retrieve the cohort members who are not
+     * members in a workspace.
+     *
+     * @param workspace $workspace
+     * @param array $audience_ids
+     *
+     * @return builder the builder.
+     */
+    private static function unenrolled_member_query(workspace $workspace, array $audience_ids): builder {
         global $CFG;
         require_once("{$CFG->dirroot}/lib/enrollib.php");
 
-        $builder = builder::table(cohort_member::TABLE)
+        return builder::table(cohort_member::TABLE)
             ->as('cm')
             ->select_raw('DISTINCT cm.userid')
             ->where_not_exists(
@@ -63,10 +90,5 @@ final class audience_loader {
                     ->where_field('userid', 'cm.userid')
             )
             ->where('cohortid', $audience_ids);
-
-        $result = $builder->count();
-
-        return $result;
     }
-
 }

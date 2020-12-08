@@ -46,4 +46,11 @@ final class enrol_exception extends \moodle_exception {
     public static function on_manual_enrol(): enrol_exception {
         return new static('error:manual_enrol');
     }
+
+    /**
+     * @return enrol_exception
+     */
+    public static function on_cohort_enrol_permission(): enrol_exception {
+        return new static('error:cohort_enrol_permission');
+    }
 }

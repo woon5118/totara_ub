@@ -258,6 +258,7 @@ $string['error:add_members'] = "Cannot add members to the workspace";
 $string['error:bulk_add_audiences'] = 'Cannot add members via given audience(s).';
 $string['error:cancel_member_request'] = 'Cannot cancel the member request';
 $string['error:decline_member_request'] = 'Cannot decline the member request for user {$a}';
+$string['error:cohort_enrol_permission'] = 'User does not have permission to enrol cohort members into workspace';
 $string['error:copy_to_clipboard'] = 'Cannot copy to the clipboard';
 $string['error:create'] = 'Cannot create a workspace';
 $string['error:create_discussion'] = 'Cannot create a discussion for workspace';

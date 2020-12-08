@@ -24,6 +24,7 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\interactor\workspace\interactor as workspace_interactor;
+use container_workspace\task\bulk_add_workspace_members_adhoc_task;
 use container_workspace\workspace;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
@@ -60,7 +61,7 @@ final class add_bulk_audience_members implements mutation_resolver, has_middlewa
             throw new \moodle_exception('invalid_workspace', 'container_workspace');
         }
 
-        // TODO: Schedule adhoc task from TL-TL-28826
+        bulk_add_workspace_members_adhoc_task::enqueue($workspace_id, $audience_ids);
 
         return ['workspace' => $workspace];
     }

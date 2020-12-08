@@ -22,11 +22,14 @@
  */
 namespace container_workspace\member;
 
+use container_workspace\exception\enrol_exception;
 use container_workspace\loader\member\loader;
+use container_workspace\loader\member\audience_loader;
 use container_workspace\query\member\query;
 use container_workspace\workspace;
 use container_workspace\interactor\workspace\interactor as workspace_interactor;
 use container_workspace\interactor\member\interactor as member_interactor;
+use core\collection;
 use core\orm\query\builder;
 use core\pagination\offset_cursor;
 
@@ -113,5 +116,37 @@ class member_handler {
         }
 
         $member->delete($this->actor_id);
+    }
+
+    /**
+     * Assigns the members of cohorts to a specified workspace.
+     *
+     * @param workspace workspace_id indicates the workspace to which to add members.
+     * @param collection cohort_ids list of cohorts from which to draw members.
+     *
+     * @return member[]|collection the newly added members in the workspace.
+     */
+    public function add_workspace_members_from_cohorts(workspace $workspace, collection $cohort_ids): collection {
+        $interactor = new workspace_interactor($workspace, $this->actor_id);
+        if (!($interactor->can_manage()
+            || $interactor->is_owner())
+            || !$interactor->can_add_audiences()
+        ) {
+            throw enrol_exception::on_cohort_enrol_permission();
+        }
+
+        $transaction = builder::get_db()->start_delegated_transaction();
+        $new_members = audience_loader::get_bulk_members_to_add($workspace, $cohort_ids->all());
+
+        $added_members = collection::new($new_members)
+            ->map(
+                function (int $user_id) use ($workspace): member {
+                    return member::added_to_workspace($workspace, $user_id);
+                }
+            );
+
+        $transaction->allow_commit();
+
+        return $added_members;
     }
 }

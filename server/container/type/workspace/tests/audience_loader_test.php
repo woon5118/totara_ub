@@ -23,11 +23,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use container_workspace\workspace;
 use container_workspace\loader\member\audience_loader;
-use container_workspace\webapi\resolver\query\bulk_audience_members_to_add;
-use core\orm\query\builder;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
+/**
+ * @group container_workspace
+ */
 class container_workspace_audience_loader_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;
@@ -84,41 +86,55 @@ class container_workspace_audience_loader_testcase extends advanced_testcase {
         $workspace_generator->add_member($workspace1, $user4->id);
         $workspace_generator->add_member($workspace1, $user6->id);
 
-        $to_add = audience_loader::get_bulk_members_to_add($workspace1, [$cohort1->id, $cohort2->id]);
-        $this->assertEquals(3, $to_add);
+        $cohort_ids = [$cohort1->id, $cohort2->id];
+        $expected = [$user2->id, $user3->id, $user5->id];
+        $this->assert_cohort_members_to_add_to_workspace($workspace1, $cohort_ids, $expected);
 
         $workspace_generator->add_member($workspace1, $user2->id);
-
-        $to_add = audience_loader::get_bulk_members_to_add($workspace1, [$cohort1->id, $cohort2->id]);
-        $this->assertEquals(2, $to_add);
+        $expected = [$user3->id, $user5->id];
+        $this->assert_cohort_members_to_add_to_workspace($workspace1, $cohort_ids, $expected);
 
         $workspace_generator->add_member($workspace1, $user3->id);
-
-        $to_add = audience_loader::get_bulk_members_to_add($workspace1, [$cohort1->id, $cohort2->id]);
-        $this->assertEquals(1, $to_add);
+        $expected = [$user5->id];
+        $this->assert_cohort_members_to_add_to_workspace($workspace1, $cohort_ids, $expected);
 
         $workspace_generator->add_member($workspace1, $user5->id);
-
-        $to_add = audience_loader::get_bulk_members_to_add($workspace1, [$cohort1->id, $cohort2->id]);
-        $this->assertEquals(0, $to_add);
+        $expected = [];
+        $this->assert_cohort_members_to_add_to_workspace($workspace1, $cohort_ids, $expected);
 
         // Now try with an empty cohort
-
-        $to_add = audience_loader::get_bulk_members_to_add($workspace1, [$cohort3->id]);
-        $this->assertEquals(0, $to_add);
+        $cohort_ids = [$cohort3->id];
+        $expected = [];
+        $this->assert_cohort_members_to_add_to_workspace($workspace1, $cohort_ids, $expected);
 
         cohort_add_member($cohort3->id, $user4->id);
         cohort_add_member($cohort3->id, $user6->id);
-
-        $to_add = audience_loader::get_bulk_members_to_add($workspace1, [$cohort3->id]);
-        $this->assertEquals(0, $to_add);
+        $this->assert_cohort_members_to_add_to_workspace($workspace1, $cohort_ids, $expected);
 
         // Now add one more and try again
 
         cohort_add_member($cohort3->id, $user7->id);
-
-        $to_add = audience_loader::get_bulk_members_to_add($workspace1, [$cohort3->id]);
-        $this->assertEquals(1, $to_add);
+        $expected = [$user7->id];
+        $this->assert_cohort_members_to_add_to_workspace($workspace1, $cohort_ids, $expected);
     }
 
+    /**
+     * Verifies the cohort members that can added as members to a workspace.
+     *
+     * @param workspace $workspace the workspace to check.
+     * @param $cohort_id cohorts whose members are to be added to the workspace.
+     * @param int[] $potential_members cohort members that can be added to the
+     *        workspace.
+     */
+    private function assert_cohort_members_to_add_to_workspace(
+        workspace $workspace,
+        array $cohort_ids,
+        array $potential_members
+    ): void {
+        $count = audience_loader::get_bulk_members_to_add_count($workspace, $cohort_ids);
+        $this->assertCount($count, $potential_members);
+
+        $to_add_members = audience_loader::get_bulk_members_to_add($workspace, $cohort_ids);
+        $this->assertEqualsCanonicalizing($to_add_members, $potential_members);
+    }
 }
