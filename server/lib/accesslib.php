@@ -3925,7 +3925,7 @@ function get_default_contextlevels($rolearchetype) {
         'coursecreator'  => array(CONTEXT_SYSTEM, CONTEXT_COURSECAT),
         'editingteacher' => array(CONTEXT_COURSE, CONTEXT_MODULE),
         'teacher'        => array(CONTEXT_COURSE, CONTEXT_MODULE),
-        'student'        => array(CONTEXT_COURSE, CONTEXT_MODULE),
+        'student'        => array(CONTEXT_PROGRAM, CONTEXT_COURSE, CONTEXT_MODULE),
         'staffmanager'   => array(CONTEXT_SYSTEM, CONTEXT_USER),
         'assessor'       => array(CONTEXT_COURSE, CONTEXT_MODULE),
         'guest'          => array(),

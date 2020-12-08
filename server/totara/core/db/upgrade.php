@@ -1388,5 +1388,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020081701, 'totara', 'core');
     }
 
+    if ($oldversion < 2020100108) {
+        // Make sure Learner role assignments in programs are not reported as unsupported.
+        $role = $DB->get_record('role', ['shortname' => 'student']);
+        if ($role) {
+            if (!$DB->record_exists('role_context_levels', ['roleid' => $role->id, 'contextlevel' => CONTEXT_PROGRAM])) {
+                $record = new stdClass();
+                $record->roleid = $role->id;
+                $record->contextlevel = CONTEXT_PROGRAM;
+                $DB->insert_record('role_context_levels', $record);
+            }
+        }
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100108, 'totara', 'core');
+    }
+
     return true;
 }
