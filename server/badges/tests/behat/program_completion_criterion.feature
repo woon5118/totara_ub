@@ -64,14 +64,14 @@ Feature: Verify badge issue based on program completion criterion.
     And I switch to "Content" tab
     And I press "Add"
     And I follow "Miscellaneous"
-    And I follow "Course 1"
+    And I follow "Course 2"
     And I click on "Ok" "button" in the "Add course set" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
     Then I should see "Caution: Program is live"
 
-    # Add site level badge.
+    # Add site level badge that requires just one of the selected programs.
     When I navigate to "Manage badges" node in "Site administration > Badges"
     And I click on "Add a new badge" "button"
     And I set the following fields to these values:
@@ -97,7 +97,7 @@ Feature: Verify badge issue based on program completion criterion.
     Then I should see "This badge is currently available to users. Disable access to make any changes."
     And I log out
 
-  Scenario: Verify badge is issued when program is completed.
+  Scenario: Verify badge is issued when one program is completed.
 
     Given I log in as "learner1"
     When I am on "Course 1" course homepage
@@ -105,6 +105,57 @@ Feature: Verify badge issue based on program completion criterion.
     And I follow "Profile" in the user menu
     Then I should see "Program Badge"
     And I log out
+
+  Scenario: Verify badge is issued when all programs are completed.
+    Given I log in as "admin"
+    # Add another site level badge that requires all programs.
+    And I navigate to "Manage badges" node in "Site administration > Badges"
+    And I click on "Add a new badge" "button"
+    And I set the following fields to these values:
+      | Name        | Program ALL Badge             |
+      | Description | Program ALL badge description |
+    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
+    And I press "Create badge"
+    And I should see "Criteria for this badge have not been set up yet."
+    # Add badge program criteria.
+    And I set the field "Add badge criteria" to "Program completion"
+    # Redirects user to select program.
+    And I set the field "Qualifying program(s)" to "Program 1,Program 2"
+    And I expand all fieldsets
+    And I set the field "All of the selected programs have been completed" to "1"
+    And I press "Save"
+    And I should see "Badge criteria successfully created"
+    # Enable the badge.
+    And I press "Enable access"
+    And I should see "Changes in badge access"
+    And I should see "This will make your badge visible to users and allow them to start earning it."
+    # Confirm enabling.
+    And I press "Continue"
+    And I should see "This badge is currently available to users. Disable access to make any changes."
+    And I log out
+
+    When I log in as "learner1"
+    And I follow "Profile" in the user menu
+    And I should not see "Program ALL Badge"
+    And I should not see "Program Badge"
+    And I am on "Course 1" course homepage
+    And I set the field "Manual completion of Click to complete course" to "1"
+    And I follow "Profile" in the user menu
+    And I should not see "Program ALL Badge"
+    And I should see "Program Badge"
+    And I am on "Course 2" course homepage
+    And I set the field "Manual completion of Click to complete course" to "1"
+    And I follow "Profile" in the user menu
+    Then I should see "Program ALL Badge"
+    And I should see "Program Badge"
+    And I log out
+
+    # Just make sure there are no errors or changes.
+    When I run the scheduled task "\core\task\badges_cron_task"
+    And I log in as "learner1"
+    And I follow "Profile" in the user menu
+    Then I should see "Program ALL Badge"
+    And I should see "Program Badge"
 
   Scenario: Verify program badge can still be enabled and issued when multiple criteria is only partially available.
 
@@ -133,7 +184,7 @@ Feature: Verify badge issue based on program completion criterion.
     # Login as a learner and complete the course required
     # to complete the program and receive the badge.
     When I log in as "learner1"
-    And I am on "Course 1" course homepage
+    And I am on "Course 2" course homepage
     And I set the field "Manual completion of Click to complete course" to "1"
     And I follow "Profile" in the user menu
     # The bagde has been issued

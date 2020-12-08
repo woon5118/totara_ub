@@ -238,22 +238,42 @@ class award_criteria_program extends award_criteria {
         // Build the joins and where SQL required to retrieve
         // a list of newly qualifying users who have met program
         // completion criteria.
-        foreach ($this->params as $param) {
-            $field_param = $DB->get_unique_param('program');
-            $table_alias = 'pc' . preg_replace('/.*(\d+)$/', '\\1', $field_param);
-            $join .= 'JOIN {prog_completion} ' . $table_alias .' ON u.id = ' . $table_alias . '.userid AND ' . $table_alias . '.status = ' . STATUS_PROGRAM_COMPLETE . ' AND ' . $table_alias . '.timecompleted > 0 ';
-            $where .= $this->method == BADGE_CRITERIA_AGGREGATION_ANY ? ' OR' : ' AND';
-            $where .= ' ' . $table_alias . '.programid = :' . $field_param;
-            $params[$field_param] = $param['program'];
+
+        if (!$this->params) {
+            // Invalid configuration.
+            return array('', "AND 1=0", []);
         }
 
-        // If this aggregation is for ANY audience then we need to
-        // manipulate $where to make sure the SQL is correct.
+        $complete = STATUS_PROGRAM_COMPLETE;
+
         if ($this->method == BADGE_CRITERIA_AGGREGATION_ANY) {
-            $where = 'AND (' . substr ($where, 4) . ')';
+            $ta = $DB->get_unique_param('pc');
+            $join = "JOIN {prog_completion} $ta ON u.id = $ta.userid AND $ta.status = $complete AND $ta.timecompleted > 0";
+            $wheres = [];
+            foreach ($this->params as $param) {
+                $programid = intval($param['program']);
+                $wheres[] = "$ta.programid = $programid";
+            }
+            $where = implode(" OR ", $wheres);
+
+        } else if ($this->method == BADGE_CRITERIA_AGGREGATION_ALL) {
+            $joins = [];
+            $wheres = [];
+            foreach ($this->params as $param) {
+                $ta = $DB->get_unique_param('pc');
+                $programid = intval($param['program']);
+                $joins[] = "JOIN {prog_completion} $ta ON u.id = $ta.userid AND $ta.status = $complete AND $ta.timecompleted > 0";
+                $wheres[] = "$ta.programid = $programid";
+            }
+            $join = implode("\n", $joins);
+            $where = implode(" AND ", $wheres);
+
+        } else {
+            // Invalid configuration.
+            return array('', "AND 1=0", []);
         }
 
-        return array($join, $where, $params);
+        return array($join, "AND ($where)", []);
     }
 
     /**
