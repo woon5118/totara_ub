@@ -31,7 +31,7 @@ Feature: Delete article
     And I click on "Actions" "button"
     And I should see "Delete"
     And I click on "Delete" "link"
-    And I press "Yes"
+    And I confirm the tui confirmation modal
     Then I should not see "Test Article 1"
     And I should see "Test Article 2"
 

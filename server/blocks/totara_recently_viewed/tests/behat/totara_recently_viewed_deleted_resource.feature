@@ -41,7 +41,7 @@ Feature: Test that the dashboard does not crash when a viewed resource is delete
     And I click on "Actions" "button"
     And I should see "Delete"
     And I click on "Delete" "link"
-    And I press "Yes"
+    And I confirm the tui confirmation modal
     And I am on "Dashboard" page
 
     Then I should not see "Test Article 1" in the ".block-totara-recently-viewed" "css_element"

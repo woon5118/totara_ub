@@ -127,7 +127,6 @@ Feature: General behat test for discussion feature within a workspace
     Then I should see "This is discussion 101"
     And I click on "Discussion's actions" "button"
     When I click on "Delete" "link" in the ".tui-workspaceDiscussionCard" "css_element"
-    Then I should see "Are you sure?"
-    And I should see "Confirm"
-    When I click on "Confirm" "button"
+    Then I should see "Delete workspace?"
+    And I confirm the tui confirmation modal
     Then I should not see "This is discussion 101"

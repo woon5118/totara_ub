@@ -40,7 +40,7 @@ Feature: Increase visibility of playlist
     Then the "Done" "button" should be enabled
 
     When I click on "Done" "button"
-    Then ".tui-engageWarningModal__title" "css_element" should not exist
+    Then ".tui-modalContent__header-title" "css_element" should not exist
     And I should see "Everyone can view" in the ".tui-engageAccessDisplay__accessIcon" "css_element"
 
   # A playlist with at a private resource should give warning message.

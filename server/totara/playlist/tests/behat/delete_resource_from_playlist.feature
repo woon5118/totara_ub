@@ -40,5 +40,5 @@ Feature: Delete resource from playlist
     And I click on ".tui-iconBtn" "css_element" in the ".tui-dropdown" "css_element"
     And I should see "Delete"
     And I click on ".tui-dropdown__content" "css_element"
-    And I press "Yes"
+    And I confirm the tui confirmation modal
     Then I should not see "Test Article 1"

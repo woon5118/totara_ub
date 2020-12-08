@@ -4,6 +4,8 @@ information provided here is intended especially for developers.
 === 13.3 ===
 * Update InlineEditing.vue to pass through prop "focusButton" to tui ButtonIcon.vue
   * Template changes
+* Removed modal/EngageWarningModal.vue component
+  * use core ConfirmationModal instead
 
 === 13.2 ===
 

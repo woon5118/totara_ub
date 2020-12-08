@@ -38,16 +38,16 @@
     </MiniProfileCard>
 
     <template v-slot:modal>
-      <ModalPresenter
+      <ConfirmationModal
         :open="openModalFromAction"
-        @request-close="openModalFromAction = false"
+        :loading="deleting"
+        :title="$str('deletewarningtitle', 'engage_article')"
+        :confirm-button-text="$str('delete', 'core')"
+        @confirm="handleDelete"
+        @cancel="openModalFromAction = false"
       >
-        <EngageWarningModal
-          :title="$str('deletewarningtitle', 'engage_article')"
-          :message-content="$str('deletewarningmsg', 'engage_article')"
-          @delete="handleDelete"
-        />
-      </ModalPresenter>
+        {{ $str('deletewarningmsg', 'engage_article') }}
+      </ConfirmationModal>
     </template>
 
     <template v-slot:overview>
@@ -124,12 +124,11 @@
 <script>
 import apolloClient from 'tui/apollo_client';
 import Loader from 'tui/components/loading/Loader';
-import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import SidePanelCommentBox from 'totara_comment/components/box/SidePanelCommentBox';
 import AccessDisplay from 'totara_engage/components/sidepanel/access/AccessDisplay';
 import AccessSetting from 'totara_engage/components/sidepanel/access/AccessSetting';
 import EngageSidePanel from 'totara_engage/components/sidepanel/EngageSidePanel';
-import EngageWarningModal from 'totara_engage/components/modal/EngageWarningModal';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import MediaSetting from 'totara_engage/components/sidepanel/media/MediaSetting';
 import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
@@ -151,10 +150,9 @@ export default {
     AccessSetting,
     ArticlePlaylistBox,
     EngageSidePanel,
-    EngageWarningModal,
+    ConfirmationModal,
     Loader,
     MediaSetting,
-    ModalPresenter,
     Related,
     SidePanelCommentBox,
     MiniProfileCard,
@@ -186,6 +184,7 @@ export default {
   data() {
     return {
       article: {},
+      deleting: false,
       submitting: false,
       openModalFromButtonLabel: false,
       openModalFromAction: false,
@@ -279,6 +278,7 @@ export default {
     },
 
     handleDelete() {
+      this.deleting = true;
       this.$apollo
         .mutate({
           mutation: deleteArticle,

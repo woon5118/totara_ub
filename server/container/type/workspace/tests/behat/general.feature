@@ -56,7 +56,7 @@ Feature: Workspace general feature
     And I click on "Owner" "button"
     And I should see "Delete workspace"
     And I click on "Delete workspace" "link"
-    And I click on "Delete workspace" "button" in the ".tui-modalContent" "css_element"
+    And I confirm the tui confirmation modal
     And I should see "The workspace \"Workspace 101\" was deleted successfully"
 
   @javascript

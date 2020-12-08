@@ -19,15 +19,16 @@
 <template>
   <div class="tui-engageSurveySidePanel">
     <template v-if="!$apollo.loading">
-      <ModalPresenter
+      <ConfirmationModal
         :open="openModalFromAction"
-        @request-close="openModalFromAction = false"
+        :title="$str('deletewarningtitle', 'engage_survey')"
+        :confirm-button-text="$str('delete', 'core')"
+        :loading="deleting"
+        @confirm="handleDelete"
+        @cancel="openModalFromAction = false"
       >
-        <EngageWarningModal
-          :message-content="$str('deletewarningmsg', 'engage_survey')"
-          @delete="handleDelete"
-        />
-      </ModalPresenter>
+        {{ $str('deletewarningmsg', 'engage_survey') }}
+      </ConfirmationModal>
 
       <MiniProfileCard
         :no-border="true"
@@ -98,8 +99,7 @@
 <script>
 import AccessSetting from 'totara_engage/components/sidepanel/access/AccessSetting';
 import AccessDisplay from 'totara_engage/components/sidepanel/access/AccessDisplay';
-import ModalPresenter from 'tui/components/modal/ModalPresenter';
-import EngageWarningModal from 'totara_engage/components/modal/EngageWarningModal';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import MediaSetting from 'totara_engage/components/sidepanel/media/MediaSetting';
 import apolloClient from 'tui/apollo_client';
 import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
@@ -118,8 +118,7 @@ import createReview from 'totara_reportedcontent/graphql/create_review';
 export default {
   components: {
     AccessDisplay,
-    ModalPresenter,
-    EngageWarningModal,
+    ConfirmationModal,
     AccessSetting,
     MediaSetting,
     MiniProfileCard,
@@ -150,6 +149,7 @@ export default {
   data() {
     return {
       survey: {},
+      deleting: false,
       submitting: false,
       openModalFromButtonLabel: false,
       openModalFromAction: false,
@@ -200,6 +200,7 @@ export default {
 
   methods: {
     handleDelete() {
+      this.deleting = true;
       this.$apollo
         .mutate({
           mutation: deleteSurvey,
@@ -322,6 +323,7 @@ export default {
 <lang-strings>
   {
     "engage_survey": [
+      "deletewarningtitle",
       "deletewarningmsg",
       "likesurvey",
       "resharesurvey",

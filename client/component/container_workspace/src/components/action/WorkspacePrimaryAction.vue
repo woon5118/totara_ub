@@ -35,17 +35,19 @@
       />
     </ModalPresenter>
 
-    <ModalPresenter
+    <ConfirmationModal
       :open="modal.deleteConfirm"
-      @request-close="modal.deleteConfirm = false"
+      :title="$str('delete_warning_title', 'container_workspace')"
+      :confirm-button-text="$str('delete', 'core')"
+      :loading="deleting"
+      @confirm="handleDelete"
+      @cancel="modal.deleteConfirm = false"
     >
-      <WorkspaceWarningModal
-        :title="$str('delete_warning_title', 'container_workspace')"
-        :message-content="$str('delete_warning_msg', 'container_workspace')"
-        :confirm-button-text="$str('delete_workspace', 'container_workspace')"
-        @confirm="handleDelete"
+      <p
+        class="tui-workspaceWarningModal__content"
+        v-html="$str('delete_warning_msg', 'container_workspace')"
       />
-    </ModalPresenter>
+    </ConfirmationModal>
 
     <ModalPresenter :open="modal.edit" @request-close="modal.edit = false">
       <WorkspaceEditModal
@@ -237,6 +239,7 @@
 
 <script>
 import Button from 'tui/components/buttons/Button';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import WorkspaceWarningModal from 'container_workspace/components/modal/WorkspaceWarningModal';
 import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
@@ -263,6 +266,7 @@ import { PUBLIC, PRIVATE, HIDDEN } from 'container_workspace/access';
 export default {
   components: {
     Button,
+    ConfirmationModal,
     ModalPresenter,
     WorkspaceWarningModal,
     LoadingButton,
@@ -309,6 +313,7 @@ export default {
     return {
       interactor: {},
       innerSubmitting: false,
+      deleting: false,
       modal: {
         leaveConfirm: false,
         deleteConfirm: false,
@@ -395,6 +400,7 @@ export default {
     },
 
     async handleDelete() {
+      this.deleting = true;
       if (this.innerSubmitting) {
         return;
       }

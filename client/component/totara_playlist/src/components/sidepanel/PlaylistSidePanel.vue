@@ -33,16 +33,16 @@
     </template>
 
     <template v-slot:modal>
-      <ModalPresenter
+      <ConfirmationModal
         :open="modal.confirm"
-        @request-close="modal.confirm = false"
+        :title="$str('deletewarningtitle', 'totara_playlist')"
+        :confirm-button-text="$str('delete', 'core')"
+        :loading="deleting"
+        @confirm="handleDelete"
+        @cancel="modal.confirm = false"
       >
-        <EngageWarningModal
-          :title="$str('deletewarningtitle', 'totara_playlist')"
-          :message-content="$str('deletewarningmsg', 'totara_playlist')"
-          @delete="handleDelete"
-        />
-      </ModalPresenter>
+        {{ $str('deletewarningmsg', 'totara_playlist') }}
+      </ConfirmationModal>
     </template>
 
     <template v-slot:overview>
@@ -135,8 +135,7 @@ import AccessSetting from 'totara_engage/components/sidepanel/access/AccessSetti
 import AccessDisplay from 'totara_engage/components/sidepanel/access/AccessDisplay';
 import PageLoader from 'tui/components/loading/Loader';
 import PlaylistSummary from 'totara_playlist/components/sidepanel/PlaylistSummary';
-import ModalPresenter from 'tui/components/modal/ModalPresenter';
-import EngageWarningModal from 'totara_engage/components/modal/EngageWarningModal';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import MediaSetting from 'totara_engage/components/sidepanel/media/MediaSetting';
 import PlaylistStarRating from 'totara_playlist/components/sidepanel/PlaylistStarRating';
 import Related from 'totara_playlist/components/sidepanel/Related';
@@ -153,7 +152,6 @@ import engageAdvancedFeatures from 'totara_engage/graphql/advanced_features';
 
 export default {
   components: {
-    EngageWarningModal,
     EngageSidePanel,
     SidePanelCommentBox,
     AccessSetting,
@@ -161,7 +159,7 @@ export default {
     PlaylistSummary,
     PlaylistStarRating,
     PageLoader,
-    ModalPresenter,
+    ConfirmationModal,
     MediaSetting,
     Related,
     MiniProfileCard,
@@ -194,6 +192,7 @@ export default {
     return {
       playlist: {},
       submitting: false,
+      deleting: false,
       modal: {
         confirm: false,
       },
@@ -283,6 +282,7 @@ export default {
     },
 
     handleDelete() {
+      this.deleting = true;
       this.$apollo
         .mutate({
           mutation: deletePlaylist,
