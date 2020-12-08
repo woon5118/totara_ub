@@ -15,14 +15,14 @@ Feature: Manage performance activity multiple choice-answers elements
     And I navigate to manage perform activity content page
     And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
-      | rawTitle   | Question 1   |
+      | rawTitle          | Question 1   |
       | options[0][value] | Option one   |
       | options[1][value] | Option two   |
-      | identifier | Identifier 1 |
+      | identifier        | Identifier 1 |
     And I save the activity content element
     And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
-      | rawTitle   | Question 2   |
+      | rawTitle          | Question 2   |
       | options[0][value] | Option three |
       | options[1][value] | Option four  |
     And I save the activity content element
@@ -30,7 +30,7 @@ Feature: Manage performance activity multiple choice-answers elements
     And I add a "Multiple choice: multi-select" activity content element
     And I wait "5" seconds
     And I set the following fields to these values:
-      | rawTitle   | Question 3  |
+      | rawTitle          | Question 3  |
       | options[0][value] | Option five |
       | options[1][value] | Option six  |
     And I save the activity content element
@@ -50,12 +50,12 @@ Feature: Manage performance activity multiple choice-answers elements
     And I navigate to manage perform activity content page
     And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
-      | rawTitle   | Question 1 |
+      | rawTitle          | Question 1 |
       | options[0][value] | Option one |
       | options[1][value] | Option two |
     And I click multiple answers question add new option
     And I set the following fields to these values:
-      |options[2][value]        | Option three |
+      | options[2][value] | Option three |
     And I save the activity content element
     And I close the tui notification toast
     And I follow "Content (Activity one)"
@@ -70,7 +70,7 @@ Feature: Manage performance activity multiple choice-answers elements
     And I navigate to manage perform activity content page
     And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
-      | rawTitle   | Question 1 |
+      | rawTitle          | Question 1 |
       | options[0][value] | Option one |
       | options[1][value] | Option two |
     And I click multiple answers question add new option
@@ -95,32 +95,3 @@ Feature: Manage performance activity multiple choice-answers elements
     And I save the activity content element
     And I should see "Required"
     And I click on "Cancel" "button"
-
-  Scenario: Save required and optional multiple answers elements
-    Given I log in as "admin"
-    And I navigate to the manage perform activities page
-    And I click on "Activity one" "link"
-    Then I should see "0" in the "required" element summary of the activity section
-    And I should see "0" in the "optional" element summary of the activity section
-    And I should see "0" in the "other" element summary of the activity section
-    # Add multiple elements
-    And I navigate to manage perform activity content page
-    And I add a "Multiple choice: multi-select" activity content element
-    When I set the following fields to these values:
-      | rawTitle   | Question 1 |
-      | options[0][value] | Option one |
-      | options[1][value] | Option two |
-    And I click on the "responseRequired" tui checkbox
-    And I save the activity content element
-    Then I should see "Required"
-    And I add a "Multiple choice: multi-select" activity content element
-    When I set the following fields to these values:
-      | rawTitle   | Question 2 |
-      | options[0][value] | Option one |
-      | options[1][value] | Option two |
-    And I save the activity content element
-    When I close the tui notification toast
-    And I follow "Content (Activity one)"
-    Then I should see "1" in the "required" element summary of the activity section
-    And I should see "1" in the "optional" element summary of the activity section
-    And I should see "0" in the "other" element summary of the activity section

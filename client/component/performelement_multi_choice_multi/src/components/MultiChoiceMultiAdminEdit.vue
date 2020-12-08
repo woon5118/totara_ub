@@ -96,7 +96,15 @@
                 )
               "
               :validations="
-                v => [v.min(0), v.max(numberOfOptions), v.max(maxOptions)]
+                v =>
+                  minRequired
+                    ? [
+                        v.min(1),
+                        v.max(numberOfOptions),
+                        v.max(maxOptions),
+                        v.required(),
+                      ]
+                    : [v.min(1), v.max(numberOfOptions), v.max(maxOptions)]
               "
             />
             <InputSizedText>
@@ -113,7 +121,7 @@
             <FormNumber
               name="max"
               char-length="4"
-              :validations="v => [v.min(0), v.max(numberOfOptions)]"
+              :validations="v => [v.min(1), v.max(numberOfOptions)]"
               :aria-label="
                 $str(
                   'restriction_maximum_label',
@@ -188,6 +196,7 @@ export default {
       numberOfOptions: null,
       maxOptions: null,
       minRows: 2,
+      minRequired: this.isRequired,
       ready: false,
     };
   },
@@ -221,9 +230,10 @@ export default {
     /**
      * Provide validation values based on existing form inputs
      *
-     * @param {Object}
+     * @param values {Object}
      */
     updateValidationValues(values) {
+      this.minRequired = values.responseRequired;
       this.numberOfOptions = values.options.length;
       this.maxOptions = values.max ? values.max : values.options.length;
     },

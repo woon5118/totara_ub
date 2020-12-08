@@ -21,7 +21,7 @@ Feature: Adding, Updating, Removing activity elements.
       | rawTitle   | Question 1   |
       | identifier | Identifier 1 |
     And I save the activity content element
-    Then I should see "Element saved." in the tui success notification toast
+    Then I should see "Element saved" in the tui success notification toast
     When I close the tui notification toast
     And I add a "Text: Short response" activity content element
     Then the focused element is "[name=rawTitle]" "css_element"
@@ -36,7 +36,7 @@ Feature: Adding, Updating, Removing activity elements.
     When I set the following fields to these values:
       | rawTitle | Question 3 |
     And I save the activity content element
-    Then I should see "Element saved." in the tui success notification toast
+    Then I should see "Element saved" in the tui success notification toast
     When I close the tui notification toast
     And I follow "Content (Add Element Activity)"
     And I click on "Edit content elements" "link_or_button"

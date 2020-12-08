@@ -365,10 +365,9 @@ class behat_mod_perform extends behat_base {
 
     /**
      * @Given /^I should see perform "([^"]*)" question "([^"]*)" is saved with options "([^"]*)"$/
-     * @param $question_text
-     * @param $question_options
-     *
-     * @throws ExpectationException
+     * @param string $type
+     * @param string $question_text
+     * @param string $question_options
      */
     public function i_should_see_multiple_answers_question_is_saved_with_options(
         string $type,
@@ -376,15 +375,17 @@ class behat_mod_perform extends behat_base {
         string $question_options
     ): void {
         /** @var behat_mod_perform $behat_mod_perform */
-        $locator = ($type == 'checkbox') ? '.tui-checkbox__label' : '.tui-radio__label';
+        $locator = $type === 'checkbox' ? '.tui-checkbox__label' : '.tui-radio__label';
         $question = $this->find_admin_question_from_text($question_text);
         $options = $question->findAll('css', $locator);
-        $expected_options = explode(",", $question_options);
+        $expected_options = explode(',', $question_options);
+        $expected_options = array_map('trim', $expected_options);
+
         $actual_options = [];
         foreach ($options as $option) {
             $actual_options[] = trim($option->getText());
         }
-        if ($expected_options != $actual_options) {
+        if ($expected_options !== $actual_options) {
             throw new ExpectationException("Question {$question_text} not found with options {$question_options}", $this->getSession());
         }
     }
@@ -528,6 +529,62 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Then /^I should (|not )see "([^"]*)" in the perform activity question "([^"]*)"$/
+     * @param string $should_or_should_not
+     * @param string $expected_text
+     * @param string $question_text
+     */
+    public function i_should_see_in_the_perform_activity_question(
+        string $should_or_should_not,
+        string $expected_text,
+        string $question_text
+    ): void {
+        $should_contain_text = $should_or_should_not !== 'not ';
+        $question = $this->find_question_from_text($question_text);
+
+        if (!$should_contain_text && strpos($question->getText(), $expected_text) !== false) {
+            throw new ExpectationException("Text '$expected_text' was found in the question", $this->getSession());
+        }
+
+        if ($should_contain_text && strpos($question->getText(), $expected_text) === false) {
+            throw new ExpectationException("Text '$expected_text' was not found in the question", $this->getSession());
+        }
+    }
+
+    /**
+     * @Then /^I should (|not )see validation error "([^"]*)" in the perform activity question "([^"]*)"$/
+     * @param string $should_or_should_not
+     * @param string $expected_text
+     * @param string $question_text
+     */
+    public function i_should_see_validation_error_in_the_perform_activity_question(
+        string $should_or_should_not,
+        string $expected_text,
+        string $question_text
+    ): void {
+        $should_contain_text = $should_or_should_not !== 'not ';
+        $question = $this->find_question_from_text($question_text);
+
+        $errors = $question->findAll('css', '.tui-formFieldError');
+
+        $found = false;
+        foreach ($errors as $error) {
+            if (strpos($error->getText(), $expected_text) !== false) {
+                $found = true;
+                break;
+            }
+        }
+
+        if ($should_contain_text && !$found) {
+            new ExpectationException("Validation error '$expected_text' was found in the question", $this->getSession());
+        }
+
+        if (!$should_contain_text && $found) {
+            new ExpectationException("Validation error '$expected_text' was not found in the question", $this->getSession());
+        }
+    }
+
+    /**
      * @Then /^I should see perform activity relationship to user "([^"]*)" as an "([(internal)|(external)]*)" participant$/
      * @Then /^I should see perform activity relationship to user "([^"]*)"$/
      *
@@ -558,11 +615,11 @@ class behat_mod_perform extends behat_base {
         $node = $this->find_all('css', self::PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR)[$section_number - 1];
 
         if (!$should_contain_text && strpos($node->getText(), $expected_text) !== false) {
-            throw new ExpectationException("Sentence: '$expected_text' was found in the section", $this->getSession());
+            throw new ExpectationException("Text '$expected_text' was found in the section", $this->getSession());
         }
 
         if ($should_contain_text && strpos($node->getText(), $expected_text) === false) {
-            throw new ExpectationException("Sentence: '$expected_text' was not found in the section", $this->getSession());
+            throw new ExpectationException("Text '$expected_text' was not found in the section", $this->getSession());
         }
     }
 
@@ -1569,7 +1626,7 @@ class behat_mod_perform extends behat_base {
 
         switch ($title) {
             case 'Multiple choice: multi-select':
-                $this->fill_multi_choice_multi_admin_form_settings($element_setting_container);
+                $this->fill_multi_choice_multi_admin_form_settings($element_setting_container, $required);
                 break;
             case 'Rating scale: Numeric':
                 $this->fill_numeric_rating_scale_admin_form_settings($element_setting_container);
@@ -1608,7 +1665,7 @@ class behat_mod_perform extends behat_base {
         }
     }
 
-    private function fill_multi_choice_multi_admin_form_settings(NodeElement $settings_container): void {
+    private function fill_multi_choice_multi_admin_form_settings(NodeElement $settings_container, bool $required): void {
         $answer_0 = $settings_container->find('css', 'input[name="options[0][value]"]');
         $answer_0->focus();
         $answer_0->setValue('Choice 0');
@@ -1616,6 +1673,12 @@ class behat_mod_perform extends behat_base {
         $answer_1 = $settings_container->find('css', 'input[name="options[1][value]"]');
         $answer_1->focus();
         $answer_1->setValue('Choice 1');
+
+        if ($required) {
+            $min = $settings_container->find('css', 'input[name="min"]');
+            $min->focus();
+            $min->setValue('1');
+        }
     }
 
     private function fill_numeric_rating_scale_admin_form_settings(NodeElement $settings_container): void {

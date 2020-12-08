@@ -19,7 +19,7 @@ Feature: Manage performance activity static content
     And I type "I see trees of green, red roses too. I see them bloom for me and you. And I think to myself what a wonderful world." in the weka editor
     And I wait for the next second
     And I save the activity content element
-    Then I should see "Element saved."
+    Then I should see "Element saved"
     And I wait for pending js
     And I should see "I see them bloom for me and you."
     When I follow "Content (Add Element Activity)"
@@ -32,7 +32,7 @@ Feature: Manage performance activity static content
     And I type "Changed static content" in the weka editor
     And I wait for the next second
     And I save the activity content element
-    Then I should see "Element saved."
+    Then I should see "Element saved"
     And I should see "Changed static content"
     When I follow "Content (Add Element Activity)"
 
@@ -47,7 +47,7 @@ Feature: Manage performance activity static content
     And I type "I see trees of green, red roses too. I see them bloom for me and you. And I think to myself what a wonderful world." in the weka editor
     And I wait for the next second
     And I save the activity content element
-    Then I should see "Element saved."
+    Then I should see "Element saved"
     And I wait for pending js
     And I should see "I see them bloom for me and you."
     When I follow "Content (Add Element Activity)"

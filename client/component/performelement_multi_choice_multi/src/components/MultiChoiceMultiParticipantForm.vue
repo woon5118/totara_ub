@@ -66,7 +66,7 @@ export default {
     minSelectionRestriction() {
       const value = this.element.data.min;
 
-      if (value === '') {
+      if (!value) {
         return null;
       }
 
@@ -80,7 +80,7 @@ export default {
     maxSelectionRestriction() {
       const value = this.element.data.max;
 
-      if (value === '') {
+      if (!value) {
         return null;
       }
 
@@ -97,6 +97,20 @@ export default {
       }
 
       const strings = [];
+
+      if (
+        this.minSelectionRestriction !== null &&
+        this.maxSelectionRestriction !== null &&
+        this.minSelectionRestriction === this.maxSelectionRestriction
+      ) {
+        return [
+          this.$str(
+            'participant_restriction_min_max',
+            'performelement_multi_choice_multi',
+            this.minSelectionRestriction
+          ),
+        ];
+      }
 
       if (this.minSelectionRestriction !== null) {
         strings.push(
@@ -168,6 +182,11 @@ export default {
         return null;
       }
 
+      // If the question is not required skip this validation if no answers have been selected.
+      if (value.length === 0 && this.element && !this.element.is_required) {
+        return null;
+      }
+
       if (value.length < minRestriction || value.length > maxRestriction) {
         return this.$str(
           'participant_restriction_min_max',
@@ -192,6 +211,11 @@ export default {
       const minRestriction = this.minSelectionRestriction;
 
       if (minRestriction === null) {
+        return null;
+      }
+
+      // If the question is not required skip this validation if no answers have been selected.
+      if (value.length === 0 && this.element && !this.element.is_required) {
         return null;
       }
 
