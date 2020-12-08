@@ -59,11 +59,6 @@ if ($context->contextlevel == CONTEXT_SYSTEM) {
     $PAGE->set_heading($COURSE->fullname);
 }
 
-if (!empty($USER->tenantid)) {
-    // NOTE: no dynamic rules for tenant members, we have no way to restrict what they select.
-    redirect(new moodle_url('/cohort/index.php', ['contextid' => $context->id]));
-}
-
 require_capability('totara/cohort:managerules', $context);
 
 $canapproverules = true;  // TODO: maybe another capability check here?

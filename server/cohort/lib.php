@@ -701,7 +701,7 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
     $cohortcontext = context::instance_by_id($cohort->contextid, MUST_EXIST);
     $systemcontext = context_system::instance();
     $canmanage = has_capability('moodle/cohort:manage', $cohortcontext);
-    $canmanagerules = (empty($USER->tenantid) && has_capability('totara/cohort:managerules', $cohortcontext));
+    $canmanagerules = has_capability('totara/cohort:managerules', $cohortcontext);
     $cancreateplancohort = has_capability('totara/plan:cancreateplancohort', $systemcontext);
     $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext);
     $canassign = has_capability('moodle/cohort:assign', $cohortcontext);

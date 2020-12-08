@@ -57,7 +57,7 @@ if ($confirm && confirm_sesskey()) {
     \core\notification::success(get_string('successfullydeleted', 'totara_cohort'));
 
     $redirect = new \moodle_url('/cohort/index.php');
-    $redirect->param('contextid', $contextid);
+    $redirect->param('contextid', $cohort->contextid);
     $redirect->param('showall', $showall);
     redirect($redirect);
 }

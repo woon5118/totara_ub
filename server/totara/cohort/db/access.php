@@ -28,6 +28,6 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
-            // Do not add tenantdomainmanager here, we have no way to restrict them!
+            // NOTE: this is suitable for tenant members since Totara 13.3
         )
     ));

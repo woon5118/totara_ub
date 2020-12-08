@@ -56,8 +56,7 @@ class cohort_edit_form extends moodleform {
         $mform->addHelpButton('visible', 'visible', 'cohort');
         */
 
-        // NOTE: no dynamic rules for tenant members, we have no way to restrict what they select.
-        if (!$cohort->id and empty($USER->tenantid)) {
+        if (!$cohort->id) {
             $mform->addElement('select', 'cohorttype', get_string('type', 'totara_cohort'), cohort::getCohortTypes());
             $mform->addHelpButton('cohorttype', 'type', 'totara_cohort');
         }
