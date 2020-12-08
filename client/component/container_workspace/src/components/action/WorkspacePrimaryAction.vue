@@ -82,6 +82,18 @@
       @cancel="modal.audienceAdder = false"
     />
 
+    <ModalPresenter
+      :open="modal.confirmAudienceAdderSelection"
+      @request-close="cancelAddAudiences"
+    >
+      <WorkspaceAddAudienceModal
+        :loading="isAddingAudiences"
+        :users-from-audiences-to-add="usersFromAudiencesToAdd"
+        @confirm="confirmAddAudiences"
+        @cancel="cancelAddAudiences"
+      ></WorkspaceAddAudienceModal>
+    </ModalPresenter>
+
     <Loading v-if="$apollo.loading" />
 
     <template v-else>
@@ -262,11 +274,14 @@ import Loading from 'tui/components/icons/Loading';
 import { notify } from 'tui/notifications';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import WorkspaceAddAudienceModal from 'container_workspace/components/modal/WorkspaceAddAudienceModal';
 import WorkspaceEditModal from 'container_workspace/components/modal/WorkspaceEditModal';
 import WorkspaceUserAdder from 'container_workspace/components/adder/WorkspaceUserAdder';
 import WorkspaceTransferOwnerModal from 'container_workspace/components/modal/WorkspaceTransferOwnerModal';
 
 // GraphQL queries
+import addBulkAudienceMembers from 'container_workspace/graphql/add_bulk_audience_members';
+import bulkAudienceMembersToAdd from 'container_workspace/graphql/bulk_audience_members_to_add';
 import getWorkspaceInteractor from 'container_workspace/graphql/workspace_interactor';
 import joinWorkspace from 'container_workspace/graphql/join_workspace';
 import leaveWorkspace from 'container_workspace/graphql/leave_workspace';
@@ -289,6 +304,7 @@ export default {
     Loading,
     DropdownItem,
     Dropdown,
+    WorkspaceAddAudienceModal,
     WorkspaceEditModal,
     WorkspaceUserAdder,
     WorkspaceTransferOwnerModal,
@@ -336,12 +352,16 @@ export default {
       deleting: false,
       modal: {
         audienceAdder: false,
+        confirmAudienceAdderSelection: false,
         leaveConfirm: false,
         deleteConfirm: false,
         edit: false,
         adder: false,
         transferOwner: false,
       },
+      audiencesToAdd: [],
+      usersFromAudiencesToAdd: null,
+      isAddingAudiences: false,
     };
   },
 
@@ -642,9 +662,70 @@ export default {
      * @param selection
      */
     async onAudiencesSelectedFromAdder(selection) {
-      console.log(selection);
+      const { data: result } = await this.$apollo.query({
+        query: bulkAudienceMembersToAdd,
+        variables: {
+          input: {
+            workspace_id: this.workspaceId,
+            audience_ids: selection.ids,
+          },
+        },
+      });
 
-      this.modal.audienceAdder = false;
+      this.usersFromAudiencesToAdd = result.container_workspace_bulk_audience_members_to_add
+        ? result.container_workspace_bulk_audience_members_to_add.members_to_add
+        : 0;
+
+      this.audiencesToAdd = selection.ids;
+      this.modal.confirmAudienceAdderSelection = true;
+    },
+
+    cancelAddAudiences() {
+      this.modal.confirmAudienceAdderSelection = false;
+    },
+
+    /**
+     * Trigger mutation to add audiences members to workspace in bulk
+     *
+     * @returns {Promise<void>}
+     */
+    async confirmAddAudiences() {
+      // If there are no users to add just close the confirmation modal
+      if (this.usersFromAudiencesToAdd <= 0) {
+        this.modal.confirmAudienceAdderSelection = false;
+        return;
+      }
+
+      this.isAddingAudiences = true;
+
+      try {
+        await this.$apollo.mutate({
+          mutation: addBulkAudienceMembers,
+          variables: {
+            input: {
+              workspace_id: this.workspaceId,
+              audience_ids: this.audiencesToAdd,
+            },
+          },
+        });
+
+        notify({
+          message: this.$str(
+            'bulk_add_audiences_modal_confirmation_message',
+            'container_workspace'
+          ),
+          type: 'success',
+        });
+      } catch (e) {
+        notify({
+          message: this.$str('error:bulk_add_audiences', 'container_workspace'),
+          type: 'error',
+        });
+      } finally {
+        this.modal.confirmAudienceAdderSelection = false;
+        this.modal.audienceAdder = false;
+        this.isAddingAudiences = false;
+      }
     },
   },
 };
@@ -655,32 +736,34 @@ export default {
   "container_workspace": [
     "actions",
     "actions_label",
+    "add_members",
     "bulk_add_audiences",
-    "member",
+    "bulk_add_audiences_modal_confirmation_message",
+    "cancel_request",
+    "delete_warning_msg",
+    "delete_warning_title",
+    "delete_workspace",
+    "edit_space",
+    "error:add_members",
+    "error:bulk_add_audiences",
+    "error:cancel_member_request",
+    "error:delete_workspace",
+    "error:join_space",
+    "error:leave_space",
+    "error:request_to_join",
     "joined",
     "join_workspace",
     "join_space",
     "leave",
-    "delete_warning_title",
     "leave_workspace",
     "leave_workspace_message",
     "leave_workspace_message_not_public",
-    "error:join_space",
-    "error:leave_space",
-    "owner",
-    "delete_workspace",
-    "delete_warning_msg",
-    "error:delete_workspace",
-    "edit_space",
-    "request_to_join",
-    "cancel_request",
-    "error:request_to_join",
-    "error:cancel_member_request",
-    "add_members",
+    "member",
     "mute_notifications",
-    "unmute_notifications",
+    "owner",
+    "request_to_join",
     "transfer_ownership",
-    "error:add_members"
+    "unmute_notifications"
   ],
   "core": [
     "admin"

@@ -23,7 +23,9 @@
 
 namespace core\entity;
 
+use core\orm\collection;
 use core\orm\entity\entity;
+use core\orm\entity\relations\has_many;
 
 /**
  * @property int $contextid
@@ -47,6 +49,7 @@ use core\orm\entity\entity;
  * @property int $draftcollectionid
  * @property bool $broken
  * @property-read string $display_name
+ * @property-read collection|cohort_member[] $members
  *
  * @method static cohort_repository repository()
  *
@@ -77,4 +80,14 @@ class cohort extends entity implements expandable {
     protected function get_display_name_attribute() {
         return $this->name;
     }
+
+    /**
+     * Get cohort members relation
+     *
+     * @return has_many
+     */
+    public function members(): has_many {
+        return $this->has_many(cohort_member::class, 'cohortid');
+    }
+
 }

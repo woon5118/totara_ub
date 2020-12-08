@@ -101,6 +101,36 @@ enum container_workspace_member_request_status {
   CANCELLED
 }
 
+"""
+Input type for container_workspace_bulk_audience_members_to_add query
+"""
+input container_workspace_bulk_audience_members_to_add_input {
+  workspace_id: param_integer!
+  audience_ids: [param_integer!]!
+}
+
+"""
+Contains result of container_workspace_bulk_audience_members_to_add query
+"""
+type container_workspace_bulk_audience_members_to_add_result {
+  members_to_add: Int!
+}
+
+"""
+Input type for container_workspace_add_bulk_audience_members mutation
+"""
+input container_workspace_add_bulk_audience_members_input {
+  workspace_id: param_integer!
+  audience_ids: [param_integer!]!
+}
+
+"""
+Contains result of container_workspace_add_bulk_audience_members mutation
+"""
+type container_workspace_add_bulk_audience_members_result {
+  workspace: container_workspace_workspace!
+}
+
 extend type Query {
   """
   A query to get all the members of a workspace. Based on workspace's id.
@@ -163,6 +193,13 @@ extend type Query {
     """
     cursor: param_text
   ): container_workspace_cursor!
+
+  """
+  Query to fetch number of users which would be added via the given audiences to the workspace
+  """
+  container_workspace_bulk_audience_members_to_add(
+    input: container_workspace_bulk_audience_members_to_add_input!
+  ): container_workspace_bulk_audience_members_to_add_result!
 }
 
 extend type Mutation {
@@ -245,4 +282,11 @@ extend type Mutation {
     """
     user_id: param_integer!
   ): container_workspace_member!
+
+  """
+  Add members of given audience(s) to the workspace
+  """
+  container_workspace_add_bulk_audience_members(
+    input: container_workspace_add_bulk_audience_members_input!
+  ): container_workspace_add_bulk_audience_members_result!
 }
