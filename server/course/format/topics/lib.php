@@ -34,6 +34,9 @@ require_once($CFG->dirroot. '/course/format/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_topics extends format_base {
+    const COLLAPSE_STATE_AUTO = 0;
+    const COLLAPSE_STATE_COLLAPSED = 1;
+    const COLLAPSE_STATE_EXPANDED = 2;
 
     /**
      * Returns true if this course format uses sections
@@ -222,6 +225,7 @@ class format_topics extends format_base {
      * - coursedisplay
      * - numsections
      * - hiddensections
+     * - collapsiblesections
      *
      * @param bool $foreditform
      * @return array of options
@@ -231,20 +235,40 @@ class format_topics extends format_base {
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
             // Totara: Keep numsections.
-            $courseformatoptions = array(
-                'numsections' => array(
+            $courseformatoptions = [
+                'numsections' => [
                     'default' => $courseconfig->numsections,
                     'type' => PARAM_INT,
-                ),
-                'hiddensections' => array(
+                ],
+                'hiddensections' => [
                     'default' => $courseconfig->hiddensections,
                     'type' => PARAM_INT,
-                ),
-                'coursedisplay' => array(
+                ],
+                'coursedisplay' => [
                     'default' => $courseconfig->coursedisplay,
                     'type' => PARAM_INT,
-                ),
-            );
+                ],
+                'collapsiblesections' => [
+                    'default' => 0,
+                    'type' => PARAM_BOOL,
+                ],
+                'collapsiblesectionscollapseall' => [
+                    'default' => 0,
+                    'type' => PARAM_BOOL,
+                ],
+                'headercolor' => [
+                    'default' => 0,
+                    'type' => PARAM_BOOL,
+                ],
+                'headerbgcolor' => [
+                    'default' => '',
+                    'type' => PARAM_RAW,
+                ],
+                'headerfgcolor' => [
+                    'default' => '',
+                    'type' => PARAM_RAW,
+                ],
+            ];
         }
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
             // Totara: Keep maxsections and numsections.
@@ -253,44 +277,117 @@ class format_topics extends format_base {
             if (!isset($max) || !is_numeric($max)) {
                 $max = 52;
             }
-            $sectionmenu = array();
+            $sectionmenu = [];
             for ($i = 0; $i <= $max; $i++) {
                 $sectionmenu[$i] = "$i";
             }
-            $courseformatoptionsedit = array(
-                'numsections' => array(
+            $courseformatoptionsedit = [
+                'numsections' => [
                     'label' => new lang_string('numberweeks'),
                     'element_type' => 'select',
-                    'element_attributes' => array($sectionmenu),
-                ),
-                'hiddensections' => array(
+                    'element_attributes' => [$sectionmenu],
+                ],
+                'hiddensections' => [
                     'label' => new lang_string('hiddensections'),
                     'help' => 'hiddensections',
                     'help_component' => 'moodle',
                     'element_type' => 'select',
-                    'element_attributes' => array(
-                        array(
+                    'element_attributes' => [
+                        [
                             0 => new lang_string('hiddensectionscollapsed'),
                             1 => new lang_string('hiddensectionsinvisible')
-                        )
-                    ),
-                ),
-                'coursedisplay' => array(
+                        ]
+                    ],
+                ],
+                'coursedisplay' => [
                     'label' => new lang_string('coursedisplay'),
                     'element_type' => 'select',
-                    'element_attributes' => array(
-                        array(
+                    'element_attributes' => [
+                        [
                             COURSE_DISPLAY_SINGLEPAGE => new lang_string('coursedisplay_single'),
                             COURSE_DISPLAY_MULTIPAGE => new lang_string('coursedisplay_multi')
-                        )
-                    ),
+                        ]
+                    ],
                     'help' => 'coursedisplay',
                     'help_component' => 'moodle',
-                )
-            );
+                ],
+                'collapsiblesections' => [
+                    'label' => new lang_string('collapsible_sections', 'totara_core'),
+                    'element_type' => 'advcheckbox',
+                    'help' => 'collapsible_sections',
+                    'help_component' => 'totara_core',
+                ],
+                'collapsiblesectionscollapseall' => [
+                    'label' => new lang_string('collapsible_sections_collapse_all', 'totara_core'),
+                    'element_type' => 'advcheckbox',
+                ],
+                'headercolor' => [
+                    'label' => new lang_string('topic_header_color', 'totara_core'),
+                    'element_type' => 'advcheckbox',
+                    'help' => 'topic_header_color',
+                    'help_component' => 'totara_core',
+                ],
+                'headerbgcolor' => [
+                    'label' => new lang_string('topic_header_bg_color', 'totara_core'),
+                    'element_type' => 'colourpicker',
+                ],
+                'headerfgcolor' => [
+                    'label' => new lang_string('topic_header_text_color', 'totara_core'),
+                    'element_type' => 'colourpicker',
+                ],
+            ];
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }
         return $courseformatoptions;
+    }
+
+    /**
+     * Definitions of the additional options that this course format uses for sections
+     *
+     * Topics format uses the following options:
+     * - collapseddefault
+     *
+     * @param bool $foreditform
+     * @return array of options
+     */
+    public function section_format_options($foreditform = false) {
+        static $sectionformatoptions = false;
+        if ($sectionformatoptions === false) {
+            $sectionformatoptions = [];
+            if (!empty($this->get_course()->collapsiblesections)) {
+                $sectionformatoptions['collapseddefault'] = [
+                    'default' => self::COLLAPSE_STATE_AUTO,
+                    'type' => PARAM_INT,
+                ];
+            }
+            $sectionformatoptions['cssclasses'] = [
+                'default' => '',
+                'type' => PARAM_TEXT,
+            ];
+        }
+        if ($foreditform && !isset(reset($sectionformatoptions)['label'])) {
+            $sectionformatoptionsedit = [];
+            if (isset($sectionformatoptions['collapseddefault'])) {
+                $sectionmenu = [
+                    self::COLLAPSE_STATE_AUTO => new lang_string('default_collapse_state_auto', 'totara_core'),
+                    self::COLLAPSE_STATE_COLLAPSED => new lang_string('default_collapse_state_collapsed', 'totara_core'),
+                    self::COLLAPSE_STATE_EXPANDED => new lang_string('default_collapse_state_expanded', 'totara_core'),
+                ];
+                $sectionformatoptionsedit['collapseddefault'] = [
+                    'label' => new lang_string('default_collapse_state', 'totara_core'),
+                    'element_type' => 'select',
+                    'element_attributes' => [$sectionmenu],
+                ];
+            }
+            $sectionformatoptionsedit['cssclasses'] = [
+                'label' => new lang_string('topic_css_classes', 'totara_core'),
+                'element_type' => 'text',
+                'help' => 'topic_css_classes',
+                'help_component' => 'totara_core',
+            ];
+            $sectionformatoptions = array_merge_recursive($sectionformatoptions, $sectionformatoptionsedit);
+        }
+        return $sectionformatoptions;
     }
 
     /**
@@ -321,6 +418,9 @@ class format_topics extends format_base {
                     $element->addOption("$i", $i);
                 }
             }
+
+            $mform->hideIf('headerbgcolor', 'headercolor', 'notchecked');
+            $mform->hideIf('headerfgcolor', 'headercolor', 'notchecked');
         }
 
         return $elements;

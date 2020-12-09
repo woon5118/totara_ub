@@ -686,6 +686,11 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
                     array('name' => 'numsections', 'value' => $dbcourse->numsections),
                     array('name' => 'hiddensections', 'value' => $dbcourse->hiddensections),
                     array('name' => 'coursedisplay', 'value' => $dbcourse->coursedisplay),
+                    array('name' => 'collapsiblesections', 'value' => $dbcourse->collapsiblesections),
+                    array('name' => 'collapsiblesectionscollapseall', 'value' => $dbcourse->collapsiblesectionscollapseall),
+                    array('name' => 'headercolor', 'value' => $dbcourse->headercolor),
+                    array('name' => 'headerbgcolor', 'value' => $dbcourse->headerbgcolor),
+                    array('name' => 'headerfgcolor', 'value' => $dbcourse->headerfgcolor),
                 ));
             }
         }
