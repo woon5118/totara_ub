@@ -52,7 +52,7 @@ administration interface can be used to review list of configured stores.
 
 Settings for each store are:
 
-* idnumber - the internal identifier of the store
+* idnumber - the internal identifier of the store (only following characters are allowed [a-zA-Z0-9_])
 * provider - either 's3' or 'azure' depending on supported cloud API
 * bucket - name of the bucket (or container) in the cloud
 * options - provider specific connection options
@@ -62,6 +62,7 @@ Settings for each store are:
 * active  - enable/disable switch for all store operations
 * maxinstantuploadsize - maximum size of files that are uploaded immediately to the cloud, bigger files
   are uploaded later via cron task or CLI script
+* x_accel_redirect - virtual URL prefix for X-Accel-Redirect, it requires special configuration of NGINX server  
 
 
 Example:
@@ -81,6 +82,7 @@ $CFG->totara_cloudfiledir_stores = [
         'restore' => true,
         'active' => true,
         'maxinstantuploadsize' => -1, // default, means all new files are uploaded to cloud asap.
+        //'x_accel_redirect' => 'cloud-download',
     ],
     [
        'idnumber' => 'persistent_backup',
@@ -99,6 +101,46 @@ $CFG->totara_cloudfiledir_stores = [
 ];
 
 ```
+
+
+### X-Accel-Redirect for NGINX
+
+Standard $CFG->xsendfile cannot work if content files are not stored locally or when web server
+cannot access content file pool (ie running in a different OS instance).
+It is possible to use the cloud storage directly from NGINX web server instead.
+
+Sample NGINX configuration:
+```
+# In this example 'cloud-download' is what you set your 'x_accel_redirect' prefix to
+location ~ ^/cloud-download/(.*?)://(.*?)/(.*) {
+   # Only allow internal redirects
+   internal;
+   # How to resolve remote URLs, you may want to update this depending
+   # on your setup, in our case it’s inside a Docker container with
+   # dnsmasq running.
+   resolver 127.0.0.53 ipv6=off;
+   # Extract the remote URL parts
+   set $download_protocol $1;
+   set $download_host $2;
+   set $download_path $3;
+   # Reconstruct the remote URL
+   set $download_url $download_protocol://$download_host/$download_path;
+   # Headers for the remote server, unset Authorization and Cookie for security reasons.
+   proxy_set_header Host $download_host;
+   proxy_set_header Authorization '';
+   proxy_set_header Cookie '';
+   # Headers for the response, by using $upstream_http_... here we can inject
+   # other headers from Django, proxy_hide_header ensures the header from the
+   # remote server isn't passed through.
+   proxy_hide_header Content-Disposition;
+   add_header Content-Disposition $upstream_http_content_disposition;
+   # Stops the local disk from being written to (just forwards data through)
+   proxy_max_temp_file_size 0;
+   # Proxy the remote file through to the client
+   proxy_pass $download_url$is_args$args;
+}
+```
+
 
 ### Amazon S3
 
@@ -122,6 +164,9 @@ Microsoft Azure Blob Storage is a notable exception because it does not support 
 
 Connection configuration options are described at
 https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string
+
+Notes:
+ * support for X-Accel-Redirect was not implemented yet
 
 
 ### Custom providers

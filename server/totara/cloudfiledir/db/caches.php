@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralearning.com>
+ * @author  Petr Skoda <petr.skoda@totaralearning.com>
  * @package totara_cloudfiledir
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2020100101;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;       // Requires this Totara version.
-$plugin->component = 'totara_cloudfiledir';  // To check on upgrade, that module sits in correct place
+$definitions = array(
+    // Cache for signed download URLs.
+    'downloadurls' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'ttl' => 3600,
+        'canuselocalstore' => true,
+    ),
+);

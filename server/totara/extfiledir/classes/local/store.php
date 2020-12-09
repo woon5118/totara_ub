@@ -55,6 +55,10 @@ final class store {
         global $CFG;
 
         $this->idnumber = $config['idnumber'];
+        if (preg_match('#[^a-zA-Z0-9_]#', $this->idnumber)) {
+            debugging('Invalid character detected in store idnumber: ' . $this->idnumber, DEBUG_ALL);
+        }
+
         $this->filedir = $config['filedir'];
 
         if (isset($config['description'])) {

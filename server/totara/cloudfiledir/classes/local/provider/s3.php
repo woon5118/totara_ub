@@ -207,6 +207,32 @@ final class s3 extends base {
     }
 
     /**
+     * Create temporary download link.
+     *
+     * @param string $contenthash
+     * @param int $lifetime minimum lifetime in seconds
+     * @return string|null file download URL
+     */
+    public function create_download_link(string $contenthash, int $lifetime = 3600): ?string {
+        $client = $this->get_client();
+        if (!$client) {
+            return null;
+        }
+
+        try {
+            $cmd = $client->getCommand('GetObject', [
+                'Bucket' => $this->bucket,
+                'Key' => $this->get_object_name($contenthash),
+            ]);
+            $request = $client->createPresignedRequest($cmd, time() + $lifetime);
+            return (string)$request->getUri();
+        } catch (S3Exception $ex) {
+            $this->log_exception($ex, 'Cannot create content download link ' . $contenthash);
+            return null;
+        }
+    }
+
+    /**
      * Delete content file from store
      * @param string $contenthash
      * @return bool success

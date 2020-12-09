@@ -37,4 +37,9 @@ $watchers = [
         'callback' => ['totara_cloudfiledir\local\filedir_hook_watcher', 'content_file_restore'],
         'priority' => 100,
     ],
+    [
+        'hookname' => 'totara_core\hook\filedir_xsendfile',
+        'callback' => ['totara_cloudfiledir\local\filedir_hook_watcher', 'xsendfile'],
+        'priority' => 100,
+    ],
 ];

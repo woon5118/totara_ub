@@ -144,4 +144,40 @@ final class filedir_hook_watcher {
             }
         }
     }
+
+    public static function xsendfile(\totara_core\hook\filedir_xsendfile $hook): void {
+        if (!get_config('totara_cloudfiledir', 'version')) {
+            // Not fully installed yet.
+            return;
+        }
+
+        if ($hook->was_file_sent()) {
+            return;
+        }
+
+        $stores = store::get_stores();
+        if (!$stores) {
+            return;
+        }
+
+        $contenthash = $hook->get_contenthash();
+
+        foreach ($stores as $store) {
+            if (!$store->is_active()) {
+                continue;
+            }
+
+            $headers = $store->xsendfile($contenthash);
+            if (!$headers) {
+                continue;
+            }
+
+            foreach ($headers as $header) {
+                header($header);
+            }
+
+            $hook->mark_as_sent();
+            return;
+        }
+    }
 }

@@ -22,6 +22,7 @@
  */
 
 $string['bucket'] = 'Bucket';
+$string['cachedef_downloadurls'] = 'Cloud file download URLs';
 $string['maxinstantuploadsize'] = 'Max instant upload size';
 $string['pluginname'] = 'Cloud file content storage';
 $string['provider'] = 'Provider';

@@ -13,7 +13,7 @@ keeping the local filedir free of unreferenced content files.
 
 List of options:
 
-* idnumber - the internal identifier of the store
+* idnumber - the internal identifier of the store (only following characters are allowed [a-zA-Z0-9_])
 * filedir - location of the file store
 * directorypermissions - permissions used for newly crated files, defaults to $CFG->directorypermissions
 * filepermissions - permissions used for newly created files, defaults to directorypermissions minus executable bits 

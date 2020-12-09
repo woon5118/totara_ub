@@ -46,13 +46,20 @@ final class store {
     private $bucket = '';
     /** @var string prefix (for testing only) */
     private $prefix = '';
+    /** @var string|null X-Accel-Redirect prefix for NGINX */
+    private $x_accel_redirect = null;
     /** @var string temporary directory for downloads */
     private $tempdir;
     /** @var int temporary file name counter */
     private $tempcounter = 0;
+    /** @var int number of seconds signed download URLs are supposed to be valid */
+    public const SIGNED_URL_TTL = 3600;
 
     protected function __construct(array $config) {
         $this->idnumber = (string)$config['idnumber'];
+        if (preg_match('#[^a-zA-Z0-9_]#', $this->idnumber)) {
+            debugging('Invalid character detected in store idnumber: ' . $this->idnumber, DEBUG_ALL);
+        }
 
         if (isset($config['description'])) {
             $this->description = (string)$config['description'];
@@ -74,6 +81,9 @@ final class store {
         }
         if (isset($config['bucket'])) {
             $this->bucket = (string)$config['bucket'];
+        }
+        if (!empty($config['x_accel_redirect'])) {
+            $this->x_accel_redirect = (string)$config['x_accel_redirect'];
         }
         $this->providername = (string)$config['provider'];
         $options = isset($config['options']) ? (array)$config['options'] : [];
@@ -560,6 +570,45 @@ final class store {
         } else {
             $DB->set_field('totara_cloudfiledir_sync', 'localproblem', 1, ['id' => $record->id]);
         }
+    }
+
+    /**
+     * Cloud based xsendfile support.
+     *
+     * @return array|null array of response headers to send, null means cloud xsendfile not possible.
+     */
+    public function xsendfile(string $contenthash): ?array {
+        // NOTE: for now there is support for NGINX only, but we can add more options later.
+        if (!$this->x_accel_redirect) {
+            return null;
+        }
+
+        if (!$this->is_content_available($contenthash, false)) {
+            return null;
+        }
+
+        $downloadlink = null;
+        $cachekey = $this->idnumber . '_' . $contenthash;
+        $cache = \cache::make('totara_cloudfiledir', 'downloadurls');
+
+        $cached = $cache->get($cachekey);
+        if ($cached && time() < $cached['time'] + self::SIGNED_URL_TTL - 20) {
+            $downloadlink = $cached['url'];
+        } else {
+            $downloadlink = $this->provider->create_download_link($contenthash, self::SIGNED_URL_TTL);
+            if ($downloadlink) {
+                $cached = ['url' => $downloadlink, 'time' => time()];
+                $cache->set($cachekey, $cached);
+            } else {
+                return null;
+            }
+        }
+
+        if ($this->x_accel_redirect) {
+            return ["X-Accel-Redirect: /{$this->x_accel_redirect}/{$downloadlink}"];
+        }
+
+        return null;
     }
 
     /**

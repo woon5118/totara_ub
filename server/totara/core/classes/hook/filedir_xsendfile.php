@@ -42,6 +42,14 @@ final class filedir_xsendfile extends base {
     }
 
     /**
+     * Return sha1 hash of file content.
+     * @return string
+     */
+    public function get_contenthash(): string {
+        return $this->contenthash;
+    }
+
+    /**
      * Must be called by hook observer after sending file.
      */
     public function mark_as_sent(): void {

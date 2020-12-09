@@ -126,6 +126,17 @@ abstract class base {
     abstract public function download_content(string $contenthash, string $filepath): bool;
 
     /**
+     * Create temporary download link.
+     *
+     * @param string $contenthash
+     * @param int $lifetime minimum lifetime in seconds
+     * @return string|null file download URL
+     */
+    public function create_download_link(string $contenthash, int $lifetime = 3600): ?string {
+        return null;
+    }
+
+    /**
      * Delete content file from store.
      *
      * @param string $contenthash

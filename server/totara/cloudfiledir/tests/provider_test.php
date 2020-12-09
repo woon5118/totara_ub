@@ -122,6 +122,30 @@ abstract class totara_cloudfiledir_provider_testcase extends advanced_testcase {
         $this->assertNotContains($contenthash3, $contenthashes);
     }
 
+    public function test_create_download_link() {
+        $contentfile1 = make_request_directory() . '/myfile1.txt';
+        file_put_contents($contentfile1, 'some fancy content for testing');
+        $contenthash1 = sha1_file($contentfile1);
+
+        $contentfile2 = make_request_directory() . '/myfile2.txt';
+        file_put_contents($contentfile2, 'some no so fance content for testing');
+        $contenthash2 = sha1_file($contentfile2);
+
+        $provider = $this->get_provider();
+
+        $provider->upload_content($contenthash1, $contentfile1);
+        $provider->upload_content($contenthash2, $contentfile2);
+
+        $link = $provider->create_download_link($contenthash1);
+        if ($provider instanceof \totara_cloudfiledir\local\provider\azure) {
+            $this->assertNull($link);
+            $this->markTestSkipped('Azure does not supoprt download links yet');
+        }
+        $this->assertNotNull($link);
+        $content = download_file_content($link);
+        $this->assertSame(file_get_contents($contentfile1), $content);
+    }
+
     public function test_clear_test_bucket() {
         $contentfile1 = make_request_directory() . '/myfile1.txt';
         file_put_contents($contentfile1, 'some fancy content for testing');
