@@ -1400,6 +1400,7 @@ class core_plugin_manager {
                 'perform_engage',
                 'engage',
                 'learn_perform_engage',
+                'learn_professional',
             ),
 
             'format' => array(

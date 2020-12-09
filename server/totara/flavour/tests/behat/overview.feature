@@ -1,6 +1,6 @@
 @totara @totara_flavour
 Feature: Flavours overview and activation
-  In order to use use flavours
+  In order to use flavours
   As an admin
   I need to be able to see flavour overview
 

@@ -100,34 +100,19 @@ class totara_flavour_overview_testcase extends advanced_testcase {
     public function test_flavours() {
         global $CFG;
 
-        if (!$this->testflavouravailable) {
-            // If you get this and want to test the overview of flavours you must install the test plugin at TL-7812.
-            $this->markTestSkipped('You must install the test flavour in order to test the overview functionality.');
-            return true; // Not needed but keeps it clear.
-        }
-
         $this->setAdminUser();
 
         // Show learn if nothing configured.
         $overview = new overview();
-        $this->assertSame(array(
-            'flavour_learn',
-            'flavour_engage',
-            'flavour_learn_engage',
-            'flavour_learn_perform',
-            'flavour_learn_perform_engage',
-            'flavour_perform',
-            'flavour_perform_engage',
-            'flavour_test',
-        ), array_keys($overview->flavours));
+        $this->assertSame(array('flavour_learn'), array_keys($overview->flavours));
         $this->assertInstanceOf('flavour_learn\\definition', $overview->flavours['flavour_learn']);
 
         // Show configured in specified order.
-        $CFG->showflavours = 'test,learn';
+        $CFG->showflavours = 'engage,learn';
         $overview = new overview();
-        $this->assertSame(array('flavour_test', 'flavour_learn'), array_keys($overview->flavours));
+        $this->assertSame(array('flavour_engage', 'flavour_learn'), array_keys($overview->flavours));
         $this->assertInstanceOf('flavour_learn\\definition', $overview->flavours['flavour_learn']);
-        $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
+        $this->assertInstanceOf('flavour_engage\\definition', $overview->flavours['flavour_engage']);
 
         // Hide all flavours (default still shown).
         $CFG->showflavours = '';
@@ -135,32 +120,29 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         $this->assertSame(array('flavour_learn'), array_keys($overview->flavours));
 
         // Make sure active is included, as last if not in the list.
-        helper::set_active_flavour('flavour_test');
+        helper::set_active_flavour('flavour_perform');
         unset($CFG->showflavours);
         $overview = new overview();
+        $this->assertSame(array('flavour_perform'), array_keys($overview->flavours));
+        $this->assertInstanceOf('flavour_perform\\definition', $overview->flavours['flavour_perform']);
+
+        $CFG->showflavours = 'learn,engage,learn_engage,learn_perform,learn_perform_engage,learn_professional,perform_engage';
+        $overview = new overview();
         $this->assertSame(array(
-            'flavour_test',
-            'flavour_engage',
             'flavour_learn',
+            'flavour_engage',
             'flavour_learn_engage',
             'flavour_learn_perform',
             'flavour_learn_perform_engage',
-            'flavour_perform',
+            'flavour_learn_professional',
             'flavour_perform_engage',
+            'flavour_perform',
         ), array_keys($overview->flavours));
-        $this->assertInstanceOf('flavour_learn\\definition', $overview->flavours['flavour_learn']);
-        $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
-
-        $CFG->showflavours = 'test,learn';
-        $overview = new overview();
-        $this->assertSame(array('flavour_test', 'flavour_learn'), array_keys($overview->flavours));
-        $this->assertInstanceOf('flavour_learn\\definition', $overview->flavours['flavour_learn']);
-        $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
 
         $CFG->showflavours = '';
         $overview = new overview();
-        $this->assertSame(array('flavour_test'), array_keys($overview->flavours));
-        $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
+        $this->assertSame(array('flavour_perform'), array_keys($overview->flavours));
+        $this->assertInstanceOf('flavour_perform\\definition', $overview->flavours['flavour_perform']);
     }
 
     public function test_get_flavour_to_enforce() {
