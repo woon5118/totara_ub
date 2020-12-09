@@ -465,6 +465,7 @@ $string['emailfromvia'] = 'Email via information';
 $string['emoticontext'] = 'Text';
 $string['emoticonimagename'] = 'Image name';
 $string['emoticonalt'] = 'Alternative text';
+$string['emoticonaltcomponent'] = 'Alt component';
 $string['emoticoncomponent'] = 'Image component';
 $string['emoticons'] = 'Emoticons';
 $string['emoticons_desc'] = 'This form defines the emoticons (or smileys) used at your site. To remove a row from the table, save the form with an empty value in any of the required fields. To register a new emoticon, fill the fields in the last blank row. To reset all the fields into default values, follow the link above.

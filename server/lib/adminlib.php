@@ -4817,7 +4817,23 @@ class admin_setting_emoticons extends admin_setting {
             $fields[$i] = (object) [
                 'field' => $field,
                 'value' => $value,
-                'index' => $i
+                'index' => $i,
+                'aria_label' => function () use ($i) {
+                    switch ($i) {
+                        case 0:
+                            return get_string('emoticontext', 'admin');
+                        case 1:
+                            return get_string('emoticonimagename', 'admin');
+                        case 2:
+                            return get_string('emoticoncomponent', 'admin');
+                        case 3:
+                            return get_string('emoticonalt', 'admin');
+                        case 4:
+                            return get_string('emoticonaltcomponent', 'admin');
+                        default:
+                            throw new coding_exception("{$i} will be never greater than 4");
+                    }
+                }
             ];
             $i++;
 
