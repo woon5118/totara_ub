@@ -78,6 +78,7 @@
     <AudienceAdder
       :open="modal.audienceAdder"
       :context-id="workspaceContextId"
+      :show-loading-btn="isRequestingAudiencesToAdd"
       @added="selection => onAudiencesSelectedFromAdder(selection)"
       @cancel="modal.audienceAdder = false"
     />
@@ -91,7 +92,7 @@
         :users-from-audiences-to-add="usersFromAudiencesToAdd"
         @confirm="confirmAddAudiences"
         @cancel="cancelAddAudiences"
-      ></WorkspaceAddAudienceModal>
+      />
     </ModalPresenter>
 
     <Loading v-if="$apollo.loading" />
@@ -362,6 +363,7 @@ export default {
       audiencesToAdd: [],
       usersFromAudiencesToAdd: null,
       isAddingAudiences: false,
+      isRequestingAudiencesToAdd: false,
     };
   },
 
@@ -662,6 +664,8 @@ export default {
      * @param selection
      */
     async onAudiencesSelectedFromAdder(selection) {
+      this.isRequestingAudiencesToAdd = true;
+
       const { data: result } = await this.$apollo.query({
         query: bulkAudienceMembersToAdd,
         variables: {
@@ -678,10 +682,12 @@ export default {
 
       this.audiencesToAdd = selection.ids;
       this.modal.confirmAudienceAdderSelection = true;
+      this.isRequestingAudiencesToAdd = false;
     },
 
     cancelAddAudiences() {
       this.modal.confirmAudienceAdderSelection = false;
+      this.isRequestingAudiencesToAdd = false;
     },
 
     /**
@@ -725,6 +731,7 @@ export default {
         this.modal.confirmAudienceAdderSelection = false;
         this.modal.audienceAdder = false;
         this.isAddingAudiences = false;
+        this.isRequestingAudiencesToAdd = false;
       }
     },
   },

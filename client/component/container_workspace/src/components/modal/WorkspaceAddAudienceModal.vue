@@ -117,10 +117,8 @@ export default {
   },
 
   computed: {
-    computed: {
-      id() {
-        return this.$id(this.title);
-      },
+    id() {
+      return this.$id(this.title);
     },
   },
 };
