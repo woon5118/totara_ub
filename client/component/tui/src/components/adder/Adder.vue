@@ -90,11 +90,12 @@
             <div class="tui-adder__actions">
               <ButtonGroup>
                 <Button
-                  :disabled="!count"
+                  :disabled="!count || showLoadingBtn"
                   :text="$str('add', 'totara_core')"
                   :styleclass="{ primary: true }"
                   :aria-describedby="$id('items-added')"
                   :aria-haspopup="ariaHaspopup"
+                  :loading="showLoadingBtn"
                   @click="$emit('added', allSelectedItems)"
                 />
                 <ButtonCancel @click="$emit('cancel')" />
@@ -145,6 +146,8 @@ export default {
     loading: {
       type: Boolean,
     },
+    // Display loading spinner on Add button click
+    showLoadingBtn: Boolean,
     // Display a load more button
     showLoadMore: {
       type: [Boolean, String],

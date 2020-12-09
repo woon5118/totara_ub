@@ -15,7 +15,7 @@ information provided here is intended especially for developers.
 * Removed overridden focus styles from SearchBox.vue submit button, now uses default IconButton.vue focus styles
 * Update Tui Theme Settings Custom and Colour Uniforms to include new fields and make rows solution more generic
   * Langstring, template, SCSS and script block changes
-
+* Updated Adder.vue component to support a loading indicator prop for add button
 
 === 13.2 ===
 

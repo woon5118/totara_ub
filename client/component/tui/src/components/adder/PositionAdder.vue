@@ -36,6 +36,7 @@ export default {
     open: Boolean,
     adderTitle: String,
     filterTitle: String,
+    showLoadingBtn: Boolean,
   },
 
   computed: {
@@ -57,6 +58,7 @@ export default {
           this.adderTitle || this.$str('select_position', 'totara_core'),
         filterTitle:
           this.filterTitle || this.$str('filter_position', 'totara_core'),
+        showLoadingBtn: this.showLoadingBtn,
         tableHeaderName: this.$str('position_name', 'totara_core'),
       },
       on: this.$listeners,

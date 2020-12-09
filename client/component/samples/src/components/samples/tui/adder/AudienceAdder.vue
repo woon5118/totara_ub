@@ -24,10 +24,12 @@
       <Button :text="$str('add_audiences', 'totara_core')" @click="adderOpen" />
 
       <AudienceAdder
+        :show-loading-btn="showAddButtonSpinner"
         :open="showAdder"
         :custom-query="query"
         :existing-items="addedIds"
         @added="adderUpdate"
+        @add-button-clicked="toggleLoading"
         @cancel="adderCancelled"
       />
 
@@ -69,6 +71,7 @@ export default {
       addedAudiences: [],
       addedIds: [],
       showAdder: false,
+      showAddButtonSpinner: false,
       query: cohorts,
     };
   },
@@ -85,7 +88,12 @@ export default {
     adderUpdate(selection) {
       this.addedIds = selection.ids;
       this.addedAudiences = selection.data;
+      this.showAddButtonSpinner = false;
       this.showAdder = false;
+    },
+
+    toggleLoading() {
+      this.showAddButtonSpinner = true;
     },
   },
 };

@@ -25,7 +25,9 @@
       <PositionAdder
         :open="showAdder"
         :existing-items="addedIds"
+        :show-loading-btn="showAddButtonSpinner"
         @added="adderUpdate"
+        @add-button-clicked="toggleLoading"
         @cancel="adderCancelled"
       />
 
@@ -62,6 +64,7 @@ export default {
       addedPositionItems: [],
       addedIds: [],
       showAdder: false,
+      showAddButtonSpinner: false,
       codeTemplate: `<Button :text="$str('add_audiences', 'totara_core')" @click="adderOpen" />
 
 <PositionAdder
@@ -122,7 +125,12 @@ export default {
     adderUpdate(selection) {
       this.addedIds = selection.ids;
       this.addedPositionItems = selection.data;
+      this.showAddButtonSpinner = false;
       this.showAdder = false;
+    },
+
+    toggleLoading() {
+      this.showAddButtonSpinner = true;
     },
   },
 };

@@ -23,6 +23,7 @@
     :existing-items="existingItems"
     :loading="$apollo.loading"
     :show-load-more="nextPage"
+    :show-loading-btn="showLoadingBtn"
     @added="closeWithData($event)"
     @cancel="$emit('cancel')"
     @load-more="loadMoreItems()"
@@ -171,6 +172,8 @@ export default {
     contextId: {
       type: Number,
     },
+    // Display loading spinner on Add button
+    showLoadingBtn: Boolean,
   },
 
   data() {
@@ -309,6 +312,9 @@ export default {
      */
     async closeWithData(selection) {
       let data;
+
+      this.$emit('add-button-clicked');
+
       try {
         data = await this.updateSelectedItems(selection);
       } catch (error) {
