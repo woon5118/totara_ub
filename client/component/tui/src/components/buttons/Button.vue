@@ -209,6 +209,7 @@ export default {
 
   > .tui-formBtn__loading {
     margin-left: var(--gap-1);
+    color: var(--btn-loader-color-disabled);
   }
 
   &:active,
@@ -333,6 +334,10 @@ export default {
         background: var(--btn-prim-bg-color-disabled);
         border-color: var(--btn-prim-border-color-disabled);
         box-shadow: none;
+      }
+
+      & .tui-formBtn__loading {
+        color: var(--btn-prim-loader-color-disabled);
       }
     }
   }

@@ -80,6 +80,7 @@
       :context-id="workspaceContextId"
       :show-loading-btn="isRequestingAudiencesToAdd"
       @added="selection => onAudiencesSelectedFromAdder(selection)"
+      @add-button-clicked="isRequestingAudiencesToAdd = true"
       @cancel="modal.audienceAdder = false"
     />
 
@@ -664,8 +665,6 @@ export default {
      * @param selection
      */
     async onAudiencesSelectedFromAdder(selection) {
-      this.isRequestingAudiencesToAdd = true;
-
       const { data: result } = await this.$apollo.query({
         query: bulkAudienceMembersToAdd,
         variables: {

@@ -295,21 +295,23 @@ export default {
 
   &__footer {
     display: flex;
-    padding-top: var(--gap-6);
+    flex-wrap: wrap;
     border-top: var(--border-width-normal) solid var(--color-neutral-5);
+
+    & > * {
+      margin-top: var(--gap-6);
+    }
   }
 
   &__summary {
     display: flex;
     align-items: center;
-    width: 50%;
     @include tui-font-heading-label();
   }
 
   &__actions {
     display: flex;
-    justify-content: flex-end;
-    width: 50%;
+    margin-left: auto;
   }
 }
 
