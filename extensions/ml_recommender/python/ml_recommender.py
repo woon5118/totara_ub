@@ -16,8 +16,10 @@ Please contact [licensing@totaralearning.com] for more information.
 @package ml_recommender
 """
 
+from config import Config
 from subroutines.arg_parser import ArgParser
 from subroutines.data_reader import DataReader
+from subroutines.remove_external_interactions import RemoveExternalInteractions
 from subroutines.data_loader import DataLoader
 from subroutines.optimize_hyperparams import OptimizeHyperparams
 from subroutines.build_model import BuildModel
@@ -36,6 +38,9 @@ def run_modelling_process():
     :return: None
     """
     # ---------------------------------------------------------------
+    # Instantiate the configuration object
+    cfg = Config()
+    # ---------------------------------------------------------------
     # Set up command line arguments
     args = ArgParser().set_args().parse_args()
 
@@ -46,11 +51,6 @@ def run_modelling_process():
     user_result_count = args.result_count_user
     item_result_count = args.result_count_item
 
-    # ------------------------------------------------------
-    # Minimum number of users in interactions set for whom to run the recommendation engine in a tenant
-    min_users = 10
-    # Minimum number of items in interactions set for which to run the recommendation engine in a tenant
-    min_items = 10
     # -------------------------------------------------------
     # Set path for the natural language processing libraries
     nl_libs = os.path.join(os.path.dirname(__file__), 'totara')
@@ -85,6 +85,13 @@ def run_modelling_process():
         interactions_df = data_reader.read_interactions_file(tenant=tenant)
         items_data = data_reader.read_items_file(tenant=tenant)
         users_data = data_reader.read_users_file(tenant=tenant)
+        # Remove interactions by the users and items that are not in the current tenant
+        interactions_cleaner = RemoveExternalInteractions(
+            users_df=users_data,
+            items_df=items_data,
+            interactions_df=interactions_df
+        )
+        interactions_df = interactions_cleaner.clean_interactions()
         processed_data = d_loader.load_data(
             interactions_df=interactions_df,
             items_data=items_data,
@@ -96,7 +103,9 @@ def run_modelling_process():
             f'The data loading and processing/transformation of tenant {tenant} took'
             f' {m: .0f} minutes and {s: .2f} seconds.\n'
         )
-        if processed_data['interactions'].shape[0] < min_users or processed_data['interactions'].shape[1] < min_items:
+        min_data = cfg.get_property('min_data')
+        shape = processed_data['interactions'].shape
+        if shape[0] < min_data['min_users'] or shape[1] < min_data['min_items']:
             print(
                 "The number of users or items is too small to run the recommendation engine."
                 f" Skipping tenant {tenant}."
@@ -109,9 +118,8 @@ def run_modelling_process():
                 f.write("uid,iid,ranking")
 
         else:
-            # The item features' matrix being very sparse, does not need significant penalty
             if query in ['hybrid', 'partial']:
-                item_alpha = 1e-6
+                item_alpha = cfg.get_property('item_alpha')
             else:
                 item_alpha = 0.0
             # --------------------------------------------------

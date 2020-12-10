@@ -61,3 +61,6 @@ diff.log
 /.patches/
 CVS
 /.cache
+
+# Python interpreter generated cache directories when Recommender Engine runs
+**/__pycache__/
