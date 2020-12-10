@@ -1755,7 +1755,7 @@ abstract class enrol_plugin {
      * @param bool $preventredirect stops the function from adding notifications and redirecting to the course
      * @return bool|int false means not enrolled, integer means timeend
      */
-    public function try_autoenrol(stdClass $instance, bool $preventredirect) {
+    public function try_autoenrol(stdClass $instance, bool $preventredirect = true) {
         global $USER;
 
         return false;
