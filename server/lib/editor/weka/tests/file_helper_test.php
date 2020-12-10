@@ -224,4 +224,31 @@ class editor_weka_file_helper_testcase extends advanced_testcase {
             ->one();
     }
 
+    /**
+     * @return void
+     */
+    public function test_get_repository_data_has_max_bytes(): void {
+        global $CFG;
+
+        // Set the max bytes for config so that we can make the repository data
+        // to return the value that we want.
+        $CFG->maxbytes = 1024;
+
+        $generator = self::getDataGenerator();
+        $user = $generator->create_user();
+
+        $this->setUser($user);
+        $repository_data = file_helper::get_upload_repository(
+            context_user::instance($user->id)->id
+        );
+
+        self::assertArrayHasKey('max_bytes', $repository_data);
+        self::assertIsNumeric($repository_data['max_bytes']);
+        self::assertEquals(get_max_upload_file_size(1024), $repository_data['max_bytes']);
+
+        self::assertArrayHasKey('repository_id', $repository_data);
+        self::assertIsNumeric($repository_data['repository_id']);
+
+        self::assertArrayHasKey('url', $repository_data);
+    }
 }

@@ -3,5 +3,6 @@ query editor_weka_get_repository_data($context_id: param_integer) {
     __typename
     repository_id
     url
+    max_bytes
   }
 }

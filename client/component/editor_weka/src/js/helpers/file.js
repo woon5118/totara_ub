@@ -19,10 +19,8 @@
 import { getDraftFile, getRepositoryData } from '../api';
 import { upload, parseFiles } from '../utils/upload';
 import { langString, loadLangStrings } from 'tui/i18n';
+import { getReadableSize } from 'tui/file';
 import { notify } from 'tui/notifications';
-
-const MAX_FILE_SIZE = 60; // Max size of upload file is 60MB
-const BYTES_IN_MEGABYTE = 1024 * 1024;
 
 /**
  * File manager for weka editor. This file storage should only support multiple extensions per editor only.
@@ -80,8 +78,9 @@ export default class FileStorage {
   /**
    * @param {Number}  repository_id
    * @param {String}  url
+   * @param {Number}  max_bytes
    */
-  setRepositoryData({ repository_id, url }) {
+  setRepositoryData({ repository_id, url, max_bytes }) {
     if (this.repositoryData) {
       return;
     }
@@ -89,6 +88,7 @@ export default class FileStorage {
     this.repositoryData = {
       repositoryId: repository_id,
       url: url,
+      maxBytes: max_bytes,
     };
   }
 
@@ -101,8 +101,14 @@ export default class FileStorage {
       return;
     }
 
-    const { repository_id, url } = await getRepositoryData(this.contextId);
-    this.setRepositoryData({ repository_id, url });
+    const { repository_id, url, max_bytes } = await getRepositoryData(
+      this.contextId
+    );
+    this.setRepositoryData({
+      repository_id,
+      url,
+      max_bytes,
+    });
   }
 
   /**
@@ -196,12 +202,15 @@ export default class FileStorage {
       return [];
     }
 
-    if (this.checkFilesSizeExceed(files)) {
-      const str = langString('file_size_exceed', 'editor_weka', MAX_FILE_SIZE);
-      loadLangStrings([str]).then(() =>
-        notify({ type: 'error', message: str.toString() })
-      );
+    if (await this.checkFilesSizeExceed(files)) {
+      // If it goes to this path, meaning that the repository data should
+      // have a max bytes by now.
+      const maxFileSize = await getReadableSize(this.repositoryData.maxBytes);
 
+      const str = langString('file_size_exceed', 'editor_weka', maxFileSize);
+      await loadLangStrings([str]);
+
+      await notify({ type: 'error', message: str.toString() });
       return [];
     }
 
@@ -215,9 +224,15 @@ export default class FileStorage {
    * @param {Array|FileList} files
    * @return {Boolean}
    */
-  checkFilesSizeExceed(files) {
-    const exceedBytes = MAX_FILE_SIZE * BYTES_IN_MEGABYTE;
-    return files.some(file => file.size > exceedBytes);
+  async checkFilesSizeExceed(files) {
+    await this._fetchRepositoryData();
+    if (!this.repositoryData.maxBytes) {
+      // No max bytes was returned from server.
+      return true;
+    }
+
+    const { maxBytes } = this.repositoryData;
+    return files.some(({ size }) => size > maxBytes);
   }
 
   /**

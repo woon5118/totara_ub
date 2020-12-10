@@ -23,6 +23,9 @@
 </template>
 
 <script>
+import { getReadableSize } from 'tui/file';
+import { toVueRequirements } from 'tui/i18n';
+
 export default {
   props: {
     size: {
@@ -34,51 +37,15 @@ export default {
       },
     },
   },
+  langStrings: toVueRequirements(getReadableSize.langStrings),
+  data() {
+    return {
+      fileSize: '',
+    };
+  },
 
-  computed: {
-    fileSize() {
-      let size = parseInt(this.size);
-
-      if (size === -1) {
-        return this.$str('unlimited', 'core');
-      }
-
-      let params = {
-        size: 0,
-        unit: '',
-      };
-
-      if (size >= 1073741824) {
-        params.size = Math.round((size / 1073741824) * 10) / 10;
-        params.unit = this.$str('sizegb', 'core');
-      } else if (size >= 1048576) {
-        params.size = Math.round((size / 1048576) * 10) / 10;
-        params.unit = this.$str('sizemb', 'core');
-      } else if (size >= 1024) {
-        params.size = Math.round((size / 1024) * 10) / 10;
-        params.unit = this.$str('sizekb', 'core');
-      } else {
-        params.size = size;
-        params.unit = this.$str('sizeb', 'core');
-      }
-
-      return this.$str('filesize', 'totara_core', params);
-    },
+  async mounted() {
+    this.fileSize = await getReadableSize(this.size);
   },
 };
 </script>
-
-<lang-strings>
-  {
-    "core": [
-      "unlimited",
-      "sizegb",
-      "sizemb",
-      "sizekb",
-      "sizeb"
-    ],
-    "totara_core": [
-      "filesize"
-    ]
-  }
-</lang-strings>

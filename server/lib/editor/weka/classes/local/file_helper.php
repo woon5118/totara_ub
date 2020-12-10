@@ -59,7 +59,8 @@ final class file_helper {
 
         return [
             'repository_id' => $repository_id,
-            'url' => (new moodle_url('/repository/repository_ajax.php', ['action' => 'upload']))->out()
+            'url' => (new moodle_url('/repository/repository_ajax.php', ['action' => 'upload']))->out(),
+            'max_bytes' => get_max_upload_file_size($CFG->maxbytes)
         ];
     }
 }

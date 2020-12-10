@@ -108,6 +108,7 @@ type editor_weka_file {
 type editor_weka_repository_data {
   url: String!
   repository_id: Int!
+  max_bytes: Int!
 }
 
 type editor_weka_file_draft_area {
