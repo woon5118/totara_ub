@@ -100,45 +100,45 @@ Feature: Navigate a learning item in a static tab
 
   Scenario: msteams201: Navigate the find learning tab
     Given I am on Microsoft Teams "catalog" page
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
     When I click on "Culinary arts 101" "text"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
     When I click on "Programming 201" "text"
     Then "Continue" "button" should be visible
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
     When I click on "Machine learning 101" "text"
     And I click on "Continue" "button"
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
     When I click on "Mastering arts" "text"
     Then "Find learning" "link" should exist in the ".totara_msteams__navigation" "css_element"
     When I follow "Culinary arts 101"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
     When I click on "Junior chef" "text"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
     When I click on "10 apps to boost your productivity" "text"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
     When I click on "Cool playlist" "text"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
   Scenario: msteams202: Sign up a seminar from the find learning tab
@@ -160,7 +160,7 @@ Feature: Navigate a learning item in a static tab
     But "Find learning" "link" should exist in the ".totara_msteams__navigation" "css_element"
 
     When I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
-    Then I should see "Catalogue" in the page title
+    Then I should see "Find learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
   Scenario: msteams203: Navigate the current learning tab

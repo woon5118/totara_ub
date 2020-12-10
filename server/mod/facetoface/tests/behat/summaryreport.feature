@@ -107,7 +107,7 @@ Feature: Seminar sessions report overview
     Given I click on "Reports" in the totara menu
     When I click on "Seminar Summary" "link"
     And I click on "Test seminar name 1" "link" in the "Course 1" "table_row"
-    Then I should see "C1: Test seminar name 1" in the page title
+    Then I should see "Test seminar name 1" in the page title
 
   Scenario: Check active seminar sessions summary report
     # Prepare 4 sessions in three activities:

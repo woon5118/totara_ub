@@ -53,7 +53,7 @@ Feature: Facilitator notifications on reassignment
     And I click on "Trainer Third" "link" in the "//div[@aria-describedby='selectfacilitators3-dialog']" "xpath_element"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectfacilitators3-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: seminar" in the page title
+    Then I should see "seminar" in the page title
     And I wait for the next second
     And I run all adhoc tasks
     And I log out
@@ -124,7 +124,7 @@ Feature: Facilitator notifications on reassignment
     And I click on "Trainer Third" "link" in the "//div[@aria-describedby='selectfacilitators3-dialog']" "xpath_element"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectfacilitators3-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: seminar" in the page title
+    Then I should see "seminar" in the page title
     And I wait for the next second
     And I run all adhoc tasks
     And I log out
@@ -191,7 +191,7 @@ Feature: Facilitator notifications on reassignment
     And I set the field "timestart[month]" to "12"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectdate2-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: seminar" in the page title
+    Then I should see "seminar" in the page title
     And I should see "Uno" in the "June" "table_row"
     And I should see "One" in the "June" "table_row"
     And I should see "Two" in the "June" "table_row"
@@ -262,7 +262,7 @@ Feature: Facilitator notifications on reassignment
     And I set the field "timestart[month]" to "3"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectdate2-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: seminar" in the page title
+    Then I should see "seminar" in the page title
     And I should see "Uno" in the "June" "table_row"
     And I should see "One" in the "June" "table_row"
     And I should see "Two" in the "June" "table_row"

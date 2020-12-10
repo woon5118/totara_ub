@@ -79,7 +79,7 @@ Feature: Facilitator notifications on time change
     And I set the field "timestart[month]" to "8"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectdate1-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: future" in the page title
+    Then I should see "future" in the page title
     And I wait for the next second
     And I run all adhoc tasks
     And I log out
@@ -158,7 +158,7 @@ Feature: Facilitator notifications on time change
     And I set the field "timestart[year]" to "## -7 year ## Y ##"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectdate0-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: ongoing" in the page title
+    Then I should see "ongoing" in the page title
     And I wait for the next second
     And I run all adhoc tasks
     And I log out
@@ -221,7 +221,7 @@ Feature: Facilitator notifications on time change
     And I set the field "timestart[year]" to "## +5 year ## Y ##"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectdate0-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: past" in the page title
+    Then I should see "past" in the page title
     And I wait for the next second
     And I run all adhoc tasks
     And I log out

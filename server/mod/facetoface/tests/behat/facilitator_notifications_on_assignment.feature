@@ -59,7 +59,7 @@ Feature: Facilitator notifications on assignment
     And I click on "Trainer Third" "link" in the "//div[@aria-describedby='selectfacilitators2-dialog']" "xpath_element"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectfacilitators2-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: seminar" in the page title
+    Then I should see "seminar" in the page title
     And I wait for the next second
     And I run all adhoc tasks
     And I log out
@@ -121,7 +121,7 @@ Feature: Facilitator notifications on assignment
     And I click on "Trainer Third" "link" in the "//div[@aria-describedby='selectfacilitators2-dialog']" "xpath_element"
     And I click on "OK" "button" in the "//div[@aria-describedby='selectfacilitators2-dialog']" "xpath_element"
     And I press "Save changes"
-    Then I should see "C1: seminar" in the page title
+    Then I should see "seminar" in the page title
     And I wait for the next second
     And I run all adhoc tasks
     And I log out
@@ -177,7 +177,7 @@ Feature: Facilitator notifications on assignment
     And I click on "Remove facilitator Two from session" "link" in the "June" "table_row"
     And I click on "Remove facilitator Three from session" "link" in the "September" "table_row"
     And I press "Save changes"
-    Then I should see "C1: seminar" in the page title
+    Then I should see "seminar" in the page title
     And I wait for the next second
     And I run all adhoc tasks
     And I log out
