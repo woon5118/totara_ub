@@ -23,7 +23,9 @@
  * @subpackage reportbuilder
  */
 
+use container_site\site;
 use totara_core\advanced_feature;
+use container_course\course;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -76,6 +78,12 @@ class rb_source_dp_course extends rb_base_source {
 
         // Caching is disabled because visibility needs to be calculated using live data that cannot be cached.
         $this->cacheable = false;
+
+        $this->sourcewhere = '(base.containertype = :course_type OR base.containertype = :site_type)';
+        $this->sourceparams = [
+            'course_type' => course::get_type(),
+            'site_type' => site::get_type()
+        ];
 
         parent::__construct();
     }
@@ -674,7 +682,7 @@ class rb_source_dp_course extends rb_base_source {
             $this->base = $this->get_dp_status_base_sql($this->userid);
 
             // Visibility checks are only applied if viewing a single user's records.
-            list($sql, $params) = totara_visibility_where(
+            [$sql, $params] = totara_visibility_where(
                 $this->userid,
                 'course.id',
                 'course.visible',
@@ -684,9 +692,13 @@ class rb_source_dp_course extends rb_base_source {
                 false,
                 true
             );
-            $this->sourcewhere = "((course_completion.status > :notyetstarted) OR ({$sql}))";
+            $this->sourcewhere = "(base.containertype = :course_type OR base.containertype = :site_type)" .
+                " AND ((course_completion.status > :notyetstarted) OR ({$sql}))";
 
             $params['notyetstarted'] = COMPLETION_STATUS_NOTYETSTARTED;
+            $params['course_type'] = course::get_type();
+            $params['site_type'] = site::get_type();
+
             $this->sourceparams = $params;
 
             $this->sourcejoins = ['ctx', 'course_completion'];

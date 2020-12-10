@@ -419,7 +419,8 @@ trait report_trait {
      * @return boolean
      */
     protected function add_core_course_tables(&$joinlist, $join, $field, $jointype = 'LEFT') {
-
+        // Note: please do not filter by container type in this join list, it should be done at
+        // the report source rather than a shared helper function like this one.
         $joinlist[] = new \rb_join(
             'course',
             $jointype,
@@ -869,21 +870,24 @@ trait report_trait {
             $p1_userid_sql = " AND p1.userid = {$userid} ";
         }
 
-        return  "(SELECT {$uniqueid} AS id, userid, courseid
-                    FROM (SELECT ue.userid AS userid, e.courseid AS courseid
+        return  "(SELECT {$uniqueid} AS id, userid, courseid, containertype
+                    FROM (SELECT ue.userid AS userid, e.courseid AS courseid, c1.containertype AS containertype
                            FROM {user_enrolments} ue
                            JOIN {enrol} e ON ue.enrolid = e.id {$ue_userid_sql}
+                           JOIN {course} c1 ON e.courseid = c1.id
                            {$global_restriction_join_ue}
                           UNION
-                         SELECT cc.userid AS userid, cc.course AS courseid
+                         SELECT cc.userid AS userid, cc.course AS courseid, c2.containertype AS containertype
                            FROM {course_completions} cc
+                           JOIN {course} c2 ON cc.course = c2.id
                            {$global_restriction_join_cc}
                           WHERE cc.status > " . COMPLETION_STATUS_NOTYETSTARTED . "
                            {$cc_userid_sql}
                           UNION
-                         SELECT p1.userid AS userid, pca1.courseid AS courseid
+                         SELECT p1.userid AS userid, pca1.courseid AS courseid, c3.containertype AS containertype
                            FROM {dp_plan_course_assign} pca1
                            JOIN {dp_plan} p1 ON pca1.planid = p1.id {$p1_userid_sql}
+                           JOIN {course} c3 ON pca1.courseid = c3.id
                            {$global_restriction_join_p1}
                     )
                 basesub)";
