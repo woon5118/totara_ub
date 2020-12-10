@@ -44,7 +44,7 @@ Feature: Theme settings basic validations for tenants
     Then "Brand" "link" should exist in the ".tui-tabs__tabs" "css_element"
     And "Colours" "link" should exist in the ".tui-tabs__tabs" "css_element"
     And "Images" "link" should exist in the ".tui-tabs__tabs" "css_element"
-    And "Custom" "link" should not exist in the ".tui-tabs__tabs" "css_element"
+    And "Custom" "link" should exist in the ".tui-tabs__tabs" "css_element"
     And I should see "Logo" in the ".tui-tabContent" "css_element"
     And the URL for image nested in ".tui-tabs .tui-form .tui-formRow:nth-child(1)" should match "/theme\/image.php\/ventura\/totara_core\/[0-9]+\/logo/"
     And I should see "Logo alternative text" in the ".tui-tabContent" "css_element"
@@ -64,6 +64,10 @@ Feature: Theme settings basic validations for tenants
     And the URL for image nested in "#tabpanel-uid-6 .tui-collapsible:nth-child(1) .tui-formRow:nth-child(2)" should match "/theme\/image.php\/ventura\/totara_core\/[0-9]+\/default_login/"
     And I should not see "Learn" in the ".tui-collapsible__header" "css_element"
     And I should not see "Engage" in the ".tui-collapsible__header" "css_element"
+
+    When I click on "Custom" "link" in the ".tui-tabs__tabs" "css_element"
+    Then I should see "Custom footer" in the ".tui-tabContent:nth-of-type(3)" "css_element"
+    And I should not see "Custom CSS" in the ".tui-tabContent:nth-of-type(3)" "css_element"
 
   Scenario: Edit tenant settings
     When I click on "Edit settings for First Tenant" "link"

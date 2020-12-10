@@ -36,3 +36,22 @@ Feature: Theme settings basic validations
     And the URL for image nested in "#tabpanel-uid-3 .tui-collapsible:nth-child(2) .tui-formRow:nth-child(3)" should match "/theme\/image.php\/ventura\/totara_certification\/[0-9]+\/defaultimage/"
     And the URL for image nested in "#tabpanel-uid-3 .tui-collapsible:nth-child(3) .tui-formRow:nth-child(1)" should match "/theme\/image.php\/ventura\/engage_article\/[0-9]+\/default/"
     And the URL for image nested in "#tabpanel-uid-3 .tui-collapsible:nth-child(3) .tui-formRow:nth-child(2)" should match "/theme\/image.php\/ventura\/container_workspace\/[0-9]+\/default_space/"
+
+  Scenario: Confirm Custom tab has all the required elements
+    When I click on "Custom" "link"
+    Then I should see "Custom footer" in the ".tui-tabContent:nth-of-type(4)" "css_element"
+    And I should see "Custom CSS" in the ".tui-tabContent:nth-of-type(4)" "css_element"
+
+  Scenario: Confirm that when entering custom text in the footer that it displays
+    When I click on "Custom" "link"
+    And I set the field "Custom footer" to "Behat Test 123"
+    And I click on "Save Custom Settings" "button"
+    And I reload the page
+    Then I should see "Behat Test 123" in the ".footnote" "css_element"
+
+  Scenario: Confirm that when entering custom HTML in the footer that it renders correctly.
+    When I click on "Custom" "link"
+    And I set the field "Custom footer" to "<div id='behat_test_123'>Behat Test 123</div>"
+    And I click on "Save Custom Settings" "button"
+    And I reload the page
+    Then I should see "Behat Test 123" in the "#behat_test_123" "css_element"

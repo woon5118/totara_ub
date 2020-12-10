@@ -32,16 +32,15 @@ defined('MOODLE_INTERNAL') || die();
         </div>
 
         <?php
-        if (!empty($PAGE->theme->settings->footnote)) {
+        $tenant_id = (!isloggedin() || empty($USER->tenantid)) ? 0 : $USER->tenantid;
+        $theme_settings = new core\theme\settings($PAGE->theme, $tenant_id);
+        $property = $theme_settings->get_property('custom', 'formcustom_field_customfooter');
+        if (!empty($property)) {
+            echo '<div class="footnote">'.format_text($property['value']).'</div>';
+        } else if (!empty($PAGE->theme->settings->footnote)) {
             echo '<div class="footnote">'.format_text($PAGE->theme->settings->footnote).'</div>';
         }
         ?>
-
-        <div class="row">
-            <div class="page-footer-loggedin-info">
-                <?php echo $OUTPUT->login_info(); ?>
-            </div>
-        </div>
         <div class="row">
             <div class="tool_usertours-resettourcontainer"><?php // Reset user tour container ?></div>
             <?php echo $OUTPUT->standard_footer_html(); ?>

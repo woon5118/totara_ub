@@ -108,7 +108,6 @@
               />
             </Tab>
             <Tab
-              v-if="!selectedTenantId"
               :id="'themesettings-tab-3'"
               :name="$str('tabcustom', 'totara_tui')"
               :always-render="true"
@@ -118,6 +117,7 @@
                 v-if="embeddedFormData.formFieldData.custom"
                 :saved-form-field-data="embeddedFormData.formFieldData.custom"
                 :is-saving="isSaving"
+                :selected-tenant-id="selectedTenantId"
                 @submit="submit"
               />
             </Tab>

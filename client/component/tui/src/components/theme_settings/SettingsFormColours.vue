@@ -258,6 +258,58 @@
               {{ $str('formcolours_details_pagetext', 'totara_tui') }}
             </FormRowDetails>
           </FormRow>
+
+          <FormRow
+            :label="$str('formcolours_label_footerbg', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormColor
+              :name="['footer-bg-color', 'value']"
+              :validations="v => [v.required(), v.colorValueHex()]"
+              :aria-describedby="
+                $id('formcolours-footerbg-details') +
+                  ' ' +
+                  $id('formcolours-footerbg-defaults')
+              "
+            />
+            <FormRowDefaults :id="$id('formcolours-footerbg-defaults')">
+              {{
+                theme_settings.getCSSVarDefault(
+                  mergedProcessedCssVariableData,
+                  'footer-bg-color'
+                )
+              }}
+            </FormRowDefaults>
+            <FormRowDetails :id="$id('formcolours-footerbg-details')">
+              {{ $str('formcolours_details_footerbg', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+
+          <FormRow
+            :label="$str('formcolours_label_footertext', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormColor
+              :name="['footer-text-color', 'value']"
+              :validations="v => [v.required(), v.colorValueHex()]"
+              :aria-describedby="
+                $id('formcolours-footertext-details') +
+                  ' ' +
+                  $id('formcolours-footertext-defaults')
+              "
+            />
+            <FormRowDefaults :id="$id('formcolours-footertext-defaults')">
+              {{
+                theme_settings.getCSSVarDefault(
+                  mergedProcessedCssVariableData,
+                  'footer-text-color'
+                )
+              }}
+            </FormRowDefaults>
+            <FormRowDetails :id="$id('formcolours-footertext-details')">
+              {{ $str('formcolours_details_footertext', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
         </FormRowStack>
       </Collapsible>
 
@@ -398,6 +450,14 @@ export default {
           type: null, // supplied by Theme-based JSON metadata
         },
         'color-text': {
+          value: null,
+          type: null, // supplied by Theme-based JSON metadata
+        },
+        'footer-bg-color': {
+          value: null,
+          type: null, // supplied by Theme-based JSON metadata
+        },
+        'footer-text-color': {
           value: null,
           type: null, // supplied by Theme-based JSON metadata
         },
@@ -599,6 +659,10 @@ export default {
     "formcolours_details_headertext",
     "formcolours_label_pagetext",
     "formcolours_details_pagetext",
+    "formcolours_label_footerbg",
+    "formcolours_details_footerbg",
+    "formcolours_label_footertext",
+    "formcolours_details_footertext",
     "tabcolours"
   ],
   "totara_core": [

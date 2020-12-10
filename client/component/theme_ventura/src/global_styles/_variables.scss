@@ -125,6 +125,17 @@
   --nav-text-color: var(--color-text);
 
   //
+  // Footer colors
+  //
+  /* theme:var */
+  --footer-bg-color: #fff;
+  /* theme:var */
+  --footer-text-color: var(--color-text);
+  /* theme:var */
+  /* theme:derive adjust-hex-value-brightness(var(--footer-text-color), -10) */
+  --footer-text-color-hover: var(--footer-text-color);
+
+  //
   // Buttons
   //
 

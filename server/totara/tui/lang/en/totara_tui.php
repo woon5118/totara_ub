@@ -96,6 +96,10 @@ $string['formcolours_label_headertext'] = 'Header text colour';
 $string['formcolours_details_headertext'] = 'This sets the text colour of the main navigation.';
 $string['formcolours_label_pagetext'] = 'Page text colour';
 $string['formcolours_details_pagetext'] = 'This sets the main text colour of the site.';
+$string['formcolours_label_footerbg'] = 'Footer background colour';
+$string['formcolours_details_footerbg'] = 'This sets the background colour of the footer.';
+$string['formcolours_label_footertext'] = 'Footer text colour';
+$string['formcolours_details_footertext'] = 'This sets the text colour of the footer.';
 
 // Theme settings - Images tab.
 $string['formimages_group_core'] = 'Core';
@@ -117,7 +121,9 @@ $string['formimages_details_resource'] = 'Upload an image to change the resource
 $string['formimages_label_workspace'] = 'Workspace';
 $string['formimages_details_workspace'] = 'Upload an image to change the workspace default images.';
 
-// Theme settings - Custom CSS tab.
+// Theme settings - Custom tab.
+$string['formcustom_label_customfooter'] = 'Custom footer';
+$string['formcustom_details_customfooter'] = 'The text entered here will be visible in the footer for this Theme.';
 $string['formcustom_label_customcss'] = 'Custom CSS';
 $string['formcustom_details_customcss'] = 'Warning: Any CSS you enter here will be added after all other styles on every page.';
 

@@ -26,13 +26,29 @@
   >
     <FormRowStack spacing="large">
       <FormRow
+        :label="$str('formcustom_label_customfooter', 'totara_tui')"
+        :is-stacked="true"
+      >
+        <FormTextarea
+          :name="['formcustom_field_customfooter', 'value']"
+          :rows="rows('formcustom_field_customfooter', 6, 20)"
+          char-length="full"
+          :aria-describedby="$id('formcustom-customfooter-details')"
+        />
+        <FormRowDetails :id="$id('formcustom-customfooter-details')">
+          {{ $str('formcustom_details_customfooter', 'totara_tui') }}
+        </FormRowDetails>
+      </FormRow>
+
+      <FormRow
+        v-if="!selectedTenantId"
         :label="$str('formcustom_label_customcss', 'totara_tui')"
         :is-stacked="true"
       >
         <FormTextarea
           :name="['formcustom_field_customcss', 'value']"
           spellcheck="false"
-          :rows="rows"
+          :rows="rows('formcustom_field_customcss', 6, 30)"
           char-length="full"
           :aria-describedby="$id('formcustom-customcss-details')"
         />
@@ -88,28 +104,42 @@ export default {
   },
 
   props: {
-    // Array of Objects, each describing the properties for fields that are part
-    // of this Form. There is only an Object present in this Array if it came
-    // from the server as it was previously saved
+    /**
+     * Array of Objects, each describing the properties for fields that are part
+     * of this Form. There is only an Object present in this Array if it came
+     * from the server as it was previously saved
+     */
     savedFormFieldData: {
       type: Array,
       default: function() {
         return [];
       },
     },
-    // Saving state, controlled by parent component GraphQl mutation handling
+
+    /**
+     * Saving state, controlled by parent component GraphQl mutation handling
+     */
     isSaving: {
       type: Boolean,
       default: function() {
         return false;
       },
     },
+
+    /**
+     * Tenant ID or null if global/multi-tenancy not enabled.
+     */
+    selectedTenantId: Number,
   },
 
   data() {
     return {
       initialValues: {
         formcustom_field_customcss: {
+          value: '',
+          type: 'text',
+        },
+        formcustom_field_customfooter: {
           value: '',
           type: 'text',
         },
@@ -120,27 +150,6 @@ export default {
       valuesForm: null,
       resultForm: null,
     };
-  },
-
-  computed: {
-    rows() {
-      var text = '';
-      if (this.valuesForm && 'formcustom_field_customcss' in this.valuesForm) {
-        text = this.valuesForm.formcustom_field_customcss.value;
-      } else if (
-        this.initialValues &&
-        'formcustom_field_customcss' in this.initialValues
-      ) {
-        text = this.initialValues.formcustom_field_customcss.value;
-      }
-      var lines = (text.match(/\n/g) || []).length + 1;
-      if (lines < 6) {
-        lines = 6;
-      } else if (lines > 30) {
-        lines = 30;
-      }
-      return lines;
-    },
   },
 
   /**
@@ -168,6 +177,27 @@ export default {
       if (this.errorsForm) {
         this.errorsForm = null;
       }
+    },
+
+    /**
+     * Adjust the height of a textarea field as the user types, up to
+     * a supplied limit, which then invokes a scrollbar
+     **/
+    rows(field, minLines, maxLines) {
+      let text = '';
+      if (this.valuesForm && field in this.valuesForm) {
+        text = this.valuesForm[field].value;
+      } else if (this.initialValues && field in this.initialValues) {
+        text = this.initialValues[field].value;
+      }
+      let lines = (text.match(/\n/g) || []).length + 1;
+      if (lines < minLines) {
+        return minLines;
+      }
+      if (lines > maxLines) {
+        return maxLines;
+      }
+      return lines;
     },
 
     /**
@@ -216,6 +246,8 @@ export default {
   "totara_tui": [
     "formcustom_label_customcss",
     "formcustom_details_customcss",
+    "formcustom_label_customfooter",
+    "formcustom_details_customfooter",
     "tabcustom"
   ],
   "totara_core": [
