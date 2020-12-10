@@ -127,6 +127,8 @@ Feature: Test various aspects of the totara mobile popup message queries
     And I should see "You have submitted your assignment submission for Test assignment name" in the "#response2" "css_element"
     And I should see "\"isread\": true" in the "#response2" "css_element"
     And I should see "\"fullmessageformat\": \"PLAIN\"" in the "#response2" "css_element"
+    And I should see "\"contextUrl\": \"http" in the "#response2" "css_element"
+    And I should see "\"fullmessageHTML\": \"<p>" in the "#response2" "css_element"
     And I should see "\"__typename\": \"message_popup_message\"" in the "#response2" "css_element"
 
   Scenario: Test totara mobile mark messages read mutation

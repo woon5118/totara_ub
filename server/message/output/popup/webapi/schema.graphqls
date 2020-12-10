@@ -23,6 +23,10 @@ type message_popup_message {
   """
   fullmessageformat: core_format
   """
+  Context URL if provided, link to message subject
+  """
+  contexturl: String
+  """
   Message sent timestamp
   """
   timecreated(format: core_date_format = TIMESTAMP): core_date!

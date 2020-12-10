@@ -50,7 +50,7 @@ trait message_popup_test_helper {
         $record->fullmessagehtml = $message;
         $record->smallmessage = $message;
         $record->timecreated = $timecreated ? $timecreated : time();
-
+        $record->contexturl = 'https://www.totaralearning.com/';
         $id = $DB->insert_record('message', $record);
 
         $popup = new stdClass();
@@ -90,6 +90,7 @@ trait message_popup_test_helper {
         $record->smallmessage = $message;
         $record->timecreated = $timecreated ? $timecreated : time();
         $record->timeread = $timeread ? $timeread : time();
+        $record->contexturl = 'https://www.totaralearning.com/';
 
         $id = $DB->insert_record('message_read', $record);
 

@@ -45,6 +45,7 @@ class message_formatter extends formatter {
                     ->format($value);
             },
             'fullmessageformat' => null,
+            'contexturl' => string_field_formatter::class,
             'timecreated' => date_field_formatter::class,
             'isread' => null
         ];

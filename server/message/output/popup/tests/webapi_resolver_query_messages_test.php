@@ -143,6 +143,7 @@ class message_popup_webapi_resolver_query_messages_testcase extends advanced_tes
         $this->assertEquals('No subject', $message0['subject']);
         $this->assertEquals('Message 4', $message0['fullmessage']);
         $this->assertEquals('HTML', $message0['fullmessageformat']);
+        $this->assertEquals('https://www.totaralearning.com/', $message0['contexturl']);
         $this->assertEquals('4', $message0['timecreated']);
         $this->assertEquals(true, $message0['isread']);
 
@@ -150,6 +151,7 @@ class message_popup_webapi_resolver_query_messages_testcase extends advanced_tes
         $this->assertEquals('No subject', $message1['subject']);
         $this->assertEquals('Message 3', $message1['fullmessage']);
         $this->assertEquals('HTML', $message1['fullmessageformat']);
+        $this->assertEquals('https://www.totaralearning.com/', $message1['contexturl']);
         $this->assertEquals('3', $message1['timecreated']);
         $this->assertEquals(false, $message1['isread']);
     }

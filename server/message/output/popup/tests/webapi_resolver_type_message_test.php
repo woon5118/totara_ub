@@ -210,6 +210,21 @@ class nessage_popup_webapi_resolver_type_message_testcase extends advanced_testc
     }
 
     /**
+     * Test the message type resolver for the contexturl field
+     */
+    public function test_resolve_contexturl() {
+        global $DB;
+        $recipient = $this->create_messages();
+        $this->setUser($recipient);
+        $messages = api::get_popup_notifications($recipient->id, 'ASC');
+        $message = $messages[0];
+
+        $value = $this->resolve('contexturl', $message, ['format' => format::FORMAT_PLAIN]);
+        $this->assertEquals($message->contexturl, $value);
+        $this->assertTrue(is_string($value));
+    }
+
+    /**
      * Test the message type resolver for the timecreated field
      */
     public function test_resolve_timecreated() {
