@@ -25,13 +25,18 @@ namespace container_workspace\task;
 defined('MOODLE_INTERNAL') || die();
 
 use coding_exception;
+use container_workspace\member\member;
+use container_workspace\output\added_to_workspace_notification;
 use container_workspace\workspace;
 use container_workspace\member\member_handler;
 use core\collection;
+use core\entity\cohort;
 use core\entity\user;
 use core\entity\adhoc_task as adhoc_task_entity;
+use core\message\message;
 use core\task\adhoc_task;
 use core\task\manager;
+use core\task\manager as task_manager;
 use dml_missing_record_exception;
 
 /**
@@ -177,9 +182,10 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         $workspace_name = $workspace->get_name();
         $this->log("adding cohort members to '$workspace_name'...");
 
-        $new_member_count = (new member_handler($this->get_userid()))
-            ->add_workspace_members_from_cohorts($workspace, $cohort_ids)
-            ->count();
+        $new_members = (new member_handler($this->get_userid()))
+            ->add_workspace_members_from_cohorts($workspace, $cohort_ids, false);
+
+        $new_member_count = count($new_members);
 
         $result = sprintf(
             "added %d member%s to '%s'",
@@ -187,6 +193,10 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
             $new_member_count === 1 ? '' : 's',
             $workspace_name
         );
+
+        $this->send_notification_task_finished($workspace, $cohort_ids, $new_member_count);
+        // We don't want to trigger a lot of individual adhoc tasks so let's send the via bulk
+        $this->queue_bulk_notification($workspace, $new_members);
 
         $this->log($result);
 
@@ -255,5 +265,94 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
             $final_message = sprintf('[%s] %s', self::class, $message);
             mtrace($final_message);
         }
+    }
+
+    /**
+     * Queue bulk member notifications
+     *
+     * @param workspace $workspace
+     * @param int[] $member_ids
+     * @return void
+     */
+    private function queue_bulk_notification(workspace $workspace, array $member_ids): void {
+        $member_id_chunks = array_chunk($member_ids, 500);
+
+        foreach ($member_id_chunks as $member_id_chunk) {
+            $task = notify_added_to_workspace_bulk_task::from_members($workspace, $member_id_chunk);
+            task_manager::queue_adhoc_task($task);
+        }
+    }
+
+    /**
+     * Send notification to the user that the task is now finished
+     *
+     * @param workspace $workspace
+     * @param collection $cohort_ids
+     * @param int $number_of_members_added
+     * @return void
+     */
+    private function send_notification_task_finished(
+        workspace $workspace,
+        collection $cohort_ids,
+        int $number_of_members_added
+    ): void {
+        $workspace_name = format_string($workspace->get_name());
+        $url = new \moodle_url("/container/type/workspace/workspace.php", ['id' => $workspace->id]);
+
+        $message_text = get_string(
+            'bulk_add_audiences_notification_message',
+            'container_workspace',
+            (object) [
+                'number' => $number_of_members_added,
+                'name' => $workspace_name,
+                'link' => $url->out(),
+            ]
+        );
+
+        $audience_names = $this->get_audience_names($cohort_ids);
+        $list_of_audiences_added = "<li>".implode("</li><li>", $audience_names)."</li>";
+
+        $message_text .= "<br><br><ul>{$list_of_audiences_added}</ul>";
+
+        $message = new message();
+        $message->userfrom = \core_user::get_noreply_user();
+        $message->userto = $this->get_userid();
+        $message->subject = get_string('bulk_add_audiences_notification_subject', 'container_workspace');
+        $message->fullmessage = $message_text;
+        $message->fullmessageformat = FORMAT_HTML;
+        $message->fullmessagehtml = $message_text;
+        $message->component = $workspace::get_type();
+        $message->name = 'bulk_members_via_audience_added';
+        $message->courseid = $workspace->get_id();
+        $message->contexturl     = $url;
+        $message->contexturlname = $workspace_name;
+
+        // Clone first to make sure we use the same base object
+        $message_to_owner = clone $message;
+
+        message_send($message);
+
+        if ($this->get_userid() != $workspace->get_user_id()) {
+            $message_to_owner->userto = $workspace->get_user_id();
+
+            message_send($message_to_owner);
+        }
+    }
+
+    /**
+     * Resolve given ids to audience names
+     *
+     * @param collection $cohort_ids
+     * @return string[]
+     */
+    private function get_audience_names(collection $cohort_ids): array {
+        if ($cohort_ids->count() == 0) {
+            return [];
+        }
+
+        return cohort::repository()
+            ->where('id', $cohort_ids->all())
+            ->get()
+            ->pluck('name');
     }
 }

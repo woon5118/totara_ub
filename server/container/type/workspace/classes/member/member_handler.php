@@ -121,12 +121,16 @@ class member_handler {
     /**
      * Assigns the members of cohorts to a specified workspace.
      *
-     * @param workspace workspace_id indicates the workspace to which to add members.
-     * @param collection cohort_ids list of cohorts from which to draw members.
-     *
-     * @return member[]|collection the newly added members in the workspace.
+     * @param workspace $workspace
+     * @param collection $cohort_ids
+     * @param bool $trigger_notification
+     * @return int[] returns the user_ids of the new members just added
      */
-    public function add_workspace_members_from_cohorts(workspace $workspace, collection $cohort_ids): collection {
+    public function add_workspace_members_from_cohorts(
+        workspace $workspace,
+        collection $cohort_ids,
+        bool $trigger_notification = true
+    ): array {
         $interactor = new workspace_interactor($workspace, $this->actor_id);
         if (!($interactor->can_manage()
             || $interactor->is_owner())
@@ -135,18 +139,14 @@ class member_handler {
             throw enrol_exception::on_cohort_enrol_permission();
         }
 
-        $transaction = builder::get_db()->start_delegated_transaction();
-        $new_members = audience_loader::get_bulk_members_to_add($workspace, $cohort_ids->all());
+        return builder::get_db()->transaction(function () use ($workspace, $cohort_ids, $trigger_notification): array {
+            $new_members = audience_loader::get_bulk_members_to_add($workspace, $cohort_ids->all());
 
-        $added_members = collection::new($new_members)
-            ->map(
-                function (int $user_id) use ($workspace): member {
-                    return member::added_to_workspace($workspace, $user_id);
-                }
-            );
+            foreach ($new_members as $new_member) {
+                member::added_to_workspace($workspace, $new_member, $trigger_notification, $this->actor_id);
+            }
 
-        $transaction->allow_commit();
-
-        return $added_members;
+            return $new_members;
+        });
     }
 }

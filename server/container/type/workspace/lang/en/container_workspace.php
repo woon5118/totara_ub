@@ -48,6 +48,8 @@ $string['bulk_add_audiences_modal_confirm_button'] = 'Add members';
 $string['bulk_add_audiences_modal_reselect_button'] = 'Reselect audiences';
 $string['bulk_add_audiences_modal_title'] = 'Bulk add {$a} new members to workspace?';
 $string['bulk_add_audiences_modal_title_no_members'] = 'Your selection will not add any new members to the workspace.';
+$string['bulk_add_audiences_notification_subject'] = 'Audience members have been successfully added to workspace.';
+$string['bulk_add_audiences_notification_message'] = '{$a->number} people from the following audiences were added to <a href="{$a->link}">{$a->name}</a>:';
 $string['cachedef_draft_id'] = 'Draft IDs';
 $string['category_name'] = 'Space category';
 $string['cancel_request'] = 'Cancel request';
@@ -281,6 +283,7 @@ $string['error:view_workspace'] = 'You don\'t have permission to view this page.
 $string['workspace:add_library'] = 'Select content to share with workspaces';
 
 // String for message provider
+$string['messageprovider:bulk_members_via_audience_added'] = "Members added in bulk via audience(s)";
 $string['messageprovider:notification'] = "New items added to workspace library";
 $string['messageprovider:accept_member_request'] = "Member request accepted";
 $string['messageprovider:comment_on_discussion'] = "Comments on discussion posts";

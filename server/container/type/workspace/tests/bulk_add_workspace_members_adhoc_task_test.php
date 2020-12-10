@@ -23,6 +23,7 @@
  */
 
 use core\collection;
+use core\entity\cohort;
 use core\task\manager;
 use core\entity\adhoc_task as adhoc_task_entity;
 use core\entity\cohort_member as cohort_member_entity;
@@ -393,12 +394,96 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
         // Since we are running as the owner,
         $this->setUser($test_data->owner_id);
 
+        $message_sink = $this->redirectMessages();
+
         $task_data = $this->task_data($workspace_id, $cohort_ids);
         $added_member_count = $this->get_enqueued_task($task_data)->execute();
         $this->assertEquals(count($user_ids), $added_member_count);
 
         $updated_members = array_merge($original_members, $user_ids);
         $this->assert_workspace_members($workspace_id, $updated_members);
+
+        $messages = $message_sink->get_messages();
+        $this->assertCount(1, $messages);
+
+        $message = array_shift($messages);
+
+        $cohort_names = cohort::repository()
+            ->where('id', $cohort_ids->all())
+            ->get()
+            ->pluck('name');
+
+        $this->assertEquals('container_workspace', $message->component);
+        $this->assertEquals('bulk_members_via_audience_added', $message->eventtype);
+        $this->assertEquals(get_string('bulk_add_audiences_notification_subject', 'container_workspace'), $message->subject);
+        $this->assertEquals($test_data->owner_id, $message->useridto);
+        $this->assertStringContainsString(
+            $added_member_count . ' people from the following audiences were added to <a href="https://www.example.com/moodle/container/type/workspace/workspace.php?id='.$workspace_id.'">'.$test_data->workspace->get_name().'</a>',
+            $message->fullmessagehtml
+        );
+        foreach ($cohort_names as $cohort_name) {
+            $this->assertStringContainsString($cohort_name, $message->fullmessagehtml);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function test_execute_task_as_admin(): void {
+        $test_data = $this->create_test_data(1, 1);
+
+        $cohort_ids = $test_data->cohort_ids;
+        $user_ids = $test_data->user_ids->all();
+
+        foreach ($cohort_ids as $cohort_id) {
+            foreach ($user_ids as $user_id) {
+                cohort_add_member($cohort_id, $user_id);
+            }
+
+            $this->assert_cohort_members($cohort_id, $user_ids);
+        }
+
+        // The workspace originally has only 1 member - the owner.
+        $workspace_id = $test_data->workspace->id;
+        $original_members = [$test_data->owner_id];
+        $this->assert_workspace_members($workspace_id, $original_members);
+
+        // Since we are running as the owner,
+        $this->setAdminUser();
+
+        $message_sink = $this->redirectMessages();
+
+        $task_data = $this->task_data($workspace_id, $cohort_ids);
+        $added_member_count = $this->get_enqueued_task($task_data)->execute();
+        $this->assertEquals(count($user_ids), $added_member_count);
+
+        $updated_members = array_merge($original_members, $user_ids);
+        $this->assert_workspace_members($workspace_id, $updated_members);
+
+        $messages = $message_sink->get_messages();
+        $this->assertCount(2, $messages);
+
+        // Both, the admin and the owner should have been notified
+        $user_id_tos = array_column($messages, 'useridto');
+        $this->assertEqualsCanonicalizing([get_admin()->id, $test_data->owner_id], $user_id_tos);
+
+        $cohort_names = cohort::repository()
+            ->where('id', $cohort_ids->all())
+            ->get()
+            ->pluck('name');
+
+        foreach ($messages as $message) {
+            $this->assertEquals('container_workspace', $message->component);
+            $this->assertEquals('bulk_members_via_audience_added', $message->eventtype);
+            $this->assertEquals(get_string('bulk_add_audiences_notification_subject', 'container_workspace'), $message->subject);
+            $this->assertStringContainsString(
+                $added_member_count . ' people from the following audiences were added to <a href="https://www.example.com/moodle/container/type/workspace/workspace.php?id='.$workspace_id.'">'.$test_data->workspace->get_name().'</a>',
+                $message->fullmessagehtml
+            );
+            foreach ($cohort_names as $cohort_name) {
+                $this->assertStringContainsString($cohort_name, $message->fullmessagehtml);
+            }
+        }
     }
 
     /**
@@ -429,14 +514,16 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
     /**
      * Generates test data.
      *
-     * @param bool $no_of_cohorts no of cohorts to generate.
-     * @param bool $no_of_users no of users to generate.
+     * @param int $no_of_cohorts no of cohorts to generate.
+     * @param int $no_of_users no of users to generate.
      *
      * @return stdClass an object with the following fields:
      *         - workspace workspace
      *         - collection cohort_ids
      *         - collection user_ids
      *         - int owner_id
+     * @throws coding_exception
+     * @throws dml_exception
      */
     private function create_test_data(
         int $no_of_cohorts = 2,
@@ -481,7 +568,7 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
     /**
      * Returns all the task objects in the repository.
      *
-     * @return collection|bulk_add_workspace_members_adhoc_task[] the list of
+     * @return collection|task[] the list of
      *         adhoc tasks
      */
     private function all_tasks(): collection {
@@ -521,13 +608,15 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
      * @return task the task.
      */
     private function get_enqueued_task(array $task_data): task {
+        global $USER;
+
         $task = new task();
 
         $task->set_component(task::COMPONENT);
         $task->set_next_run_time(time());
         $task->set_blocking(false);
         $task->set_fail_delay(0);
-        $task->set_userid(get_admin()->id);
+        $task->set_userid($USER->id);
         $task->set_custom_data($task_data);
 
         return $task;
