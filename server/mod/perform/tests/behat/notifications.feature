@@ -100,7 +100,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "Your Activity test Feedback is ready for you to complete"
     And I should see date "2 weeks" formatted "This needs to be completed by %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I log out
 
     # appraiser should receive a notification
@@ -113,7 +113,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "Activity test Feedback"
     And I should see date "2 weeks" formatted "This needs to be completed by %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I log out
 
     # user2 should not receive any notifications
@@ -218,7 +218,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "6 days ago you were sent your Activity test Feedback to complete"
     And I should see date "2 weeks" formatted "This needs to be completed by %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I log out
 
     # appraiser should receive as many notifications as user1 does
@@ -299,7 +299,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "Your Activity test Feedback is due to be completed in 6 days"
     And I should see date "2 weeks" formatted "Please ensure you complete it by %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I am on site homepage
 
     # day 9 (5 days before due)
@@ -420,7 +420,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "Your Activity test Feedback is due to be completed today"
     And I should see "Please ensure you complete it by the end of the day"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I am on site homepage
 
     # day 15 (overdue)
@@ -502,7 +502,7 @@ Feature: Perform activity notifications - core relationships
     Then I should see "Hi User One"
     And I should see date "2 weeks" formatted "Your Activity test Feedback was due to be completed on %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I am on site homepage
 
     # day 16 (2 day overdue)
@@ -625,7 +625,7 @@ Feature: Perform activity notifications - core relationships
     Then I should see "Hi User One"
     And I should see "Your Activity test Feedback has been completed by all participants"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I log out
 
     # user3 should receive a notification
@@ -643,7 +643,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "The following activity has been completed by all participants"
     And I should see "Activity test Feedback: User One"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I log out
 
     # user2 should not receive any notifications
@@ -743,7 +743,7 @@ Feature: Perform activity notifications - core relationships
     Then I should see "Hi User One"
     And I should see "Your Activity test Feedback has been reopened"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I log out
 
     # user3 should receive a notification
@@ -761,7 +761,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "The following activity has been reopened"
     And I should see "Activity test Feedback: User One"
     When I follow "Activity test"
-    Then I should see "Performance activities" in the page title
+    Then I should see "Activity test" in the page title
     And I log out
 
     # user2 should not receive any notifications

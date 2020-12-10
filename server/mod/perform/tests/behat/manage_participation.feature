@@ -91,25 +91,25 @@ Feature: Test management of activity participation
       | User Two     | 1               | 2            |
       | User Two     | 2               | 2            |
     When I click on "2" "link" in the "User Three 99999997" "table_row"
-    Then I should see "Participant instances: 2 records shown"
+    Then I should see "for manager2 appraiser - Participant instances"
     And the following should exist in the "perform_manage_participation_participant_instance" table:
       | Participant name | Subject name | Relationship name |
       | appraiser User   | User Three   | Appraiser         |
       | manager Two      | User Three   | Manager           |
 
     When I click on "Show all" "link"
-    Then I should see "Participant instances: 20 records shown"
+    Then I should see "for manager2 appraiser - Participant instances"
 
     When I click on "Subject instances" "link"
     And I click on "2" "link" in the "User Three 99999997" "table_row"
     And I click on "1" "link" in the "appraiser User User Three 99999997" "table_row"
-    Then I should see "Participant sections: 1 records shown"
+    Then I should see "for manager2 appraiser - Participant sections"
     And the following should exist in the "perform_manage_participation_participant_section" table:
       | Participant name | Section title | Subject name | Relationship name |
       | appraiser User   | Part one      | User Three   | Appraiser         |
 
     When I click on "Show all" "link"
-    Then I should see "Participant sections: 10 records shown"
+    Then I should see "for manager2 appraiser - Participant sections"
 
   Scenario: open/close action on participant management reports
     Given I log in as "admin"

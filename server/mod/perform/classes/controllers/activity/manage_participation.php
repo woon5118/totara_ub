@@ -106,7 +106,7 @@ class manage_participation extends perform_controller {
         ]);
 
         $new_heading = get_string("manage_participation_{$this->current_tab}_number_shown",
-            'mod_perform', $report->get_filtered_count()
+            'mod_perform', $this->activity->name
         );
 
         /** @var embedded_report_view $report_view */

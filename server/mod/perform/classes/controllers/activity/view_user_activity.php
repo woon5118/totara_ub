@@ -28,6 +28,7 @@ use core\entity\user;
 use invalid_parameter_exception;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\models\activity\section;
 use mod_perform\models\response\participant_section as participant_section_model;
 use mod_perform\totara\menu\my_activities;
 use moodle_exception;
@@ -96,8 +97,14 @@ class view_user_activity extends perform_controller {
         $this->set_url($url);
         $this->get_page()->set_totara_menu_selected(my_activities::class);
 
+        $section = $this->get_section();
+        $activity = $section->get_activity();
+        $title = $activity->get_multisection_setting()
+            ? $activity->name .' - '. $section->get_display_title()
+            : $activity->name;
+
         return self::create_tui_view('mod_perform/pages/UserActivity', $props)
-            ->set_title(get_string('user_activities_page_title', 'mod_perform'));
+            ->set_title($title);
     }
 
     /**
@@ -152,4 +159,17 @@ class view_user_activity extends perform_controller {
         }
     }
 
+    /**
+     * @return section
+     */
+    private function get_section(): section {
+        $participant_instance = self::get_participant_instance(
+            $this->get_participant_instance_id(),
+            $this->get_participant_section_id()
+        );
+
+        $section_entity = $participant_instance->get_participant_sections()->current();
+
+        return section::load_by_id($section_entity->section_id);
+    }
 }

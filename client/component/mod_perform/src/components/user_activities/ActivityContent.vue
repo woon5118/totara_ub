@@ -1130,6 +1130,7 @@ export default {
       if (shouldChange) {
         this.navModel = newNavModel;
         this.updateUrl();
+        this.updateTitle();
         this.reloadData();
       }
     },
@@ -1174,6 +1175,20 @@ export default {
 
       // Note we push state by default (a new history entry) not replace it on section change.
       window.history.pushState(null, null, url);
+    },
+    updateTitle() {
+      if (this.activity.settings.multisection && !this.viewOnlyReportMode) {
+        const currentParticipantSection = this.activeParticipantSection.participant_instance.participant_sections.find(
+          section => this.selectedParticipantSectionId === section.id
+        );
+        window.document.title =
+          this.activity.name +
+          ' - ' +
+          currentParticipantSection.section.display_title;
+
+        return;
+      }
+      window.document.title = this.activity.name;
     },
     popstateHandler() {
       const urlNavModelKey = this.viewOnlyReportMode
