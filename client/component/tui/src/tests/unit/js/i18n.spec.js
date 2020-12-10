@@ -28,9 +28,18 @@ import {
   getString as rawGetString,
   hasString as rawHasString,
 } from 'tui/internal/lang_string_store';
+import { config } from 'tui/config';
 
 jest.unmock('tui/i18n');
 jest.mock('tui/internal/lang_string_store');
+
+jest.mock('tui/util', function() {
+  return {
+    getQueryStringParam(name) {
+      if (name == 'strings') return 1;
+    },
+  };
+});
 
 beforeEach(() => {
   rawLoadStrings.mockClear();
@@ -76,6 +85,13 @@ describe('getString', () => {
     expect(rawGetString).toHaveBeenCalledWith('save', 'core');
     expect(getString('save')).toBe('Save');
     expect(rawGetString).toHaveBeenCalledWith('save', 'core');
+  });
+
+  it('supports debugstringids', () => {
+    const orig_debugstringids = config.locale.debugstringids;
+    config.locale.debugstringids = 1;
+    expect(getString('replace', 'foo', 'bob')).toBe('hello bob {replace/foo}');
+    config.locale.debugstringids = orig_debugstringids;
   });
 });
 

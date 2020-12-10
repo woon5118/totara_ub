@@ -21,6 +21,8 @@ import {
   getString as rawGetString,
   hasString as rawHasString,
 } from './internal/lang_string_store';
+import { config } from './config';
+import { getQueryStringParam } from './util';
 
 /**
  * Normalize component name for i18n API.
@@ -49,8 +51,15 @@ const normalizeComponent = component => {
  */
 export function getString(key, component, param) {
   component = normalizeComponent(component);
-  const str = rawGetString(key, component);
-  return str ? replacePlaceholders(str, param) : `[[${key}, ${component}]]`;
+  let str = rawGetString(key, component);
+  if (!str) {
+    return `[[${key}, ${component}]]`;
+  }
+  str = replacePlaceholders(str, param);
+  if (config.locale.debugstringids && getQueryStringParam('strings')) {
+    str += ` {${key}/${component}}`;
+  }
+  return str;
 }
 
 /**

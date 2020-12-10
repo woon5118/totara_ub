@@ -1773,6 +1773,7 @@ require(['core/autoinitialise'], function(ai) {
             'context' => ['id' => $contextid],
             'locale' => [
                 'language' => $currentlanguage,
+                'debugstringids' => get_config('core', 'debugstringids'),
             ],
         ];
         if (defined('BEHAT_SITE_RUNNING')) {
