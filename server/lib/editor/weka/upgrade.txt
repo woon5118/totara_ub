@@ -18,11 +18,11 @@ The information here is intended only for developers.
 * editor_weka\extension\extension::$contextid had been deprecated and no longer used.
 * editor_weka\extension\extension::__construct() first, second and third parameters are no longer used. Please update all calls.
 * weka_texteditor::get_config() is no longer return null, but throw exception instead.
-* weka_texteditor::show_toolbar() first and second parameters are no longer used. Plase update all calls.
+* weka_texteditor::show_toolbar() first and second parameters are no longer used. Please update all calls.
 * weka_texteditor::get_files() has been deprecated, please use file_storage::get_area_files() instead.
 
---- Update to GraphQl ---
-* Field "repository_data" of type "editor_weka_editor" had been deperecated, please use query editor_weka_repository_data instead.
+--- Update to GraphQL ---
+* Field "repository_data" of type "editor_weka_editor" had been deprecated, please use query editor_weka_repository_data instead.
 * Field "draft_files" of type "editor_weka_editor" had been deprecated and no longer used.
 * Field "showtoolbar" of type "editor_weka_editor" had been deprecated, and no longer used. Please update all calls.
 * Argument "component" to resolve field "extensions" of type "editor_weka_editor" had been deprecated in favour of "usage_identifier"

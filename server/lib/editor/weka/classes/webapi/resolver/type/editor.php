@@ -89,7 +89,7 @@ final class editor implements type_resolver {
                         new component_area($usage_identifier['component'], $usage_identifier['area'])
                     );
 
-                    if (isset($usage_identifier['instance_id'])) {
+                    if (!empty($usage_identifier['instance_id'])) {
                         $variant->set_instance_id($usage_identifier['instance_id']);
                     }
                 }

@@ -23,7 +23,7 @@
 namespace editor_weka\extension;
 
 /**
- * Media extesion includes web_image and video types.
+ * Media extension includes web_image and video types.
  * @method static media create(array $options)
  */
 final class media extends extension {

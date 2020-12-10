@@ -180,7 +180,7 @@ class editor_weka_webapi_editor_weka_testcase extends advanced_testcase {
     /**
      * @return void
      */
-    public function test_get_editor_with_deprecated_fields_but_superceed_by_usage_identifier(): void {
+    public function test_get_editor_with_deprecated_fields_but_supersede_by_usage_identifier(): void {
         $generator = self::getDataGenerator();
 
         $user_one = $generator->create_user();
@@ -222,7 +222,7 @@ class editor_weka_webapi_editor_weka_testcase extends advanced_testcase {
         self::assertInstanceOf(weka_texteditor::class, $editor);
         self::assertNotEmpty($editor->get_context_id());
 
-        // The usage identifier will superceedt he deprecated fields.
+        // The usage identifier will supersede the deprecated fields.
         // Hence we should be expecting the context's id from user two rather than user one.
 
         self::assertEquals($context_two->id, $editor->get_context_id());

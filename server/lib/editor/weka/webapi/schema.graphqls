@@ -11,7 +11,7 @@ type editor_weka_extension {
 type editor_weka_editor {
   extensions(
     """
-    The component where the editor weka is  used.
+    The component where the editor weka is used.
     Deprecated in favour of usage_identifier.
     """
     component: param_component
@@ -49,7 +49,7 @@ type editor_weka_editor {
   """
   repository_data: editor_weka_repository_data!
     @deprecated(
-      reason: "The repository_data is now fetched from different query"
+      reason: "The repository_data is now fetched from query editor_weka_repository_data"
     )
   """
   The context's id where the editor is being used. This has to be done as part of constructing
@@ -75,7 +75,9 @@ type editor_weka_editor {
     """
     item_id: param_integer
   ): [editor_weka_file!]!
-    @deprecated(reason: "The files field got deprecated and longer used.")
+    @deprecated(
+      reason: "The files field got deprecated in favour of query editor_weka_draft_file"
+    )
 
   """
   The current draft files within weka editor. If there are any.
@@ -87,7 +89,7 @@ type editor_weka_editor {
     draft_item_id: param_integer
   ): [editor_weka_file!]!
     @deprecated(
-      reason: "The draft file's metadata is now fetched from the runtime"
+      reason: "The files field got deprecated in favour of query editor_weka_draft_file"
     )
 }
 
@@ -135,7 +137,7 @@ extend type Query {
     """
     instance_id: param_integer
     """
-    To identifier where the editor is being used. The input includes the fields
+    The identifier where the editor is being used. The input includes the fields
     component, area as required fields and optional for instance_id.
     """
     usage_identifier: core_editor_usage_identifier

@@ -68,10 +68,8 @@ class core_webapi_resolve_type_core_editor_testcase extends advanced_testcase {
     }
 
     /**
-     * This is to make sure that our API is always returning the prefered the
-     * instance of the introduced variant class. Or returning the instance of fallback
-     * variant when none is provided.
-     *
+     * This is to make sure that our API either returns the preferred
+     * instance of the variant class or the fallback variant instance otherwise.
      * @return void
      */
     public function test_resolve_editor_variant(): void {

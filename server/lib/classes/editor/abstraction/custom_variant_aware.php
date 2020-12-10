@@ -23,13 +23,8 @@
 namespace core\editor\abstraction;
 
 /**
- * This interface is to tell the process to stop on validating the standard
- * variant names and let it through.
- *
- * Only implement this interface when you really want to support custom variant name.
- * This interface was meant to support backward compatible for old version of weka editor.
- *
- * Note that this interface should only be used for variant.
+ * This interface indicates this variant has a custom name and should not be validated by the core process.
+ * It's intended to make the variant system backwards compatible with older versions of weka editor.
  */
 interface custom_variant_aware {
 }

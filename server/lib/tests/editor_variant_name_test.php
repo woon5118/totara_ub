@@ -48,7 +48,7 @@ class core_editor_variant_name_testcase extends advanced_testcase {
                 continue;
             }
 
-            self::fail("Expecting the validation to be failed for string '{$str}'");
+            self::fail("An expected exception was not thrown for invalid variant '{$str}'");
         }
     }
 }

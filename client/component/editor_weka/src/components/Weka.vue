@@ -92,7 +92,7 @@ export default {
         return {
           component: this.component || 'editor_weka',
           area: this.area || 'learn',
-          instanceId: this.instanceId || null,
+          instanceId: this.instanceId,
         };
       },
     },
@@ -111,10 +111,7 @@ export default {
     /**
      * The compact mode is to determine whether we are showing the tool bar or not.
      */
-    compact: {
-      type: Boolean,
-      default: false,
-    },
+    compact: Boolean,
   },
 
   data() {

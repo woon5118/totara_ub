@@ -88,7 +88,6 @@ class extension_loader {
             function (string $extension_class): string {
                 return ltrim($extension_class, '\\');
             },
-
             $exclude_classes
         );
 

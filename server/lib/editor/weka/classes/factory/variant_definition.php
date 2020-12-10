@@ -56,7 +56,7 @@ class variant_definition {
                     mention::class
                 ]
             ],
-            // The rest is the custom variants thru out the system that we would want to
+            // The rest is the custom variants through out the system that we would want to
             // make it backward compatible.
             'editor_weka-phpunit' => [
                 'exclude_extensions' => [
@@ -100,7 +100,7 @@ class variant_definition {
                     media::class
                 ]
             ],
-            'container_worksapce-discussion' => [
+            'container_workspace-discussion' => [
                 'exclude_extensions' => []
             ],
             'engage_article-content' => [
