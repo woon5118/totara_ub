@@ -25,3 +25,4 @@ information provided here is intended especially for developers.
 
 * Added new optional prop "instanceId" for component User.vue
 * Added new optional prop "contextId" for component Weka.vue
+* Added new addAltButton for component ImageBlock.vue

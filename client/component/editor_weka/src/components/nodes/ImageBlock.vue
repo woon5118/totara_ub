@@ -19,11 +19,17 @@
 <template>
   <div class="tui-wekaImageBlock">
     <div v-if="!$apollo.loading" class="tui-wekaImageBlock__inner">
-      <ModalPresenter :open="showModal" @request-close="$_hideModal">
+      <ModalPresenter :open="showModal" @request-close="cancel">
         <EditImageAltTextModal :value="altText" @change="$_updateAltText" />
       </ModalPresenter>
 
       <ImageBlock :url="file.url" :filename="filename" :alt-text="altText" />
+      <Button
+        v-if="altTextButtonVisible"
+        class="tui-wekaImageBlock__inner-addAltButton"
+        :text="altTextLabel"
+        @click="openModal"
+      />
       <NodeBar
         :actions="actions"
         :aria-label="$str('actions_menu_for', 'editor_weka', filename)"
@@ -44,10 +50,12 @@ import BaseNode from 'editor_weka/components/nodes/BaseNode';
 import getDraftFile from 'editor_weka/graphql/get_draft_file';
 import NodeBar from 'editor_weka/components/toolbar/NodeBar';
 import EditImageAltTextModal from 'editor_weka/components/editing/EditImageAltTextModal';
+import Button from 'tui/components/buttons/Button';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 
 export default {
   components: {
+    Button,
     EditImageAltTextModal,
     ModalPresenter,
     ImageBlock,
@@ -89,7 +97,7 @@ export default {
         },
         {
           label: this.altTextLabel,
-          action: this.$_showModal,
+          action: this.openModal,
         },
         {
           label: this.$str('remove', 'core'),
@@ -111,11 +119,14 @@ export default {
     },
 
     altText() {
-      if (!this.attrs.alttext) {
-        return '';
-      }
-
+      // Return null for showing addAltButton at the init stage. The value comes from media.js
+      // Return empty string for hiding the addAltButton which represents user didn't want to put in an alt text. Plus user already acknowledged and dismissed the setting modal
+      // Return the real value after getting user input. It also hides the addAltButton since it's not a null
       return this.attrs.alttext;
+    },
+
+    altTextButtonVisible() {
+      return this.altText === null;
     },
 
     filename() {
@@ -147,7 +158,7 @@ export default {
       this.context.replaceWithAttachment(this.getRange, params);
     },
 
-    $_showModal() {
+    openModal() {
       this.showModal = true;
     },
 
@@ -176,6 +187,15 @@ export default {
 
     async $_download() {
       window.open(await this.context.getDownloadUrl(this.filename));
+    },
+
+    cancel() {
+      // Save as empty string when the user didn't want to put in an alt text. It triggered once user acknowledged and dismissed the setting modal
+      if (this.altText === null) {
+        this.$_updateAltText('');
+      } else {
+        this.$_hideModal();
+      }
     },
   },
 };
@@ -215,9 +235,16 @@ export default {
   }
 
   &__inner {
+    position: relative;
     display: inline-block;
     max-width: 100%;
     white-space: normal;
+
+    &-addAltButton {
+      position: absolute;
+      right: var(--gap-2);
+      bottom: var(--gap-7);
+    }
 
     .tui-imageBlock {
       margin: 0;

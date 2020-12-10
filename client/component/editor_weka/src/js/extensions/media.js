@@ -255,7 +255,7 @@ class MediaExtension extends BaseExtension {
           if (IMAGE === media_type) {
             return schema.node('image', {
               filename: filename,
-              alttext: '',
+              alttext: null,
               url: url,
             });
           } else if (VIDEO === media_type) {

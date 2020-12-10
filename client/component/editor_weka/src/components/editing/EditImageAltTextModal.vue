@@ -24,7 +24,12 @@
     >
       <Form input-width="full" @submit.prevent="confirm">
         <div class="tui-wekaEditImageAltTextModal__input">
-          <InputText v-model="innerValue" :autofocus="true" />
+          <InputText
+            v-model="innerValue"
+            :maxlength="120"
+            char-length="full"
+            :autofocus="true"
+          />
 
           <p class="tui-wekaEditImageAltTextModal__input-helpText">
             {{ $str('image_alt_help', 'editor_weka') }}
@@ -33,6 +38,7 @@
 
         <ButtonGroup class="tui-wekaEditImageAltTextModal__buttonGroup">
           <Button
+            :disabled="!innerValue"
             :styleclass="{ primary: 'true' }"
             :text="$str('done', 'editor_weka')"
             @click="confirm"
@@ -66,10 +72,7 @@ export default {
   },
 
   props: {
-    value: {
-      type: String,
-      required: true,
-    },
+    value: String,
   },
 
   data() {
@@ -80,11 +83,11 @@ export default {
 
   computed: {
     modalTitle() {
-      if (this.value.length === 0) {
-        return this.$str('add_image_alt_text', 'editor_weka');
+      if (this.value) {
+        return this.$str('edit_image_alt_text', 'editor_weka');
       }
 
-      return this.$str('edit_image_alt_text', 'editor_weka');
+      return this.$str('add_image_alt_text', 'editor_weka');
     },
   },
 

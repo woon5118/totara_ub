@@ -72,6 +72,7 @@ export default {
     },
 
     $_requestClose(e) {
+      // Please be aware, $_request-close makes it an object if the argument is the falsy value
       this.$emit('request-close', e || {});
     },
   },
