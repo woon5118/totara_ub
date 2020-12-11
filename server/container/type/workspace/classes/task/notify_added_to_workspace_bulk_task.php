@@ -25,8 +25,10 @@ namespace container_workspace\task;
 use container_workspace\member\member;
 use container_workspace\output\added_to_workspace_notification;
 use container_workspace\workspace;
+use core\entity\user;
 use core\message\message;
 use core\task\adhoc_task;
+use core_user;
 
 /**
  * This task is to send notification to users who had been added to a workspace in bulk.
@@ -61,7 +63,16 @@ final class notify_added_to_workspace_bulk_task extends adhoc_task {
         }
 
         foreach ($data->user_ids as $user_id) {
+            $user_to = core_user::get_user($user_id);
+            if (!$user_to) {
+                // Let's just ignore non-existent users
+                continue;
+            }
+
             $member = member::from_user($user_id, $data->workspace_id);
+
+            // Setup this user so that environment matches receiving user.
+            cron_setup_user($user_to);
 
             $template = added_to_workspace_notification::create($member);
             $rendered_content = $OUTPUT->render($template);
@@ -74,10 +85,12 @@ final class notify_added_to_workspace_bulk_task extends adhoc_task {
             $message->fullmessageformat = FORMAT_PLAIN;
             $message->fullmessage = html_to_text($rendered_content);
             $message->fullmessagehtml = $rendered_content;
-            $message->userto = $member->get_user_id();
+            $message->userto = $user_to;
             $message->userfrom = \core_user::get_noreply_user();
 
             message_send($message);
         }
+
+        cron_setup_user();
     }
 }

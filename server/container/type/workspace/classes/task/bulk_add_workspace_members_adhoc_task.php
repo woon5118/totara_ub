@@ -324,7 +324,7 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         $message->component = $workspace::get_type();
         $message->name = 'bulk_members_via_audience_added';
         $message->courseid = $workspace->get_id();
-        $message->contexturl     = $url;
+        $message->contexturl = $url;
         $message->contexturlname = $workspace_name;
 
         // Clone first to make sure we use the same base object
@@ -353,6 +353,9 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         return cohort::repository()
             ->where('id', $cohort_ids->all())
             ->get()
-            ->pluck('name');
+            ->map(function (cohort $cohort) {
+                return format_string($cohort->name);
+            })
+            ->all();
     }
 }
