@@ -40,16 +40,17 @@ final class repository_data implements query_resolver, has_middleware {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        $context_id = context_system::instance()->id;
+        $context = context_system::instance();
+
         if (isset($args['context_id'])) {
             $context = context::instance_by_id($args['context_id']);
-
-            if (!$ec->has_relevant_context()) {
-                $ec->set_relevant_context($context);
-            }
         }
 
-        return file_helper::get_upload_repository($context_id);
+        if (!$ec->has_relevant_context() && CONTEXT_SYSTEM != $context->contextlevel) {
+            $ec->set_relevant_context($context);
+        }
+
+        return file_helper::get_upload_repository($context->id);
     }
 
     /**

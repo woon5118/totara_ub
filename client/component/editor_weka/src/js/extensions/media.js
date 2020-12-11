@@ -395,7 +395,7 @@ class MediaExtension extends BaseExtension {
 
       let node = state.schema.node('image', {
         filename: filename,
-        url: info.filename,
+        url: info.url,
         alttext: alttext,
       });
 
