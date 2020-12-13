@@ -101,6 +101,7 @@ class MediaExtension extends BaseExtension {
             // server side to reformat the plugin file url.
             url: { default: undefined },
             mime_type: { default: undefined },
+            subtitle: { default: undefined },
           },
 
           parseDOM: [
@@ -115,15 +116,21 @@ class MediaExtension extends BaseExtension {
           ],
 
           toDOM(node) {
+            let dataAttrs = {
+              filename: node.attrs.filename,
+              url: node.attrs.url,
+              mime_type: node.attrs.mime_type,
+            };
+
+            if (node.attrs.subtitle) {
+              dataAttrs.subtitle = node.attrs.subtitle;
+            }
+
             return [
               'div',
               {
                 class: 'tui-wekaNodeVideoBlock',
-                'data-attrs': JSON.stringify({
-                  filename: node.attrs.filename,
-                  url: node.attrs.url,
-                  mime_type: node.attrs.mime_type,
-                }),
+                'data-attrs': JSON.stringify(dataAttrs),
               },
             ];
           },
@@ -137,6 +144,8 @@ class MediaExtension extends BaseExtension {
           getFileUrl: () => null,
           getItemId: this._getItemId.bind(this),
           getDownloadUrl: this._getDownloadUrl.bind(this),
+          getContextId: this._getContextId.bind(this),
+          updateVideoWithSubtitle: this._updateVideoWithSubtitle.bind(this),
         },
       },
 
@@ -153,6 +162,7 @@ class MediaExtension extends BaseExtension {
 
             // This is needed to display embedded audio file.
             mime_type: { default: undefined },
+            transcript: { default: undefined },
           },
 
           parseDOM: [
@@ -190,6 +200,8 @@ class MediaExtension extends BaseExtension {
           getFileUrl: () => null,
           getItemId: this._getItemId.bind(this),
           getDownloadUrl: this._getDownloadUrl.bind(this),
+          getContextId: this._getContextId.bind(this),
+          updateAudioWithTranscript: this._updateAudioWithTranscript.bind(this),
         },
       },
     };
@@ -350,24 +362,34 @@ class MediaExtension extends BaseExtension {
 
   /**
    *
-   * @param {Function} getRange
-   * @param {String}  filename
-   * @param {Number}  size
+   * @param {Function}  getRange
+   * @param {String}    filename
+   * @param {Number}    size
+   * @param {?Object}   subtitle
    * @private
    */
-  async _replaceVideoWithAttachment(getRange, { filename, size }) {
+  async _replaceVideoWithAttachment(getRange, { filename, size, subtitle }) {
     const info = await this._getFileInfo(filename);
 
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
 
-      let attachment = state.schema.node('attachment', {
+      let attachmentAttrs = {
         filename: filename,
         url: info.url,
         size: size,
         option: {},
-      });
+      };
+
+      if (subtitle) {
+        attachmentAttrs.option.subtitle = {
+          url: subtitle.url,
+          filename: subtitle.filename,
+        };
+      }
+
+      let attachment = state.schema.node('attachment', attachmentAttrs);
 
       dispatch(
         transaction.replaceWith(
@@ -376,6 +398,42 @@ class MediaExtension extends BaseExtension {
           state.schema.node('attachments', null, [attachment])
         )
       );
+    });
+  }
+
+  /**
+   *
+   * @param {Function}    getRange
+   * @param {String}      filename
+   * @param {String}      url
+   * @param {String}      mime_type
+   * @param {Object|null} subtitle
+   * @return {Promise<void>}
+   * @private
+   */
+  async _updateVideoWithSubtitle(
+    getRange,
+    { filename, url, mime_type, subtitle }
+  ) {
+    this.editor.execute((state, dispatch) => {
+      const transaction = state.tr,
+        range = getRange();
+
+      let nodeAttributes = {
+        filename: filename,
+        url: url,
+        mime_type: mime_type,
+      };
+
+      if (subtitle) {
+        nodeAttributes.subtitle = {
+          filename: subtitle.filename,
+          url: subtitle.url,
+        };
+      }
+
+      const video = state.schema.node('video', nodeAttributes);
+      dispatch(transaction.replaceWith(range.from, range.to, video));
     });
   }
 
@@ -411,19 +469,28 @@ class MediaExtension extends BaseExtension {
    * @param {Number}    size
    * @private
    */
-  async _replaceAudioWithAttachment(getRange, { filename, size }) {
+  async _replaceAudioWithAttachment(getRange, { filename, size, transcript }) {
     const info = await this._getFileInfo(filename);
 
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
 
-      let attachment = state.schema.node('attachment', {
+      let attachmentAttrs = {
         filename: filename,
         url: info.url,
         size: size,
         option: {},
-      });
+      };
+
+      if (transcript) {
+        attachmentAttrs.option.transcript = {
+          url: transcript.url,
+          filename: transcript.filename,
+        };
+      }
+
+      let attachment = state.schema.node('attachment', attachmentAttrs);
 
       dispatch(
         transaction.replaceWith(
@@ -432,6 +499,32 @@ class MediaExtension extends BaseExtension {
           state.schema.node('attachments', null, [attachment])
         )
       );
+    });
+  }
+
+  async _updateAudioWithTranscript(
+    getRange,
+    { filename, url, mime_type, transcript }
+  ) {
+    this.editor.execute((state, dispatch) => {
+      const transaction = state.tr,
+        range = getRange();
+
+      let nodeAttributes = {
+        filename: filename,
+        url: url,
+        mime_type: mime_type,
+      };
+
+      if (transcript) {
+        nodeAttributes.transcript = {
+          filename: transcript.filename,
+          url: transcript.url,
+        };
+      }
+
+      let audio = state.schema.node('audio', nodeAttributes);
+      dispatch(transaction.replaceWith(range.from, range.to, audio));
     });
   }
 
@@ -468,6 +561,10 @@ class MediaExtension extends BaseExtension {
    */
   _getItemId() {
     return this.editor.fileStorage.getFileStorageItemId();
+  }
+
+  _getContextId() {
+    return this.editor.identifier.contextId;
   }
 }
 

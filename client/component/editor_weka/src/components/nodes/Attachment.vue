@@ -194,6 +194,7 @@ export default {
       const params = {
         filename: this.filename,
         mimeType: this.file.mime_type,
+        subtitle: this.option.subtitle || null,
       };
 
       this.context.convertToVideo(this.getRange, params);
@@ -203,6 +204,7 @@ export default {
       const params = {
         filename: this.filename,
         mimeType: this.file.mime_type,
+        transcript: this.option.transcript || null,
       };
 
       this.context.convertToAudio(this.getRange, params);

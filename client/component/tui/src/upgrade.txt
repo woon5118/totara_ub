@@ -16,6 +16,11 @@ information provided here is intended especially for developers.
 * Update Tui Theme Settings Custom and Colour Uniforms to include new fields and make rows solution more generic
   * Langstring, template, SCSS and script block changes
 * Updated Adder.vue component to support a loading indicator prop for add button and amend button position styles
+* Removed overridden focus styles from SearchBox.vue submit button, now uses default IconButton.vue focus styles
+* Update Tui Theme Settings Custom and Colour Uniforms to include new fields and make rows solution more generic
+  * Langstring, template, SCSS and script block changes
+* Updated AudioBlock.vue to display transcript button and expose a slot
+  * Template changes
 
 === 13.2 ===
 

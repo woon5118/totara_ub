@@ -20,6 +20,14 @@
   <div class="tui-videoBlock">
     <video ref="videojs" class="video-js">
       <source :src="url" :type="mimeType" />
+      <track
+        v-if="subtitleUrl"
+        kind="captions"
+        :src="subtitleUrl"
+        :srclang="$str('iso6391', 'langconfig')"
+        :label="$str('caption_on', 'editor')"
+        default
+      />
     </video>
   </div>
 </template>
@@ -43,6 +51,11 @@ export default {
       type: String,
       required: true,
     },
+
+    /**
+     * The url for subtitle file
+     */
+    subtitleUrl: String,
   },
 
   computed: {
@@ -82,6 +95,17 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+  "editor": [
+    "caption_on"
+  ],
+  "langconfig": [
+    "iso6391"
+  ]
+}
+</lang-strings>
 
 <style lang="scss">
 .tui-videoBlock {

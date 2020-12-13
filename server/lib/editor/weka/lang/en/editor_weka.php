@@ -56,18 +56,16 @@ $string['matching_hashtags'] = 'Matching hashtags';
 $string['matching_users'] = 'Matching users';
 $string['more_items'] = 'More';
 $string['pluginname'] = 'Weka editor';
-$string['transcript'] = 'Transcript';
+$string['transcript_modal_title_help'] = 'If your transcript is in a Word document format, select "Save as" and choose .txt';
 $string['unknown_attachment'] = 'Unknown attachment';
 $string['upload_captions'] = 'Upload captions';
 $string['upload_caption_confirmation'] = 'Captions have been added to the video';
 $string['upload_transcript'] = 'Upload transcript';
-$string['upload_transcript_confirmation'] = 'Transcript have been added to the audio';
 $string['upload_video_caption'] = 'Upload captions (file format .vtt)';
 $string['upload_audio_transcript'] = 'Upload transcript (file format .txt file)';
 $string['upload_caption_transcript_button'] = 'Upload {$a} file';
 $string['video_alt_help'] = 'Captions are a text version of audio information, used for people who are deaf or can\'t hear audio, and people who process written information better than audio. They are displayed within the media player and are synchronized with the audio.';
 $string['view_search_results'] = 'View search results';
-$string['view_transcript'] = 'View transcript';
 
 // Dperecated since Totara 13.2.
 $string['edit_link'] = 'Edit link';

@@ -22,11 +22,54 @@
       <source :src="url" :type="mimeType" />
       {{ $str('audionotsupported', 'totara_core') }}
     </audio>
+
+    <div class="tui-audioBlock__actionsWrapper">
+      <Button
+        v-if="transcriptUrl"
+        class="tui-audioBlock__viewTranscript"
+        :styleclass="{
+          transparent: true,
+        }"
+        :aria-haspopup="true"
+        :aria-label="
+          $str('view_transcript_file', 'editor', filenameNoExtension)
+        "
+        :text="$str('view_transcript', 'editor')"
+        @click="showModal"
+      />
+
+      <ModalPresenter :open="modal" @request-close="hideModal">
+        <Modal :size="size">
+          <ModalContent
+            :title="$str('transcript', 'editor')"
+            :title-visible="false"
+            class="tui-audioBlock__transcriptModal"
+            :close-button="true"
+          >
+            <!-- prettier-ignore -->
+            <div class="tui-audioBlock__transcriptContent"> {{ transcriptContent }} </div>
+          </ModalContent>
+        </Modal>
+      </ModalPresenter>
+
+      <slot name="actions" />
+    </div>
   </div>
 </template>
 
 <script>
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import Button from 'tui/components/buttons/Button';
+
 export default {
+  components: {
+    ModalPresenter,
+    Modal,
+    ModalContent,
+    Button,
+  },
   inheritAttrs: false,
 
   props: {
@@ -44,11 +87,52 @@ export default {
       type: String,
       required: true,
     },
+
+    /**
+     * For transcript url
+     */
+    transcriptUrl: String,
+  },
+
+  data() {
+    return {
+      transcriptContent: null,
+      modal: false,
+      size: 'large',
+    };
   },
 
   computed: {
+    filenameNoExtension() {
+      if (!this.filename) {
+        return '';
+      }
+
+      let parts = this.filename.split('.');
+      parts.pop();
+
+      return parts.join('.');
+    },
+
     /** @deprecated since 13.3 */
     attributes: () => null,
+  },
+
+  methods: {
+    async $_getDetails() {
+      this.transcriptContent = await fetch(this.transcriptUrl).then(x =>
+        x.text()
+      );
+    },
+
+    async showModal() {
+      this.modal = true;
+      await this.$_getDetails();
+    },
+
+    hideModal() {
+      this.modal = false;
+    },
   },
 };
 </script>
@@ -57,6 +141,11 @@ export default {
   {
     "totara_core": [
       "audionotsupported"
+    ],
+    "editor": [
+      "transcript",
+      "view_transcript",
+      "view_transcript_file"
     ]
   }
 </lang-strings>
@@ -64,5 +153,20 @@ export default {
 <style lang="scss">
 .tui-audioBlock {
   margin: var(--gap-8) 0;
+
+  &__actionsWrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-2);
+  }
+
+  &__viewTranscript {
+    margin-right: auto;
+  }
+
+  &__transcriptContent {
+    height: 60rem;
+    white-space: pre-line;
+  }
 }
 </style>

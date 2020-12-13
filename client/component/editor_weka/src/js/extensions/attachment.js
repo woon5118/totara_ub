@@ -50,7 +50,7 @@ class AttachmentExtension extends BaseExtension {
             // need them for the back-end to be populated.
             filename: { default: undefined },
             size: { default: undefined },
-            // For the alt-text or transcript of the attachment.
+            // For the alt-text/subtitle/transcript of the attachment.
             option: { default: undefined },
             // This is from the support of file_rewrite_plugin_file, it will be picked up by the
             // server side to reformat the plugin file url.
@@ -330,20 +330,30 @@ class AttachmentExtension extends BaseExtension {
 
   /**
    *
-   * @param {Function}  getRange
-   * @param {String}    filename
-   * @param {String}    mimeType
+   * @param {Function}    getRange
+   * @param {String}      filename
+   * @param {String}      mimeType
+   * @param {Object|null} subtitle
    * @private
    */
-  async _convertToVideo(getRange, { filename, mimeType }) {
+  async _convertToVideo(getRange, { filename, mimeType, subtitle }) {
     const info = await this._getFileInfo(filename);
 
     this.editor.execute((state, dispatch) => {
-      const video = state.schema.node('video', {
+      let videoAttrs = {
         filename: filename,
         url: info.url,
         mime_type: mimeType,
-      });
+      };
+
+      if (subtitle) {
+        videoAttrs.subtitle = {
+          url: subtitle.url,
+          filename: subtitle.filename,
+        };
+      }
+
+      const video = state.schema.node('video', videoAttrs);
 
       this._doConvertToMedia(video, state.tr, dispatch, getRange);
     });
@@ -355,26 +365,36 @@ class AttachmentExtension extends BaseExtension {
    * @param {String} filename
    * @param {Object} option
    * @param {Number} size
+   * @param {Object|null} transcript
    *
    * @private
    */
-  async _updateNode(getRange, { filename, option, size }) {
+  async _updateNode(getRange, { filename, option, size, transcript }) {
     const info = await this._getFileInfo(filename);
 
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
 
+      let audioAttrs = {
+        filename: filename,
+        url: info.url,
+        option: option,
+        size: size,
+      };
+
+      if (transcript) {
+        audioAttrs.transcript = {
+          url: transcript.url,
+          filename: transcript.filename,
+        };
+      }
+
       dispatch(
         transaction.replaceWith(
           range.from,
           range.to,
-          state.schema.node('attachment', {
-            filename: filename,
-            url: info.url,
-            option: option,
-            size: size,
-          })
+          state.schema.node('attachment', audioAttrs)
         )
       );
 
@@ -417,21 +437,29 @@ class AttachmentExtension extends BaseExtension {
 
   /**
    *
-   * @param {Function}  getRange
-   * @param {String}    filename
-   * @param {String}    mimeType
+   * @param {Function}    getRange
+   * @param {String}      filename
+   * @param {String}      mimeType
+   * @param {Object|null} transcript
    * @private
    */
-  async _convertToAudio(getRange, { filename, mimeType }) {
+  async _convertToAudio(getRange, { filename, mimeType, transcript }) {
     const info = await this._getFileInfo(filename);
+    let audioAttrs = {
+      filename: filename,
+      url: info.url,
+      mime_type: mimeType,
+    };
+
+    if (transcript) {
+      audioAttrs.transcript = {
+        filename: transcript.filename,
+        url: transcript.url,
+      };
+    }
 
     this.editor.execute((state, dispatch) => {
-      const node = state.schema.node('audio', {
-        filename: filename,
-        url: info.url,
-        mime_type: mimeType,
-      });
-
+      const node = state.schema.node('audio', audioAttrs);
       this._doConvertToMedia(node, state.tr, dispatch, getRange);
     });
   }
