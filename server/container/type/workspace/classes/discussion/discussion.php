@@ -17,21 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package container_workspace
  */
 namespace container_workspace\discussion;
 
+use coding_exception;
 use container_workspace\entity\workspace_discussion;
 use container_workspace\repository\discussion_repository;
 use container_workspace\workspace;
+use context;
+use context_course;
+use context_user;
 use core\json_editor\document;
+use core\json_editor\node\abstraction\has_extra_linked_file;
 use core\json_editor\node\attachment;
 use core\json_editor\node\audio;
 use core\json_editor\node\file\base_file;
 use core\json_editor\node\image;
 use core\json_editor\node\video;
 use core_container\factory;
+use core_user;
+use moodle_url;
+use stdClass;
+use stored_file;
 use totara_comment\loader\comment_loader;
 use totara_reaction\loader\reaction_loader;
 
@@ -64,7 +73,7 @@ final class discussion {
     private $entity;
 
     /**
-     * @var \stdClass|null
+     * @var stdClass|null
      */
     private $user;
 
@@ -109,11 +118,11 @@ final class discussion {
 
     /**
      * @param workspace_discussion $entity
-     * @param \stdClass|null $user
+     * @param stdClass|null       $user
      *
      * @return discussion
      */
-    public static function from_entity(workspace_discussion $entity, ?\stdClass $user = null): discussion {
+    public static function from_entity(workspace_discussion $entity, ?stdClass $user = null): discussion {
         $discussion = new static($entity);
 
         if (null !== $user) {
@@ -129,11 +138,11 @@ final class discussion {
      *
      * Note that this function will only process the files if $draft_id is provided.
      *
-     * @param string    $content
-     * @param int       $content_format
-     * @param int       $discussion_id
-     * @param int|null  $user_id
-     * @param int|null  $draft_id
+     * @param string   $content
+     * @param int      $content_format
+     * @param int      $discussion_id
+     * @param int|null $user_id
+     * @param int|null $draft_id
      *
      * @return string
      */
@@ -151,7 +160,7 @@ final class discussion {
             $user_id = $USER->id;
         }
 
-        $user_context = \context_user::instance($user_id);
+        $user_context = context_user::instance($user_id);
 
         if (FORMAT_JSON_EDITOR == $content_format) {
             // It is a json editor content. Therefore we can make sure that if there is are files or not.
@@ -165,7 +174,7 @@ final class discussion {
                 attachment::get_type(),
                 audio::get_type(),
                 image::get_type(),
-                video::get_type()
+                video::get_type(),
             ];
 
             $nodes = $document->find_nodes_by_types($node_types);
@@ -176,29 +185,32 @@ final class discussion {
                 $user_context->id,
                 'user',
                 'draft',
-                $draft_id
-            );
-
-            $files = array_filter(
-                $files,
-                function (\stored_file $file): bool {
-                    return !$file->is_directory();
-                }
+                $draft_id,
+                'itemid, filepath, filename',
+                false
             );
 
             // Start indexing the file names from the json node.
-            $filenames = array_map(
-                function (base_file $node): string {
-                    return $node->get_filename();
-                },
-                $nodes
-            );
+            $file_names = [];
+
+            /** @var base_file $file_node */
+            foreach ($nodes as $file_node) {
+                $file_names[] = $file_node->get_filename();
+
+                if ($file_node instanceof has_extra_linked_file) {
+                    $extra_file = $file_node->get_extra_linked_file();
+
+                    if (null !== $extra_file) {
+                        $file_names[] = $extra_file->get_filename();
+                    }
+                }
+            }
 
             // Now start looping the files to remove the files that are not appearing within the json
             // nodes content and start removing them.
             foreach ($files as $file) {
                 $filename = $file->get_filename();
-                if (!in_array($filename, $filenames, true)) {
+                if (!in_array($filename, $file_names, true)) {
                     $file->delete();
                 }
             }
@@ -212,18 +224,18 @@ final class discussion {
         );
 
         // Simulate the form data.
-        $form_data = new \stdClass();
+        $form_data = new stdClass();
         $form_data->content_editor = [
             'format' => $content_format,
             'text' => $content,
-            'itemid' => $draft_id
+            'itemid' => $draft_id,
         ];
 
         $form_data = file_postupdate_standard_editor(
             $form_data,
             'content',
             ['maxfiles' => -1],
-            \context_course::instance($workspace_id),
+            context_course::instance($workspace_id),
             workspace::get_type(),
             static::AREA,
             $discussion_id
@@ -235,11 +247,11 @@ final class discussion {
     /**
      * Note that this function does not include any capability check nor emitting any event.
      *
-     * @param string    $content
-     * @param int       $workspace_id
-     * @param int|null  $draft_id
-     * @param int|null  $content_format
-     * @param int|null  $actor_id
+     * @param string   $content
+     * @param int      $workspace_id
+     * @param int|null $draft_id
+     * @param int|null $content_format
+     * @param int|null $actor_id
      *
      * @return discussion
      */
@@ -248,7 +260,7 @@ final class discussion {
         global $USER, $CFG;
 
         if (empty($content)) {
-            throw new \coding_exception("Cannot create a discussion with empty content");
+            throw new coding_exception("Cannot create a discussion with empty content");
         }
 
         if (null === $actor_id || 0 === $actor_id) {
@@ -311,10 +323,10 @@ final class discussion {
     /**
      * Please note that this function does not include any capabilities check.
      *
-     * @param string    $content
-     * @param int|null  $draft_id
-     * @param int|null  $content_format
-     * @param int|null  $actor_id
+     * @param string   $content
+     * @param int|null $draft_id
+     * @param int|null $content_format
+     * @param int|null $actor_id
      *
      * @return void
      */
@@ -323,7 +335,7 @@ final class discussion {
         global $USER, $CFG;
 
         if (empty($content)) {
-            throw new \coding_exception("Cannot update a discussion with empty content");
+            throw new coding_exception("Cannot update a discussion with empty content");
         }
 
         if (null === $actor_id || 0 === $actor_id) {
@@ -360,7 +372,7 @@ final class discussion {
             // to remove them.
             $fs = get_file_storage();
 
-            $context = \context_course::instance($this->entity->course_id);
+            $context = context_course::instance($this->entity->course_id);
             $fs->delete_area_files(
                 $context->id,
                 workspace::get_type(),
@@ -392,7 +404,7 @@ final class discussion {
 
         // Start deleting the files related to the discussion.
         $fs = get_file_storage();
-        $context = \context_course::instance($this->entity->course_id);
+        $context = context_course::instance($this->entity->course_id);
 
         $fs->delete_area_files(
             $context->id,
@@ -408,7 +420,7 @@ final class discussion {
      * Delete the discussion, but keep the base discussion record.
      * Used when it's deleted via the reportedcontent report.
      *
-     * @param int $reason Status code indicating why the comment was deleted. Defaults to by user.
+     * @param int      $reason Status code indicating why the comment was deleted. Defaults to by user.
      * @param int|null $time_deleted
      * @return bool
      */
@@ -418,7 +430,7 @@ final class discussion {
 
         // Start deleting the files related to the discussion.
         $fs = get_file_storage();
-        $context = \context_course::instance($this->entity->course_id);
+        $context = context_course::instance($this->entity->course_id);
 
         $fs->delete_area_files(
             $context->id,
@@ -448,12 +460,12 @@ final class discussion {
     }
 
     /**
-     * @return \stdClass
+     * @return stdClass
      */
-    public function get_user(): \stdClass {
+    public function get_user(): stdClass {
         if (null === $this->user) {
             $user_id = $this->entity->user_id;
-            $this->user = \core_user::get_user($user_id);
+            $this->user = core_user::get_user($user_id);
         }
 
         return $this->user;
@@ -467,17 +479,17 @@ final class discussion {
     }
 
     /**
-     * @param \stdClass $user
+     * @param stdClass $user
      * @return void
      */
-    public function set_user(\stdClass $user): void {
+    public function set_user(stdClass $user): void {
         if (!property_exists($user, 'id')) {
-            throw new \coding_exception("Cannot set the user record when the record does not have an id of itself");
+            throw new coding_exception("Cannot set the user record when the record does not have an id of itself");
         }
 
         $user_id = $this->entity->user_id;
         if ($user_id != $user->id) {
-            throw new \coding_exception(
+            throw new coding_exception(
                 "Cannot set the user record to someone else that is not an owner of the discussion"
             );
         }
@@ -613,14 +625,14 @@ final class discussion {
      * the discussion's content. The files that are uploaded under comments/replies
      * that related to the discussion will be excluded from this function.
      *
-     * @return \stored_file[]
+     * @return stored_file[]
      */
     public function get_files(): array {
         global $CFG;
         require_once("{$CFG->dirroot}/lib/filelib.php");
 
         $fs = get_file_storage();
-        $context = \context_course::instance($this->entity->course_id);
+        $context = context_course::instance($this->entity->course_id);
 
         $stored_files = $fs->get_area_files(
             $context->id,
@@ -635,7 +647,7 @@ final class discussion {
 
         return array_filter(
             $stored_files,
-            function (\stored_file $file): bool {
+            function (stored_file $file): bool {
                 return !$file->is_directory();
             }
         );
@@ -644,9 +656,9 @@ final class discussion {
     /**
      * Returning the workspace's context.
      *
-     * @return \context
+     * @return context
      */
-    public function get_context(): \context {
+    public function get_context(): context {
         return $this->get_workspace()->get_context();
     }
 
@@ -672,10 +684,10 @@ final class discussion {
     }
 
     /**
-     * @return \moodle_url
+     * @return moodle_url
      */
-    public function get_url(): \moodle_url {
-        return new \moodle_url(
+    public function get_url(): moodle_url {
+        return new moodle_url(
             "/container/type/workspace/discussion.php",
             ['id' => $this->entity->id]
         );
@@ -689,7 +701,7 @@ final class discussion {
      */
     public function set_prevent_delete_files_on_update(bool $prevent_delete_files_on_update): void {
         if ((!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) && (!defined('BEHAT_TEST') || !BEHAT_TEST)) {
-            throw new \coding_exception('Cannot call set_prevent_delete_files_on_update outside of a phpunit or behat test.');
+            throw new coding_exception('Cannot call set_prevent_delete_files_on_update outside of a phpunit or behat test.');
         }
         $this->prevent_delete_files_on_update = $prevent_delete_files_on_update;
     }

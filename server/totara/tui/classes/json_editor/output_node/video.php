@@ -48,15 +48,21 @@ final class video extends output_node {
      * @return string
      */
     public function render_tui_component_content(): string {
-        $tui = new component(
-            'tui/components/json_editor/nodes/VideoBlock',
-            [
-                'mime-type' => $this->node->get_mime_type(),
-                'url' => $this->node->get_file_url()->out(false),
-                'filename' => $this->node->get_filename(),
-            ]
-        );
+        /** @var video_node $video_node */
+        $video_node = $this->node;
 
+        $parameters = [
+            'mime-type' => $video_node->get_mime_type(),
+            'url' => $video_node->get_file_url()->out(false),
+            'filename' => $video_node->get_filename()
+        ];
+
+        $subtitle = $video_node->get_extra_linked_file();
+        if (null !== $subtitle) {
+            $parameters['subtitle-url'] = $subtitle->get_file_url()->out(false);
+        }
+
+        $tui = new component('tui/components/json_editor/nodes/VideoBlock', $parameters);
         return $tui->out_html();
     }
 

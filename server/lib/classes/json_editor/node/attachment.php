@@ -17,15 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package core
  */
 namespace core\json_editor\node;
 
+use coding_exception;
 use core\json_editor\formatter\formatter;
 use core\json_editor\helper\node_helper;
 use core\json_editor\node\file\base_file;
 use html_writer;
+use stored_file;
 
 /**
  * Node type for attachment.
@@ -45,7 +47,7 @@ final class attachment extends base_file {
      * @param array $node
      *
      * @return node|attachment
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function from_node(array $node): node {
         /** @var attachment $attachment */
@@ -55,7 +57,7 @@ final class attachment extends base_file {
         $attrs = $node['attrs'];
 
         if (!array_key_exists('size', $attrs)) {
-            throw new \coding_exception("No attachment size was found");
+            throw new coding_exception("No attachment size was found");
         }
 
         if (array_key_exists('option', $attrs) && !is_null($attrs['option'])) {
@@ -95,9 +97,37 @@ final class attachment extends base_file {
             return null;
         }
 
-        $size = $cleaned_raw_node['attrs']['size'];
-        $cleaned_raw_node['attrs']['size'] = clean_param($size, PARAM_INT);
+        $attrs = $cleaned_raw_node['attrs'];
+        $attrs['size'] = clean_param($attrs['size'], PARAM_INT);
 
+        if (array_key_exists('option', $attrs)) {
+            $option = $attrs['option'];
+            if (array_key_exists('alttext', $option)) {
+                $option['alttext'] = clean_param($option['alttext'], PARAM_TEXT);
+            }
+
+            if (array_key_exists('subtitle', $option) && is_array($option['subtitle'])) {
+                $subtitle = $option['subtitle'];
+
+                $subtitle['url'] = clean_param($subtitle['url'], PARAM_URL);
+                $subtitle['filename'] = clean_param($subtitle['filename'], PARAM_FILE);
+
+                $option['subtitle'] = $subtitle;
+            }
+
+            if (array_key_exists('transcript', $option) && is_array($option['transcript'])) {
+                $transcript = $option['transcript'];
+
+                $transcript['url'] = clean_param($transcript['url'], PARAM_URL);
+                $transcript['filename'] = clean_param($transcript['filename'], PARAM_FILE);
+
+                $option['transcript'] = $transcript;
+            }
+
+            $attrs['option'] = $option;
+        }
+
+        $cleaned_raw_node['attrs'] = $attrs;
         return $cleaned_raw_node;
     }
 
@@ -114,7 +144,7 @@ final class attachment extends base_file {
                 'editor_weka',
                 [
                     'filename' => $this->filename,
-                    'size' => display_size($this->size)
+                    'size' => display_size($this->size),
                 ]
             ),
             ['href' => $download_url->out()]
@@ -145,10 +175,10 @@ final class attachment extends base_file {
     }
 
     /**
-     * @param \stored_file $file
+     * @param stored_file $file
      * @return array
      */
-    public static function create_raw_node(\stored_file $file): array {
+    public static function create_raw_node(stored_file $file): array {
         $type = static::get_type();
         $file_url = self::build_file_url_from_stored_file($file);
 
@@ -158,7 +188,7 @@ final class attachment extends base_file {
                 'filename' => $file->get_filename(),
                 'url' => $file_url->out(false),
                 'size' => $file->get_filesize(),
-                'option' => []
+                'option' => [],
             ],
         ];
     }

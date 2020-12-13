@@ -78,7 +78,7 @@ abstract class base_file extends node {
      * @return \moodle_url
      */
     public function get_file_url(bool $force_download = false): \moodle_url {
-        if (false !== stripos('@@PLUGINFILE@@', $this->url, 0)) {
+        if (false !== stripos($this->url, '@@PLUGINFILE@@', 0)) {
             throw new \coding_exception("The file url had not been rewritten yet");
         }
 

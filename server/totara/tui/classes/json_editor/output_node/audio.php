@@ -48,15 +48,20 @@ final class audio extends output_node {
      * @return string
      */
     public function render_tui_component_content(): string {
-        $tui = new component(
-            'tui/components/json_editor/nodes/AudioBlock',
-            [
-                'filename' => $this->node->get_filename(),
-                'url' => $this->node->get_file_url()->out(false),
-                'mime-type' => $this->node->get_mime_type()
-            ]
-        );
+        /** @var audio_node $audio_node */
+        $audio_node = $this->node;
+        $parameters = [
+            'filename' => $audio_node->get_filename(),
+            'url' => $audio_node->get_file_url()->out(false),
+            'mime-type' => $audio_node->get_mime_type()
+        ];
 
+        $transcript = $audio_node->get_extra_linked_file();
+        if (null !== $transcript) {
+            $parameters['transcript-url'] = $transcript->get_file_url()->out(false);
+        }
+
+        $tui = new component('tui/components/json_editor/nodes/AudioBlock', $parameters);
         return $tui->out_html();
     }
 

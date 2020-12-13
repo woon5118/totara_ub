@@ -140,4 +140,138 @@ class core_json_editor_audio_testcase extends advanced_testcase {
 
         $this->assertDebuggingCalledCount(2);
     }
+
+    /**
+     * @return void
+     */
+    public function test_validate_schema_with_valid_transcript(): void {
+        self::assertTrue(
+            audio::validate_schema([
+                'type' => audio::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp3',
+                    'url' => 'http://example.com/data.mp3',
+                    'mime_type' => 'audio/mp3',
+                    'transcript' => [
+                        'url' => 'http://example.com/transcript.txt',
+                        'filename' => 'transcript.txt'
+                    ]
+                ]
+            ])
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_validate_schema_with_invalid_transcript(): void {
+        self::assertFalse(
+            audio::validate_schema([
+                'type' => audio::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp3',
+                    'url' => 'http://example.com/data.mp3',
+                    'mime_type' => 'audio/mp3',
+                    'transcript' => false
+                ]
+            ])
+        );
+
+        self::assertFalse(
+            audio::validate_schema([
+                'type' => audio::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp3',
+                    'url' => 'http://example.com/data.mp3',
+                    'mime_type' => 'audio/mp3',
+                    'transcript' => [
+                        'xyz' => 'dd'
+                    ]
+                ]
+            ])
+        );
+
+        self::assertFalse(
+            audio::validate_schema([
+                'type' => audio::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp3',
+                    'url' => 'http://example.com/data.mp3',
+                    'mime_type' => 'audio/mp3',
+                    'transcript' => [
+                        'url' => 'http://example.com/transcript.vtt',
+                        'filename' => 'transcript.vtt',
+                        'injection' => '<script>alert("Cyperpunk 2077 is da :hankey:!!")</script>'
+                    ]
+                ]
+            ])
+        );
+
+        // Clean up the debugging messages. Since we would know that debugging message will be emitted
+        $this->resetDebugging();
+    }
+
+    /**
+     * @return void
+     */
+    public function test_clean_raw_node_with_invalid_transcript(): void {
+        self::assertEquals(
+            [
+                'type' => audio::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp3',
+                    'url' => 'http://example.com/data.mp3',
+                    'mime_type' => 'audio/mp3',
+                    'transcript' => [
+                        'url' => null,
+                        'filename' => 'hankey.vtt'
+                    ]
+                ]
+            ],
+            audio::clean_raw_node([
+                'type' => audio::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp3',
+                    'url' => 'http://example.com/data.mp3',
+                    'mime_type' => 'audio/mp3',
+                    'transcript' => [
+                        'url' => '<script>alert("Cyperpunk 2077 is da :hankey:!!")</script>',
+                        'filename' => 'hankey.vtt'
+                    ]
+                ]
+            ])
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_clean_raw_node_with_valid_transcript(): void {
+        self::assertEquals(
+            [
+                'type' => audio::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp3',
+                    'url' => 'http://example.com/data.mp3',
+                    'mime_type' => 'audio/mp3',
+                    'transcript' => [
+                        'url' => 'http://example.com/hankey.vtt',
+                        'filename' => 'hankey.vtt'
+                    ]
+                ]
+            ],
+            audio::clean_raw_node([
+                'type' => audio::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp3',
+                    'url' => 'http://example.com/data.mp3',
+                    'mime_type' => 'audio/mp3',
+                    'transcript' => [
+                        'url' => 'http://example.com/hankey.vtt',
+                        'filename' => 'hankey.vtt'
+                    ]
+                ]
+            ])
+        );
+    }
 }

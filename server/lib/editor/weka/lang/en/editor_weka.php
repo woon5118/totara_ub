@@ -24,6 +24,7 @@
 $string['add_image_alt_text'] = 'Add alt text';
 $string['attachment'] = 'Attachment';
 $string['actions_menu_for'] = 'Actions menu for {$a}';
+$string['audio_alt_help'] = 'A transcript is a text version of audio information, used for people who are deaf or can\'t hear audio, and people who process written information better than audio. It is displayed below the audio file and will open in a modal.';
 $string['displayas'] = 'Display as';
 $string['display_as_attachment'] = 'Display as attachment';
 $string['display_as_card'] = 'Display as card';
@@ -50,12 +51,23 @@ $string['insert_link_label'] = 'Insert link';
 $string['invalid_response'] = 'Invalid response from server';
 $string['label_toolbar'] = 'Weka editor toolbar';
 $string['link'] = 'Link';
+$string['meta_upload_generic_error'] = 'Your file could not be uploaded, please try again.';
 $string['matching_hashtags'] = 'Matching hashtags';
 $string['matching_users'] = 'Matching users';
 $string['more_items'] = 'More';
 $string['pluginname'] = 'Weka editor';
+$string['transcript'] = 'Transcript';
 $string['unknown_attachment'] = 'Unknown attachment';
+$string['upload_captions'] = 'Upload captions';
+$string['upload_caption_confirmation'] = 'Captions have been added to the video';
+$string['upload_transcript'] = 'Upload transcript';
+$string['upload_transcript_confirmation'] = 'Transcript have been added to the audio';
+$string['upload_video_caption'] = 'Upload captions (file format .vtt)';
+$string['upload_audio_transcript'] = 'Upload transcript (file format .txt file)';
+$string['upload_caption_transcript_button'] = 'Upload {$a} file';
+$string['video_alt_help'] = 'Captions are a text version of audio information, used for people who are deaf or can\'t hear audio, and people who process written information better than audio. They are displayed within the media player and are synchronized with the audio.';
 $string['view_search_results'] = 'View search results';
+$string['view_transcript'] = 'View transcript';
 
 // Dperecated since Totara 13.2.
 $string['edit_link'] = 'Edit link';

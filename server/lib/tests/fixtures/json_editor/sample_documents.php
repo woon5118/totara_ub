@@ -17,10 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
+ * @author  Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
  * @package core
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 final class core_json_editor_sample_documents {
@@ -35,9 +34,26 @@ final class core_json_editor_sample_documents {
         return self::prettify([
             'type' => 'doc',
             'content' => [
-                ['type' => 'heading', 'attrs' => ['level' => 1], 'content' => [['type' => 'text', 'text' => 'Hooray!']]],
-                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'kia ora koutou']]]
-            ]
+                [
+                    'type' => 'heading',
+                    'attrs' => ['level' => 1],
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Hooray!',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'kia ora koutou',
+                        ],
+                    ],
+                ],
+            ],
         ], $as_string, $rewrite_urls);
     }
 
@@ -52,16 +68,43 @@ final class core_json_editor_sample_documents {
         return self::prettify([
             'type' => 'doc',
             'content' => [
-                ['type' => 'heading', 'attrs' => ['level' => 1], 'content' => [['type' => 'text', 'text' => 'Hooray!']]],
-                ['type' => 'image', 'attrs' => ['filename' => 'avocado.png', 'url' => '@@PLUGINFILE@@/avocado.png', 'alttext' => 'Avocado']],
+                [
+                    'type' => 'heading',
+                    'attrs' => ['level' => 1],
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Hooray!'
+                        ]
+                    ]
+                ],
+                [
+                    'type' => 'image',
+                    'attrs' => [
+                        'filename' => 'avocado.png',
+                        'url' => '@@PLUGINFILE@@/avocado.png',
+                        'alttext' => 'Avocado'
+                    ]
+                ],
                 [
                     'type' => 'paragraph',
                     'content' => [
                         ['type' => 'text', 'text' => 'kia'],
-                        ['type' => 'text', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'https://totara.example.com/ora.jsp']]], 'text' => 'ora'],
+                        [
+                            'type' => 'text',
+                            'marks' => [
+                                [
+                                    'type' => 'link',
+                                    'attrs' => [
+                                        'href' => 'https://totara.example.com/ora.jsp'
+                                    ]
+                                ]
+                            ],
+                            'text' => 'ora'
+                        ],
                         ['type' => 'text', 'text' => 'koutou'],
-                        ['type' => 'emoji', 'attrs' => ['shortcode' => '1F4A9']]
-                    ]
+                        ['type' => 'emoji', 'attrs' => ['shortcode' => '1F4A9']],
+                    ],
                 ],
                 ['type' => 'ruler'],
                 [
@@ -71,19 +114,25 @@ final class core_json_editor_sample_documents {
                         'image' => 'https://i.ytimg.com/vi/ParCfETbJ80/maxresdefault.jpg',
                         'title' => 'Totara',
                         'description' => 'Totara TXP...',
-                        'resolution' => ['width' => 1280, 'height' => 720]
-                    ]
+                        'resolution' => ['width' => 1280, 'height' => 720],
+                    ],
                 ],
                 [
                     'type' => 'attachments',
                     'content' => [
                         [
                             'type' => 'attachment',
-                            'attrs' => ['filename' => 'eicar.com', 'size' => 68, 'option' => [], 'url' => '@@PLUGINFILE@@/eicar.com']
-                        ]
-                    ]
-                ]
-            ]
+                            'attrs' =>
+                                [
+                                    'filename' => 'eicar.com',
+                                    'size' => 68,
+                                    'option' => [],
+                                    'url' => '@@PLUGINFILE@@/eicar.com'
+                                ],
+                        ],
+                    ],
+                ],
+            ],
         ], $as_string, $rewrite_urls);
     }
 
@@ -98,7 +147,14 @@ final class core_json_editor_sample_documents {
         return self::prettify([
             'type' => 'doc',
             'content' => [
-                ['type' => 'image', 'attrs' => ['filename' => 'Avocado.png', 'url' => '@@PLUGINFILE@@/Avocado.png', 'alttext' => 'Avocado']],
+                [
+                    'type' => 'image',
+                    'attrs' => [
+                        'filename' => 'Avocado.png',
+                        'url' => '@@PLUGINFILE@@/Avocado.png',
+                        'alttext' => 'Avocado'
+                    ]
+                ],
                 [
                     'type' => 'attachments',
                     'content' => [
@@ -108,12 +164,12 @@ final class core_json_editor_sample_documents {
                                 'filename' => 'Cheeseburger.jpg',
                                 'size' => 42195,
                                 'option' => [],
-                                'url' => '@@PLUGINFILE@@/Cheeseburger.jpg'
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'url' => '@@PLUGINFILE@@/Cheeseburger.jpg',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ], $as_string, $rewrite_urls);
     }
 
@@ -128,10 +184,42 @@ final class core_json_editor_sample_documents {
         return self::prettify([
             'type' => 'doc',
             'content' => [
-                ['type' => 'heading', 'attrs' => ['level' => 1], 'content' => [['type' => 'text', 'text' => 'Kia ora koutou katoa']]],
-                ['type' => 'image', 'attrs' => ['filename' => 'avo.png', 'url' => '@@PLUGINFILE@@/avo.png', 'alttext' => 'Mr. Avocado']],
-                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']]],
-                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Aenean tempor sed metus quis porta.']]],
+                [
+                    'type' => 'heading',
+                    'attrs' => ['level' => 1],
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Kia ora koutou katoa'
+                        ]
+                    ]
+                ],
+                [
+                    'type' => 'image',
+                    'attrs' => [
+                        'filename' => 'avo.png',
+                        'url' => '@@PLUGINFILE@@/avo.png',
+                        'alttext' => 'Mr. Avocado'
+                    ]
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+                        ]
+                    ]
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Aenean tempor sed metus quis porta.'
+                        ]
+                    ]
+                ],
                 [
                     'type' => 'link_media',
                     'attrs' => [
@@ -139,18 +227,42 @@ final class core_json_editor_sample_documents {
                         'image' => 'https://i.ytimg.com/vi/ParCfETbJ80/maxresdefault.jpg',
                         'title' => 'Totara',
                         'description' => 'Totara TXP...',
-                        'resolution' => ['width' => 1280, 'height' => 720]
+                        'resolution' => ['width' => 1280, 'height' => 720],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Sed volutpat arcu eget nibh ultricies ultricies.'
+                        ]
                     ]
                 ],
-                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Sed volutpat arcu eget nibh ultricies ultricies.']]],
-                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Sed ac ligula enim. Ut posuere scelerisque lacus.']]],
-                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Aliquam cursus leo dui, sit amet viverra velit lobortis non.']]]
-            ]
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Sed ac ligula enim. Ut posuere scelerisque lacus.'
+                        ]
+                    ]
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Aliquam cursus leo dui, sit amet viverra velit lobortis non.'
+                        ]
+                    ]
+                ],
+            ],
         ], $as_string, $rewrite_urls);
     }
 
     /**
-     * @param array $doc
+     * @param array   $doc
      * @param boolean $as_string
      * @param boolean $rewrite_urls
      * @return array|string
@@ -162,5 +274,20 @@ final class core_json_editor_sample_documents {
             $json = file_rewrite_pluginfile_urls($json, 'pluginfile.php', 42, 'sample', 'dummy', 1);
         }
         return $as_string ? $json : json_decode($json, true);
+    }
+
+    /**
+     * @param array $nodes
+     * @return string
+     */
+    public static function create_json_document_from_nodes(array $nodes): string {
+        return static::prettify(
+            [
+                'type' => 'doc',
+                'content' => $nodes,
+            ],
+            true,
+            false
+        );
     }
 }

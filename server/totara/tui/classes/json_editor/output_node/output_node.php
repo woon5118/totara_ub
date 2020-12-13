@@ -56,5 +56,5 @@ abstract class output_node {
     /**
      * @return string
      */
-    abstract static public function get_node_type(): string;
+    abstract public static function get_node_type(): string;
 }

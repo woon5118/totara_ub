@@ -17,20 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package totara_comment
  */
 namespace totara_comment;
 
+use coding_exception;
+use context;
+use context_user;
 use core\json_editor\document;
+use core\json_editor\node\abstraction\has_extra_linked_file;
 use core\json_editor\node\attachment;
 use core\json_editor\node\audio;
 use core\json_editor\node\file\base_file;
 use core\json_editor\node\image;
 use core\json_editor\node\video;
+use core_user;
+use stdClass;
+use stored_file;
 use totara_comment\event\comment_created;
-use totara_comment\event\comment_updated;
 use totara_comment\event\comment_soft_deleted;
+use totara_comment\event\comment_updated;
 use totara_comment\event\reply_created;
 use totara_comment\event\reply_soft_deleted;
 use totara_comment\exception\comment_exception;
@@ -57,7 +64,7 @@ final class comment_helper {
      *
      * @param string $component
      * @param string $area
-     * @param int $instance_id
+     * @param int    $instance_id
      *
      * @return void
      */
@@ -66,7 +73,7 @@ final class comment_helper {
         // record is deleted, the cursor should be reset.
         $cursor = new cursor([
             'limit' => 100,
-            'page' => 1
+            'page' => 1,
         ]);
 
         $paginator = comment_loader::get_paginator(
@@ -96,7 +103,7 @@ final class comment_helper {
     /**
      * Purging a single comment. If a reason is provided then the comment will be soft-deleted.
      *
-     * @param comment $comment
+     * @param comment  $comment
      * @param int|null $delete_reason
      * @return void
      */
@@ -198,12 +205,12 @@ final class comment_helper {
      *
      * If $draft_id is not being set, then current content will be returned.
      *
-     * @param string    $content
-     * @param int       $content_format
-     * @param int       $comment_id
-     * @param int       $context_id
-     * @param int|null  $draft_id
-     * @param int|null  $user_id
+     * @param string   $content
+     * @param int      $content_format
+     * @param int      $comment_id
+     * @param int      $context_id
+     * @param int|null $draft_id
+     * @param int|null $user_id
      *
      * @return string
      */
@@ -230,35 +237,38 @@ final class comment_helper {
                 attachment::get_type(),
                 video::get_type(),
                 audio::get_type(),
-                image::get_type()
+                image::get_type(),
             ];
 
             $nodes = $document->find_nodes_by_types($node_types);
-            $filenames = array_map(
-                function (base_file $node): string {
-                    return $node->get_filename();
-                },
-                $nodes
-            );
+            $file_names = [];
 
-            $user_context = \context_user::instance($user_id);
+            /** @var base_file $file_node */
+            foreach ($nodes as $file_node) {
+                $file_names[] = $file_node->get_filename();
+
+                if ($file_node instanceof has_extra_linked_file) {
+                    $extra_file = $file_node->get_extra_linked_file();
+
+                    if (null !== $extra_file) {
+                        $file_names[] = $extra_file->get_filename();
+                    }
+                }
+            }
+
+            $user_context = context_user::instance($user_id);
             $draft_files = $fs->get_area_files(
                 $user_context->id,
                 'user',
                 'draft',
-                $draft_id
-            );
-
-            $draft_files = array_filter(
-                $draft_files,
-                function (\stored_file $file): bool {
-                    return !$file->is_directory();
-                }
+                $draft_id,
+                'itemid, filepath, filename',
+                false
             );
 
             foreach ($draft_files as $file) {
                 $filename = $file->get_filename();
-                if (!in_array($filename, $filenames, true)) {
+                if (!in_array($filename, $file_names, true)) {
                     // This draft file is not appearing within the content of the comment, therefore
                     // it will be deleted prior to the point where it is moved to the actual area.
                     $file->delete();
@@ -279,15 +289,15 @@ final class comment_helper {
         }
 
         // Emulate the form data for editor function to work.
-        $form_data = new \stdClass();
+        $form_data = new stdClass();
         $form_data->content_editor = [
             'text' => $content,
             'format' => $content_format,
-            'itemid' => $draft_id
+            'itemid' => $draft_id,
         ];
 
         $options = ['maxfiles' => -1];
-        $context = \context::instance_by_id($context_id);
+        $context = context::instance_by_id($context_id);
 
         // Note that we are save files against the totara_comment and its area. Instead of using
         // different places. The only difference is that the context - since totara_comment does
@@ -307,9 +317,9 @@ final class comment_helper {
     }
 
     /**
-     * @param string    $raw_content
-     * @param int       $content_format
-     * @param int|null  $draft_id
+     * @param string   $raw_content
+     * @param int      $content_format
+     * @param int|null $draft_id
      *
      * @return string
      */
@@ -330,13 +340,13 @@ final class comment_helper {
     /**
      * An API to create the comment.
      *
-     * @param string    $component
-     * @param string    $area
-     * @param int       $instance_id
-     * @param string    $content
-     * @param int|null  $content_format
-     * @param int|null  $draft_id
-     * @param int|null  $actor_id
+     * @param string   $component
+     * @param string   $area
+     * @param int      $instance_id
+     * @param string   $content
+     * @param int|null $content_format
+     * @param int|null $draft_id
+     * @param int|null $actor_id
      *
      * @return comment
      */
@@ -345,7 +355,7 @@ final class comment_helper {
         global $USER;
 
         if (empty($content)) {
-            throw new \coding_exception("Cannot create a comment with empty content");
+            throw new coding_exception("Cannot create a comment with empty content");
         }
 
         if (null === $actor_id || 0 === $actor_id) {
@@ -387,13 +397,13 @@ final class comment_helper {
         if ($actor_id == $USER->id) {
             $comment->set_user($USER);
         } else {
-            $user = \core_user::get_user($actor_id, '*', MUST_EXIST);
+            $user = core_user::get_user($actor_id, '*', MUST_EXIST);
             unset($user->password);
 
             $comment->set_user($user);
         }
 
-        $context = \context::instance_by_id($context_id);
+        $context = context::instance_by_id($context_id);
 
         $event = comment_created::from_comment($comment, $context, $actor_id);
         $event->add_record_snapshot(comment::get_entity_table(), $comment->to_record());
@@ -405,8 +415,8 @@ final class comment_helper {
     /**
      * Creating a reply for the parent comment's id.
      *
-     * @param int $parent_comment_id
-     * @param string $content
+     * @param int      $parent_comment_id
+     * @param string   $content
      * @param int|null $draft_id
      * @param int|null $content_format
      * @param int|null $actor_id
@@ -418,7 +428,7 @@ final class comment_helper {
         global $USER;
 
         if (empty($content)) {
-            throw new \coding_exception("Cannot create a reply with empty content");
+            throw new coding_exception("Cannot create a reply with empty content");
         }
 
         if (null === $actor_id || 0 === $actor_id) {
@@ -427,7 +437,7 @@ final class comment_helper {
 
         $parent_comment = comment::from_id($parent_comment_id);
         if ($parent_comment->is_reply()) {
-            throw new \coding_exception("Cannot create a reply of another reply");
+            throw new coding_exception("Cannot create a reply of another reply");
         }
 
         $component = $parent_comment->get_component();
@@ -472,7 +482,7 @@ final class comment_helper {
         if ($actor_id == $USER->id) {
             $reply->set_user($USER);
         } else {
-            $user = \core_user::get_user($actor_id, '*', MUST_EXIST);
+            $user = core_user::get_user($actor_id, '*', MUST_EXIST);
 
             unset($user->password);
             $reply->set_user($user);
@@ -489,8 +499,8 @@ final class comment_helper {
      * Update the content of a comment.
      * Note that this function will try to bump the timestamp for of updating content.
      *
-     * @param int $comment_id
-     * @param string $content
+     * @param int      $comment_id
+     * @param string   $content
      * @param int|null $draft_id
      * @param int|null $content_format
      * @param int|null $actor_id
@@ -551,7 +561,7 @@ final class comment_helper {
         $comment->update_content($processed_content, $content_format);
         $comment->update_content_text($content_text);
 
-        $context = \context::instance_by_id($context_id);
+        $context = context::instance_by_id($context_id);
         $event = comment_updated::from_comment($comment, $context, $actor_id);
         $event->add_record_snapshot(comment::get_entity_table(), $comment->to_record());
         $event->trigger();
@@ -562,7 +572,7 @@ final class comment_helper {
     /**
      * Set the flag deleted of the comment, instead of hard deleting the record.
      *
-     * @param int $comment_id
+     * @param int      $comment_id
      * @param int|null $actor_id
      *
      * @param int|null $delete_reason
@@ -670,7 +680,7 @@ final class comment_helper {
      * This function will not include any directories to the list of the result.
      *
      * @param comment $comment
-     * @return \stored_file[]
+     * @return stored_file[]
      */
     public static function get_files(comment $comment): array {
         global $CFG;
@@ -699,7 +709,7 @@ final class comment_helper {
 
         return array_filter(
             $files,
-            function (\stored_file $file): bool {
+            function (stored_file $file): bool {
                 return !$file->is_directory();
             }
         );
@@ -721,7 +731,7 @@ final class comment_helper {
             FORMAT_HTML,
             FORMAT_PLAIN,
             FORMAT_MARKDOWN,
-            FORMAT_JSON_EDITOR
+            FORMAT_JSON_EDITOR,
         ];
 
         if (!in_array($format, $formats)) {
@@ -740,7 +750,7 @@ final class comment_helper {
      * Delete any related items, including files and reactions.
      *
      * @param comment $comment
-     * @param int $context_id
+     * @param int     $context_id
      */
     private static function remove_related_content(comment $comment, int $context_id): void {
         global $CFG;
@@ -780,7 +790,7 @@ final class comment_helper {
      */
     public static function validate_comment_area(string $area): void {
         if (!static::is_valid_area($area)) {
-            throw new \coding_exception("Invalid area '{$area}'");
+            throw new coding_exception("Invalid area '{$area}'");
         }
     }
 }

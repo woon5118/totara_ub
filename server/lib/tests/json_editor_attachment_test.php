@@ -121,4 +121,43 @@ class core_json_editor_attachment_testcase extends advanced_testcase {
 
         $this->assertFalse($result);
     }
+
+    /**
+     * @return void
+     */
+    public function test_get_invalid_file_url(): void {
+        $node = attachment::from_node([
+            'type' => attachment::get_type(),
+            'attrs' => [
+                'filename' => 'file.txt',
+                'url' => '@@PLUGINFILE@@/file.txt',
+                'size' => 42
+            ]
+        ]);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("The file url had not been rewritten yet");
+
+        $node->get_file_url();
+    }
+
+    /**
+     * @return void
+     */
+    public function test_get_valid_file_url(): void {
+        $node = attachment::from_node([
+            'type' => attachment::get_type(),
+            'attrs' => [
+                'filename' => 'file.txt',
+                'url' => 'http://example.com/file.txt',
+                'size' => 192
+            ]
+        ]);
+
+        $file_url = $node->get_file_url(true);
+
+        self::assertEquals(1, $file_url->get_param('forcedownload'));
+        self::assertEquals('example.com', $file_url->get_host());
+        self::assertEquals('http', $file_url->get_scheme());
+    }
 }

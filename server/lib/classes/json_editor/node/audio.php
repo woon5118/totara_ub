@@ -17,26 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package core
  */
 namespace core\json_editor\node;
 
+use coding_exception;
 use core\json_editor\formatter\formatter;
 use core\json_editor\helper\node_helper;
-use core\json_editor\node\file\base_file;
 use core\json_editor\node\abstraction\block_node;
+use core\json_editor\node\abstraction\has_extra_linked_file;
+use core\json_editor\node\attribute\extra_linked_file;
+use core\json_editor\node\file\base_file;
 use html_writer;
+use stored_file;
 
 /**
  * Class audio
  * @package core\json_editor\node
  */
-final class audio extends base_file implements block_node {
+final class audio extends base_file implements block_node, has_extra_linked_file {
     /**
      * @var string
      */
     protected $mime_type;
+
+    /**
+     * @var extra_linked_file|null
+     */
+    private $transcript;
 
     /**
      * @param array $node
@@ -48,10 +57,24 @@ final class audio extends base_file implements block_node {
         $attrs = $node['attrs'];
 
         if (!array_key_exists('mime_type', $attrs)) {
-            throw new \coding_exception("No mime type was set");
+            throw new coding_exception("No mime type was set");
         }
 
         $audio->mime_type = $attrs['mime_type'];
+        $audio->transcript = null;
+
+        if (array_key_exists('transcript', $attrs)) {
+            $transcript = $attrs['transcript'];
+            if (!is_array($transcript)) {
+                throw new coding_exception("Expecting 'transcript' attribute to be an array");
+            }
+
+            $audio->transcript = new extra_linked_file(
+                $transcript['url'],
+                $transcript['filename']
+            );
+        }
+
         return $audio;
     }
 
@@ -70,9 +93,21 @@ final class audio extends base_file implements block_node {
             return false;
         }
 
+        // Validate transcript if it exist in the node data.
+        if (array_key_exists('transcript', $attrs)) {
+            if (!is_array($attrs['transcript'])) {
+                return false;
+            }
+
+            $transcript_keys = array_keys($attrs['transcript']);
+            if (!node_helper::check_keys_match($transcript_keys, ['url', 'filename'])) {
+                return false;
+            }
+        }
+
         // Validate on attribute keys.
         $input_keys = array_keys($attrs);
-        return node_helper::check_keys_match($input_keys, ['filename', 'url', 'mime_type']);
+        return node_helper::check_keys_match($input_keys, ['filename', 'url', 'mime_type'], ['transcript']);
     }
 
     /**
@@ -89,8 +124,18 @@ final class audio extends base_file implements block_node {
 
         // Cleanning mime type.
         $attrs['mime_type'] = clean_param($attrs['mime_type'], PARAM_TEXT);
-        $cleaned_raw_node['attrs'] = $attrs;
 
+        // Cleaning the transcript object, if there is any.
+        if (array_key_exists('transcript', $attrs)) {
+            $transcript = $attrs['transcript'];
+
+            $transcript['url'] = clean_param($transcript['url'], PARAM_URL);
+            $transcript['filename'] = clean_param($transcript['filename'], PARAM_FILE);
+
+            $attrs['transcript'] = $transcript;
+        }
+
+        $cleaned_raw_node['attrs'] = $attrs;
         return $cleaned_raw_node;
     }
 
@@ -133,18 +178,37 @@ final class audio extends base_file implements block_node {
     }
 
     /**
-     * @param \stored_file $file
+     * @param stored_file      $audio_file
+     * @param stored_file|null $transcript_file
      * @return array
      */
-    public static function create_raw_node(\stored_file $file): array {
-        $file_url = self::build_file_url_from_stored_file($file);
+    public static function create_raw_node(stored_file $audio_file, ?stored_file $transcript_file = null): array {
+        $audio_file_url = self::build_file_url_from_stored_file($audio_file);
+        $attrs = [
+            'filename' => $audio_file->get_filename(),
+            'url' => $audio_file_url->out(false),
+            'mime_type' => $audio_file->get_mimetype()
+        ];
+
+        if (null !== $transcript_file) {
+            $transcript_file_url = self::build_file_url_from_stored_file($transcript_file);
+            $attrs['transcript'] = [
+                'url' => $transcript_file_url->out(),
+                'filename' => $transcript_file->get_filename()
+            ];
+        }
+
         return [
             'type' => static::get_type(),
-            'attrs' => [
-                'filename' => $file->get_filename(),
-                'url' => $file_url->out(false),
-                'mime_type' => $file->get_mimetype()
-            ],
+            'attrs' => $attrs
         ];
+    }
+
+    /**
+     * Returning the transcript file metadata.
+     * @return extra_linked_file|null
+     */
+    public function get_extra_linked_file(): ?extra_linked_file {
+        return $this->transcript;
     }
 }

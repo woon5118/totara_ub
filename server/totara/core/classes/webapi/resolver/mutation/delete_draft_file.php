@@ -22,22 +22,39 @@
  */
 namespace totara_core\webapi\resolver\mutation;
 
-
+use context_user;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_core\upload\upload;
 
-final class delete_draft_file implements mutation_resolver {
+final class delete_draft_file implements mutation_resolver, has_middleware {
     /**
      * @param array             $args
      * @param execution_context $ec
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        upload::delete_draft_file($args['draftid'], $args['filename']);
+        global $USER;
 
+        $context = context_user::instance($USER->id);
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($context);
+        }
+
+        upload::delete_draft_file($args['draftid'], $args['filename'], $USER->id);
         return [
             'success' => true
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login()
         ];
     }
 }

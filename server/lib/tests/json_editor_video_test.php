@@ -202,4 +202,173 @@ class core_json_editor_video_testcase extends advanced_testcase {
             ])
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_validate_schema_with_valid_subtitle(): void {
+        self::assertTrue(
+            video::validate_schema([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'video/mp4',
+                    'subtitle' => [
+                        'url' => 'http://example.com/data_subtitle.vtt',
+                        'filename' => 'data_subtitle.vtt'
+                    ]
+                ]
+            ])
+        );
+
+        self::assertTrue(
+            video::validate_schema([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'ddd',
+                    'subtitle' => null
+                ]
+            ])
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_validate_schema_with_invalid_subtitle(): void {
+        self::assertFalse(
+            video::validate_schema([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'ddd',
+                    'subtitle' => 'xwz'
+                ]
+            ])
+        );
+
+        self::assertFalse(
+            video::validate_schema([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'ddd',
+                    'subtitle' => 45
+                ]
+            ])
+        );
+
+        self::assertFalse(
+            video::validate_schema([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'ddd',
+                    'subtitle' => true
+                ]
+            ])
+        );
+
+        self::assertFalse(
+            video::validate_schema([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'ddd',
+                    'subtitle' => []
+                ]
+            ])
+        );
+
+        self::assertFalse(
+            video::validate_schema([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'ddd',
+                    'subtitle' => [
+                        'db' => '192.168.0.1'
+                    ]
+                ]
+            ])
+        );
+
+        // We don't really have to assert the debugging message, but we know for sure that debugging message
+        // is emitted.
+        $this->resetDebugging();
+    }
+
+    /**
+     * @return void
+     */
+    public function test_clean_video_node_with_invalid_subtitle_node(): void {
+        self::assertEquals(
+            [
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'video/mp4 ',
+                    'subtitle' => [
+                        'url' => null,
+                        'filename' => 'kaboom_da_rock'
+                    ]
+                ]
+            ],
+
+            video::clean_raw_node([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'video/mp4 ',
+                    'subtitle' => [
+                        'url' => '<script>alert("hi there")</script>',
+                        'filename' => 'kaboom_da_rock'
+                    ]
+                ]
+            ])
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_clean_video_node_with_valid_subtitle_node(): void {
+        self::assertEquals(
+            [
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'video/mp4 ',
+                    'subtitle' => [
+                        'url' => 'http://example.com/kaboom_da_rock',
+                        'filename' => 'kaboom_da_rock'
+                    ]
+                ]
+            ],
+
+            video::clean_raw_node([
+                'type' => video::get_type(),
+                'attrs' => [
+                    'filename' => 'data.mp4',
+                    'url' => 'http://example.com/data.mp4',
+                    'mime_type' => 'video/mp4 ',
+                    'subtitle' => [
+                        'url' => 'http://example.com/kaboom_da_rock',
+                        'filename' => 'kaboom_da_rock'
+                    ]
+                ]
+            ])
+        );
+    }
 }

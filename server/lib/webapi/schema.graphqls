@@ -110,6 +110,16 @@ Input parameter equivalent to PARAM_URL, '' is converted to NULL
 scalar param_url
 
 """
+Input parameter equivalent to PARAM_FILE, '' is converted to NULL.
+"""
+scalar param_file
+
+"""
+Input parameter equivalent to PARAM_PATH, '' is converted to NULL.
+"""
+scalar param_path
+
+"""
 Represents database id fields (numeric string).
 """
 scalar core_id
