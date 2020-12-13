@@ -139,6 +139,8 @@ Feature: Assign position user groups to perform activities
 
     When I set the following fields to these values:
       | Search hierarchy | Dev |
+    # pausing due to search being debounced (waiting 500 ms)
+    And I wait "1" seconds
     Then I should see the following unselected adder picker entries:
       | Position     |
       | IT Developer |
@@ -149,6 +151,8 @@ Feature: Assign position user groups to perform activities
 
     When I set the following fields to these values:
       | Search hierarchy | |
+    # pausing due to search being debounced (waiting 500 ms)
+    And I wait "1" seconds
     Then I should see the following unselected adder picker entries:
       | Position     |
       | IT Developer |
