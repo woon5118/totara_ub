@@ -79,7 +79,7 @@ class totara_tui_output_component_testcase extends advanced_testcase {
         $property->setAccessible(true);
         $components = $property->getValue($framework);
 
-        self::assertSame($components, ['test']);
+        self::assertSame($components, ['tui', 'test']);
     }
 
     public function test_register_component() {
@@ -91,7 +91,7 @@ class totara_tui_output_component_testcase extends advanced_testcase {
         $property->setAccessible(true);
         $components = $property->getValue($framework);
 
-        self::assertSame($components, ['test']);
+        self::assertSame($components, ['tui', 'test']);
     }
 
     public function test_register_component_too_late() {

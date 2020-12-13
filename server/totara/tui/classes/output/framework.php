@@ -87,7 +87,8 @@ final class framework implements \core\output\framework {
      * Initialise this instance of the framework
      */
     public function initialise(): void {
-        // Nothing to actually initialise here.
+        // We always require Tui component so that components wishing to auto-initialise from attributes can.
+        $this->require_component(self::COMPONENT);
     }
 
     /**

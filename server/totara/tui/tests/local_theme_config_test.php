@@ -51,6 +51,11 @@ class totara_tui_local_theme_config_testcase extends advanced_testcase {
                 $shas[] = $file;
             }
         }
+        if (empty($shas)) {
+            // This mimicks how get_component_sha works.
+            $shas[] = '';
+        }
+        // This accounts for settings.
         $shas[] = sha1('');
         $expected = sha1(join("\n", $shas));
         $actual = $theme->get_component_sha('samples/pages/samples');

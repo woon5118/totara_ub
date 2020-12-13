@@ -345,7 +345,7 @@ require(['core/autoinitialise'], function(ai) {
         $instances = [];
         foreach (\core_component::get_namespace_classes('output', \core\output\framework::class) as $class) {
             /** @var \core\output\framework $class */
-            $instance = $class::new_instance($this);
+            $instance = $class::new_instance();
             $instances[get_class($instance)] = $instance;
         }
         return $instances;

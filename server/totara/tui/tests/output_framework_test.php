@@ -48,6 +48,20 @@ class totara_tui_output_framework_test extends advanced_testcase {
         self::assertInstanceOf(framework::class, $framework);
     }
 
+    public function test_initialise_requires_tui() {
+        $framework = framework::new_instance();
+
+        $property = new ReflectionProperty($framework, 'components');
+        $property->setAccessible(true);
+        self::assertCount(0, $property->getValue($framework));
+
+        $framework->initialise();
+
+        $components = $property->getValue($framework);
+        self::assertCount(1, $components);
+        self::assertTrue(in_array('tui', $components));
+    }
+
     public function test_get_head_code() {
         $page = new moodle_page();
         /** @var core_renderer $renderer */
@@ -155,7 +169,9 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $page = new moodle_page;
         $framework = framework::get($page);
 
-        self::assertFalse($framework->is_component_required('tui'));
+        // Tui is required on all pages.
+        self::assertTrue($framework->is_component_required('tui'));
+        // Confirm nothing changes if we then try to require it again.
         $framework->require_component('tui');
         self::assertTrue($framework->is_component_required('tui'));
 
@@ -181,7 +197,9 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $page = new moodle_page;
         $framework = framework::get($page);
 
-        self::assertFalse($framework->is_component_required('tui'));
+        // Tui is required on all pages.
+        self::assertTrue($framework->is_component_required('tui'));
+        // Confirm nothing changes if we then try to require it again.
         $component = framework::vue('tui', $page);
         self::assertInstanceOf(\totara_tui\output\component::class, $component);
         self::assertTrue($framework->is_component_required('tui'));
@@ -198,7 +216,9 @@ class totara_tui_output_framework_test extends advanced_testcase {
         global $PAGE;
         $framework = framework::get($PAGE);
 
-        self::assertFalse($framework->is_component_required('tui'));
+        // Tui is required on all pages.
+        self::assertTrue($framework->is_component_required('tui'));
+        // Confirm nothing changes if we then try to require it again.
         $component = framework::vue('tui');
         self::assertInstanceOf(\totara_tui\output\component::class, $component);
         self::assertTrue($framework->is_component_required('tui'));
@@ -215,10 +235,13 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $page = new moodle_page;
         $framework = framework::get($page);
 
-        self::assertFalse($framework->is_component_required('tui'));
+        // Tui is required on all pages.
+        self::assertTrue($framework->is_component_required('tui'));
+        // Confirm nothing changes if we then try to require it again.
         $framework->require_vue('tui');
         self::assertTrue($framework->is_component_required('tui'));
 
+        // Test a component we haven't loaded
         self::assertFalse($framework->is_component_required('samples'));
         $framework->require_vue('samples/pages/samples');
         self::assertTrue($framework->is_component_required('samples'));
@@ -228,11 +251,11 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $page = new moodle_page;
         $framework = framework::get($page);
 
-        self::assertSame([], $framework->get_final_components());
-
-        $framework->require_vue('tui');
-
+        // Tui is required on all pages.
         self::assertSame(['tui'], $framework->get_final_components());
+
+        // Confirm nothing changes if we then try to require it again.
+        $framework->require_vue('tui');
         self::assertSame(['tui'], $framework->get_final_components());
     }
 
@@ -240,12 +263,13 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $page = new moodle_page;
         $framework = framework::get($page);
 
-        self::assertSame([], $framework->get_bundles());
-        self::assertSame([], $framework->get_bundles(\totara_tui\local\requirement::TYPE_JS));
-        self::assertSame([], $framework->get_bundles(\totara_tui\local\requirement::TYPE_CSS));
+        // Tui is required on all pages.
+        self::assertCount(3, $framework->get_bundles());
+        self::assertCount(2, $framework->get_bundles(\totara_tui\local\requirement::TYPE_JS));
+        self::assertCount(1, $framework->get_bundles(\totara_tui\local\requirement::TYPE_CSS));
 
+        // Confirm nothing changes if we then try to require it again.
         $framework->require_vue('tui');
-
         self::assertCount(3, $framework->get_bundles());
         self::assertCount(2, $framework->get_bundles(\totara_tui\local\requirement::TYPE_JS));
         self::assertCount(1, $framework->get_bundles(\totara_tui\local\requirement::TYPE_CSS));
