@@ -37,7 +37,9 @@ use core\message\message;
 use core\task\adhoc_task;
 use core\task\manager;
 use core\task\manager as task_manager;
+use core_user;
 use dml_missing_record_exception;
+use stdClass;
 
 /**
  * Adds workspace members in bulk.
@@ -296,6 +298,39 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         collection $cohort_ids,
         int $number_of_members_added
     ): void {
+        $user = core_user::get_user($this->get_userid());
+        $message = $this->create_message($user, $workspace, $cohort_ids, $number_of_members_added);
+        message_send($message);
+
+        if ($this->get_userid() != $workspace->get_user_id()) {
+            $owner = core_user::get_user($workspace->get_user_id());
+            if ($owner) {
+                // Make sure we send the notification in the language of the user
+                cron_setup_user($owner);
+
+                $message = $this->create_message($owner, $workspace, $cohort_ids, $number_of_members_added);
+                message_send($message);
+
+                cron_setup_user($user);
+            }
+        }
+    }
+
+    /**
+     * Create message
+     *
+     * @param stdClass $receiver
+     * @param workspace $workspace
+     * @param collection $cohort_ids
+     * @param int $number_of_members_added
+     * @return message
+     */
+    private function create_message(
+        stdClass $receiver,
+        workspace $workspace,
+        collection $cohort_ids,
+        int $number_of_members_added
+    ): message {
         $workspace_name = format_string($workspace->get_name());
         $url = new \moodle_url("/container/type/workspace/workspace.php", ['id' => $workspace->id]);
 
@@ -316,7 +351,7 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
 
         $message = new message();
         $message->userfrom = \core_user::get_noreply_user();
-        $message->userto = $this->get_userid();
+        $message->userto = $receiver;
         $message->subject = get_string('bulk_add_audiences_notification_subject', 'container_workspace');
         $message->fullmessage = $message_text;
         $message->fullmessageformat = FORMAT_HTML;
@@ -327,16 +362,7 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         $message->contexturl = $url;
         $message->contexturlname = $workspace_name;
 
-        // Clone first to make sure we use the same base object
-        $message_to_owner = clone $message;
-
-        message_send($message);
-
-        if ($this->get_userid() != $workspace->get_user_id()) {
-            $message_to_owner->userto = $workspace->get_user_id();
-
-            message_send($message_to_owner);
-        }
+        return $message;
     }
 
     /**
