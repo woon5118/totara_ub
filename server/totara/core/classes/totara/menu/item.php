@@ -382,11 +382,23 @@ class item {
         if ($this->visibility == self::VISIBILITY_HIDE) {
             return false;
         }
-        if (!$this->check_visibility()) {
+        static $nestingflags = [];
+        if (!empty($nestingflags[$this->id])) {
+            // Prevent infinite loops.
+            debugging('Cyclic dependency detected for menu item visibility: ' . $this->id, DEBUG_DEVELOPER);
+            return false;
+        }
+        $nestingflags[$this->id] = true;
+        $visible = $this->check_visibility();
+        unset($nestingflags[$this->id]);
+        if (!$visible) {
             return false;
         }
         if ($this->visibility == self::VISIBILITY_CUSTOM) {
-            return $this->get_visibility_custom();
+            $nestingflags[$this->id] = true;
+            $visible = $this->get_visibility_custom();
+            unset($nestingflags[$this->id]);
+            return $visible;
         }
         return true;
     }
