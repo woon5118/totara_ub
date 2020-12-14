@@ -118,11 +118,105 @@ class container_workspace_audience_loader_testcase extends advanced_testcase {
         $this->assert_cohort_members_to_add_to_workspace($workspace1, $cohort_ids, $expected);
     }
 
+    public function test_get_users_to_add_with_multi_tenancy(): void {
+        $generator = $this->getDataGenerator();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+
+        $tenant_generator->enable_tenants();
+
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        // Tenant 1 users
+        $tenant1_user1 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $tenant1_user2 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $tenant1_user3 = $generator->create_user(['tenantid' => $tenant1->id]);
+        // Tenant 2 users
+        $tenant2_user1 = $generator->create_user(['tenantid' => $tenant2->id]);
+        $tenant2_user2 = $generator->create_user(['tenantid' => $tenant2->id]);
+        $tenant2_user3 = $generator->create_user(['tenantid' => $tenant2->id]);
+        // A system user
+        $system_user1 = $generator->create_user();
+
+        $tenant1_cat_context = context_coursecat::instance($tenant1->categoryid);
+        $tenant2_cat_context = context_coursecat::instance($tenant1->categoryid);
+
+        // Tenant audiences
+        $tenant1_cohort = $generator->create_cohort(['contextid' => $tenant1_cat_context->id]);
+        $tenant2_cohort = $generator->create_cohort(['contextid' => $tenant2_cat_context->id]);
+        // System audience
+        $mixed_cohort = $generator->create_cohort();
+
+        cohort_add_member($tenant1_cohort->id, $tenant1_user1->id);
+        cohort_add_member($tenant1_cohort->id, $tenant1_user2->id);
+        cohort_add_member($tenant1_cohort->id, $tenant1_user3->id);
+
+        cohort_add_member($tenant2_cohort->id, $tenant2_user1->id);
+        cohort_add_member($tenant2_cohort->id, $tenant2_user2->id);
+        cohort_add_member($tenant2_cohort->id, $tenant2_user3->id);
+
+        // Create a mixed cohort
+        cohort_add_member($mixed_cohort->id, $tenant1_user2->id);
+        cohort_add_member($mixed_cohort->id, $tenant1_user3->id);
+        cohort_add_member($mixed_cohort->id, $system_user1->id);
+
+        $this->setUser($tenant1_user1);
+
+        $workspace_generator = $this->get_workspace_generator();
+        $tenant1_workspace = $workspace_generator->create_workspace();
+
+        $this->setUser($tenant2_user1);
+
+        $workspace_generator = $this->get_workspace_generator();
+        $tenant2_workspace = $workspace_generator->create_workspace();
+
+        $this->setAdminUser();
+
+        $workspace_generator = $this->get_workspace_generator();
+        $system_workspace = $workspace_generator->create_workspace();
+
+        $cohort_ids = [$tenant1_cohort->id];
+        $expected = [$tenant1_user2->id, $tenant1_user3->id];
+        $this->assert_cohort_members_to_add_to_workspace($tenant1_workspace, $cohort_ids, $expected);
+
+        $cohort_ids = [$tenant1_cohort->id];
+        $expected = [];
+        $this->assert_cohort_members_to_add_to_workspace($tenant2_workspace, $cohort_ids, $expected);
+
+        $cohort_ids = [$tenant2_cohort->id];
+        $expected = [];
+        $this->assert_cohort_members_to_add_to_workspace($tenant1_workspace, $cohort_ids, $expected);
+
+        $cohort_ids = [$tenant2_cohort->id];
+        $expected = [$tenant2_user2->id, $tenant2_user3->id];
+        $this->assert_cohort_members_to_add_to_workspace($tenant2_workspace, $cohort_ids, $expected);
+
+        $cohort_ids = [$mixed_cohort->id];
+        $expected = [$tenant1_user2->id, $tenant1_user3->id];
+        $this->assert_cohort_members_to_add_to_workspace($tenant1_workspace, $cohort_ids, $expected);
+
+        $cohort_ids = [$mixed_cohort->id];
+        $expected = [];
+        $this->assert_cohort_members_to_add_to_workspace($tenant2_workspace, $cohort_ids, $expected);
+
+        $cohort_ids = [$mixed_cohort->id];
+        $expected = [$tenant1_user2->id, $tenant1_user3->id, $system_user1->id];
+        $this->assert_cohort_members_to_add_to_workspace($system_workspace, $cohort_ids, $expected);
+
+        set_config('tenantsisolated', 1);
+
+        $cohort_ids = [$mixed_cohort->id];
+        $expected = [$system_user1->id];
+        $this->assert_cohort_members_to_add_to_workspace($system_workspace, $cohort_ids, $expected);
+    }
+
     /**
      * Verifies the cohort members that can added as members to a workspace.
      *
      * @param workspace $workspace the workspace to check.
-     * @param $cohort_id cohorts whose members are to be added to the workspace.
+     * @param int[] $cohort_ids
      * @param int[] $potential_members cohort members that can be added to the
      *        workspace.
      */

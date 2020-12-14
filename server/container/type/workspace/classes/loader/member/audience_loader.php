@@ -26,7 +26,10 @@ namespace container_workspace\loader\member;
 use container_workspace\workspace;
 use core\entity\cohort_member;
 use core\entity\user_enrolment;
+use core\entity\user_repository;
 use core\orm\query\builder;
+use core\orm\query\field;
+use core\tenant_orm_helper;
 
 /**
  * Loader for members within a workspace
@@ -89,6 +92,13 @@ final class audience_loader {
                     ->where('e.courseid', $workspace->id)
                     ->where_field('userid', 'cm.userid')
             )
+            ->when(true, function (builder $builder) use ($workspace) {
+                tenant_orm_helper::restrict_users(
+                    $builder,
+                    'cm.userid',
+                    $workspace->get_context()
+                );
+            })
             ->where('cohortid', $audience_ids);
     }
 }
