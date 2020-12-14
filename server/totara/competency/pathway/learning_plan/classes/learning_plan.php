@@ -86,6 +86,14 @@ class learning_plan extends pathway {
         return true;
     }
 
+    /**
+     * Are learning plans enabled?
+     *
+     * @return bool
+     */
+    public function is_enabled(): bool {
+        return advanced_feature::is_enabled('learningplans');
+    }
 
     /**
      * Get the current value from the learning plan and aggregate the pathway with it

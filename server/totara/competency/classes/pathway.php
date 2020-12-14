@@ -642,6 +642,15 @@ abstract class pathway {
         return false;
     }
 
+    /**
+     * Is this specific pathway type enabled - i.e. can it be added as a pathway?
+     *
+     * @return bool
+     */
+    public function is_enabled(): bool {
+        return true;
+    }
+
 
     /*******************************************************************************************************
      * Data exporting

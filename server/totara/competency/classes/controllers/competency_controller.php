@@ -253,7 +253,7 @@ class competency_controller extends admin_controller {
      * @return array
      */
     private function get_pathway_types(): array {
-        $types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
+        $types = pathway_factory::get_pathway_types();
         $types = array_map(function ($type) {
             $pw = pathway_factory::create($type);
             return [

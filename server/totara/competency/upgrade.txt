@@ -1,6 +1,10 @@
 This files describes API changes in /totara/competency/*,
 information provided here is intended especially for developers.
 
+=== 13.3 ===
+
+* Added new method is_enabled() to \totara_competency\pathway so pathway plugins can define if they can be added to competencies.
+
 === 13.2 ===
 * totara_competency\entities\filters\competency_assignment_status has been moved to totara_competency\entity\filters\competency_assignment_status
 * totara_competency\entities\filters\competency_assignment_type has been moved to totara_competency\entity\filters\competency_assignment_type

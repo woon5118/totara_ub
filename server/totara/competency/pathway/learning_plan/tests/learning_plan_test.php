@@ -22,6 +22,7 @@
  */
 
 use pathway_learning_plan\achievement_detail;
+use pathway_manual\manual;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_competency\achievement_configuration;
@@ -34,6 +35,7 @@ use totara_competency\entity\pathway_achievement;
 use totara_competency\entity\scale_value;
 use pathway_learning_plan\learning_plan;
 use totara_competency\entity\competency;
+use totara_competency\pathway_factory;
 use totara_core\advanced_feature;
 
 /**
@@ -195,6 +197,21 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
         $strings = (new achievement_detail())->get_achieved_via_strings();
         $this->assertCount(1, $strings);
         $this->assertEquals(get_string('achievement_detail', 'pathway_learning_plan'), reset($strings));
+    }
+
+    public function test_is_enabled() {
+        $plan_pathway = new learning_plan();
+        $other_pathway = new manual();
+
+        $this->assertTrue($plan_pathway->is_enabled());
+        $this->assertTrue($other_pathway->is_enabled());
+        $this->assertContainsEquals('learning_plan', pathway_factory::get_pathway_types());
+
+        advanced_feature::disable('learningplans');
+
+        $this->assertFalse($plan_pathway->is_enabled());
+        $this->assertTrue($other_pathway->is_enabled());
+        $this->assertNotContainsEquals('learning_plan', pathway_factory::get_pathway_types());
     }
 
     private function run_aggregation_task() {

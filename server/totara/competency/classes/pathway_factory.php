@@ -168,6 +168,12 @@ class pathway_factory {
      * @return string[]|array
      */
     public static function get_pathway_types(): array {
-        return plugin_types::get_enabled_plugins('pathway', 'totara_competency');
+        $pathway_types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
+
+        $pathway_types = array_filter($pathway_types, function (string $pathway_type) {
+            return static::create($pathway_type)->is_enabled();
+        });
+
+        return $pathway_types;
     }
 }
