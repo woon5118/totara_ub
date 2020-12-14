@@ -25,6 +25,7 @@ namespace container_workspace\task;
 defined('MOODLE_INTERNAL') || die();
 
 use coding_exception;
+use container_workspace\event\audience_added;
 use container_workspace\member\member;
 use container_workspace\output\added_to_workspace_notification;
 use container_workspace\workspace;
@@ -201,6 +202,8 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         $this->queue_bulk_notification($workspace, $new_members);
 
         $this->log($result);
+
+        audience_added::from_workspace($workspace, $cohort_ids->all(), $new_member_count, $this->get_userid())->trigger();
 
         return $new_member_count;
     }

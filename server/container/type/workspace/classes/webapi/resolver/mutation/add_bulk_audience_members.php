@@ -23,6 +23,7 @@
 
 namespace container_workspace\webapi\resolver\mutation;
 
+use container_workspace\event\audience_added;
 use container_workspace\interactor\workspace\interactor as workspace_interactor;
 use container_workspace\task\bulk_add_workspace_members_adhoc_task;
 use container_workspace\workspace;

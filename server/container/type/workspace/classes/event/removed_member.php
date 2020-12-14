@@ -95,4 +95,11 @@ class removed_member extends base implements clear_bookmark {
     public function get_target_user_ids(): array {
         return [$this->relateduserid];
     }
+
+    /**
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('event_member_removed', 'container_workspace');
+    }
 }

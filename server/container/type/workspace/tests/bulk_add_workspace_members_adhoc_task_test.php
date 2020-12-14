@@ -22,8 +22,10 @@
  * @category test
  */
 
+use container_workspace\event\audience_added;
 use core\collection;
 use core\entity\cohort;
+use core\event\base;
 use core\task\manager;
 use core\entity\adhoc_task as adhoc_task_entity;
 use core\entity\cohort_member as cohort_member_entity;
@@ -395,6 +397,7 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
         $this->setUser($test_data->owner_id);
 
         $message_sink = $this->redirectMessages();
+        $events_sink = $this->redirectEvents();
 
         $task_data = $this->task_data($workspace_id, $cohort_ids);
         $added_member_count = $this->get_enqueued_task($task_data)->execute();
@@ -424,6 +427,23 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
         foreach ($cohort_names as $cohort_name) {
             $this->assertStringContainsString($cohort_name, $message->fullmessagehtml);
         }
+
+        $events = $events_sink->get_events();
+        // Two events for enrolling the user and one for the actual task
+        $this->assertCount(3, $events);
+        $events = array_filter($events, function (base $event) {
+            return $event instanceof audience_added;
+        });
+        $this->assertCount(1, $events);
+        $event = array_shift($events);
+
+        $this->assertInstanceOf(audience_added::class, $event);
+        $this->assertEquals($test_data->workspace->id, $event->objectid);
+        $this->assertEquals($test_data->workspace->id, $event->courseid);
+        $this->assertEquals($test_data->owner_id, $event->userid);
+        $this->assertEquals($test_data->owner_id, $event->relateduserid);
+        $this->assertEquals($cohort_ids->all(), $event->other['cohort_ids']);
+        $this->assertEquals(1, $event->other['number_of_members_added']);
     }
 
     /**
@@ -452,6 +472,7 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
         $this->setAdminUser();
 
         $message_sink = $this->redirectMessages();
+        $events_sink = $this->redirectEvents();
 
         $task_data = $this->task_data($workspace_id, $cohort_ids);
         $added_member_count = $this->get_enqueued_task($task_data)->execute();
@@ -484,6 +505,23 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
                 $this->assertStringContainsString($cohort_name, $message->fullmessagehtml);
             }
         }
+
+        $events = $events_sink->get_events();
+        // Two events for enrolling the user and one for the actual task
+        $this->assertCount(3, $events);
+        $events = array_filter($events, function (base $event) {
+            return $event instanceof audience_added;
+        });
+        $this->assertCount(1, $events);
+        $event = array_shift($events);
+
+        $this->assertInstanceOf(audience_added::class, $event);
+        $this->assertEquals($test_data->workspace->id, $event->objectid);
+        $this->assertEquals($test_data->workspace->id, $event->courseid);
+        $this->assertEquals(get_admin()->id, $event->userid);
+        $this->assertEquals($test_data->owner_id, $event->relateduserid);
+        $this->assertEquals($cohort_ids->all(), $event->other['cohort_ids']);
+        $this->assertEquals(1, $event->other['number_of_members_added']);
     }
 
     /**
