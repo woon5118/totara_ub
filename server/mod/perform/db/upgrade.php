@@ -235,5 +235,11 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020100106, 'perform');
     }
 
+    if ($oldversion < 2020100107) {
+        mod_perform_upgrade_remove_obsolete_static_content_element_files();
+
+        upgrade_mod_savepoint(true, 2020100107, 'perform');
+    }
+
     return true;
 }

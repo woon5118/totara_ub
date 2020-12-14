@@ -236,3 +236,35 @@ function mod_perform_upgrade_long_text_responses_to_weka_format() {
 
     $transaction->allow_commit();
 }
+
+/**
+ * Removes leftover static_content element files for deleted activities.
+ */
+function mod_perform_upgrade_remove_obsolete_static_content_element_files() {
+    global $DB;
+
+    /*
+     * Find files for the 'performelement_static_content' component that neither have a corresponding activity
+     * nor a corresponding element.
+     */
+    $query = "SELECT f. id, f.itemid, f.contextid
+                FROM {files} f
+                JOIN {context} c ON (f.contextid = c.id AND c.contextlevel = :course_module_level)
+           LEFT JOIN {perform_element} e ON (f.contextid = e.context_id AND f.itemid = e.id)
+           LEFT JOIN {perform} p ON p.course = c.instanceid
+               WHERE f.component = :component
+                 AND e.id IS NULL
+                 AND p.id IS NULL";
+
+    $component = 'performelement_static_content';
+
+    $params = [
+        'course_module_level' => CONTEXT_MODULE,
+        'component' => $component,
+    ];
+
+    $records = $DB->get_records_sql($query, $params);
+    foreach ($records as $record) {
+        get_file_storage()->delete_area_files($record->contextid, $component, false, $record->itemid);
+    }
+}
