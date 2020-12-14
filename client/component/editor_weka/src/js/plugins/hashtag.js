@@ -19,6 +19,9 @@
 import { Plugin, PluginKey } from 'ext_prosemirror/state';
 import HashtagSuggestion from 'editor_weka/components/suggestion/Hashtag';
 import Suggestion from '../helpers/suggestion';
+import { debounce } from 'tui/util';
+
+export const REGEX = new RegExp(`#[^#\\s]+`, 'g');
 
 /**
  *
@@ -29,16 +32,6 @@ import Suggestion from '../helpers/suggestion';
 export default function(editor) {
   const key = new PluginKey('hashtags');
   let suggestion = new Suggestion(editor);
-  let hashtag = suggestion.resetComponent();
-  const regex = new RegExp(`#[A-Za-z0-9]+$`, 'g');
-
-  let processHashtag = view => {
-    const node = suggestion.getNode(view.state, 'hashtag', {
-      text: hashtag.text.slice(1),
-    });
-    suggestion.convertToNode(hashtag, node);
-    hashtag = suggestion.resetComponent();
-  };
 
   return new Plugin({
     key: key,
@@ -49,7 +42,7 @@ export default function(editor) {
          *
          * @param {EditorView} view
          */
-        update: view => {
+        update: debounce(async view => {
           const { text, active, range } = this.key.getState(view.state);
           suggestion.destroyInstance();
 
@@ -57,7 +50,7 @@ export default function(editor) {
             return;
           }
 
-          suggestion.showList({
+          await suggestion.showList({
             view,
             component: {
               name: 'hashtag',
@@ -71,11 +64,8 @@ export default function(editor) {
               active,
               range,
             },
-            callback: () => {
-              hashtag = suggestion.resetComponent();
-            },
           });
-        },
+        }, 500),
       };
     },
 
@@ -89,54 +79,57 @@ export default function(editor) {
       },
 
       /**
-       *
        * @param {Transaction} transaction
        * @param {Object} oldState
-       *
        * @return {Object}
        */
       apply(transaction, oldState) {
-        return suggestion.apply(transaction, oldState, regex, hashtag);
+        // Reset REGEX so that we can start at the start of the string.
+        REGEX.lastIndex = 0;
+        return suggestion.apply(transaction, oldState, REGEX);
       },
     },
 
     props: {
       /**
-       * Some key strokes causes the node conversion to get ignored so we
-       * want to monitor certain key strokes to apply the node transaction.
        *
        * @param {EditorView} view
-       * @param {KeyboardEvent} event
+       * @param {Keyboardevent} event
+       *
+       * @return {Boolean}
        */
       handleKeyDown(view, event) {
-        // Leave when user not busy constructing a hashtag.
-        if (hashtag.text.length <= 0) {
-          return;
+        const { active, text, range } = this.getState(view.state);
+        if (!active) {
+          return false;
         }
 
-        // Moving away from the hashtag needs to reset the component as the user might
-        // not want the process to convert the text to hashtag node.
-        if (event.key.includes('Arrow')) {
-          hashtag = suggestion.resetComponent();
-          return;
+        const validKeys = [
+          ' ',
+          'Tab',
+          'Enter',
+          'PageUp',
+          'PageDown',
+          'Home',
+          'End',
+          'Escape',
+          'Spacebar', // For ie11
+        ];
+
+        if (validKeys.includes(event.key)) {
+          editor.execute((state, dispatch) => {
+            dispatch(
+              state.tr.replaceWith(
+                range.from,
+                range.to,
+                state.schema.node('hashtag', { text: text.slice(1) })
+              )
+            );
+            return true;
+          });
         }
 
-        hashtag.apply =
-          [
-            ' ',
-            'Tab',
-            'Enter',
-            'PageUp',
-            'PageDown',
-            'Home',
-            'End',
-            'Escape',
-            'Spacebar', // For ie11
-          ].find(key => key === event.key) !== undefined;
-
-        if (hashtag.apply) {
-          processHashtag(view);
-        }
+        return false;
       },
 
       /**
@@ -144,21 +137,17 @@ export default function(editor) {
        * @param {EditorView} view
        */
       handleClick(view) {
-        // Leave when user not busy constructing a hashtag.
-        if (hashtag.text.length <= 0) {
+        const { active, text, range } = this.getState(view.state);
+        if (!active) {
           return false;
         }
 
-        // Leave when user is still on the hashtag.
-        if (
-          hashtag.from <= view.state.selection.from &&
-          hashtag.to >= view.state.selection.to
-        ) {
-          return false;
-        }
+        editor.execute((state, dispatch) => {
+          const node = state.schema.node('hashtag', { text: text.slice(1) });
 
-        // Convert the text to a hashtag node.
-        processHashtag(view);
+          dispatch(state.tr.replaceWith(range.from, range.to, node));
+        });
+
         return true;
       },
     },

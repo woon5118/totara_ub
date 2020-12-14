@@ -52,7 +52,7 @@ export default class Suggestion {
     const text = $position.doc.textBetween(
       $position.start(),
       $position.end(),
-      '\0',
+      '\n',
       '\0'
     );
 
@@ -61,37 +61,21 @@ export default class Suggestion {
       return null;
     }
 
-    let match;
-    $regex.lastIndex = 0;
-    while ((match = $regex.exec(text))) {
-      // Javascript doesn't have lookbehinds; this hacks a check that first character is " " or the line beginning.
-      let beforeCharacters = match.input.slice(
-        Math.max(0, match.index - 1),
-        match.index
-      );
-
-      // If the before characters are not an empty string, but any other characters, then we skip this functionality.
-      if (!/^[\s\0]?$/.test(beforeCharacters)) {
-        continue;
-      }
-
-      // The absolute position of the match in the document
-      let from = match.index + $position.start(),
-        to = from + match[0].length;
-
-      // If the position is located within matched substring, return that range.
-      if (from < $position.pos && to >= $position.pos) {
-        return {
-          range: {
-            from,
-            to,
-          },
-          text: match[0],
-        };
-      }
+    let match = $regex.exec(text);
+    if (!match) {
+      return null;
     }
 
-    return null;
+    let from = match.index + $position.start(),
+      to = from + match[0].length;
+
+    return {
+      range: {
+        from,
+        to,
+      },
+      text: match[0],
+    };
   }
 
   /**
@@ -120,6 +104,11 @@ export default class Suggestion {
    * @returns {{apply: boolean, from: number, text: string, to: number}}
    */
   resetComponent() {
+    console.warn(
+      '[editor_weka] The function Suggestion.resetComponent() had been deprecated, ',
+      'please do not use'
+    );
+
     return { apply: false, text: '', from: 0, to: 0 };
   }
 
@@ -133,6 +122,14 @@ export default class Suggestion {
    * @param {Function} callback
    */
   async showList({ view, component, state: { range, text }, callback }) {
+    // If callback function provided.
+    if (callback) {
+      console.warn(
+        '[editor_weka] The fourth parameter of function Suggestion.showList(), ',
+        'had been deprecated, and no longer used'
+      );
+    }
+
     if (this._instance !== null) {
       this.destroyInstance();
     }
@@ -184,11 +181,6 @@ export default class Suggestion {
         component.attrs(id, text)
       );
       this.convertToNode(range, node);
-
-      // If callback function provided.
-      if (typeof callback === 'function') {
-        callback();
-      }
     });
     this._instance.$on('dismiss', () => {
       this.destroyInstance();
@@ -289,14 +281,24 @@ export default class Suggestion {
   /**
    *
    * @param {Transaction} transaction
-   * @param {Object} oldState
+   * @param {{
+   *  active: Boolean,
+   *  range: Object,
+   *  text: String|null
+   * }} oldState
    * @param {RegExp} regex
-   * @param {Object} cache
+   * @param {Object|null} cache - deprecated
    * @return {Object}
    */
   apply(transaction, oldState, regex, cache) {
-    const { selection } = transaction;
+    if (cache) {
+      console.warn(
+        '[editor_weka] The fourth parameter of function Suggestion.apply() had been deprecated ',
+        'and no longer needed. Please update all calls'
+      );
+    }
 
+    const { selection } = transaction;
     let next = Object.assign({}, oldState);
 
     if (selection.from === selection.to) {
@@ -306,12 +308,6 @@ export default class Suggestion {
         next.active = true;
         next.range = match.range;
         next.text = match.text;
-
-        if (cache) {
-          cache.text = match.text;
-          cache.from = match.range.from;
-          cache.to = match.range.to;
-        }
 
         return next;
       }

@@ -115,6 +115,14 @@ export default class BaseExtension {
   }
 
   /**
+   *
+   * @param {EditorState} state
+   */
+  applyFormatters(state) {
+    return state;
+  }
+
+  /**
    * @returns {Node}
    */
   get doc() {

@@ -170,7 +170,7 @@ export default class Editor {
         value.inflate(this, state);
       } else {
         const state = EditorState.fromJSON(this._editorConfig(), {
-          doc: value.getDoc(),
+          doc: value.getDoc(false),
           selection: { anchor: 0, head: 0, type: 'text' },
         });
         value.inflate(this, state);
@@ -391,5 +391,15 @@ export default class Editor {
       area: this._options.area || null,
       instanceId: this._options.instanceId || null,
     };
+  }
+
+  /**
+   *
+   * @return {Function[]}
+   */
+  get extensionFormatters() {
+    return this._extensions.map(extension => {
+      return extension.applyFormatters.bind(extension);
+    });
   }
 }

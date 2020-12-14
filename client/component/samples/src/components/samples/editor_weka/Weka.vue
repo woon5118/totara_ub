@@ -31,6 +31,7 @@
     <hr />
     <Button text="Reset" @click="reset" />
     <Button text="Toggle editor" @click="showEditor = !showEditor" />
+    <Button text="Apply formatters" @click="applyFormatter" />
     <br />
     <div class="tui-sample-weka__json" v-text="json" />
   </div>
@@ -60,7 +61,7 @@ export default {
 
   watch: {
     content(value) {
-      this.json = value && value.getDoc();
+      this.json = value && value.getDoc(false);
     },
   },
 
@@ -76,6 +77,14 @@ export default {
   methods: {
     reset() {
       this.content = null;
+    },
+
+    applyFormatter() {
+      if (!this.content) {
+        return;
+      }
+
+      this.content.getDoc(true);
     },
   },
 };

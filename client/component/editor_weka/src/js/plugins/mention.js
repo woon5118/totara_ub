@@ -88,6 +88,8 @@ export default function(editor) {
        * @return {Object}
        */
       apply(transaction, oldState) {
+        // Reset last index in order to perform the regex again at the start of the string.
+        regex.lastIndex = 0;
         return suggestion.apply(transaction, oldState, regex);
       },
     },
