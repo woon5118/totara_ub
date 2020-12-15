@@ -545,6 +545,26 @@ class section extends model {
     }
 
     /**
+     * Sync updated_at to make it same as created_at
+     */
+    public function sync_updated_at_with_created_at(): void {
+        section_entity::repository()
+            ->where('id', $this->id)
+            ->update(['updated_at' => $this->created_at]);
+    }
+
+    /**
+     * Get the highest sort order of the section element
+     *
+     * @return int
+     * @throws coding_exception
+     */
+    public function get_highest_sort_order() {
+        $last_section_element = $this->get_section_elements()->last();
+        return $last_section_element ? $last_section_element->sort_order : 0;
+    }
+
+    /**
      * check if the section has already been deleted
      *
      * @return bool

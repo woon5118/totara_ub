@@ -69,7 +69,7 @@ class move_element_to_section implements mutation_resolver, has_middleware {
 
         $source_section_element = section_element::load_by_entity($source_section_element_entity);
         $source_section = section::load_by_entity($source_section_element_entity->section);
-        $element = $source_section_element->element;
+
         try {
             $target_section = section::load_by_id($args['input']['target_section_id']);
         } catch (record_not_found_exception $exception) {
@@ -88,10 +88,7 @@ class move_element_to_section implements mutation_resolver, has_middleware {
             throw new coding_exception('Element cannot be moved if activity is active');
         }
 
-        $DB->transaction(function () use ($source_section, $source_section_element, $target_section, $element) {
-            $source_section->remove_section_elements([$source_section_element]);
-            $target_section->add_element($element);
-        });
+        $source_section_element->move_to_section($target_section);
 
         return ['source_section_elements' => $source_section->section_elements];
     }

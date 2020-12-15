@@ -450,6 +450,13 @@ export default {
         });
       }
     },
+
+    section: function() {
+      this.title = this.section.title;
+      this.displayedParticipants = this.getParticipantsFromSection(
+        this.section
+      );
+    },
   },
 
   mounted() {

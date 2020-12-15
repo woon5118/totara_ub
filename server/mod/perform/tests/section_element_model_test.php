@@ -22,6 +22,7 @@
  */
 
 use mod_perform\models\activity\section_element;
+use mod_perform\state\activity\draft;
 
 /**
  * @group perform
@@ -50,4 +51,22 @@ class mod_perform_section_element_model_testcase extends advanced_testcase {
         $this->assertEquals($element->id, $actual_section_element->element_id);
     }
 
+    public function test_move_element_to_another_section() {
+        self::setAdminUser();
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container(
+            ['activity_name' => 'Activity 1', 'activity_status' => draft::get_code(), 'create_section' => false]
+        );
+        $activity_section1 = $perform_generator->create_section($activity, ['title' => 'Activity 1 section 1']);
+        $activity_section2 = $perform_generator->create_section($activity, ['title' => 'Activity 1 section 2']);
+        $element_one = $perform_generator->create_element(['title' => 'Question one']);
+        $element_two = $perform_generator->create_element(['title' => 'Question two']);
+
+        $section_element_one = $perform_generator->create_section_element($activity_section1, $element_one);
+        $section_element_two = $perform_generator->create_section_element($activity_section1, $element_two);
+
+        $this->assertEquals(2, $section_element_two->sort_order);
+        $section_element_two->move_to_section($activity_section2);
+        $this->assertEquals(1, $section_element_two->sort_order);
+    }
 }

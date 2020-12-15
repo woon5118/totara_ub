@@ -180,4 +180,10 @@ class section_relationship extends model {
         return $this->entity->core_relationship->idnumber === constants::RELATIONSHIP_SUBJECT;
     }
 
+    /**
+     * Delete the section relationship
+     */
+    public function delete(): void {
+        $this->entity->delete();
+    }
 }

@@ -389,6 +389,35 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $section->update_relationships([]);
     }
 
+    public function test_sync_updated_at_with_created_at() {
+        [$section] = $this->create_section_element();
+        $this->waitForSecond();
+
+        // make an update operation to change the update time
+        $section->update_title("new title");
+        $this->assertNotEquals($section->created_at, $section->updated_at);
+
+        $section->sync_updated_at_with_created_at();
+        $updated_section = section::load_by_id($section->id);
+
+        $this->assertEquals($updated_section->created_at, $updated_section->updated_at);
+    }
+
+    public function test_get_highest_sort_order() {
+        self::setAdminUser();
+        $perform_generator = $this->perform_generator();
+        $activity = $perform_generator->create_activity_in_container(
+            ['activity_name' => 'Activity 1', 'activity_status' => draft::get_code(), 'create_section' => false]
+        );
+        $activity_section1 = $perform_generator->create_section($activity, ['title' => 'Activity 1 section 1']);
+        $activity_section2 = $perform_generator->create_section($activity, ['title' => 'Activity 1 section 2']);
+        $element = $perform_generator->create_element(['title' => 'Question one']);
+        $section_element = $perform_generator->create_section_element($activity_section1, $element);
+
+        $this->assertEquals(1, $activity_section1->get_highest_sort_order());
+        $this->assertEquals(0, $activity_section2->get_highest_sort_order());
+    }
+
     /**
      * @return array
      */

@@ -25,6 +25,7 @@ use core\orm\query\exceptions\record_not_found_exception;
 use mod_perform\constants;
 use mod_perform\entity\activity\section;
 use mod_perform\models\activity\section_relationship;
+use mod_perform\entity\activity\section_relationship as section_relationship_entity;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
@@ -163,7 +164,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         section_relationship::delete_with_properties($section1->get_id(), $subject);
     }
 
-    public function test_delete_successful() {
+    public function test_delete_with_properties_successful() {
         $this->setAdminUser();
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->perform_generator();
@@ -218,5 +219,27 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
 
         $this->assertTrue($subject_section_relationship->get_is_subject());
         $this->assertFalse($manager_section_relationship->get_is_subject());
+    }
+
+    public function test_delete_successful() {
+        $this->setAdminUser();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->perform_generator();
+        $activity1 = $perform_generator->create_activity_in_container();
+        $section1 = $perform_generator->create_section($activity1);
+
+        $section_relationship = $perform_generator->create_section_relationship(
+            $section1, ['relationship' => constants::RELATIONSHIP_MANAGER]
+        );
+
+        $this->assertCount(1, $section1->get_section_relationships());
+
+        $section_relationship->delete();
+
+        $section_relationships = section_relationship_entity::repository()
+            ->where('section_id', $section1->id)
+            ->get();
+
+        $this->assertCount(0, $section_relationships);
     }
 }

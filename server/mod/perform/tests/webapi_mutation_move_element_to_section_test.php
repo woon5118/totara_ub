@@ -88,7 +88,7 @@ class mod_perform_webapi_mutation_move_element_to_section_testcase extends advan
         $result_a1_s1_sectionelement2 = reset($result['source_section_elements']);
         self::assertEquals($a1_s1_sectionelement2->element->id, $result_a1_s1_sectionelement2['element']['id']);
         // The sort_order has been updated.
-        self::assertEquals(1, $result_a1_s1_sectionelement2['sort_order']);
+        self::assertEquals(2, $result_a1_s1_sectionelement2['sort_order']);
 
         // The target section now contains the element.
         $result_a1_s2_sectionelements = $a1_section2->section_elements;

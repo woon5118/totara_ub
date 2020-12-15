@@ -23,9 +23,11 @@
 
 namespace mod_perform\models\activity\helpers;
 
+use mod_perform\entity\activity\section_element;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\section;
+use mod_perform\models\activity\section_relationship;
 
 /**
  * Encapsulates the business logic to execute when an activity toggles between
@@ -102,10 +104,7 @@ class activity_multisection_toggler {
             function () use ($activity_settings, $setting_key, $new_setting) {
                 if (!$new_setting) {
                     // This is only executed if multisection -> single section.
-                    $this->merge_sections();
-                } else {
-                    // This is only executed if single section -> multisection.
-                    $this->rebuild_first_section();
+                    $this->multi_to_single();
                 }
 
                 $activity_settings->update([$setting_key => $new_setting]);
@@ -116,86 +115,41 @@ class activity_multisection_toggler {
     }
 
     /**
-     * Merges activity content in multiple sections into a single one.
+     * Convert multi section to single section,
+     * keep the first section and discard others,
+     * make all section elements point to the first section,
+     * and recalculate sort_order of section elements
      */
-    private function merge_sections(): void {
+    private function multi_to_single(): void {
         $sections = $this->activity->sections; // Already sorted in the correct order.
         if ($sections->count() === 0) {
             return;
         }
 
-        $elements_to_transfer = [];
+        // reset first section title, create and update time
+        $first_section = $sections->shift();
+        $first_section->update_title('');
+        $first_section->sync_updated_at_with_created_at();
+
+        // remove all section relationships of first section
+        $section_relationships = $first_section->get_section_relationships();
+
+        /** @var section_relationship $section_relationship */
+        foreach ($section_relationships as $section_relationship) {
+            $section_relationship->delete();
+        }
+
+        // point all section elements to first section and reordering
+        $i = $first_section->section_elements->count();
         foreach ($sections as $section) {
-            $section_elements = $section->section_elements->sort('sort_order');
+            $section_elements = $section->section_elements;
 
             foreach ($section_elements as $section_element) {
-                $elements_to_transfer[] = $section_element->element;
-
-                $section_element->delete();
+                $i++;
+                $section_element->move_to_section($first_section, $i);
             }
 
             $section->delete();
-        }
-
-        $merged_section = section::create($this->activity);
-        foreach ($elements_to_transfer as $order => $element) {
-            $merged_section->add_element($element);
-        }
-    }
-
-    /**
-     * Adjusts the sections in an activity when moving from single section
-     * to multisection mode.
-     *
-     * NB: this method deletes existing section(s) and recreates them so that
-     * sections appear as "new" to callers. As of now, this is acceptable since
-     * only draft activities (ie those activities that do not have participants
-     * or their responses) are allowed to change the multisection setting. If
-     * there is a need in the future to account for participant responses as
-     * well, then this method will need to change.
-     */
-    private function rebuild_first_section(): void {
-        $sections = $this->activity->sections;
-        if ($sections->count() === 0) {
-            return;
-        }
-
-        // Ideally, the section count is always consistent with the multisection
-        // setting. However, that cannot be 100% enforced because callers can set
-        // up these values independently of each other. Which is why this method
-        // does not assume there is only one section.
-        foreach ($sections as $section) {
-            $title = $section->title;
-
-            // Remove original section.
-            $elements_to_transfer = [];
-            $section_elements = $section->section_elements->sort('sort_order');
-            foreach ($section_elements as $section_element) {
-                $elements_to_transfer[] = $section_element->element;
-
-                $section_element->delete();
-            }
-
-            $relationships_to_transfer = [];
-            $relationships = $section->get_section_relationships();
-            foreach ($relationships as $section_relationship) {
-                $relationships_to_transfer[] = [
-                    'core_relationship_id' => $section_relationship->core_relationship->id,
-                    'can_view' => $section_relationship->can_view,
-                    'can_answer' => $section_relationship->can_answer
-                ];
-            }
-
-            $section->delete(); // This also removes the relationships.
-
-            // And then recreate it.
-            $rebuilt_section = section::create($this->activity)
-                ->update_title($title)
-                ->update_relationships($relationships_to_transfer);
-
-            foreach ($elements_to_transfer as $order => $element) {
-                $rebuilt_section->add_element($element);
-            }
         }
     }
 }

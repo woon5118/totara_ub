@@ -23,6 +23,7 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use core\orm\entity\model;
 use mod_perform\entity\activity\section_element as section_element_entity;
 
@@ -126,5 +127,20 @@ class section_element extends model {
      */
     public function delete(): void {
         $this->entity->delete();
+    }
+
+    /**
+     * Update this section element to point to a new section
+     *
+     * @param section $new_section
+     * @param int|null $new_sort_order
+     * @throws coding_exception
+     */
+    public function move_to_section(section $new_section, int $new_sort_order = null) {
+        $this->entity->section_id = $new_section->id;
+        $this->entity->sort_order = $new_sort_order ?? $new_section->get_highest_sort_order() + 1;
+        $this->entity->save();
+
+        $this->entity->load_relation('section');
     }
 }
