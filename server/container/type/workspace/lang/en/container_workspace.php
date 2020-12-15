@@ -51,6 +51,7 @@ $string['bulk_add_audiences_modal_title_no_members'] = 'Your selection will not 
 $string['bulk_add_audiences_notification_subject'] = 'Audience members have been successfully added to workspace.';
 $string['bulk_add_audiences_notification_message'] = '{$a->number} people from the following audiences were added to <a href="{$a->link}">{$a->name}</a>:';
 $string['cachedef_draft_id'] = 'Draft IDs';
+$string['cachedef_workspace'] = 'Workspace';
 $string['category_name'] = 'Space category';
 $string['cancel_request'] = 'Cancel request';
 $string['collaborate'] = 'Collaborate';
