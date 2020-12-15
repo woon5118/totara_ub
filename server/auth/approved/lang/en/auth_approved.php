@@ -148,13 +148,7 @@ $string['hashierarchyfreetexts'] = 'The following free text data will be ignored
 {$a}';
 $string['instructions'] = 'Sign up request form instructions';
 $string['instructions_desc'] = 'This text will be displayed at the top of the sign up form. No default text is provided because the process depends on combination of settings on this page.';
-$string['loginsteps'] = '
-For full access to courses you\'ll need to take a minute to create a new
-account for yourself on this web site. Each of the individual courses may also
-have a one-time "enrolment key", which you won\'t need until later.
-<br/><br/>
-Click on the button below to start the registration process.
-';
+$string['loginsteps'] = "For full access to the site's content you'll need to take a minute to create a new account for yourself.";
 $string['managereitherselectionorfreeformrequired'] = 'You must provide either a manager or free text manager';
 $string['managerfreetext'] = 'Manager free text';
 $string['managerorganisationframeworks'] = 'Manager organisation frameworks';
