@@ -84,6 +84,7 @@ $string['check:mf_name_toolong'] = 'The short name is too long. It must not exce
 $string['check:mf_namefull'] = 'Manifest full name';
 $string['check:mf_namefull_toolong'] = 'The full name is too long. It must not exceed {$a} characters.';
 $string['check:mf_package'] = 'Manifest package name';
+$string['check:mf_package_nodefault'] = 'The package name must not be default.';
 $string['check:mf_package_notset'] = 'The package name is not set.';
 $string['check:pub_mpnid_toolong'] = 'The Microsoft Partner Network ID is too long. It must not exceed {$a} characters.';
 $string['check:pub_name_notset'] = 'The publisher\'s name is not set.';
@@ -181,7 +182,6 @@ $string['settings:manifest_app_version'] = 'App version';
 $string['settings:manifest_app_version_default'] = '1.0.0';
 $string['settings:manifest_app_version_help'] = 'If you update any settings for Teams integration, the version must be incremented and it must follow the <a href="{$a->semverurl}" target="_blank">semver</a> standard.';
 $string['settings:manifest_package_name'] = 'Package name';
-$string['settings:manifest_package_name_default'] = 'com.totaralearning.microsoft.msteams';
 $string['settings:manifest_package_name_help'] = 'A unique identifier for this app in reverse domain notation.';
 $string['settings:messaging_extension_enabled'] = 'Messaging extension feature enabled';
 $string['settings:messaging_extension_enabled_help'] = '';
@@ -208,3 +208,6 @@ $string['tab:mylearning'] = 'Current learning';
 $string['userdataitemuser'] = 'MS Teams user records';
 $string['userdataitemusersetting'] = 'MS Teams user settings';
 $string['userdataitemuserstate'] = 'MS Teams user authentication state';
+
+// Deprecated since Totara 13.3
+$string['settings:manifest_package_name_default'] = '';

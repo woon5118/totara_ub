@@ -57,6 +57,7 @@ Feature: Customise Teams integration settings
       | Short name          | Mistletoetara                        |
       | Full name           |                                      |
       | Manifest app ID     | 31415926-5358-9793-2384-626433832795 |
+      | Package name        | com.totaralearning.microsoft.msteams |
       | Publisher's name    | Totara Learn                         |
       | Publisher's website | https://example.com/totara/          |
       | Privacy policy      | https://example.com/privacy/         |
@@ -67,6 +68,17 @@ Feature: Customise Teams integration settings
 
     When I navigate to "Totara app installation" node in "Site administration > Microsoft Teams"
     Then I should see "One or more settings are not correctly set"
+    And I should see "Failed" in the "Manifest package name" "table_row"
+    And I should see "Failed" in the "Allow frame embedding" "table_row"
+    And I should see "Skipped" in the "Allow public access to catalogue" "table_row"
+
+    When I follow "Manifest package name"
+    And I set the field "Package name" to "com.totaralearning.msteams.for.behat"
+    And I press "Save changes"
+    And I am on homepage
+    And I navigate to "Totara app installation" node in "Site administration > Microsoft Teams"
+    Then I should see "One or more settings are not correctly set"
+    And I should see "OK" in the "Manifest package name" "table_row"
     And I should see "Failed" in the "Allow frame embedding" "table_row"
     And I should see "Skipped" in the "Allow public access to catalogue" "table_row"
 
@@ -76,6 +88,7 @@ Feature: Customise Teams integration settings
     And I am on homepage
     And I navigate to "Totara app installation" node in "Site administration > Microsoft Teams"
     Then I should see "All settings have been verified, you can download the manifest file"
+    And I should see "OK" in the "Manifest package name" "table_row"
     And I should see "OK" in the "Allow frame embedding" "table_row"
     But I should see "Skipped" in the "Allow public access to catalogue" "table_row"
 
@@ -85,6 +98,7 @@ Feature: Customise Teams integration settings
     And I am on homepage
     And I navigate to "Totara app installation" node in "Site administration > Microsoft Teams"
     Then I should see "All settings have been verified, you can download the manifest file"
+    And I should see "OK" in the "Manifest package name" "table_row"
     And I should see "OK" in the "Allow frame embedding" "table_row"
     And I should see "OK" in the "Allow public access to catalogue" "table_row"
 

@@ -138,7 +138,7 @@ final class settings_helper {
             $page->add(new admin_setting_configtext('totara_msteams/manifest_app_package_name',
                 new lang_string('settings:manifest_package_name', 'totara_msteams'),
                 new lang_string('settings:manifest_package_name_help', 'totara_msteams'),
-                new lang_string('settings:manifest_package_name_default', 'totara_msteams'),
+                '',
                 PARAM_TEXT));
 
             // Single Sign On.

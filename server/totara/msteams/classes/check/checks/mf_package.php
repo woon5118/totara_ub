@@ -56,6 +56,10 @@ class mf_package implements checkable {
             $this->result = get_string('check:mf_package_notset', 'totara_msteams');
             return status::FAILED;
         }
+        if ($packname === 'com.totaralearning.microsoft.msteams') {
+            $this->result = get_string('check:mf_package_nodefault', 'totara_msteams');
+            return status::FAILED;
+        }
         return status::PASS;
     }
 

@@ -1,0 +1,1 @@
+settings:manifest_package_name_default,totara_msteams

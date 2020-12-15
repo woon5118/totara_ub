@@ -376,7 +376,9 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $check = new mf_package();
         set_config('manifest_app_package_name', '', 'totara_msteams');
         $this->assert_check(status::FAILED, $check);
-        // Not checking the format at the moment.
+        // Not checking the format at the moment, apart from the default package name prior to Totara 13.3.
+        set_config('manifest_app_package_name', 'com.totaralearning.microsoft.msteams', 'totara_msteams');
+        $this->assert_check(status::FAILED, $check);
         set_config('manifest_app_package_name', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
         set_config('manifest_app_package_name', 'com.example.totara.msteams', 'totara_msteams');
