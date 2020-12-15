@@ -16,19 +16,23 @@ exports[`presentation/form/SearchBox.vue matches snapshot 1`] = `
     <!---->
   </label>
    
-  <input
-    aria-label="label"
-    class="tui-formInput tui-searchBox__search"
-    id="tempid"
-    placeholder="tempstring"
-    type="search"
-  />
-   
-  <!---->
+  <div
+    class="tui-searchBox__inputWrapper"
+  >
+    <input
+      aria-label="label"
+      class="tui-formInput tui-searchBox__search tui-formInput--postIcon tui-formInput--charLength-full tui-input--customSize"
+      id="tempid"
+      placeholder="tempstring"
+      type="search"
+    />
+     
+    <!---->
+  </div>
    
   <button
     aria-label="label"
-    class="tui-iconBtn tui-searchBox__button tui-iconBtn--small tui-iconBtn--transparent"
+    class="tui-iconBtn tui-searchBox__button tui-iconBtn--small"
     title="label"
     type="button"
   >

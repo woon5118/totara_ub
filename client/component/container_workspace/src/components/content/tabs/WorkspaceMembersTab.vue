@@ -24,10 +24,11 @@
     />
 
     <div class="tui-workspaceMembersTab__searchHead">
-      <MemberSearchBox
-        :search-term="searchTerm"
-        @submit="searchTerm = $event"
-        @clear="searchTerm = $event"
+      <SearchFilter
+        v-model="searchTerm"
+        drop-label
+        :label="$str('search_members', 'container_workspace')"
+        :placeholder="$str('search_members', 'container_workspace')"
       />
     </div>
 
@@ -115,9 +116,9 @@
 </template>
 
 <script>
-import MemberSearchBox from 'container_workspace/components/filter/MemberSearchBox';
 import WorkspaceMemberCard from 'container_workspace/components/card/WorkspaceMemberCard';
 import SelectFilter from 'tui/components/filters/SelectFilter';
+import SearchFilter from 'tui/components/filters/SearchFilter';
 import apolloClient from 'tui/apollo_client';
 import VirtualScroll from 'tui/components/virtualscroll/VirtualScroll';
 import Button from 'tui/components/buttons/Button';
@@ -130,9 +131,9 @@ import findMembers from 'container_workspace/graphql/find_members';
 
 export default {
   components: {
-    MemberSearchBox,
     WorkspaceMemberCard,
     SelectFilter,
+    SearchFilter,
     VirtualScroll,
     Button,
     PageLoader,
@@ -308,7 +309,8 @@ export default {
       "total_member_x",
       "no_member_found",
       "vieweditems",
-      "member_list"
+      "member_list",
+      "search_members"
     ],
 
     "core": [

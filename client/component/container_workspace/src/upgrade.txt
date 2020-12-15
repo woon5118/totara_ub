@@ -25,3 +25,7 @@ information provided here is intended especially for developers.
 * Added new optional prop "contextId" for component WorkspaceForm.vue
 * Updated PostDiscussionForm.vue to hide the Avatar on small screens
     * SCSS changes
+
+=== 13.3 ===
+
+* Removed MemberSearchBox.vue, is implemented directly in WorkspaceFilter.vue now

@@ -73,10 +73,9 @@ export default {
     },
 
     clearSearchInput() {
-      this.searchValue = '';
       if (this.redirection) {
         window.location.href = this.$url('/totara/engage/search_results.php', {
-          search: this.searchValue,
+          search: '',
         });
       }
     },

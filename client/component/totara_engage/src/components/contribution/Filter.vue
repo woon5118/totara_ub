@@ -67,18 +67,14 @@
           />
         </template>
 
-        <template v-slot:filters-right="{ stacked }">
-          <SearchBox
+        <template v-slot:filters-right>
+          <SearchFilter
             v-if="showSearch"
-            :value="selection.search"
+            v-model="search"
             :drop-label="true"
-            :disabled="false"
+            :label="$str('filtersearch', 'totara_engage')"
             :aria-label="$str('filtersearch', 'totara_engage')"
             :placeholder="searchPlaceholder"
-            :enable-clear-icon="true"
-            @clear="clearSearchInput"
-            @input="searchInput"
-            @submit="searchSubmit"
           />
         </template>
       </FilterBar>
@@ -98,7 +94,7 @@
 <script>
 import FilterBar from 'tui/components/filters/FilterBar';
 import SelectFilter from 'tui/components/filters/SelectFilter';
-import SearchBox from 'tui/components/form/SearchBox';
+import SearchFilter from 'tui/components/filters/SearchFilter';
 
 // GraphQL
 import getFilterOptions from 'totara_engage/graphql/get_filter_options';
@@ -107,7 +103,7 @@ export default {
   components: {
     FilterBar,
     SelectFilter,
-    SearchBox,
+    SearchFilter,
   },
 
   props: {
@@ -278,21 +274,16 @@ export default {
         });
       },
     },
-  },
 
-  methods: {
-    searchInput(value) {
-      this.search = value;
-    },
-
-    searchSubmit() {
-      this.$emit('search', {
-        value: this.search,
-      });
-    },
-
-    clearSearchInput() {
-      this.search = '';
+    search: {
+      get() {
+        return this.value.search;
+      },
+      set(value) {
+        this.$emit('search', {
+          value: value,
+        });
+      },
     },
   },
 };

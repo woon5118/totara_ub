@@ -30,7 +30,6 @@
           :show-label="true"
           :options="options.types"
           :stacked="stacked"
-          @input="update"
         />
 
         <SelectFilter
@@ -39,7 +38,6 @@
           :show-label="true"
           :options="options.statuses"
           :stacked="stacked"
-          @input="update"
         />
       </template>
 
@@ -50,9 +48,8 @@
           :placeholder="
             $str('manage_activity_list_filter_name_placeholder', 'mod_perform')
           "
-          :show-label="false"
+          drop-label
           :stacked="stacked"
-          @submit="update"
         />
       </template>
     </FilterBar>
@@ -68,7 +65,6 @@
           :label="$str('sortby')"
           :show-label="true"
           :options="options.sorts"
-          @input="update"
         />
       </div>
     </div>
@@ -154,6 +150,14 @@ export default {
       },
       selectedSorting: 'creation_date',
     };
+  },
+
+  watch: {
+    selectedFilters: {
+      deep: true,
+      handler: 'update',
+    },
+    selectedSorting: 'update',
   },
 
   methods: {

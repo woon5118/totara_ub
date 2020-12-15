@@ -19,10 +19,11 @@
 <template>
   <div class="tui-bulkManualRatingRateUsersList">
     <div class="tui-bulkManualRatingRateUsersList__search">
-      <SearchBox
+      <SearchFilter
+        v-model="userFullName"
+        drop-label
+        :label="$str('search_people', 'pathway_manual')"
         :placeholder="$str('search_people', 'pathway_manual')"
-        @input="name => (search = name)"
-        @submit="searchPeople"
       />
     </div>
     <Loader :loading="$apollo.loading">
@@ -91,7 +92,7 @@ import LastRatingBlock from 'pathway_manual/components/LastRatingBlock';
 import LastRatingHelp from 'pathway_manual/components/LastRatingHelp';
 import Loader from 'tui/components/loading/Loader';
 import RateableUsersQuery from 'pathway_manual/graphql/rateable_users';
-import SearchBox from 'tui/components/form/SearchBox';
+import SearchFilter from 'tui/components/filters/SearchFilter';
 import Table from 'tui/components/datatable/Table';
 
 export default {
@@ -102,7 +103,7 @@ export default {
     LastRatingBlock,
     LastRatingHelp,
     Loader,
-    SearchBox,
+    SearchFilter,
     Table,
   },
 
@@ -120,23 +121,11 @@ export default {
   data() {
     return {
       users: [],
-      filters: {
-        user_full_name: null,
-      },
-      search: '',
+      userFullName: '',
     };
   },
 
   methods: {
-    /**
-     * Apply the user fullname filter.
-     */
-    searchPeople() {
-      this.filters = {
-        user_full_name: this.search.length > 0 ? this.search : null,
-      };
-    },
-
     /**
      * Get the URL for rating an individual user.
      * @param userId The user.
@@ -156,7 +145,9 @@ export default {
       variables() {
         return {
           role: this.role,
-          filters: this.filters,
+          filters: {
+            user_full_name: this.userFullName,
+          },
         };
       },
       update({ pathway_manual_rateable_users: users }) {

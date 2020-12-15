@@ -30,7 +30,6 @@
             :show-label="true"
             :options="options.accesses"
             :stacked="stacked"
-            @input="filterChanged"
           />
 
           <SelectFilter
@@ -39,20 +38,16 @@
             :show-label="true"
             :options="options.sources"
             :stacked="stacked"
-            @input="filterChanged"
           />
         </template>
 
         <template v-slot:filters-right="{ stacked }">
-          <SearchBox
+          <SearchFilter
             v-model="selection.searchTerm"
             :label="$str('search_spaces', 'container_workspace')"
+            drop-label
             :placeholder="$str('search_spaces', 'container_workspace')"
-            :show-label="false"
-            :enable-clear-icon="true"
             :stacked="stacked"
-            @submit="submitSearch"
-            @clear="clearSearch"
           />
         </template>
       </FilterBar>
@@ -75,7 +70,6 @@
           :label="$str('sortby', 'core')"
           :show-label="true"
           :options="options.sorts"
-          @input="filterChanged"
         />
       </div>
     </template>
@@ -85,7 +79,7 @@
 <script>
 import FilterBar from 'tui/components/filters/FilterBar';
 import SelectFilter from 'tui/components/filters/SelectFilter';
-import SearchBox from 'tui/components/form/SearchBox';
+import SearchFilter from 'tui/components/filters/SearchFilter';
 
 // GraphQL queries
 import getFilterOptions from 'container_workspace/graphql/workspace_filter_options';
@@ -94,7 +88,7 @@ export default {
   components: {
     FilterBar,
     SelectFilter,
-    SearchBox,
+    SearchFilter,
   },
 
   props: {
@@ -183,19 +177,17 @@ export default {
       },
     };
   },
-
+  watch: {
+    selection: {
+      deep: true,
+      handler() {
+        this.$emit('filter', this.selection);
+      },
+    },
+  },
   methods: {
     submitSearch() {
       this.$emit('submit-search', this.selection);
-    },
-
-    clearSearch() {
-      this.selection.searchTerm = '';
-      this.$emit('clear', this.selection);
-    },
-
-    filterChanged() {
-      this.$emit('filter', this.selection);
     },
   },
 };

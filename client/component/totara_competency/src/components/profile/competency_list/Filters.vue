@@ -37,7 +37,7 @@
         v-model="filters.search"
         :label="$str('search', 'core')"
         :stacked="stacked"
-        @input="filtersUpdatedDebounced"
+        @input="filtersUpdated"
       />
     </template>
     <template v-slot:filters-right="{ stacked }">
@@ -57,7 +57,6 @@
 import FilterBar from 'tui/components/filters/FilterBar';
 import SelectFilter from 'tui/components/filters/SelectFilter';
 import SearchFilter from 'tui/components/filters/SearchFilter';
-import { debounce } from 'tui/util';
 
 export default {
   components: {
@@ -134,10 +133,6 @@ export default {
     defaultOrder(newOrder) {
       this.order = newOrder;
     },
-  },
-
-  created() {
-    this.filtersUpdatedDebounced = debounce(this.filtersUpdated, 500);
   },
 
   mounted() {

@@ -18,15 +18,12 @@
 <template>
   <div class="tui-workspaceDiscussionFilter">
     <div class="tui-workspaceDiscussionFilter__search">
-      <SearchBox
+      <SearchFilter
         v-model="innerSearchTerm"
-        :aria-label="$str('search_discussions', 'container_workspace')"
-        :label-visible="false"
+        :label="$str('search_discussions', 'container_workspace')"
+        drop-label
         :placeholder="$str('search_discussions', 'container_workspace')"
-        :enable-clear-icon="true"
         class="tui-workspaceDiscussionFilter__search-box"
-        @submit="$emit('update-search-term', innerSearchTerm)"
-        @clear="clearSearchTerm"
       />
 
       <a
@@ -55,7 +52,7 @@
 </template>
 
 <script>
-import SearchBox from 'tui/components/form/SearchBox';
+import SearchFilter from 'tui/components/filters/SearchFilter';
 import SelectFilter from 'tui/components/filters/SelectFilter';
 
 // GraphQL queries
@@ -63,7 +60,7 @@ import getDiscussionOptions from 'container_workspace/graphql/discussion_filter_
 
 export default {
   components: {
-    SearchBox,
+    SearchFilter,
     SelectFilter,
   },
 
@@ -113,12 +110,8 @@ export default {
       }
     },
 
-    /**
-     *
-     * @param {String} value
-     */
-    searchTerm(value) {
-      this.innerSearchTerm = value;
+    innerSearchTerm() {
+      this.$emit('update-search-term', this.innerSearchTerm);
     },
 
     /**
@@ -129,13 +122,6 @@ export default {
       if (value !== this.sort) {
         this.$emit('update-sort', value);
       }
-    },
-  },
-
-  methods: {
-    clearSearchTerm() {
-      this.innerSearchTerm = '';
-      this.$emit('clear', this.innerSearchTerm);
     },
   },
 };

@@ -104,7 +104,6 @@ export default {
     SamplesCode,
     SamplesPropCtl,
     SamplesExample,
-
     FilterBar,
     SearchFilter,
     SelectFilter,

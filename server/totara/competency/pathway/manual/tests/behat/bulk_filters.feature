@@ -57,8 +57,7 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
     And I should see "3" in the "//div[@class='tui-dataTableRow'][2]" "xpath_element"
     And I should not see "User 1-One"
 
-    When I set the field with xpath "//div[@class='tui-searchBox']/input" to "Three"
-    And I click on "//div[@class='tui-searchBox']/button" "xpath_element"
+    When I set the field with xpath "//*[@aria-label='Search people']" to "Three"
     Then I should see "User 3-Three" in the "//div[@class='tui-dataTableRow'][1]" "xpath_element"
     And I should see "3" in the "//div[@class='tui-dataTableRow'][1]" "xpath_element"
     And I should not see "User 1-One"

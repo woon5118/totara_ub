@@ -24,19 +24,32 @@
       :hidden="!labelVisible"
       :label="ariaLabel || placeholder"
     />
-    <InputSearch
-      :id="generatedId"
-      v-bind="$props"
-      :aria-label="ariaLabel || placeholder"
-      :disabled="disabled"
-      :placeholder="placeholder || $str('search', 'core')"
-      :styleclass="{ postIcon: enableClearIcon }"
-      class="tui-searchBox__search"
-      @input="input"
-      @submit="submit"
-    />
-    <div v-if="isClearIconVisible" class="tui-searchBox__clearContainer">
+    <div
+      class="tui-searchBox__inputWrapper"
+      :class="[
+        charLength
+          ? 'tui-searchBox__inputWrapper--charLength-' + charLength
+          : null,
+        charLength ? 'tui-input--customSize' : null,
+      ]"
+    >
+      <InputSearch
+        :id="generatedId"
+        ref="search"
+        v-bind="$props"
+        :aria-label="ariaLabel || placeholder"
+        char-length="full"
+        :disabled="disabled"
+        :placeholder="placeholder || $str('search', 'core')"
+        :styleclass="{ postIcon: true }"
+        class="tui-searchBox__search"
+        @input="input"
+        @submit="submit"
+      />
+
       <ButtonIcon
+        v-if="isClearIconVisible"
+        class="tui-searchBox__clearContainer"
         :aria-label="$str('clear_search_term', 'totara_core')"
         :disabled="disabled"
         :styleclass="{ small: true, transparent: true }"
@@ -48,7 +61,7 @@
     <ButtonIcon
       :aria-label="ariaLabel || placeholder"
       :disabled="disabled"
-      :styleclass="{ small: true, transparent: true }"
+      :styleclass="{ small: true }"
       class="tui-searchBox__button"
       @click="submit"
     >
@@ -80,6 +93,7 @@ export default {
     'ariaDescribedby',
     'ariaLabel',
     'ariaLabelledby',
+    'charLength',
     'disabled',
     'dropLabel',
     'id',
@@ -93,32 +107,27 @@ export default {
     'size',
     'spellcheck',
     'value',
-    'enableClearIcon',
   ],
-
-  data() {
-    return {
-      isClearIconVisible: this.enableClearIcon ? !!this.value : false,
-    };
-  },
 
   computed: {
     generatedId() {
       return this.id || this.$id();
     },
+
+    isClearIconVisible() {
+      return this.value && this.value.length > 0;
+    },
   },
 
   methods: {
     input(value) {
-      if (this.enableClearIcon) {
-        this.isClearIconVisible = !!value;
-      }
       this.$emit('input', value);
     },
 
     clear() {
-      this.isClearIconVisible = false;
+      this.$refs.search.$el.focus();
       this.$emit('clear');
+      this.$emit('input', '');
     },
 
     submit() {
@@ -144,6 +153,13 @@ export default {
   position: relative;
   display: flex;
 
+  &__inputWrapper {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    @include tui-char-length-classes();
+  }
+
   &__search {
     // disable the default clear (x) action in IE
     &::-ms-clear {
@@ -157,32 +173,25 @@ export default {
 
   &__clearContainer {
     position: absolute;
-    right: var(--gap-8);
-    display: flex;
-    align-items: center;
+    right: 0;
     height: 100%;
   }
 
   &__removeIcon {
-    color: var(--color-neutral-6);
+    color: var(--filter-search-clear-icon-color);
   }
 
   // So that the search button matches the format of the input that is next to it
   &__button {
-    border-color: var(--form-input-border-color);
-    border-style: solid;
-    border-width: var(--form-input-border-size) var(--form-input-border-size)
-      var(--form-input-border-size) 0;
+    border-left: none;
+    border-radius: 0;
 
-    &:hover,
     &:active,
-    &:focus {
-      background-color: var(--btn-bg-color-focus);
-      border-color: var(--form-input-border-color);
-      border-style: solid;
-      border-width: var(--form-input-border-size) var(--form-input-border-size)
-        var(--form-input-border-size) 0;
-      box-shadow: var(--btn-shadow-focus);
+    &:focus,
+    &:active:focus,
+    &:active:hover,
+    &:hover {
+      border-left: none;
     }
   }
 }

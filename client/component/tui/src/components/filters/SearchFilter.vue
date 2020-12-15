@@ -33,26 +33,43 @@
       </div>
       <InputSearch
         :id="generatedId"
+        ref="search"
         v-bind="$props"
         :aria-label="ariaLabel || label"
         :styleclass="{ preIcon: true }"
+        class="tui-searchFilter__search"
         @input="input"
         @submit="submit"
       />
+      <ButtonIcon
+        v-if="isClearIconVisible"
+        class="tui-searchFilter__group-clearContainer"
+        :aria-label="$str('clear_search_term', 'totara_core')"
+        :disabled="disabled"
+        :styleclass="{ small: true, transparent: true }"
+        @click="clear"
+      >
+        <RemoveIcon class="tui-searchBox__removeIcon" />
+      </ButtonIcon>
     </div>
   </div>
 </template>
 
 <script>
 // Components
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import InputSearch from 'tui/components/form/InputSearch';
 import Label from 'tui/components/form/Label';
+import RemoveIcon from 'tui/components/icons/Remove';
 import SearchIcon from 'tui/components/icons/Search';
+import { debounce } from 'tui/util';
 
 export default {
   components: {
+    ButtonIcon,
     InputSearch,
     Label,
+    RemoveIcon,
     SearchIcon,
   },
   inheritAttrs: false,
@@ -62,6 +79,10 @@ export default {
     ariaDescribedby: {},
     ariaLabel: {},
     ariaLabelledby: {},
+    debounceInput: {
+      type: Boolean,
+      default: true,
+    },
     disabled: {},
     dropLabel: {
       required: false,
@@ -92,11 +113,31 @@ export default {
     generatedId() {
       return this.id || this.$id();
     },
+
+    isClearIconVisible() {
+      return this.value && this.value.length > 0;
+    },
+  },
+
+  created() {
+    this.inputDebounced = debounce(e => {
+      this.$emit('input', e);
+    }, 500);
   },
 
   methods: {
     input(e) {
-      this.$emit('input', e);
+      if (this.debounceInput) {
+        this.inputDebounced(e);
+      } else {
+        this.$emit('input', e);
+      }
+    },
+
+    clear() {
+      this.$refs.search.$el.focus();
+      this.$emit('clear');
+      this.$emit('input', ''); // This is not debounced so that clearing isn't slowed in the ui.
     },
 
     submit() {
@@ -105,6 +146,14 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+  "totara_core": [
+    "clear_search_term"
+  ]
+}
+</lang-strings>
 
 <style lang="scss">
 .tui-searchFilter {
@@ -144,6 +193,23 @@ export default {
         margin: auto 0;
       }
     }
+
+    &-clearContainer {
+      position: absolute;
+      right: 0;
+      height: 100%;
+    }
+  }
+
+  &__search {
+    // disable the default clear (x) action in IE
+    &::-ms-clear {
+      display: none;
+    }
+  }
+
+  &__removeIcon {
+    color: var(--filter-search-clear-icon-color);
   }
 
   &--stacked {

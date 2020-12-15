@@ -19,6 +19,8 @@
 import { mount } from '@vue/test-utils';
 import component from 'tui/components/filters/SearchFilter';
 import { axe, toHaveNoViolations } from 'jest-axe';
+import Vue from 'vue';
+
 expect.extend(toHaveNoViolations);
 let wrapper;
 
@@ -51,5 +53,47 @@ describe('SearchFilter.vue', () => {
       },
     });
     expect(results).toHaveNoViolations();
+  });
+
+  it('should have a clear icon when characters have been entered', async () => {
+    wrapper = mount(component, {
+      propsData: {
+        id: 'tempid',
+        dropLabel: false,
+        ariaLabel: 'label',
+        label: 'bla',
+      },
+      mocks: {
+        $str: function() {
+          return 'tempstring';
+        },
+      },
+      attachToDocument: true,
+    });
+
+    expect(
+      wrapper.find('.tui-searchFilter__group-clearContainer').exists()
+    ).toBeFalse();
+
+    wrapper.setProps({ value: 'A' });
+    await Vue.nextTick();
+    expect(
+      wrapper.find('.tui-searchFilter__group-clearContainer').exists()
+    ).toBeTrue();
+
+    wrapper.setProps({ value: 'A Name' });
+    await Vue.nextTick();
+    expect(
+      wrapper.find('.tui-searchFilter__group-clearContainer').exists()
+    ).toBeTrue();
+
+    wrapper.find('.tui-searchFilter__group-clearContainer').element.click();
+    await Vue.nextTick();
+    expect(wrapper.emittedByOrder().map(e => [e.name, e.args[0]])).toEqual([
+      ['clear', undefined],
+      ['input', ''],
+    ]);
+
+    expect(wrapper.find('input').element).toBe(document.activeElement);
   });
 });

@@ -39,7 +39,6 @@
       class="tui-workspaceDiscussionTab__filter"
       @update-search-term="searchTerm = $event"
       @update-sort="sort = $event"
-      @clear="searchTerm = $event"
     />
 
     <div

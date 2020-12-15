@@ -40,14 +40,12 @@
       :title="$str('filter_users', 'container_workspace')"
     >
       <template v-slot:filters-left>
-        <SearchBox
-          :value="tempSearchTerm"
+        <SearchFilter
+          v-model="searchTerm"
           name="user-search-input"
-          :label-visible="false"
+          drop-label
           :placeholder="$str('search', 'totara_core')"
-          :aria-label="$str('filter_users', 'container_workspace')"
-          @input="tempSearchTerm = $event"
-          @submit="searchTerm = tempSearchTerm"
+          :label="$str('filter_users', 'container_workspace')"
         />
       </template>
     </FilterBar>
@@ -158,7 +156,7 @@
 <script>
 import Adder from 'tui/components/adder/Adder';
 import FilterBar from 'tui/components/filters/FilterBar';
-import SearchBox from 'tui/components/form/SearchBox';
+import SearchFilter from 'tui/components/filters/SearchFilter';
 import SelectTable from 'tui/components/datatable/SelectTable';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
 import Cell from 'tui/components/datatable/Cell';
@@ -173,7 +171,7 @@ export default {
     Avatar,
     Adder,
     FilterBar,
-    SearchBox,
+    SearchFilter,
     SelectTable,
     HeaderCell,
     Cell,
@@ -219,7 +217,6 @@ export default {
           next: null,
         },
       },
-      tempSearchTerm: '',
       searchTerm: '',
       selectedUserIds: [],
     };
