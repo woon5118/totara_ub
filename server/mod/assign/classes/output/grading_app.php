@@ -112,12 +112,22 @@ class grading_app implements templatable, renderable {
             $num++;
         }
 
-        $feedbackplugins = $this->assignment->get_feedback_plugins();
+        $hasfiletypesubmission = false;
+        foreach ($this->assignment->get_submission_plugins() as $plugin) {
+            if ($plugin->get_type() === 'file' && $plugin->is_enabled() && $plugin->is_visible() && $plugin->allow_submissions()) {
+                $hasfiletypesubmission = true;
+                break;
+            }
+        }
+
         $showreview = false;
-        foreach ($feedbackplugins as $plugin) {
-            if ($plugin->is_enabled() && $plugin->is_visible()) {
-                if ($plugin->supports_review_panel()) {
-                    $showreview = true;
+        if ($hasfiletypesubmission) {
+            $feedbackplugins = $this->assignment->get_feedback_plugins();
+            foreach ($feedbackplugins as $plugin) {
+                if ($plugin->is_enabled() && $plugin->is_visible()) {
+                    if ($plugin->supports_review_panel()) {
+                        $showreview = true;
+                    }
                 }
             }
         }
