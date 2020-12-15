@@ -30,5 +30,13 @@ $definitions = [
         'staticacceleration' => true,
         'staticaccelerationsize' => 50,
         'canuselocalstore' => true
+    ],
+    'workspace' => [
+        'mode' => cache_store::MODE_REQUEST,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 50,
+        'canuselocalstore' => true
     ]
 ];

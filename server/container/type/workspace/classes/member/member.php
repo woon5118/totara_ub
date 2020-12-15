@@ -22,6 +22,7 @@
  */
 namespace container_workspace\member;
 
+use cache;
 use container_workspace\exception\enrol_exception;
 use container_workspace\interactor\workspace\interactor;
 use container_workspace\tracker\tracker;
@@ -198,12 +199,8 @@ final class member {
             throw enrol_exception::on_manual_enrol();
         }
 
-        $roles = get_archetype_roles('student');
-        if (empty($roles)) {
-            throw new \coding_exception("No roles for archetype 'student'");
-        }
+        $role = static::get_role_for_members();
 
-        $role = reset($roles);
         $member = static::do_add_to_workspace($workspace, $user_id, $role->id, $actor_id);
 
         if ($trigger_notification) {
@@ -213,6 +210,26 @@ final class member {
         }
 
         return $member;
+    }
+
+    /**
+     * Get role for member being added.
+     *
+     * @return stdClass
+     */
+    private static function get_role_for_members(): stdClass {
+        $cache = cache::make('container_workspace', 'workspace');
+        $role = $cache->get('member_role');
+        if (!$role) {
+            $roles = get_archetype_roles('student');
+            if (empty($roles)) {
+                throw new \coding_exception("No roles for archetype 'student'");
+            }
+            $role = reset($roles);
+            $cache->set('member_role', $role);
+        }
+
+        return $role;
     }
 
     /**

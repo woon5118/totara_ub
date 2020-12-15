@@ -25,10 +25,10 @@ namespace container_workspace\task;
 use container_workspace\member\member;
 use container_workspace\output\added_to_workspace_notification;
 use container_workspace\workspace;
-use core\entity\user;
 use core\message\message;
 use core\task\adhoc_task;
 use core_user;
+use dml_missing_record_exception;
 
 /**
  * This task is to send notification to users who had been added to a workspace in bulk.
@@ -60,6 +60,18 @@ final class notify_added_to_workspace_bulk_task extends adhoc_task {
 
         if (null === $data || !property_exists($data, 'user_ids') || !property_exists($data, 'workspace_id')) {
             throw new \coding_exception("There was no user ids or workspace's id was set");
+        }
+
+        try {
+            $workspace = workspace::from_id($data->workspace_id);
+        } catch (dml_missing_record_exception $exception) {
+            // The workspace might have been deleted in the meanwhile
+            return;
+        }
+
+        if ($workspace->is_to_be_deleted()) {
+            // We don't want to send out notifications for a workspace which is marked as deleted
+            return;
         }
 
         foreach ($data->user_ids as $user_id) {

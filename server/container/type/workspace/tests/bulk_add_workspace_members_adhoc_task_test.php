@@ -550,6 +550,44 @@ class container_workspace_bulk_add_workspace_members_adhoc_task_testcase extends
     }
 
     /**
+     * @return void
+     */
+    public function test_execute_task_on_deleted_workspace(): void {
+        $test_data = $this->create_test_data(1, 1);
+
+        $cohort_ids = $test_data->cohort_ids;
+        $user_ids = $test_data->user_ids->all();
+
+        foreach ($cohort_ids as $cohort_id) {
+            foreach ($user_ids as $user_id) {
+                cohort_add_member($cohort_id, $user_id);
+            }
+
+            $this->assert_cohort_members($cohort_id, $user_ids);
+        }
+
+        // The workspace originally has only 1 member - the owner.
+        $workspace_id = $test_data->workspace->id;
+        $original_members = [$test_data->owner_id];
+        $this->assert_workspace_members($workspace_id, $original_members);
+
+        // Since we are running as the owner,
+        $this->setAdminUser();
+
+        $test_data->workspace->mark_to_be_deleted(true);
+
+        $message_sink = $this->redirectMessages();
+        $events_sink = $this->redirectEvents();
+
+        $task_data = $this->task_data($workspace_id, $cohort_ids);
+        $added_member_count = $this->get_enqueued_task($task_data)->execute();
+        $this->assertNull($added_member_count);
+
+        $this->assertEmpty($message_sink->get_messages());
+        $this->assertEmpty($events_sink->get_events());
+    }
+
+    /**
      * Generates test data.
      *
      * @param int $no_of_cohorts no of cohorts to generate.

@@ -26,14 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 
 use coding_exception;
 use container_workspace\event\audience_added;
-use container_workspace\member\member;
-use container_workspace\output\added_to_workspace_notification;
-use container_workspace\workspace;
 use container_workspace\member\member_handler;
+use container_workspace\workspace;
 use core\collection;
+use core\entity\adhoc_task as adhoc_task_entity;
 use core\entity\cohort;
 use core\entity\user;
-use core\entity\adhoc_task as adhoc_task_entity;
 use core\message\message;
 use core\task\adhoc_task;
 use core\task\manager;
@@ -184,6 +182,11 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
 
         $workspace_name = $workspace->get_name();
         $this->log("adding cohort members to '$workspace_name'...");
+
+        if ($workspace->is_to_be_deleted()) {
+            $this->log('workspace is queued for deletion, skipping.');
+            return;
+        }
 
         $new_members = (new member_handler($this->get_userid()))
             ->add_workspace_members_from_cohorts($workspace, $cohort_ids, false);
