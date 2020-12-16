@@ -121,6 +121,49 @@ class container_workspace_add_member_testcase extends advanced_testcase {
     /**
      * @return void
      */
+    public function test_add_members_in_bulk(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+        $user_three = $generator->create_user();
+        $user_four = $generator->create_user();
+        $user_five = $generator->create_user();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $this->setUser($user_one);
+
+        $workspace1 = $workspace_generator->create_workspace();
+        $workspace2 = $workspace_generator->create_workspace();
+
+        // Make sure that we clear out the adhoc tasks first.
+        $this->execute_adhoc_tasks();
+
+        $users_to_add = [$user_two->id, $user_three->id, $user_four->id, $user_five->id];
+
+        $message_sink = phpunit_util::start_message_redirection();
+        $members = member::added_to_workspace_in_bulk($workspace1, $users_to_add, false);
+
+        $this->assertEquals(count($users_to_add), count($members));
+
+        $this->execute_adhoc_tasks();
+
+        $this->assertEmpty($message_sink->get_messages());
+
+        $members = member::added_to_workspace_in_bulk($workspace1, $users_to_add, true);
+
+        $this->assertEquals(count($users_to_add), count($members));
+
+        $this->execute_adhoc_tasks();
+
+        $messages = $message_sink->get_messages();
+        $this->assertCount(count($users_to_add), $messages);
+    }
+
+    /**
+     * @return void
+     */
     public function test_add_member_to_hidden_workspace_with_exception(): void {
         $generator = $this->getDataGenerator();
 

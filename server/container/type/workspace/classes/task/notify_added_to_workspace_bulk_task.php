@@ -38,13 +38,13 @@ final class notify_added_to_workspace_bulk_task extends adhoc_task {
 
     /**
      * @param workspace $workspace
-     * @param array $member_ids
+     * @param int[] $member_ids
      * @return self
      */
     public static function from_members(workspace $workspace, array $member_ids): self {
         $task = new static();
         $task->set_custom_data([
-            'user_ids' => $member_ids,
+            'member_ids' => $member_ids,
             'workspace_id' => $workspace->id
         ]);
 
@@ -58,7 +58,10 @@ final class notify_added_to_workspace_bulk_task extends adhoc_task {
         global $OUTPUT;
         $data = $this->get_custom_data();
 
-        if (null === $data || !property_exists($data, 'user_ids') || !property_exists($data, 'workspace_id')) {
+        if (null === $data
+            || !property_exists($data, 'member_ids')
+            || !property_exists($data, 'workspace_id')
+        ) {
             throw new \coding_exception("There was no user ids or workspace's id was set");
         }
 
@@ -74,14 +77,14 @@ final class notify_added_to_workspace_bulk_task extends adhoc_task {
             return;
         }
 
-        foreach ($data->user_ids as $user_id) {
-            $user_to = core_user::get_user($user_id);
+        foreach ($data->member_ids as $id) {
+            $member = member::from_id($id, $data->workspace_id);
+            $user_to = core_user::get_user($member->get_user_id());
+
             if (!$user_to) {
                 // Let's just ignore non-existent users
                 continue;
             }
-
-            $member = member::from_user($user_id, $data->workspace_id);
 
             // Setup this user so that environment matches receiving user.
             cron_setup_user($user_to);

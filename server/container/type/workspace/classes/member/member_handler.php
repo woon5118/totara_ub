@@ -124,7 +124,7 @@ class member_handler {
      * @param workspace $workspace
      * @param collection $cohort_ids
      * @param bool $trigger_notification
-     * @return int[] returns the user_ids of the new members just added
+     * @return int[] returns the member ids just being added
      */
     public function add_workspace_members_from_cohorts(
         workspace $workspace,
@@ -139,14 +139,8 @@ class member_handler {
             throw enrol_exception::on_cohort_enrol_permission();
         }
 
-        return builder::get_db()->transaction(function () use ($workspace, $cohort_ids, $trigger_notification): array {
-            $new_members = audience_loader::get_bulk_members_to_add($workspace, $cohort_ids->all());
+        $new_user_ids = audience_loader::get_bulk_members_to_add($workspace, $cohort_ids->all());
 
-            foreach ($new_members as $new_member) {
-                member::added_to_workspace($workspace, $new_member, $trigger_notification, $this->actor_id);
-            }
-
-            return $new_members;
-        });
+        return member::added_to_workspace_in_bulk($workspace, $new_user_ids, $trigger_notification, $this->actor_id);
     }
 }

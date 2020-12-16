@@ -188,10 +188,10 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
             return;
         }
 
-        $new_members = (new member_handler($this->get_userid()))
-            ->add_workspace_members_from_cohorts($workspace, $cohort_ids, false);
+        $handler = new member_handler($this->get_userid());
+        $new_member_ids = $handler->add_workspace_members_from_cohorts($workspace, $cohort_ids, false);
 
-        $new_member_count = count($new_members);
+        $new_member_count = count($new_member_ids);
 
         $result = sprintf(
             "added %d member%s to '%s'",
@@ -202,7 +202,7 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
 
         $this->send_notification_task_finished($workspace, $cohort_ids, $new_member_count);
         // We don't want to trigger a lot of individual adhoc tasks so let's send the via bulk
-        $this->queue_bulk_notification($workspace, $new_members);
+        $this->queue_bulk_notification($workspace, $new_member_ids);
 
         $this->log($result);
 
