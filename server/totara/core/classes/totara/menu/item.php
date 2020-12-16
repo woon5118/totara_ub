@@ -93,6 +93,12 @@ class item {
     private static $preventpublicconstructor = true;
 
     /**
+     * Used only from is_visible() to prevent infinite loops.
+     * @var array
+     */
+    private static $visibilityloopflags = [];
+
+    /**
      * Private constructor, use item::create_instance() instead.
      *
      * @param \stdClass|array $record
@@ -382,22 +388,21 @@ class item {
         if ($this->visibility == self::VISIBILITY_HIDE) {
             return false;
         }
-        static $nestingflags = [];
-        if (!empty($nestingflags[$this->id])) {
+        if (!empty(self::$visibilityloopflags[$this->id])) {
             // Prevent infinite loops.
             debugging('Cyclic dependency detected for menu item visibility: ' . $this->id, DEBUG_DEVELOPER);
             return false;
         }
-        $nestingflags[$this->id] = true;
+        self::$visibilityloopflags[$this->id] = true;
         $visible = $this->check_visibility();
-        unset($nestingflags[$this->id]);
+        unset(self::$visibilityloopflags[$this->id]);
         if (!$visible) {
             return false;
         }
         if ($this->visibility == self::VISIBILITY_CUSTOM) {
-            $nestingflags[$this->id] = true;
+            self::$visibilityloopflags[$this->id] = true;
             $visible = $this->get_visibility_custom();
-            unset($nestingflags[$this->id]);
+            unset(self::$visibilityloopflags[$this->id]);
             return $visible;
         }
         return true;
