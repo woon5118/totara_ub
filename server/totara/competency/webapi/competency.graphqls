@@ -61,7 +61,7 @@ type totara_competency_scale_value {
   """
   Optional numeric score associated with this scale value
   """
-  numericscore: Int
+  numericscore: Float
   """
   Numeric sort order used to arrange the values in a scale relative to each other
   """

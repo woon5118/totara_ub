@@ -4,6 +4,7 @@ information provided here is intended especially for developers.
 === 13.3 ===
 
 * Added new method is_enabled() to \totara_competency\pathway so pathway plugins can define if they can be added to competencies.
+* Changed the return type of the field "numericscore" in the "totara_competency_scale_value" GraphQL type schema to Float.
 
 === 13.2 ===
 * totara_competency\entities\filters\competency_assignment_status has been moved to totara_competency\entity\filters\competency_assignment_status
