@@ -52,12 +52,14 @@ $string['displayselect'] = 'Display';
 $string['displayselect_help'] = 'This setting, together with the file type and whether the browser allows embedding, determines how the file is displayed. Options may include:
 
 * **Automatic**: The best display option for the file type is selected automatically.
-* **Embed**: The file is displayed within the page below the navigation bar together with the file description and any blocks.
+* **Embed**: The file is displayed within the page below the navigation bar together with the file description and other blocks.
 * **Force download**: The user is prompted to download the file.
 * **Open**: Only the file is displayed in the browser window.
 * **In pop-up**: The file is displayed in a new browser window without menus or an address bar.
 * **In frame**: The file is displayed within a frame below the navigation bar and file description.
-* **New window**: The file is displayed in a new browser window with menus and an address bar.';
+* **New window**: The file is displayed in a new browser window with menus and an address bar.
+
+Please note that in order to display **PDF files** in the browser you must go to Site administration > Plugins > Activity modules > File, and allow PDF embedding (allowpdfembedding).';
 $string['displayselect_link'] = 'File';
 $string['displayselectexplain'] = 'Choose display type, unfortunately not all types are suitable for all files.';
 $string['dnduploadresource'] = 'Create file resource';
