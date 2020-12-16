@@ -146,11 +146,14 @@ class cachelock_file implements cache_lock_interface {
                 }
             }
             if ($block) {
-                // OK we are blocking. We had better sleep and then retry to lock.
+                // OK we are blocking. We had better sleep and then retry to lock, until the limit of iteration is reached.
                 $iterations = 0;
                 $maxiterations = $this->blockattempts;
-                while (($result = $this->lock($key, false)) === false) {
-                    // Usleep causes the application to cleep to x microseconds.
+
+                // First attempt.
+                $attempt_result = $this->lock($key, false);
+                while ($attempt_result === false) {
+                    // Usleep causes the application to sleep to x microseconds.
                     // Before anyone asks there are 1'000'000 microseconds to a second.
                     usleep(rand(1000, 50000)); // Sleep between 1 and 50 milliseconds.
                     $iterations++;
@@ -158,7 +161,13 @@ class cachelock_file implements cache_lock_interface {
                         // BOOM! We've exceeded the maximum number of iterations we want to block for.
                         throw new cache_exception('ex_unabletolock');
                     }
+
+                    // Attempt N plus one (n+1).
+                    $attempt_result = $this->lock($key, false);
                 }
+
+                // At this point, the lock file should be acquired - we can move on.
+                return file_exists($lockfile);
             }
 
             return false;

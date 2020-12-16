@@ -589,6 +589,11 @@ function get_site(bool $usecache = true) {
 
     $site_course = false;
 
+    // This is for backward compatible to run upgrade from older version to t13. This happened, because
+    // when we are runing upgrade to T13 without disable cache, then the cache loader that we request
+    // might not yet be added to the muc/config.php yet.
+    $usecache = ($usecache && cache_factory::has_definition_in_config_instance('core', 'site_course'));
+
     if ($usecache) {
         $cache = cache::make('core', 'site_course');
         $site_course = $cache->get('courseobject');

@@ -152,7 +152,7 @@ class cache implements cache_loader {
     /**
      * Gets set to the class name of the store during initialisation. This is used several times in the cache class internally
      * and having it here helps speed up processing.
-     * @var strubg
+     * @var string
      */
     protected $storetype = 'unknown';
 

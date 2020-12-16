@@ -102,13 +102,19 @@ class cache_config_writer extends cache_config {
         $factory = cache_factory::instance();
         $locking = $factory->create_lock_instance($lockconf);
         if ($locking->lock('configwrite', 'config', true)) {
+            // Some hard disk is just too fast that it can make parallel processes go pass the locking mechanism above,
+            // hence we will have to make sure that we are writing to a different temp file for the time being,
+            // and then change the temp file to the actual cache file.
+            $tempcachefile = $cachefile . uniqid('cache_') . '.tmp';
+
             // Its safe to use w mode here because we have already acquired the lock.
-            $handle = fopen($cachefile, 'w');
+            $handle = fopen($tempcachefile, 'w');
             fwrite($handle, $content);
             fflush($handle);
             fclose($handle);
             $locking->unlock('configwrite', 'config');
-            @chmod($cachefile, $CFG->filepermissions);
+            @chmod($tempcachefile, $CFG->filepermissions);
+            rename($tempcachefile, $cachefile);
             // Tell PHP to recompile the script.
             core_component::invalidate_opcode_php_cache($cachefile);
         } else {

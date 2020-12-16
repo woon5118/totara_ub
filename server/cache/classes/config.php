@@ -323,7 +323,8 @@ class cache_config {
      * @throws cache_exception
      */
     protected function include_configuration() {
-        $configuration = array();
+        // The config file will set the variable to an array. If not, exception.
+        $configuration = null;
         // We need to allow for late static bindings to allow for class path mudling happending for unit tests.
         $cachefile = static::get_config_file_path();
 

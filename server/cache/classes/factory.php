@@ -642,4 +642,16 @@ class cache_factory {
     public function purged_all_stores() {
        // NOTE: this is intended to allow factory for cleanup up any caches that hold store data.
     }
+
+    /**
+     * @param string $component
+     * @param string $area
+     * @return bool
+     */
+    public static function has_definition_in_config_instance(string $component, string $area): bool {
+        $factory = cache_factory::instance();
+
+        $config_instance = $factory->create_config_instance();
+        return !empty($config_instance->get_definition_by_id("{$component}/{$area}"));
+    }
 }
