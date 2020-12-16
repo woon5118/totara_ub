@@ -6444,6 +6444,8 @@ class core_dml_testcase extends database_driver_testcase {
         }
         // Test that the count is as expected. It will differ if a param already exists.
         $this->assertSame($i, count($params));
+
+        $this->assertNotSame(moodle_database::get_unique_param('grrruniquetest'), $DB->get_unique_param('grrruniquetest'));
     }
 
     public function test_sql_intersect() {

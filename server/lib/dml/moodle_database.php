@@ -78,6 +78,8 @@ abstract class moodle_database {
     protected $temptables;
     /** @var array Cache of table info. */
     protected $tables  = null;
+    /** @var array used from get_unique_param only() */
+    private static $paramcounts = [];
 
     // db connection options
     /** @var string db host name. */
@@ -3707,17 +3709,16 @@ abstract class moodle_database {
      */
     final public static function get_unique_param($prefix = 'param') {
         // Totara: method was changed to static to make the purpose of this method more clear.
-        static $paramcounts = array();
         if (debugging('', DEBUG_DEVELOPER) && strlen($prefix) > 20) {
             // You should keep your param short in order to avoid running close to the limit if it gets used a lot.
             // Ideally you will make it only a word or two.
             debugging('Please reduce the length of your prefix to less than 20.', DEBUG_DEVELOPER);
         }
-        if (!isset($paramcounts[$prefix])) {
-            $paramcounts[$prefix] = 0;
+        if (!isset(self::$paramcounts[$prefix])) {
+            self::$paramcounts[$prefix] = 0;
         }
-        $paramcounts[$prefix]++;
-        return 'uq_'.$prefix.'_'.$paramcounts[$prefix];
+        self::$paramcounts[$prefix]++;
+        return 'uq_'.$prefix.'_'.self::$paramcounts[$prefix];
     }
 
     /**
