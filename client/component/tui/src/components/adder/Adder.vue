@@ -79,7 +79,12 @@
 
           <!-- Footer (count & action buttons) -->
           <div class="tui-adder__footer">
-            <div :id="$id('items-added')" class="tui-adder__summary">
+            <div
+              :id="$id('items-added')"
+              class="tui-adder__summary"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               <template v-if="customSelected">
                 {{ customSelected(count) }}
               </template>
