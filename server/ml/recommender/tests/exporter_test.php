@@ -106,4 +106,117 @@ class ml_recommender_exporter_testcase extends advanced_testcase {
             exporter::get_tenant_csv_file_path("/boom/x/o/me\/")
         );
     }
+
+    /**
+     * Ensure that tenant 0 is written to csv when no tenants registered on site.
+     *
+     * @return void
+     */
+    public function test_tenant_csv_file_no_tenants(): void {
+        // Set up exporter.
+        $data_path = $this->make_temp_dir();
+        $exporter = new exporter($data_path);
+        $path = $exporter::get_tenant_csv_file_path();
+
+        // Check that we have a tenant record for tenant 0.
+        $exporter->export_tenants();
+        $lines = file($path);
+        $line = explode("\n", $lines[1]);
+        $tenant_id = (int) $line[0];
+
+        // Heading line and tenant id 0 line.
+        self::assertEquals(2, count($lines));
+
+        // Second line should have tenant id 0.
+        self::assertEquals(0, $tenant_id);
+    }
+
+    /**
+     * Ensure that tenant 0 is written to csv when there are tenants registered on site.
+     *
+     * @return void
+     */
+    public function test_tenant_csv_file_with_tenants(): void {
+        // Set up exporter.
+        $data_path = $this->make_temp_dir();
+        $exporter = new exporter($data_path);
+        $path = $exporter::get_tenant_csv_file_path();
+
+        // Set up reflected class.
+        $reflection = new ReflectionClass($exporter);
+        $property = $reflection->getProperty('tenantids');
+        $property->setAccessible(true);
+
+        // Create some tenants.
+        $tenant_count = 2;
+        $tenants = $this->create_tenants($tenant_count);
+
+        // Set list of registered tenant ids.
+        $property->setValue($exporter, $this->get_tenant_ids());
+        $exporter->export_tenants();
+
+        // Get file contents into array.
+        $lines = file($path);
+        $line = explode("\n", $lines[1]);
+        $tenant_id = (int) $line[0];
+
+        // Heading line and tenant id 0 line plus number of registered tenants.
+        self::assertEquals(2 + $tenant_count, count($lines));
+
+        // Second line should still have tenant id 0.
+        self::assertEquals(0, $tenant_id);
+
+        // Last line should have highest tenant id.
+        $line = explode("\n", end($lines));
+        $tenant_id = (int) $line[0];
+        $last_tenant = end($tenants);
+        self::assertEquals($last_tenant->id, $tenant_id);
+    }
+
+    /**
+     * Make a temp directory to run test in.
+     *
+     * @return string
+     */
+    public function make_temp_dir(): string {
+        $data_path = environment::get_temp_path();
+        mkdir($data_path, 0777, true);
+
+        return $data_path;
+    }
+
+    /**
+     * Retrieve all tenant ids.
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    public static function get_tenant_ids(): array {
+        global $DB;
+
+        $sql = 'SELECT t.id FROM "ttr_tenant" t ORDER BY t.id ASC';
+        return $DB->get_fieldset_sql($sql);
+    }
+
+    /**
+     * Generate a specified number of tenants.
+     *
+     * @param int $count
+     * @return array
+     * @throws coding_exception
+     */
+    protected function create_tenants(int $count): array {
+        $generator = self::getDataGenerator();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenants = [];
+        for ($i = 0; $i < $count; $i++) {
+            $tenants[] = $tenant_generator->create_tenant();
+        }
+
+        return $tenants;
+    }
 }

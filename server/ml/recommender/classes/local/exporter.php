@@ -148,6 +148,11 @@ class exporter {
 
         $writer = new writer($csv_file);
         $writer->add_headings(['tenants']);
+
+        // The nil tenant is where we find users who are not (yet) assigned to any tenant.
+        $writer->add_data([0]);
+
+        // List the registered tenants.
         foreach ($this->tenantids as $tenantid) {
             $writer->add_data([$tenantid]);
         }
