@@ -221,7 +221,7 @@ final class member {
      * @param int[] $user_ids
      * @param bool $trigger_notification
      * @param int|null $actor_id
-     * @return int[] returns the member ids just added
+     * @return member[] returns the member ids just added
      */
     public static function added_to_workspace_in_bulk(workspace $workspace, array $user_ids,
                                                       bool $trigger_notification = true, ?int $actor_id = null): array {
@@ -230,29 +230,33 @@ final class member {
             $actor_id = $USER->id;
         }
 
-        $role = self::get_role_for_members();
+        if (empty($user_ids)) {
+            throw new coding_exception('No user ids given');
+        }
 
-        $member_ids = builder::get_db()->transaction(
-            function () use ($workspace, $user_ids, $actor_id, $role): array {
+        $members = builder::get_db()->transaction(
+            function () use ($workspace, $user_ids, $actor_id): array {
+                $role = self::get_role_for_members();
+
                 $owner_id = $workspace->get_user_id();
 
-                $member_ids = [];
                 foreach ($user_ids as $user_id) {
+                    // The owner cannot be added by this, he should always be a member already
                     if ($user_id == $owner_id) {
                         throw enrol_exception::on_manual_enrol();
                     }
-
-                    $member = self::do_add_to_workspace($workspace, $user_id, $role->id, $actor_id, true);
-                    $member_ids[] = $member->get_id();
                 }
 
-                return $member_ids;
+                return self::do_add_to_workspace_bulk($workspace, $user_ids, $role->id, $actor_id);
             }
         );
 
-        self::assign_view_hidden_capability($workspace, $role->id);
-
         if ($trigger_notification) {
+            $member_ids = [];
+            foreach ($members as $member) {
+                $member_ids[] = $member->get_id();
+            }
+
             $member_id_chunks = array_chunk($member_ids, 500);
 
             foreach ($member_id_chunks as $member_id_chunk) {
@@ -261,7 +265,7 @@ final class member {
             }
         }
 
-        return $member_ids;
+        return $members;
     }
 
     /**
@@ -320,20 +324,55 @@ final class member {
     }
 
     /**
+     * Add users in bulk to the workspace
+     * @param workspace $workspace
+     * @param int[] $user_ids
+     * @param int $role_id
+     * @param int $actor_id
+     * @return member[]
+     */
+    private static function do_add_to_workspace_bulk(
+        workspace $workspace,
+        array $user_ids,
+        int $role_id,
+        int $actor_id
+    ): array {
+        global $CFG;
+        // Make sure everything is valid before enrolling users
+        foreach ($user_ids as $user_id) {
+            if ($CFG->tenantsenabled) {
+                // Only checking this if multi-tenancy is enabled.
+                $target_workspace_interactor = new interactor($workspace, $user_id);
+                if (!$target_workspace_interactor->can_view_workspace_with_tenant_check()) {
+                    // Check if the newly going-to-be-added user is able to see the workspace or not.
+                    throw new \coding_exception("Target user is not able to see the workspace");
+                }
+            }
+        }
+
+        $manager = $workspace->get_enrolment_manager();
+        $manager->manual_enrol_user_bulk($user_ids, $role_id, $actor_id);
+
+        static::assign_view_hidden_capability($workspace, $role_id);
+
+        $members = [];
+        foreach ($user_ids as $user_id) {
+            $members[] = self::from_user($user_id, $workspace->id);
+        }
+
+        return $members;
+    }
+
+    /**
      * @param workspace $workspace
      * @param int $user_id
      * @param int $role_id
      * @param int $actor_id
-     * @param bool $is_bulk
+     *
      * @return member
      */
-    private static function do_add_to_workspace(
-        workspace $workspace,
-        int $user_id,
-        int $role_id,
-        int $actor_id,
-        bool $is_bulk = false
-    ): member {
+    private static function do_add_to_workspace(workspace $workspace, int $user_id,
+                                                    int $role_id, int $actor_id): member {
         global $CFG;
         if ($CFG->tenantsenabled) {
             // Only checking this if multi-tenancy is enabled.
@@ -347,9 +386,7 @@ final class member {
         $manager = $workspace->get_enrolment_manager();
         $manager->manual_enrol_user($user_id, $role_id, $actor_id);
 
-        if (!$is_bulk) {
-            static::assign_view_hidden_capability($workspace, $role_id);
-        }
+        static::assign_view_hidden_capability($workspace, $role_id);
 
         $workspace_id = $workspace->get_id();
         return static::from_user($user_id, $workspace_id);

@@ -1910,21 +1910,42 @@ abstract class enrol_plugin {
         $context = context_course::instance($instance->courseid, MUST_EXIST);
 
         // Remove duplicates
-        list($sqlin, $sqlinparams) = $DB->get_in_or_equal(array_map(function($item) { return $item->userid; },
-            $userids));
-        $sql = "SELECT u.id AS userid
-            FROM {user} u
-            LEFT JOIN {user_enrolments} ue ON u.id = ue.userid AND ue.enrolid = {$instance->id}
-            WHERE u.id {$sqlin}
-            AND ue.id IS NULL";
-        $userids = $DB->get_records_sql($sql, $sqlinparams);
+        $userids = array_map(
+            function ($item) {
+                return $item->userid;
+            },
+            $userids
+        );
+
+        // Get the users who are not enrolled in the given instance yet
+        $temp_user_ids = [];
+        $userids_chunks = array_chunk($userids, $DB->get_max_in_params());
+        foreach ($userids_chunks as $userids_chunk) {
+            [$sqlin, $sqlinparams] = $DB->get_in_or_equal($userids_chunk);
+            $sql = "SELECT DISTINCT u.id AS userid
+                FROM {user} u
+                LEFT JOIN {user_enrolments} ue ON u.id = ue.userid AND ue.enrolid = {$instance->id}
+                WHERE u.id {$sqlin}
+                    AND ue.id IS NULL";
+            $user_ids_found = $DB->get_fieldset_sql($sql, $sqlinparams);
+
+            if (!empty($user_ids_found)) {
+                $temp_user_ids = array_merge($temp_user_ids, $user_ids_found);
+            }
+        }
+
+        $userids = array_unique($temp_user_ids);
+        // No one to enrol
+        if (empty($userids)) {
+            return;
+        }
 
         $timenow = time();
         $newenrolments = array();
-        foreach ($userids as $u) {
+        foreach ($userids as $userid) {
             $enrolobj = new stdClass;
-            $enrolobj->userid           = $u->userid;
-            $enrolobj->enrolid          = $instance->id;
+            $enrolobj->userid       = $userid;
+            $enrolobj->enrolid      = $instance->id;
             $enrolobj->status       = is_null($status) ? ENROL_USER_ACTIVE : $status;
             $enrolobj->timestart    = $timestart;
             $enrolobj->timeend      = $timeend;

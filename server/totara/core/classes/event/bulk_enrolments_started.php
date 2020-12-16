@@ -26,7 +26,7 @@ namespace totara_core\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Event triggered when bulk enrolments in course finished.
+ * Event triggered when bulk enrolments in course started.
  *
  * Note: this includes enrolments, unenrolments and enrolment modifications.
  *

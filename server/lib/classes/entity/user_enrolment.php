@@ -24,6 +24,7 @@
 namespace core\entity;
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 
 /**
  * Entity for table "user_enrolments"
@@ -37,6 +38,7 @@ use core\orm\entity\entity;
  * @property int        $modifierid
  * @property int        $timecreated
  * @property int        $timemodified
+ * @property-read enrol $enrol_instance
  */
 final class user_enrolment extends entity {
     /**
@@ -74,5 +76,14 @@ final class user_enrolment extends entity {
 
         $status = $this->get_attribute('status');
         return ENROL_USER_SUSPENDED === (int) $status;
+    }
+
+    /**
+     * Get enrol instance
+     *
+     * @return belongs_to
+     */
+    public function enrol_instance(): belongs_to {
+        return $this->belongs_to(enrol::class, 'enrolid', 'id');
     }
 }

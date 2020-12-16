@@ -181,7 +181,12 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         }
 
         $workspace_name = $workspace->get_name();
-        $this->log("adding cohort members to '$workspace_name'...");
+        $this->log("adding audience members to '$workspace_name'...");
+
+        if (empty($cohort_ids)) {
+            $this->log('no audiences to queue, skipping.');
+            return;
+        }
 
         if ($workspace->is_to_be_deleted()) {
             $this->log('workspace is queued for deletion, skipping.');
@@ -189,7 +194,12 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         }
 
         $handler = new member_handler($this->get_userid());
-        $new_member_ids = $handler->add_workspace_members_from_cohorts($workspace, $cohort_ids, false);
+        $new_members = $handler->add_workspace_members_from_cohorts($workspace, $cohort_ids, false);
+
+        $new_member_ids = [];
+        foreach ($new_members as $new_member) {
+            $new_member_ids[] = $new_member->get_id();
+        }
 
         $new_member_count = count($new_member_ids);
 
@@ -241,7 +251,7 @@ final class bulk_add_workspace_members_adhoc_task extends adhoc_task {
         }
 
         if (!$cohort_ids) {
-            $this->log("invalid cohorts in task data");
+            $this->log("invalid audiences in task data");
             $result['error'] = self::EXECUTE_INVALID_COHORTS_IN_TASK_DATA;
 
             return $result;

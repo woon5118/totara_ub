@@ -26,6 +26,8 @@ use container_workspace\exception\enrol_exception;
 use container_workspace\workspace;
 use core\entity\enrol;
 use core\entity\user_enrolment;
+use core\orm\collection;
+use core\orm\query\builder;
 
 /**
  * Enrolment manager.
@@ -92,11 +94,18 @@ final class manager {
     }
 
     /**
-     * First we need to check if this very user does have a record in enrolment or not. If there isn't
-     * then we will create a new record and stop it from here. Otherwise, checking if it is the same
-     * enrolment method or not.
+     * Enrol the given users in bulk
      *
-     * If it is the same enrolment method. Update the status, if it is not delete the record and create a new one.
+     * @param array $user_ids
+     * @param int $role_id
+     * @param string $enrol
+     */
+    private function enrol_users_bulk(array $user_ids, int $role_id, string $enrol): void {
+        $this->do_enrol_users($user_ids, $role_id, $enrol);
+    }
+
+    /**
+     * Enrol a user in this workspace
      *
      * @param int $user_id
      * @param int $role_id
@@ -105,13 +114,28 @@ final class manager {
      * @return void
      */
     private function enrol_user(int $user_id, int $role_id, string $enrol): void {
+        $this->do_enrol_users([$user_id], $role_id, $enrol);
+    }
+
+    /**
+     * First we need to check if this very user does have a record in enrolment or not. If there isn't
+     * then we will create a new record and stop it from here. Otherwise, checking if it is the same
+     * enrolment method or not.
+     *
+     * If it is the same enrolment method. Update the status, if it is not delete the record and create a new one.
+     *
+     * @param array $user_ids
+     * @param int $role_id
+     * @param string $enrol
+     */
+    private function do_enrol_users(array $user_ids, int $role_id, string $enrol): void {
         global $CFG, $DB;
         require_once("{$CFG->dirroot}/lib/enrollib.php");
 
         $plugin = enrol_get_plugin($enrol);
         $workspace_id = $this->workspace->get_id();
 
-        $record = $DB->get_record(
+        $enrol_instance = $DB->get_record(
             'enrol',
             [
                 'enrol' => $plugin->get_name(),
@@ -122,60 +146,79 @@ final class manager {
             IGNORE_MISSING
         );
 
-        if (null === $record || false === $record) {
-            throw enrol_exception::on_self_enrol();
+        if (null === $enrol_instance || false === $enrol_instance) {
+            throw enrol_exception::on_manual_enrol();
         }
 
         $context = $this->workspace->get_context();
 
-        // Need to find out if the user is already enrolled.
-        $sql = '
-            SELECT ue.*, e.enrol 
-            FROM "ttr_user_enrolments" ue
-            INNER JOIN "ttr_enrol" e ON e.id = ue.enrolid
-            WHERE ue.userid = :user_id
-            AND e.courseid = :workspace_id
-        ';
+        $user_ids_chunks = array_chunk($user_ids, builder::get_db()->get_max_in_params());
+        $update_user_ids = [];
+        $reactivated_userids = [];
 
-        // There MUST only one user enrolment record at a time despite of there are two enrol instances
-        // enabled for the workspace.
-        $user_enrolment = $DB->get_record_sql(
-            $sql,
-            [
-                'user_id' => $user_id,
-                'workspace_id' => $workspace_id,
-            ],
-            IGNORE_MISSING
-        );
+        foreach ($user_ids_chunks as $user_ids_chunk) {
+            // Get all enrol instances of the same type which are non-active and make them active
+            /** @var user_enrolment[]|collection $user_enrolments */
+            $user_enrolments = user_enrolment::repository()
+                ->join(['enrol', 'e'], 'enrolid', 'id')
+                ->where('e.courseid', $workspace_id)
+                ->where('e.enrol', $plugin->get_name())
+                ->where('userid', $user_ids_chunk)
+                ->get_lazy();
 
-        if (null === $user_enrolment || false === $user_enrolment) {
-            // User does not have a record yet. Time to create a new record.
-            $plugin->enrol_user($record, $user_id);
-            role_assign($role_id, $user_id, $context->id, 'container_workspace');
-            return;
-        }
-
-        // User does have the record, we need to check if it is the same enrol method. If it is
-        // then we need to update the status. Otherwise, delete the user_enrolment record and create a new one.
-        if ($plugin->get_name() === $user_enrolment->enrol) {
-            if (ENROL_USER_ACTIVE == $user_enrolment->status) {
-                // It is already active, leave it.
-                return;
+            foreach ($user_enrolments as $user_enrolment) {
+                $update_user_ids[] = $user_enrolment->userid;
+                if ($user_enrolment->status != ENROL_USER_ACTIVE) {
+                    $reactivated_userids[] = $user_enrolment->userid;
+                    $plugin->update_user_enrol($enrol_instance, $user_enrolment->userid, ENROL_USER_ACTIVE);
+                }
             }
 
-            $plugin->update_user_enrol($record, $user_id, ENROL_USER_ACTIVE);
+            // Delete all enrollment instances for the users which are not of the given type
+            /** @var user_enrolment[]|collection $user_enrolments */
+            $user_enrolment_ids = user_enrolment::repository()
+                ->join(['enrol', 'e'], 'enrolid', 'id')
+                ->where('e.courseid', $workspace_id)
+                ->where('e.enrol', '<>', $plugin->get_name())
+                ->where('userid', $user_ids_chunk)
+                ->get()
+                ->pluck('id');
 
-            // After updating the status, we might as well need to update the role. If it is already assigned,
-            // then the function can just skip it.
-            role_assign($role_id, $user_id, $context->id, 'container_workspace');
-            return;
+            if (!empty($user_enrolments)) {
+                user_enrolment::repository()->where('id', $user_enrolment_ids)->delete();
+            }
         }
 
-        // Right, not the same enrolment method. Delete this record and create a new one.
-        $DB->delete_records('user_enrolments', ['id' => $user_enrolment->id]);
-        $plugin->enrol_user($record, $user_id);
+        // Make sure the reactivated users have the correct role in the context
+        if (!empty($reactivated_userids)) {
+            if (count($reactivated_userids) > 1) {
+                role_assign_bulk($role_id, $reactivated_userids, $context->id, 'container_workspace');
+            } else {
+                $user_id = array_shift($reactivated_userids);
+                role_assign($role_id, $user_id, $context->id, 'container_workspace');
+            }
+        }
 
-        role_assign($role_id, $user_id, $context->id, 'container_workspace');
+        $user_ids_to_enrol = array_diff($user_ids, $update_user_ids);
+
+        if (!empty($user_ids_to_enrol)) {
+            if (count($user_ids_to_enrol) > 1) {
+                // For some unknown reason the bulk enrol function needs the ids encapsulated in objects
+                $user_ids_mapped = array_map(
+                    function ($user_id) {
+                        return (object) ['userid' => $user_id];
+                    },
+                    $user_ids_to_enrol
+                );
+
+                $plugin->enrol_user_bulk($enrol_instance, $user_ids_mapped);
+                role_assign_bulk($role_id, $user_ids_to_enrol, $context->id, 'container_workspace');
+            } else {
+                $user_id = array_shift($user_ids_to_enrol);
+                $plugin->enrol_user($enrol_instance, $user_id);
+                role_assign($role_id, $user_id, $context->id, 'container_workspace');
+            }
+        }
     }
 
     /**
@@ -214,6 +257,33 @@ final class manager {
         }
 
         $this->enrol_user($user_id, $role_id, 'manual');
+    }
+
+    /**
+     * Enrol users in bulk
+     *
+     * @param array $user_ids
+     * @param int $role_id
+     * @param int|null $actor_id
+     */
+    public function manual_enrol_user_bulk(array $user_ids, int $role_id, ?int $actor_id = null): void {
+        global $USER;
+
+        if (null === $actor_id || 0 === $actor_id) {
+            $actor_id = $USER->id;
+        }
+
+        $owner_id = $this->workspace->get_user_id();
+        if ($actor_id != $owner_id) {
+            // Not an actor, time to check for capability.
+            $context = $this->workspace->get_context();
+
+            if (!has_capability('container/workspace:addmember', $context, $actor_id)) {
+                throw enrol_exception::on_manual_enrol();
+            }
+        }
+
+        $this->enrol_users_bulk($user_ids, $role_id, 'manual');
     }
 
     /**

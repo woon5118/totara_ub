@@ -124,7 +124,7 @@ class member_handler {
      * @param workspace $workspace
      * @param collection $cohort_ids
      * @param bool $trigger_notification
-     * @return int[] returns the member ids just being added
+     * @return member[] returns the member ids just being added
      */
     public function add_workspace_members_from_cohorts(
         workspace $workspace,
@@ -140,6 +140,9 @@ class member_handler {
         }
 
         $new_user_ids = audience_loader::get_bulk_members_to_add($workspace, $cohort_ids->all());
+        if (empty($new_user_ids)) {
+            return [];
+        }
 
         return member::added_to_workspace_in_bulk($workspace, $new_user_ids, $trigger_notification, $this->actor_id);
     }

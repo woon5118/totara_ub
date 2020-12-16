@@ -23,9 +23,83 @@
 defined('MOODLE_INTERNAL') || die();
 
 use container_workspace\member\member;
+use container_workspace\workspace;
 use core\entity\user_enrolment;
 
 class container_workspace_add_member_testcase extends advanced_testcase {
+
+    protected $expected_role;
+
+    protected function tearDown(): void {
+        parent::tearDown();
+        $this->expected_role = null;
+    }
+
+    /**
+     * @return void
+     */
+    public function test_add_member_results_in_correct_(): void {
+        global $CFG;
+        require_once("{$CFG->dirroot}/lib/enrollib.php");
+
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+
+        // Login as first user and start creating the workspace.
+        $this->setUser($user_one);
+        $workspace = $workspace_generator->create_workspace();
+
+        // Join via self enrolment
+        $this->setUser($user_two);
+        $member = member::join_workspace($workspace, $user_two->id);
+
+        /** @var user_enrolment $user_enrolment */
+        $user_enrolment = user_enrolment::repository()->find($member->get_id());
+        $this->assertNotNull($user_enrolment);
+
+        $this->assertEquals('self', $user_enrolment->enrol_instance->enrol);
+
+        $this->setUser($user_one);
+
+        $member = member::added_to_workspace($workspace, $user_two->id);
+        $this->assertEquals($user_two->id, $member->get_user_id());
+
+        /** @var user_enrolment $user_enrolment */
+        $user_enrolment = user_enrolment::repository()->find($member->get_id());
+        $this->assertNotNull($user_enrolment);
+        $this->assertEquals(ENROL_USER_ACTIVE, $user_enrolment->status);
+
+        // Method should now be manual
+        $this->assertEquals('manual', $user_enrolment->enrol_instance->enrol);
+
+        // User should only be enrolled once
+        $this->assertEquals(
+            1,
+            user_enrolment::repository()->where('userid', $user_two->id)->count()
+        );
+
+        // Now suspend the enrolment
+        $user_enrolment->status = ENROL_USER_SUSPENDED;
+        $user_enrolment->save();
+
+        // And enrolling the user again should reactivate the enrollment
+
+        $member = member::added_to_workspace($workspace, $user_two->id);
+        $this->assertEquals($user_two->id, $member->get_user_id());
+
+        /** @var user_enrolment $user_enrolment */
+        $user_enrolment = user_enrolment::repository()->find($member->get_id());
+        $this->assertNotNull($user_enrolment);
+        $this->assertEquals(ENROL_USER_ACTIVE, $user_enrolment->status);
+
+        $this->assert_has_role_assignment($user_two->id, $workspace);
+    }
+
     /**
      * @return void
      */
@@ -143,15 +217,20 @@ class container_workspace_add_member_testcase extends advanced_testcase {
         $users_to_add = [$user_two->id, $user_three->id, $user_four->id, $user_five->id];
 
         $message_sink = phpunit_util::start_message_redirection();
-        $members = member::added_to_workspace_in_bulk($workspace1, $users_to_add, false);
+        $member_ids = member::added_to_workspace_in_bulk($workspace1, $users_to_add, false);
 
-        $this->assertEquals(count($users_to_add), count($members));
+        $this->assertEquals(count($users_to_add), count($member_ids));
 
         $this->execute_adhoc_tasks();
 
         $this->assertEmpty($message_sink->get_messages());
 
-        $members = member::added_to_workspace_in_bulk($workspace1, $users_to_add, true);
+        $this->assert_has_role_assignment($user_two->id, $workspace1);
+        $this->assert_has_role_assignment($user_three->id, $workspace1);
+        $this->assert_has_role_assignment($user_four->id, $workspace1);
+        $this->assert_has_role_assignment($user_five->id, $workspace1);
+
+        $members = member::added_to_workspace_in_bulk($workspace2, $users_to_add, true);
 
         $this->assertEquals(count($users_to_add), count($members));
 
@@ -159,6 +238,15 @@ class container_workspace_add_member_testcase extends advanced_testcase {
 
         $messages = $message_sink->get_messages();
         $this->assertCount(count($users_to_add), $messages);
+
+        foreach ($members as $member) {
+            $user_enrolment = user_enrolment::repository()->find($member->get_id());
+            $this->assertNotNull($user_enrolment);
+            $this->assertEquals(ENROL_USER_ACTIVE, $user_enrolment->status);
+
+            // Method should now be manual
+            $this->assertEquals('manual', $user_enrolment->enrol_instance->enrol);
+        }
     }
 
     /**
@@ -204,4 +292,31 @@ class container_workspace_add_member_testcase extends advanced_testcase {
         $this->expectExceptionMessage("Cannot manual add user to workspace");
         member::added_to_workspace($workspace, $user_three->id);
     }
+
+    /**
+     * Assert that the user has the role assignment expected after enrolment.
+     *
+     * @param int $user_id
+     * @param workspace $workspace
+     */
+    private function assert_has_role_assignment(int $user_id, workspace $workspace): void {
+        global $DB;
+
+        if (!isset($this->expected_role)) {
+            $roles = get_archetype_roles('student');
+            $this->expected_role = reset($roles);
+        }
+
+        $this->assertTrue(
+            $DB->record_exists(
+                'role_assignments',
+                [
+                    'userid' => $user_id,
+                    'roleid' => $this->expected_role->id,
+                    'contextid' => $workspace->get_context()->id
+                ]
+            )
+        );
+    }
+
 }
