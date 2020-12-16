@@ -30,14 +30,15 @@ function xmldb_mod_lti_premigrate() {
 
     $version = premigrate_get_plugin_version('mod', 'lti');
 
-    if ($version > 2020061500) {
+    if ($version > 2020061501) {
         throw new coding_exception("Invalid plugin (mod_lti) version ($version) for pre-migration");
     }
 
     // Moodle 3.9 pre-migration line.
 
-    // Plugin was backported from Moodle 3.8.1 to Totara 13.
+    // Plugin was backported from Moodle 3.8.6 to Totara 13.
     if ($version > 2019111800) {
+        // Use lower version to force change of lti.instructorcustomparameters to text.
         $version = premigrate_plugin_savepoint(2019111800, 'mod', 'lti');
     }
 }

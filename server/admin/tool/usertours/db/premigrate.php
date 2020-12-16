@@ -30,7 +30,7 @@ function xmldb_tool_usertours_premigrate() {
 
     $version = premigrate_get_plugin_version('tool', 'usertours');
 
-    if ($version > 2020061501) {
+    if ($version > 2020061502) {
         throw new coding_exception("Invalid plugin (tool_usertours) version ($version) for pre-migration");
     }
 
