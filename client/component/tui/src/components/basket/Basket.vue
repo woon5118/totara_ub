@@ -19,7 +19,7 @@
 <template>
   <div class="tui-basket">
     <div class="tui-basket__status">
-      <div class="tui-basket__selected">
+      <div class="tui-basket__selected" aria-live="polite" aria-atomic="true">
         {{ $str('selected', 'totara_core') }}:
         <span class="tui-basket__selectedCount">{{ selectedCount }}</span>
       </div>

@@ -8,6 +8,8 @@ exports[`Basket matches snapshot 1`] = `
     class="tui-basket__status"
   >
     <div
+      aria-atomic="true"
+      aria-live="polite"
       class="tui-basket__selected"
     >
       

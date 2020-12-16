@@ -53,16 +53,10 @@
           </template>
           <template v-slot:actions="{ empty }">
             <Button
-              v-if="!isViewingSelections && !empty"
+              v-if="!empty"
               :styleclass="{ transparent: true }"
-              :text="$str('viewselected', 'totara_core')"
-              @click="viewSelections"
-            />
-            <Button
-              v-if="isViewingSelections && !empty"
-              :styleclass="{ transparent: true }"
-              :text="$str('back_to_all_competencies', 'totara_competency')"
-              @click="applyFilter"
+              :text="buttonText"
+              @click="selectOrFilter"
             />
           </template>
         </Basket>
@@ -348,6 +342,11 @@ export default {
         this.selectedItems.length
       );
     },
+    buttonText() {
+      return !this.isViewingSelections
+        ? this.$str('viewselected', 'totara_core')
+        : this.$str('back_to_all_competencies', 'totara_competency');
+    },
   },
   watch: {
     frameworkSelection: 'applyFilter',
@@ -454,6 +453,10 @@ export default {
         message: this.$str('error_generic_mutation', 'totara_competency'),
         type: 'error',
       });
+    },
+
+    selectOrFilter() {
+      !this.isViewingSelections ? this.viewSelections() : this.applyFilter();
     },
   },
   apollo: {
