@@ -1023,12 +1023,7 @@ class theme_config {
             $vars = $theme_settings->get_css_variables();
             if ($this->legacybrowser) {
                 $cssvars = new \core\cssvars();
-                $csscontent = $cssvars->transform(
-                    $csscontent,
-                    [
-                        'override_values' => $cssvars->get_custom_property_values($vars)
-                    ]
-                );
+                $csscontent = $cssvars->transform($csscontent . ' ' . $vars);
             } else {
                 $csscontent .= $vars;
             }
