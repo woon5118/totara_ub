@@ -27,6 +27,7 @@
   >
     <FormRowStack spacing="large">
       <FormRow
+        v-if="logoEditable"
         :label="$str('formbrand_label_logo', 'totara_tui')"
         :is-stacked="true"
       >
@@ -45,7 +46,9 @@
         </FormRowDetails>
       </FormRow>
 
+      <!-- Not allowing alt text change if image can't be changed -->
       <FormRow
+        v-if="logoEditable"
         :label="$str('formbrand_label_logoalttext', 'totara_tui')"
         :is-stacked="true"
       >
@@ -60,6 +63,7 @@
       </FormRow>
 
       <FormRow
+        v-if="faviconEditable"
         :label="$str('formbrand_label_favicon', 'totara_tui')"
         :is-stacked="true"
       >
@@ -132,24 +136,45 @@ export default {
   mixins: [FileMixin],
 
   props: {
-    // Array of Objects, each describing the properties for fields that are part
-    // of this Form. There is only an Object present in this Array if it came
-    // from the server as it was previously saved
+    /**
+     * Array of Objects, each describing the properties for fields that are part
+     * of this Form. There is only an Object present in this Array if it came
+     * from the server as it was previously saved
+     */
     savedFormFieldData: {
       type: Array,
       default: function() {
         return [];
       },
     },
-    // Saving state, controlled by parent component GraphQl mutation handling
+
+    /**
+     *  Saving state, controlled by parent component GraphQl mutation handling
+     */
     isSaving: {
       type: Boolean,
       default: function() {
         return false;
       },
     },
-    // Context ID.
+
+    /**
+     *  Context ID.
+     */
     contextId: [Number, String],
+
+    /**
+     * Tenant ID or null if global/multi-tenancy not enabled.
+     */
+    selectedTenantId: Number,
+
+    /**
+     *  Customizable tenant settings
+     */
+    customizableTenantSettings: {
+      type: [Array, String],
+      required: false,
+    },
   },
 
   data() {
@@ -170,6 +195,15 @@ export default {
       resultForm: null,
       theme_settings: theme_settings,
     };
+  },
+
+  computed: {
+    logoEditable() {
+      return this.canEditImage('sitelogo');
+    },
+    faviconEditable() {
+      return this.canEditImage('sitefavicon');
+    },
   },
 
   /**
@@ -205,6 +239,27 @@ export default {
       if (this.errorsForm) {
         this.errorsForm = null;
       }
+    },
+
+    /**
+     * Check whether the specific image can be customized
+     * @param {String} key
+     * @return {Boolean}
+     */
+    canEditImage(key) {
+      if (!this.selectedTenantId) {
+        return true;
+      }
+
+      if (!this.customizableTenantSettings) {
+        return false;
+      }
+
+      if (Array.isArray(this.customizableTenantSettings)) {
+        return this.customizableTenantSettings.includes(key);
+      }
+
+      return this.customizableTenantSettings === '*';
     },
 
     /**

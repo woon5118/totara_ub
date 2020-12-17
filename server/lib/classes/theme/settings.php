@@ -23,6 +23,7 @@
 
 namespace core\theme;
 
+use core\hook\tenant_customizable_theme_settings as tenant_customizable_theme_settings_hook;
 use core\theme\file\helper;
 use core\theme\file\theme_file;
 use core\theme\validation\property\property_validator;
@@ -42,6 +43,9 @@ final class settings {
     /** @var theme_file[] */
     private $file_instances = [];
 
+    /** @var tenant_customizable_theme_settings_hook */
+    private $tenant_settings_hook;
+
     /**
      * settings constructor.
      *
@@ -51,6 +55,17 @@ final class settings {
     public function __construct(theme_config $theme_config, int $tenant_id) {
         $this->theme_config = $theme_config;
         $this->tenant_id = $tenant_id;
+
+        $default_tenant_can_customize = [
+            'brand' => '*',
+            'colours' => '*',
+            'images' => ['sitelogin'],
+            'custom' => ['formcustom_field_customfooter'],
+            'tenant' => '*',
+        ];
+
+        $this->tenant_settings_hook = new tenant_customizable_theme_settings_hook($default_tenant_can_customize);
+        $this->tenant_settings_hook->execute();
     }
 
     /**
@@ -257,12 +272,9 @@ final class settings {
         }
 
         if ($this->tenant_id > 0 && $copy_site_files) {
-            $system_context = \context_system::instance();
-
             // Make copy of customizable files not yet customized for the tenant
             foreach ($instances as $instance_key => $instance) {
-                if ($this->is_tenant_customizable_category($instance->get_ui_category())
-                    && $this->is_tenant_customizable_image($instance->get_area())) {
+                if ($this->is_tenant_customizable_image($instance->get_ui_category(), $instance->get_ui_key())) {
                     $instance->copy_site_file_to_tenant();
                 }
             }
@@ -480,6 +492,15 @@ final class settings {
     }
 
     /**
+     * Return the list of theme settings that can be customized for tenants
+     *
+     * @return array
+     */
+    public function get_customizable_tenant_theme_settings(): array {
+        return $this->tenant_settings_hook->get_customizable_settings();
+    }
+
+    /**
      * @param int|null $tenant_id
      * @param string|null $theme_name
      * @return array
@@ -499,14 +520,15 @@ final class settings {
      * @return bool
      */
     private function is_tenant_customizable_category(string $name): bool {
-        return in_array($name, ['brand', 'colours', 'images', 'tenant']);
+        return $this->tenant_settings_hook->is_tenant_customizable_category($name);
     }
 
     /**
-     * @param string $area
+     * @param string $category
+     * @param string $ui_key
      * @return bool
      */
-    private function is_tenant_customizable_image(string $area): bool {
-        return in_array($area, ['logo', 'favicon', 'loginimage']);
+    private function is_tenant_customizable_image(string $category, string $ui_key): bool {
+        return $this->tenant_settings_hook->is_tenant_customizable_category_setting($category, $ui_key);
     }
 }

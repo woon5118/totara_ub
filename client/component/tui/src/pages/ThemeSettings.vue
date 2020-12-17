@@ -58,6 +58,7 @@
             content-spacing="large"
           >
             <Tab
+              v-if="canEditCategory('brand')"
               :id="'themesettings-tab-0'"
               :name="$str('tabbrand', 'totara_tui')"
               :always-render="true"
@@ -68,11 +69,16 @@
                 :file-form-field-data="embeddedFormData.fileData"
                 :is-saving="isSaving"
                 :context-id="embeddedFormData.contextId"
+                :selected-tenant-id="selectedTenantId"
+                :customizable-tenant-settings="
+                  customizableTenantCategorySettings('brand')
+                "
                 @mounted="setInitialTenantCategoryValues"
                 @submit="submit"
               />
             </Tab>
             <Tab
+              v-if="canEditCategory('colours')"
               :id="'themesettings-tab-1'"
               :name="$str('tabcolours', 'totara_tui')"
               :always-render="true"
@@ -87,11 +93,15 @@
                   embeddedFormData.mergedProcessedCSSVariableData
                 "
                 :is-saving="isSaving"
+                :customizable-tenant-settings="
+                  customizableTenantCategorySettings('colours')
+                "
                 @mounted="setInitialTenantCategoryValues"
                 @submit="submit"
               />
             </Tab>
             <Tab
+              v-if="canEditCategory('images')"
               :id="'themesettings-tab-2'"
               :name="$str('tabimages', 'totara_tui')"
               :always-render="true"
@@ -104,10 +114,15 @@
                 :is-saving="isSaving"
                 :context-id="embeddedFormData.contextId"
                 :selected-tenant-id="selectedTenantId"
+                :customizable-tenant-settings="
+                  customizableTenantCategorySettings('images')
+                "
+                @mounted="setInitialTenantCategoryValues"
                 @submit="submit"
               />
             </Tab>
             <Tab
+              v-if="canEditCategory('custom')"
               :id="'themesettings-tab-3'"
               :name="$str('tabcustom', 'totara_tui')"
               :always-render="true"
@@ -118,6 +133,10 @@
                 :saved-form-field-data="embeddedFormData.formFieldData.custom"
                 :is-saving="isSaving"
                 :selected-tenant-id="selectedTenantId"
+                :customizable-tenant-settings="
+                  customizableTenantCategorySettings('custom')
+                "
+                @mounted="setInitialTenantCategoryValues"
                 @submit="submit"
               />
             </Tab>
@@ -181,6 +200,11 @@ export default {
      * Tenant Name or null if global/multi-tenancy not enabled.
      */
     selectedTenantName: String,
+
+    /**
+     * Customizable tenant settings
+     */
+    customizableTenantSettings: Object,
   },
 
   data() {
@@ -217,10 +241,7 @@ export default {
       // raw CSS variable data, this is handled via fetch, not GraphQL
       rawCSSVariableData: null,
       // Categories to add when tenant is enabled
-      tenantCategories: {
-        brand: [],
-        colours: [],
-      },
+      tenantCategories: {},
     };
   },
 
@@ -378,11 +399,42 @@ export default {
     },
 
     /**
+     * Check whether the specific category can be customized
+     *
+     * @param {String} category
+     * @return {Boolean}
+     */
+    canEditCategory(category) {
+      return (
+        !this.selectedTenantId ||
+        (this.customizableTenantSettings &&
+          !!this.customizableTenantSettings[category])
+      );
+    },
+
+    /**
+     * Return customizable settings in a specific category
+     *
+     * @param {String} category
+     * @return {String|Object|null}
+     */
+    customizableTenantCategorySettings(category) {
+      if (
+        !this.customizableTenantSettings ||
+        !this.customizableTenantSettings[category]
+      ) {
+        return null;
+      }
+
+      return this.customizableTenantSettings[category];
+    },
+
+    /**
      * Takes Form field data and formats it to meet GraphQL mutation expectations
      *
      * @param {Object} currentValues The submitted form data.
      * @return {Object}
-     **/
+     */
     formatDataForMutation(currentValues) {
       let data = {
         form: 'tenant',
@@ -436,7 +488,11 @@ export default {
      */
     setInitialTenantCategoryValues(categoryData) {
       let category = categoryData.category;
-      if (this.tenantCategories[category]) {
+
+      if (
+        this.customizableTenantSettings &&
+        !!this.customizableTenantSettings[category]
+      ) {
         this.tenantCategories[category] = categoryData.values;
       }
     },

@@ -35,6 +35,8 @@ use moodle_url;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
 use totara_tenant\entity\tenant;
+use core\theme\settings as core_theme_settings;
+
 
 class theme_settings extends controller {
 
@@ -144,13 +146,16 @@ class theme_settings extends controller {
      * @inheritDoc
      */
     public function action(): tui_view {
-        global $CFG;
+        global $CFG, $PAGE;
+
+        $core_theme_settings = new core_theme_settings($PAGE->theme, $this->tenant_id ?? 0);
 
         $props = [
             'theme' => $this->theme,
             'themeName' => get_string_manager()->string_exists('pluginname', 'theme_' . $this->theme)
                 ? get_string('pluginname', 'theme_' . $this->theme)
                 : null,
+            'customizableTenantSettings' => $core_theme_settings->get_customizable_tenant_theme_settings(),
         ];
 
         // If tenant is selected then get selected tenant details.

@@ -23,6 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use core\hook\tenant_customizable_theme_settings;
 use core\theme\file\favicon_image;
 use core\theme\file\login_image;
 use core\theme\file\logo_image;
@@ -33,6 +34,8 @@ use totara_tui\local\mediation\resolver;
 use totara_tui\local\mediation\styles\resolver as styles_resolver;
 use totara_tui\local\mediation\styles\mediator;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use totara_core\hook\manager as hook_manager;
+
 
 class core_theme_settings_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
@@ -1052,14 +1055,14 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertNotNull($tenant_file_record);
         $this->assertNotEqualsCanonicalizing($site_file_record, $tenant_file_record);
     }
-    
+
     public function test_get_categories() {
         $this->setAdminUser();
         $ventura_config = theme_config::load('ventura');
         $base_config = theme_config::load('base');
         $ventura_settings = new settings($ventura_config, 0);
         $base_settings = new settings($base_config, 0);
-        
+
         $test_base_categories = [
             [
                 'name' => 'test_base_category',
@@ -1074,12 +1077,56 @@ class core_theme_settings_testcase extends advanced_testcase {
         ];
         $base_settings->update_categories($test_base_categories);
         $categories = $ventura_settings->get_categories(false);
-        
+
         $category_names = array_map(function ($category) {
             return $category['name'];
         }, $categories);
-        
+
         $this->assertFalse(in_array('test_base_category', $category_names));
+    }
+
+    public function test_tenant_theme_hooks_default() {
+        $this->setAdminUser();
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+
+        $expected = [
+            'brand' => '*',
+            'colours' => '*',
+            'images' => ['sitelogin'],
+            'custom' => ['formcustom_field_customfooter'],
+            'tenant' => '*',
+        ];
+        $this->assertEqualsCanonicalizing($expected, $theme_settings->get_customizable_tenant_theme_settings());
+    }
+
+    public function test_tenant_theme_hooks_custom() {
+        // Replace the customizable categories and image keys
+        hook_manager::phpunit_replace_watchers([
+            [
+                'hookname' => tenant_customizable_theme_settings::class,
+                'callback' => [__CLASS__, 'custom_theme_settings_watcher']
+            ],
+        ]);
+
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+
+        $expected = [
+            'A' => '*',
+            'B' => ['a', 'b', 'c'],
+            'C' => ['whatever'],
+        ];
+        $this->assertEqualsCanonicalizing($expected, $theme_settings->get_customizable_tenant_theme_settings());
+    }
+
+    public static function custom_theme_settings_watcher(tenant_customizable_theme_settings $hook) {
+        $new = [
+            'A' => '*',
+            'B' => ['a', 'b', 'c'],
+            'C' => ['whatever'],
+        ];
+        $hook->set_customizable_settings($new);
     }
 
     /**

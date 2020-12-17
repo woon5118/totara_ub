@@ -26,6 +26,7 @@
   >
     <FormRowStack spacing="large">
       <FormRow
+        v-if="customFooterEditable"
         :label="$str('formcustom_label_customfooter', 'totara_tui')"
         :is-stacked="true"
       >
@@ -41,7 +42,7 @@
       </FormRow>
 
       <FormRow
-        v-if="!selectedTenantId"
+        v-if="customCssEditable"
         :label="$str('formcustom_label_customcss', 'totara_tui')"
         :is-stacked="true"
       >
@@ -130,6 +131,14 @@ export default {
      * Tenant ID or null if global/multi-tenancy not enabled.
      */
     selectedTenantId: Number,
+
+    /**
+     *  Customizable tenant settings
+     */
+    customizableTenantSettings: {
+      type: [Array, String],
+      required: false,
+    },
   },
 
   data() {
@@ -150,6 +159,16 @@ export default {
       valuesForm: null,
       resultForm: null,
     };
+  },
+
+  computed: {
+    customFooterEditable() {
+      return this.canEditSetting('formcustom_field_customfooter');
+    },
+
+    customCssEditable() {
+      return this.canEditSetting('formcustom_label_customcss');
+    },
   },
 
   /**
@@ -177,6 +196,27 @@ export default {
       if (this.errorsForm) {
         this.errorsForm = null;
       }
+    },
+
+    /**
+     * Check whether the specific setting can be customized
+     * @param {String} key
+     * @return {Boolean}
+     */
+    canEditSetting(key) {
+      if (!this.selectedTenantId) {
+        return true;
+      }
+
+      if (!this.customizableTenantSettings) {
+        return false;
+      }
+
+      if (Array.isArray(this.customizableTenantSettings)) {
+        return this.customizableTenantSettings.includes(key);
+      }
+
+      return this.customizableTenantSettings === '*';
     },
 
     /**

@@ -43,6 +43,7 @@
           </FormRow>
 
           <FormRow
+            v-if="loginEditable"
             :label="$str('formimages_label_login', 'totara_tui')"
             :is-stacked="true"
           >
@@ -68,6 +69,7 @@
           </FormRow>
 
           <FormRow
+            v-if="loginEditable"
             :label="$str('formimages_label_loginalttext', 'totara_tui')"
             :is-stacked="true"
           >
@@ -83,12 +85,13 @@
       </Collapsible>
 
       <Collapsible
-        v-if="flavoursData.learn && !selectedTenantId"
+        v-if="canEditLearnImages"
         :label="$str('formimages_group_learn', 'totara_tui')"
         :initial-state="true"
       >
         <FormRowStack spacing="large">
           <FormRow
+            v-if="learnCourseEditable"
             :label="$str('formimages_label_course', 'totara_tui')"
             :is-stacked="true"
           >
@@ -113,7 +116,7 @@
             </FormRowDetails>
           </FormRow>
           <FormRow
-            v-if="fileData.learnprogram"
+            v-if="fileData.learnprogram && learnProgramEditable"
             :label="$str('formimages_label_program', 'totara_tui')"
             :is-stacked="true"
           >
@@ -138,7 +141,7 @@
             </FormRowDetails>
           </FormRow>
           <FormRow
-            v-if="fileData.learncert"
+            v-if="fileData.learncert && learnCertEditable"
             :label="$str('formimages_label_cert', 'totara_tui')"
             :is-stacked="true"
           >
@@ -166,17 +169,13 @@
       </Collapsible>
 
       <Collapsible
-        v-if="
-          flavoursData.engage &&
-            (fileData.engageresource || fileData.engageworkspace) &&
-            !selectedTenantId
-        "
+        v-if="canEditEngageImages"
         :label="$str('formimages_group_engage', 'totara_tui')"
         :initial-state="true"
       >
         <FormRowStack>
           <FormRow
-            v-if="fileData.engageresource"
+            v-if="fileData.engageresource && engageResourceEditable"
             :label="$str('formimages_label_resource', 'totara_tui')"
             :is-stacked="true"
           >
@@ -201,7 +200,7 @@
             </FormRowDetails>
           </FormRow>
           <FormRow
-            v-if="fileData.engageworkspace"
+            v-if="fileData.engageworkspace && engageWorkspaceEditable"
             :label="$str('formimages_label_workspace', 'totara_tui')"
             :is-stacked="true"
           >
@@ -329,6 +328,14 @@ export default {
      * Tenant ID or null if global/multi-tenancy not enabled.
      */
     selectedTenantId: Number,
+
+    /**
+     *  Customizable tenant settings
+     */
+    customizableTenantSettings: {
+      type: [Array, String],
+      required: false,
+    },
   },
 
   data() {
@@ -357,6 +364,51 @@ export default {
       resultForm: null,
       theme_settings: theme_settings,
     };
+  },
+
+  computed: {
+    loginEditable() {
+      return this.canEditImage('sitelogin');
+    },
+
+    learnCourseEditable() {
+      return this.canEditImage('learncourse');
+    },
+
+    learnProgramEditable() {
+      return this.canEditImage('learnprogram');
+    },
+
+    learnCertEditable() {
+      return this.canEditImage('learncert');
+    },
+
+    engageResourceEditable() {
+      return this.canEditImage('engageresource');
+    },
+
+    engageWorkspaceEditable() {
+      return this.canEditImage('engageworkspace');
+    },
+
+    canEditLearnImages() {
+      return (
+        this.flavoursData.learn &&
+        (this.learnCourseEditable ||
+          this.learnProgramEditable ||
+          this.learnCertEditable)
+      );
+    },
+
+    canEditEngageImages() {
+      return (
+        this.flavoursData.engage &&
+        (this.fileData.engageresource || this.fileData.engageworkspace) &&
+        (!this.selectedTenantId ||
+          (this.selectedTenantId && this.engageResourceEditable) ||
+          this.engageWorkspaceEditable)
+      );
+    },
   },
 
   /**
@@ -389,6 +441,27 @@ export default {
       if (this.errorsForm) {
         this.errorsForm = null;
       }
+    },
+
+    /**
+     * Check whether the specific image can be customized
+     * @param {String} key
+     * @return {Boolean}
+     */
+    canEditImage(key) {
+      if (!this.selectedTenantId) {
+        return true;
+      }
+
+      if (!this.customizableTenantSettings) {
+        return false;
+      }
+
+      if (Array.isArray(this.customizableTenantSettings)) {
+        return this.customizableTenantSettings.includes(key);
+      }
+
+      return this.customizableTenantSettings === '*';
     },
 
     /**
