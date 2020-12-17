@@ -1,8 +1,8 @@
 type core_editor {
   """
-  The interface name for the front-end to load the editor code.
+  Name of the front-end module to load for this editor.
   """
-  interface_name: String!
+  js_module(framework: param_alpha): String
   """
   The context's id where editor is being used.
   """
@@ -64,5 +64,10 @@ extend type Query {
     By default format that is set in user's preference will used if none is given.
     """
     format: param_integer
+    """
+    Name of the front-end framework we are using.
+    Only editors supporting this framework will be returned.
+    """
+    framework: param_alpha
   ): core_editor!
 }

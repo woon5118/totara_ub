@@ -80,7 +80,7 @@ class extension_loader {
 
     /**
      * @param array $exclude_classes
-     * @return array
+     * @return string[]
      */
     private static function get_all_extension_classes_exclude(array $exclude_classes) {
         $all_extensions = static::get_all_extension_classes();
@@ -91,12 +91,14 @@ class extension_loader {
             $exclude_classes
         );
 
-        return array_filter(
-            $all_extensions,
-            function (string $extension_class) use ($exclude_classes): bool {
-                $extension_class = ltrim($extension_class, '\\');
-                return !in_array($extension_class, $exclude_classes);
-            }
+        return array_values(
+            array_filter(
+                $all_extensions,
+                function (string $extension_class) use ($exclude_classes): bool {
+                    $extension_class = ltrim($extension_class, '\\');
+                    return !in_array($extension_class, $exclude_classes);
+                }
+            )
         );
     }
 

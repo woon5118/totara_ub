@@ -34,7 +34,7 @@ import { langString } from './i18n';
  * @param {object} opts
  * @param {string} [opts.error]
  */
-export async function showError(error, { vm }) {
+export async function showError(error, { vm } = {}) {
   // handle errors that look like apollo errors
   if (error.graphQLErrors) {
     vueApolloErrorHandler(error, vm);

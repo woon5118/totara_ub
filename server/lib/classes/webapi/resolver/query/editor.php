@@ -54,9 +54,10 @@ class editor implements query_resolver, has_middleware {
         }
 
         $format = $args['format'] ?? null;
+        $framework = $args['framework'] ?? null;
 
         require_once("{$CFG->dirroot}/lib/editorlib.php");
-        $editor = editors_get_preferred_editor($format);
+        $editor = editors_get_preferred_editor($format, $framework);
 
         if ($editor instanceof context_aware_editor) {
             $editor->set_context_id($context->id);

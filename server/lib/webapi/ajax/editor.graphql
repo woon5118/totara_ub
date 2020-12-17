@@ -3,14 +3,17 @@ query core_editor(
   $variant_name: param_alphaext
   $format: param_integer
   $usage_identifier: core_editor_usage_identifier
+  $framework: param_alpha
 ) {
-  editor: core_editor(context_id: $context_id, format: $format) {
-    __typename
-    interface_name
+  editor: core_editor(
+    context_id: $context_id
+    format: $format
+    framework: $framework
+  ) {
+    js_module(framework: $framework)
     context_id
     name
     variant(variant_name: $variant_name, usage_identifier: $usage_identifier) {
-      __typename
       options
       name
     }

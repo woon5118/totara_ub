@@ -26,6 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use totara_tui\output\framework;
 
 class core_editorslib_testcase extends advanced_testcase {
 
@@ -56,5 +57,20 @@ class core_editorslib_testcase extends advanced_testcase {
         }
     }
 
-}
+    /**
+     * @return void
+     */
+    public function test_preferred_editor_with_framework_tui(): void {
+        // There are no compatible editor for FORMAT_HTML with framework tui - hence textarea should be returned
+        $text_editor = editors_get_preferred_editor(FORMAT_HTML, framework::COMPONENT);
+        self::assertInstanceOf(textarea_texteditor::class, $text_editor);
 
+        // No framework provide, this should return a normal editor.
+        $atto_editor = editors_get_preferred_editor(FORMAT_HTML);
+        self::assertInstanceOf(atto_texteditor::class, $atto_editor);
+
+        // Returning weka editor for json_editor.
+        $weka_editor= editors_get_preferred_editor(FORMAT_JSON_EDITOR, framework::COMPONENT);
+        self::assertInstanceOf(weka_texteditor::class, $weka_editor);
+    }
+}

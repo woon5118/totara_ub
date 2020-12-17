@@ -448,4 +448,11 @@ final class weka_texteditor extends texteditor implements context_aware_editor {
             })();
         ";
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get_js_module(string $framework): ?string {
+        return $framework === 'tui' ? 'editor_weka/interface' : null;
+    }
 }

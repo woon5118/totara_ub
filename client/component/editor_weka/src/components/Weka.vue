@@ -251,8 +251,12 @@ export default {
           this.finalOptions.extensions.map(({ tuicomponent, options }) => {
             let opt = {};
 
-            if (options !== undefined && options !== null) {
-              opt = JSON.parse(options);
+            if (options != null) {
+              if (typeof options === 'object') {
+                opt = options;
+              } else {
+                opt = JSON.parse(options);
+              }
             }
 
             return tui

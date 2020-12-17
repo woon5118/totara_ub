@@ -50,8 +50,8 @@ class editor implements type_resolver {
         }
 
         switch ($field) {
-            case 'interface_name':
-                return $editor->get_interface_name();
+            case 'js_module':
+                return $editor->get_js_module($args['framework'] ?? '');
 
             case 'name':
                 $class_name = get_class($editor);

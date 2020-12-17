@@ -23,8 +23,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\editor\variant_name;
-use editor_weka\webapi\resolver\query\editor;
+use core\webapi\resolver\query\editor;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use totara_tui\output\framework;
 
 class core_webapi_get_editor_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
@@ -140,13 +141,10 @@ class core_webapi_get_editor_testcase extends advanced_testcase {
      * @return void
      */
     public function test_get_editor_with_context_id_as_system_should_not_yield_error(): void {
-        global $CFG;
-
         $generator = self::getDataGenerator();
         $user_one = $generator->create_user();
 
         $this->setUser($user_one);
-        require_once("{$CFG->dirroot}/lib/editorlib.php");
 
         try {
             $editor = $this->resolve_graphql_query(
@@ -161,5 +159,53 @@ class core_webapi_get_editor_testcase extends advanced_testcase {
         } catch (coding_exception $e) {
             $this->fail("Expecting the context_id as system context should not yield any error");
         }
+    }
+
+    /**
+     * @return void
+     */
+    public function test_get_editor_with_framework_incompatible(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+        $context_user = context_user::instance($user_one->id);
+
+        $editor = $this->resolve_graphql_query(
+            $this->get_graphql_name(editor::class),
+            [
+                'context_id' =>  $context_user->id,
+                'format' => FORMAT_HTML,
+                'framework' => framework::COMPONENT
+            ]
+        );
+
+        self::assertNotInstanceOf(weka_texteditor::class, $editor);
+        self::assertNotInstanceOf(atto_texteditor::class, $editor);
+        self::assertInstanceOf(textarea_texteditor::class, $editor);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_get_weka_editor_with_framework_compatible(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+        $context_user = context_user::instance($user_one->id);
+
+        $editor = $this->resolve_graphql_query(
+            $this->get_graphql_name(editor::class),
+            [
+                'context_id' =>  $context_user->id,
+                'format' => FORMAT_JSON_EDITOR,
+                'framework' => framework::COMPONENT
+            ]
+        );
+
+        self::assertNotInstanceOf(textarea_texteditor::class, $editor);
+        self::assertNotInstanceOf(atto_texteditor::class, $editor);
+        self::assertInstanceOf(weka_texteditor::class, $editor);
     }
 }
