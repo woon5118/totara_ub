@@ -28,6 +28,7 @@ use engage_article\totara_engage\resource\article;
 use totara_core\content\content_handler;
 use engage_article\event\article_viewed;
 use totara_engage\resource\resource_completion;
+use ml_recommender\local\seen_recommended_item;
 
 /**
  * Observer for article component
@@ -109,6 +110,9 @@ final class article_observer {
             $instance->create();
         }
         $transaction->allow_commit();
+
+        // Flag article as seen if it is on users recommendations list.
+        seen_recommended_item::seen_recommended_article($event);
 
         // Clear instance.
         unset($instance);

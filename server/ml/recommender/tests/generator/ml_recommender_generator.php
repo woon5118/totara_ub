@@ -36,6 +36,7 @@ final class ml_recommender_generator extends component_generator_base {
      * @param string $component
      * @param string|null $area
      * @param float|null $score
+     * @param int $seen
      * @return int
      */
     public function create_user_recommendation(
@@ -43,7 +44,8 @@ final class ml_recommender_generator extends component_generator_base {
         int $item_id,
         string $component,
         ?string $area = null,
-        ?float $score = null
+        ?float $score = null,
+        int $seen = 0
     ): int {
         global $DB;
 
@@ -54,6 +56,7 @@ final class ml_recommender_generator extends component_generator_base {
             'component' => $component,
             'area' => $area,
             'score' => $score ?? 1.0,
+            'seen' => $seen,
             'time_created' => time(),
         ]);
     }

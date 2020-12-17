@@ -33,6 +33,7 @@ use core\orm\entity\entity;
  * @property string|null $area
  * @property int $time_created
  * @property float $score
+ * @property int $seen
  */
 final class recommended_user_item extends entity {
     /**

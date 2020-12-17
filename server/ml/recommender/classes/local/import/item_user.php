@@ -66,7 +66,9 @@ class item_user extends import {
             $record->item_id = (int) $item_id;
             $record->component = $component;
             $record->area = null;
-            $record->score = (float) $score;
+
+            $record->score = (float)$score;
+            $record->seen = (int) 0;
             $record->time_created = $time ?: time();
 
             $DB->insert_record('ml_recommender_users', $record);

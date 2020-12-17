@@ -102,4 +102,8 @@ $observers = [
         'eventname' => '\engage_survey\event\survey_reshared',
         'callback'  => [interaction_observer::class, 'watch_interaction'],
     ],
+    [
+        'eventname' => \totara_playlist\event\playlist_viewed::class,
+        'callback'  => [\totara_playlist\observer\playlist_observer::class, 'on_viewed'],
+    ],
 ];

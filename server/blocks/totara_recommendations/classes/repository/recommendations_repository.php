@@ -59,7 +59,7 @@ final class recommendations_repository {
 
         $builder->where('ru.component', 'engage_article');
 
-        $builder->order_by_raw('ru.score DESC, ru.time_created DESC');
+        $builder->order_by_raw('ru.seen ASC, ru.score DESC, ru.time_created DESC');
         $builder->limit($max_count);
 
         return $builder->fetch();
@@ -150,6 +150,7 @@ final class recommendations_repository {
             'ru.item_id',
             'ru.component',
             'ru.area',
+            'ru.seen',
         ]);
 
         return $builder;

@@ -66,7 +66,8 @@ class block_totara_recommendations_courses_testcase extends advanced_testcase {
                 'item_id' => $course1->id,
                 'component' => 'container_course',
                 'time_created' => time(),
-                'score' => 1
+                'score' => 1,
+                'seen' => 0
             ]);
             $DB->insert_record('ml_recommender_users', [
                 'user_id' => $user->id,
@@ -74,7 +75,8 @@ class block_totara_recommendations_courses_testcase extends advanced_testcase {
                 'item_id' => $course3->id,
                 'component' => 'container_course',
                 'time_created' => time(),
-                'score' => 1
+                'score' => 1,
+                'seen' => 0
             ]);
         }
 

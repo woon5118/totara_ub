@@ -65,7 +65,8 @@ class ml_recommender_get_recommended_workspaces_testcase extends advanced_testca
                     $workspace->get_id(),
                     $workspace::get_type(),
                     null,
-                    2.5
+                    2.5,
+                    0
                 );
             }
         }
@@ -200,14 +201,16 @@ class ml_recommender_get_recommended_workspaces_testcase extends advanced_testca
                 $workspace_id,
                 'container_workspace',
                 null,
-                2.5
+                2.5,
+                0
             );
             $recommendations_generator->create_user_recommendation(
                 $user4->id,
                 $workspace_id,
                 'container_workspace',
                 null,
-                2.5
+                2.5,
+                0
             );
         }
 

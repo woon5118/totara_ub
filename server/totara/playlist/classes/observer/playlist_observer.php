@@ -24,12 +24,14 @@ namespace totara_playlist\observer;
 
 use engage_article\event\article_deleted;
 use engage_survey\event\survey_deleted;
+use ml_recommender\local\seen_recommended_item;
 use totara_playlist\entity\playlist_resource;
 use totara_playlist\event\playlist_created;
 use totara_playlist\event\playlist_updated;
 use totara_playlist\playlist;
 use totara_core\content\content_handler;
 use totara_playlist\repository\playlist_resource_repository;
+use totara_playlist\event\playlist_viewed;
 
 final class playlist_observer {
     /**
@@ -70,6 +72,15 @@ final class playlist_observer {
     public static function on_updated(playlist_updated $event): void {
         $playlist = playlist::from_id($event->objectid);
         static::handle_playlist($playlist, $event->userid);
+    }
+
+    /**
+     * @param playlist_viewed $event
+     * @return void
+     */
+    public static function on_viewed(playlist_viewed $event): void {
+        // Flag playlist as seen if it is on users recommendations list.
+        seen_recommended_item::seen_recommended_playlist($event);
     }
 
     /**

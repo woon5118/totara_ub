@@ -58,6 +58,7 @@
         <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="area" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="score" TYPE="number" LENGTH="20" NOTNULL="true" SEQUENCE="false" DECIMALS="12" COMMENT="Score/rating of the recommended item"/>
+        <FIELD NAME="seen" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="time_created" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -68,6 +69,7 @@
         <INDEX NAME="component_idx" UNIQUE="false" FIELDS="component"/>
         <INDEX NAME="area_idx" UNIQUE="false" FIELDS="area"/>
         <INDEX NAME="score_idx" UNIQUE="false" FIELDS="score"/>
+        <INDEX NAME="user_seen_score_idx" UNIQUE="false" FIELDS="user_id, seen, score"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="ml_recommender_items" COMMENT="Related content">
