@@ -201,10 +201,22 @@ class core_weblib_testcase extends advanced_testcase {
         $this->assertNotSame($email, $obfuscated);
         $back = core_text::entities_to_utf8(urldecode($email), true);
         $this->assertSame($email, $back);
+
+        $email = 'some\'user@example.com';
+        $obfuscated = obfuscate_email($email);
+        $this->assertNotSame($email, $obfuscated);
+        $back = core_text::entities_to_utf8(urldecode($email), true);
+        $this->assertSame($email, $back);
     }
 
     public function test_obfuscate_text() {
         $text = 'Žluťoučký koníček 32131';
+        $obfuscated = obfuscate_text($text);
+        $this->assertNotSame($text, $obfuscated);
+        $back = core_text::entities_to_utf8($obfuscated, true);
+        $this->assertSame($text, $back);
+
+        $text = 'Žluťoučký \' koníček 32131';
         $obfuscated = obfuscate_text($text);
         $this->assertNotSame($text, $obfuscated);
         $back = core_text::entities_to_utf8($obfuscated, true);
