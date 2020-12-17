@@ -26,6 +26,8 @@
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
 
+use Behat\Mink\Exception\ExpectationException;
+
 require_once(__DIR__ . '/../../../lib/behat/behat_base.php');
 
 /**
@@ -68,8 +70,17 @@ class behat_auth extends behat_base {
         // Wait for page to be loaded.
         $this->wait_for_pending_js();
 
-        // Click on logout link in footer, as it's much faster.
-        $this->execute('behat_general::i_click_on_in_the', array(get_string('logout'), 'link', '#page-footer', "css_element"));
+        $content = $this->getSession()->getPage()->getContent();
+        $sesskey = [];
+        if (preg_match('/"sesskey":"([a-zA-Z0-9]+)"/', $content, $sesskey) !== 1) {
+            throw new ExpectationException(
+                "Unable to retrieve sesskey",
+                $this->getSession()
+            );
+        }
+
+        // Add the sesskey parameter otherwise we will be prompted to confirm the logout.
+        $this->getSession()->visit($this->locate_path('/login/logout.php?sesskey=' . $sesskey[1]));
     }
 
     /**
