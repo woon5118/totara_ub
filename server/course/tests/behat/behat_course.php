@@ -1854,4 +1854,32 @@ class behat_course extends behat_base {
         $xpath = "//div[contains(@class,'block') and contains(@class,'block_course_navigation')]";
         $this->execute('behat_general::i_click_on_in_the', [get_string('participants'), 'link', $xpath, 'xpath_element']);
     }
+
+    /**
+     * Expands or collapses the course topic section.
+     *
+     * @Given /^I "(?P<action_string>(?:[^"]|\\")*)" course topic "(?P<section_number>\d+)"/
+     * @param string $action Expand or collapse
+     * @param int $sectionnumber The section number
+     */
+    public function i_expand_or_collapse_course_topic($action, $sectionnumber) {
+        switch ($action) {
+            case 'expand':
+                $actionstr = 'false';
+                break;
+            case 'collapse':
+                $actionstr = 'true';
+                break;
+            default:
+                throw new ExpectationException("Expected action of 'expand' or 'collapse' was not used. ($action)", $this->getSession());
+        }
+        \behat_hooks::set_step_readonly(false);
+        $xpath = "//a[contains(@href,'tw-formatTopics__topic-" . $sectionnumber . "') and contains(@aria-expanded,'" . $actionstr . "')]";
+        $node = $this->find(
+            'xpath',
+            $xpath,
+            new \Behat\Mink\Exception\ExpectationException('Could not find topic "' . $sectionnumber . '" for the expand/collapse action of "' . $action . '" ' . $xpath, $this->getSession())
+        );
+        $node->click();
+    }
 }
