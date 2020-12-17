@@ -772,7 +772,8 @@ export default {
     "unmute_notifications"
   ],
   "core": [
-    "admin"
+    "admin",
+    "delete"
   ]
 }
 </lang-strings>
