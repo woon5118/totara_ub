@@ -736,7 +736,9 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
             get_string('editmembers','totara_cohort'));
     }
 
-    if ($canview) {
+    // TODO: TL-7492, TL-7240 - Update when audience visibilty is corrected
+    //       For now just hiding enrolled learning for tenant audiences
+    if ($canview && empty($cohortcontext->tenantid)) {
         $toprow[] = new tabobject('enrolledlearning', new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $cohortid)),
             get_string('enrolledlearning', 'totara_cohort'));
     }
@@ -751,7 +753,9 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
             get_string('learningplan', 'totara_cohort'));
     }
 
-    if (advanced_feature::is_enabled('goals') && $canview) {
+    // TODO: TL-7492, TL-7240 - Update when audience visibilty is corrected
+    //       For now just hiding goals for tenant audiences
+    if (advanced_feature::is_enabled('goals') && $canview && empty($cohortcontext->tenantid)) {
         $toprow[] = new tabobject('goals', new moodle_url('/totara/cohort/goals.php', array('id' => $cohortid)),
             get_string('goals', 'totara_hierarchy'));
     }
