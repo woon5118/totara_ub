@@ -44,7 +44,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
     # regardless of what was selected before anonymise had been toggled on.
     When I toggle the "Anonymise responses" tui form row toggle switch
     Then ".tui-radioGroup" "css_element" should exist
-    And the "All responding participants' responses must be marked closed." radio button is selected
+    And the "Response submission is closed for all participants" radio button is selected
     And I click on "Save changes" "button"
 
   Scenario: Show warning message on saving changes when condition is not none and automatic closure is disabled
@@ -58,7 +58,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
     Then the "None (submitted responses immediately visible to viewers)" radio button is selected
     And ".tui-notificationBanner" "css_element" should not exist
     # Situation: automatic closure disabled & visibility condition is not none
-    When I click on the "Viewer's own responses (if any) are marked closed" tui radio
+    When I click on the "Response submission is closed for the participant who is viewing" tui radio
     And I click on "Save changes" "button"
     And I should see "This condition cannot be met by participants without manual intervention, because automatic closure is currently disabled. Enable it as a workflow setting on the \"Content\" tab." in the tui warning notification banner
     When I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
@@ -76,7 +76,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
     And I click on "General" "link"
     Then the "None (submitted responses immediately visible to viewers)" radio button is selected
 
-    When I click on the "Viewer's own responses (if any) are marked closed" tui radio
+    When I click on the "Response submission is closed for the participant who is viewing" tui radio
     And I click on "Save changes" "button"
     And I click on "Assignments" "link"
     And I click on "Add group" "button"
@@ -90,7 +90,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
 
     When I click on "General" "link"
     Then ".tui-radioGroup" "css_element" should exist
-    And the "Viewer's own responses (if any) are marked closed" radio button is selected
+    And the "Response submission is closed for the participant who is viewing" radio button is selected
 
   Scenario: Visibility control should not be editable after activation if anonymous response is enabled
     Given I log in as "admin"
