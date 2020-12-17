@@ -76,9 +76,9 @@ export default class FileStorage {
   }
 
   /**
-   * @param {Number}  repository_id
-   * @param {String}  url
-   * @param {Number}  max_bytes
+   * @param {Number}         repository_id
+   * @param {String}         url
+   * @param {Number|String}  max_bytes
    */
   setRepositoryData({ repository_id, url, max_bytes }) {
     if (this.repositoryData) {
@@ -88,7 +88,7 @@ export default class FileStorage {
     this.repositoryData = {
       repositoryId: repository_id,
       url: url,
-      maxBytes: max_bytes,
+      maxBytes: parseInt(max_bytes),
     };
   }
 

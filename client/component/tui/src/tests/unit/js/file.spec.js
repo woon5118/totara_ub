@@ -83,6 +83,9 @@ describe('getReadAbleSize', () => {
 
     // This is 2 GB
     expect(await getReadableSize(2147483648)).toEqual('2 GB');
+
+    // This is 10 GB
+    expect(await getReadableSize(10737418240)).toEqual('10 GB');
   });
 
   it('gives MB size', async () => {

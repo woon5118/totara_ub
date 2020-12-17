@@ -108,7 +108,11 @@ type editor_weka_file {
 type editor_weka_repository_data {
   url: String!
   repository_id: Int!
-  max_bytes: Int!
+  """
+  A numeric string that represent for bytes. We are using string instead of
+  integer for this one because, graphql Integer does not support up to 64-bit integers but only 32-bit integers.
+  """
+  max_bytes: String!
 }
 
 type editor_weka_file_draft_area {
