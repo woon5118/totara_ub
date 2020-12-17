@@ -74,7 +74,11 @@ final class resolver extends \totara_tui\local\mediation\resolver {
      * @return string
      */
     protected function calculate_etag(): string {
-        $etag = sha1('tui ' . $this->get_rev() . ' ' . $this->component . ' ' . $this->suffix);
+        $content = 'tui ' . $this->get_rev() . ' ' . $this->component . ' ' . $this->suffix;
+        if ($this->should_use_dev_mode() && $this->suffix !== 'p' && $this->suffix !== 'pl') {
+            $content .= ' ' . $this->get_sha_for_etag_comparison();
+        }
+        $etag = sha1($content);
         return $etag;
     }
 

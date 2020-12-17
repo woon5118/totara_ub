@@ -226,12 +226,18 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
 
         $rev = -1;
 
+        // Set the expected etag as an IF_NONE_MATCH header
+        $resolver = new resolver(mediator::class, -1, 'd', 'tui');
+        $method = new ReflectionMethod($resolver, 'calculate_etag');
+        $method->setAccessible(true);
+        $etag = $method->invoke($resolver);
+
         [$js, $messages, $file] = $this->get_resolver($rev, 'd');
 
         self::assertSame('d', bundle::get_js_suffix_for_url());
 
         self::assertSame([
-            'Header: Etag: "'.sha1('tui ' . $rev . ' tui d').'"',
+            'Header: Etag: "' . $etag . '"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
             'Header: Last-Modified: ' . gmdate('D, d M Y', time()),
@@ -258,12 +264,17 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         // Fake IE.
         \core_useragent::instance(true, 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; KTXN)');
 
+        $resolver = new resolver(mediator::class, -1, 'dl', 'tui');
+        $method = new ReflectionMethod($resolver, 'calculate_etag');
+        $method->setAccessible(true);
+        $etag = $method->invoke($resolver);
+
         [$js, $messages, $file] = $this->get_resolver($rev, 'dl');
 
         self::assertSame('dl', bundle::get_js_suffix_for_url());
 
         self::assertSame([
-            'Header: Etag: "'.sha1('tui ' . $rev . ' tui dl').'"',
+            'Header: Etag: "' . $etag . '"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
             'Header: Last-Modified: ' . gmdate('D, d M Y', time()),
@@ -284,8 +295,11 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         $CFG->forced_plugin_settings['totara_tui'] = ['development_mode' => true];
         $rev = -1;
 
-        $etag = sha1('tui ' . $rev . ' tui d');
-        $_SERVER['HTTP_IF_NONE_MATCH'] = $etag;
+        // Set the expected etag as an IF_NONE_MATCH header
+        $resolver = new resolver(mediator::class, $rev, 'd', 'tui');
+        $method = new ReflectionMethod($resolver, 'calculate_etag');
+        $method->setAccessible(true);
+        $_SERVER['HTTP_IF_NONE_MATCH'] = $etag = $method->invoke($resolver);
 
         // Once to prime the cache
         $this->get_resolver($rev, 'd');
@@ -371,7 +385,7 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         [$js, $messages] = $this->get_resolver(-1, 'd', 'monkeys');
         self::assertSame('/** File not found */', $js);
         self::assertSame([
-            'Header: Etag: "'.sha1('tui -1 monkeys d').'"',
+            'Header: Etag: "'.sha1('tui -1 monkeys d unknown').'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
             'Header: Last-Modified: ' . gmdate('D, d M Y', time()),
@@ -414,11 +428,17 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
 
         global $CFG;
         $CFG->forced_plugin_settings['totara_tui'] = ['development_mode' => true];
+
+        $resolver = new resolver(mediator::class, -1, 'd', 'vendors');
+        $method = new ReflectionMethod($resolver, 'calculate_etag');
+        $method->setAccessible(true);
+        $etag = $method->invoke($resolver);
+
         [$js, $messages] = $this->get_resolver(-1, 'd', 'vendors');
         self::assertStringStartsWith('(window["webpackJsonp"] = window["webpackJsonp"]', $js);
         self::assertStringContainsString('/*!******************************************', $js);
         self::assertSame([
-            'Header: Etag: "'.sha1('tui -1 vendors d').'"',
+            'Header: Etag: "'.$etag.'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
             'Header: Last-Modified: ' . gmdate('D, d M Y', time()),
@@ -461,11 +481,17 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
 
         global $CFG;
         $CFG->forced_plugin_settings['totara_tui'] = ['development_mode' => true];
+
+        $resolver = new resolver(mediator::class, -1, 'd', 'theme_ventura');
+        $method = new ReflectionMethod($resolver, 'calculate_etag');
+        $method->setAccessible(true);
+        $etag = $method->invoke($resolver);
+
         [$js, $messages] = $this->get_resolver(-1, 'd', 'theme_ventura');
         self::assertStringStartsWith("/* theme: ventura */\n/******/ (function(", $js);
         self::assertStringContainsString('/*!******************************************', $js);
         self::assertSame([
-            'Header: Etag: "'.sha1('tui -1 theme_ventura d').'"',
+            'Header: Etag: "' . $etag . '"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
             'Header: Last-Modified: ' . gmdate('D, d M Y', time()),

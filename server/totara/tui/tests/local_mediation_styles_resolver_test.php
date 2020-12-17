@@ -43,15 +43,12 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
     }
 
     private function get_etag(int $rev, $mode, $rtl = false) {
-        $etag = sha1(join('-', [
-            'tui',
-            $rev,
-            'ventura',
-            'theme_ventura',
-            $mode,
-            ($rtl) ? 'rtl' : 'ltr',
-            0
-        ]));
+
+        $resolver = new resolver(mediator::class, $rev, 'ventura', 'theme_ventura', $mode, 0, $rtl);
+        $method = new ReflectionMethod($resolver, 'calculate_etag');
+        $method->setAccessible(true);
+        $etag = $method->invoke($resolver);
+
         return $etag;
     }
 
@@ -298,8 +295,11 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
         $CFG->forced_plugin_settings['totara_tui'] = ['development_mode' => true];
         $rev = -1;
 
-        $etag = $this->get_etag($rev, 'd' , false);
-        $_SERVER['HTTP_IF_NONE_MATCH'] = $etag;
+        // Set the expected etag as an IF_NONE_MATCH header
+        $resolver = new resolver(mediator::class, $rev, 'ventura', 'theme_ventura', 'd', 0);
+        $method = new ReflectionMethod($resolver, 'calculate_etag');
+        $method->setAccessible(true);
+        $_SERVER['HTTP_IF_NONE_MATCH'] = $etag = $method->invoke($resolver);
 
         // Once to prime the cache
         $this->get_resolver($rev, 'd');
