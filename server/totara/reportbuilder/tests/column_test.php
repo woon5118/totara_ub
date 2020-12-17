@@ -1154,6 +1154,11 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'frameworkfullname'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'frameworkidnumber'));
             }
+            foreach (['organisation', 'position', 'competency'] as $type) {
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'name'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'idnumber'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'type'));
+            }
             if ($sourcename === 'facetoface_sessions') {
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'asset', 'value' => 'namelink'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'asset', 'value' => 'name'));
