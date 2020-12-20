@@ -133,8 +133,6 @@ Feature: Assign user groups to perform activities
 
     When I set the following fields to these values:
       | Filter items by search | Delta |
-    # pausing due to search being debounced (waiting 500 ms)
-    And I wait "1" seconds
     Then I should see the following unselected adder picker entries:
       | Audience name| Short name  |
       | Delta Force  | Delta Force |
@@ -145,8 +143,6 @@ Feature: Assign user groups to perform activities
 
     When I set the following fields to these values:
       | Filter items by search | |
-    # pausing due to search being debounced (waiting 500 ms)
-    And I wait "1" seconds
     Then I should see the following unselected adder picker entries:
       | Audience name| Short name  |
       | 22 SAS       | 22 SAS      |

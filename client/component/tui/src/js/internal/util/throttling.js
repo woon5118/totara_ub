@@ -17,6 +17,7 @@
  */
 
 import ArrayKeyedMap from './ArrayKeyedMap';
+import pending from '../../pending';
 
 /**
  * Creates a throttled function that invokes `fn` at most every `wait` ms.
@@ -195,6 +196,9 @@ function throttleCommon(fn, wait, options = {}, done) {
   // handle to timeout, set when in wait period
   let timeout = null;
 
+  // store pending
+  let pendingDone = null;
+
   // call fn when timeout expires?
   let expireCall = false;
 
@@ -215,12 +219,29 @@ function throttleCommon(fn, wait, options = {}, done) {
       // would execute double `wait` ms after the last call instead of `wait` ms
       timeout = setTimeout(expire, wait);
     } else {
+      // Resolve pending
+      if (pendingDone) {
+        pendingDone();
+        pendingDone = null;
+      }
+
       // it has been `wait` ms since the last call and there hasn't been any
       // more, we can dispose of this function now if needed and recreate it
       // later without throwing off timing
       if (done) {
         done();
       }
+    }
+  }
+
+  /**
+   * Make sure our behat tests wait while the throttling is ongoing
+   *
+   * @param {String} pendingName
+   */
+  function setPending(pendingName) {
+    if (!pendingDone) {
+      pendingDone = pending(pendingName);
     }
   }
 
@@ -244,6 +265,7 @@ function throttleCommon(fn, wait, options = {}, done) {
       if (extendWait) {
         // reset wait so that expire() happens `wait` ms from now (used to implement debouncing)
         clearTimeout(timeout);
+        setPending('throttling_extend_wait');
         timeout = setTimeout(expire, wait);
       }
     } else {
@@ -256,6 +278,7 @@ function throttleCommon(fn, wait, options = {}, done) {
         // leading call too, otherwise we're doing unneccesary work
         expireCall = true;
       }
+      setPending('throttling');
       timeout = setTimeout(expire, wait);
     }
   };
