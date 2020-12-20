@@ -24,6 +24,8 @@
 namespace mod_perform\controllers\activity;
 
 use context;
+use core\format;
+use core\webapi\formatter\field\string_field_formatter;
 use Exception;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\section;
@@ -80,6 +82,7 @@ class section_content extends perform_controller {
             ? $section->get_display_title()
             : $section->activity->name;
         $activity_state = $section->activity->get_status_state();
+        $string_field_formatter = new string_field_formatter(format::FORMAT_PLAIN, $this->setup_context());
         $props = [
             'activity-context-id' => (int) $section->activity->context_id,
             'section-id' => (string) $this->get_section_id_param(),
@@ -89,11 +92,15 @@ class section_content extends perform_controller {
                 'name' => $activity_state::get_name(),
                 'display_name' => $activity_state::get_display_name(),
             ],
-            'title' => format_string($title),
+            'title' => $string_field_formatter->format($title),
             'is-multi-section-active' => $section->activity->get_multisection_setting(),
             'go-back-link' => [
                 'url' => (string) edit_activity::get_url(['activity_id' => $section->activity_id]),
-                'text' => get_string('back_to_activity_content', 'mod_perform', format_string($section->activity->name)),
+                'text' => get_string(
+                    'back_to_activity_content',
+                    'mod_perform',
+                    $string_field_formatter->format($section->activity->name)
+                ),
             ],
         ];
 
