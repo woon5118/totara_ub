@@ -19,9 +19,7 @@ Feature: Find workspaces
     When I click on "Find Workspaces" in the totara menu
     Then I should see "Workspace 101"
     And I should see "Workspace 102"
-    And I set the field "Search workspaces" to "clear search"
-    And I set the field "Search workspaces" to "test"
-    When I click on "Search workspaces" "button"
+    When I set the field "Search workspaces" to "test"
     Then I should see "No workspaces match your search. Please try again." in the ".tui-spaceCardsGrid__emptyResult" "css_element"
     When  I click on "Clear this search term" "button"
     Then I should see "Workspace 101"

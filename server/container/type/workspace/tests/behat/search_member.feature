@@ -17,7 +17,6 @@ Feature: Search for members in workspaces
     And I follow "Workspace 101"
     And I click on "Members (1)" "link" in the ".tui-tabs__tabs" "css_element"
     And I set the field "Search members" to "test"
-    When I click on "Search members" "button"
     Then I should see "No members match your search. Please try again." in the ".tui-workspaceMembersTab__message" "css_element"
     When I click on "Clear this search term" "button"
     Then I should see "User One" in the ".tui-miniProfileCard__row-link" "css_element"

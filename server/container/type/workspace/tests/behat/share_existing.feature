@@ -135,13 +135,10 @@ Feature: Share existing items with workspace
     Then I should see "Select content to share with workspaces"
 
     When I set the field with css ".tui-adder input[type='search']" to "Test Article 1"
-    And I click on ".tui-adder button[title='Search']" "css_element"
     Then ".tui-engageAdderBrowseTable img[src*='preview=totara_engage_adder_thumbnail']" "css_element" should exist
 
     When I set the field with css ".tui-adder input[type='search']" to "Test Survey 1?"
-    And I click on ".tui-adder button[title='Search']" "css_element"
     Then ".tui-engageAdderBrowseTable .tui-engageSurveyIcon" "css_element" should exist
 
     When I set the field with css ".tui-adder input[type='search']" to "Test Playlist 1"
-    And I click on ".tui-adder button[title='Search']" "css_element"
     Then ".tui-engageAdderBrowseTable img[src*='preview=totara_engage_adder_thumbnail']" "css_element" should exist

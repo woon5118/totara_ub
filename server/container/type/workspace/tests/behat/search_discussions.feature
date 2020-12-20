@@ -29,10 +29,9 @@ Feature: User search discussions
     And I type "The second discussion" in the weka editor
     And I wait for the next second
     And I click on "Post" "button"
-    And I set the field "Search discussions" to "SECOND"
     And I should see "This is the discussion 1"
     And I should see "The second discussion"
-    When I click on "Search discussions" "button"
+    When I set the field "Search discussions" to "SECOND"
     Then I should not see "This is the discussion 1"
     And I should see "The second discussion"
 
@@ -68,14 +67,12 @@ Feature: User search discussions
     And I type " Discussion one reply" in the weka editor
     When I click on "Reply" "button" in the ".tui-commentReplyForm__form" "css_element"
     Then I should see "Discussion one reply"
-    And I set the field "Search discussions" to "COMMENT"
     And I should see "This is the discussion 1"
     And I should see "The second discussion"
-    When I click on "Search discussions" "button"
+    When I set the field "Search discussions" to "COMMENT"
     Then I should not see "This is the discussion 1"
     And I should see "The second discussion"
-    And I set the field "Search discussions" to "reply"
-    When I click on "Search discussions" "button"
+    When I set the field "Search discussions" to "reply"
     Then I should not see "This is the discussion 1"
     And I should see "The second discussion"
 
@@ -93,8 +90,7 @@ Feature: User search discussions
     And I wait for the next second
     When I click on "Post" "button"
     Then I should see "The second discussion"
-    And I set the field "Search discussions" to "test"
-    When I click on "Search discussions" "button"
+    When I set the field "Search discussions" to "test"
     Then I should see "No results found." in the ".tui-workspaceDiscussionTab__message" "css_element"
     When I click on "Clear this search term" "button"
     Then I should see "The first discussion"
