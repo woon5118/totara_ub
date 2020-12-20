@@ -25,7 +25,7 @@
           {{ modalTitle }}
           <InfoIconButton
             v-if="modalTitleHelpText"
-            :is-help-for="$str('transcript', 'editor_weka')"
+            :is-help-for="$str('transcript', 'editor')"
           >
             {{ modalTitleHelpText }}
           </InfoIconButton>
@@ -299,10 +299,12 @@ export default {
       "filewithname",
       "delete"
     ],
+    "editor": [
+      "transcript"
+    ],
     "editor_weka": [
       "done",
-      "meta_upload_generic_error",
-      "transcript"
+      "meta_upload_generic_error"
     ]
   }
 </lang-strings>
