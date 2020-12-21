@@ -66,6 +66,8 @@ Feature: Long text responses support the Weka editor
     And I upload embedded media to the weka editor using the file "mod/perform/element/long_text/tests/behat/fixtures/blue.png"
     And I move the cursor to the end of the weka editor
     And I upload attachment to the weka editor using the file "mod/perform/element/long_text/tests/behat/fixtures/green.png"
+    # This is to make sure that the files are all uploaded correctly
+    And I wait for the next second
 
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal

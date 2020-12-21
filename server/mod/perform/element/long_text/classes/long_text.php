@@ -42,9 +42,24 @@ class long_text extends respondable_element_plugin implements element_response_h
         ?element $element,
         $is_draft_validation = false
     ): collection {
+        global $CFG;
         $element_data = $element->data ?? null;
-        $answer_text = $this->decode_response($encoded_response_data, $element_data);
 
+        // We need to make sure that the @@PLUGINFILE@@ url had been converted properly in order to convert the
+        // weka content to text.
+        // Note that zero in this case is represent for nothing, because we just want to validate the text and
+        // there is no way to get the element response id from here.
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $encoded_response_data = file_rewrite_pluginfile_urls(
+            $encoded_response_data,
+            'pluginfile.php',
+            $element->context_id,
+            self::get_response_files_component_name(),
+            self::get_response_files_filearea_name(),
+            0
+        );
+
+        $answer_text = $this->decode_response($encoded_response_data, $element_data);
         $errors = new collection();
 
         $is_empty_answer = empty($answer_text) || $answer_text === 'null';
@@ -112,19 +127,36 @@ class long_text extends respondable_element_plugin implements element_response_h
      * @param section_element_response $element_response
      */
     public function post_response_submission(section_element_response $element_response): void {
-        global $CFG, $TEXTAREA_OPTIONS;
+        global $CFG, $TEXTAREA_OPTIONS, $USER;
         require_once($CFG->dirroot . '/lib/filelib.php');
         require_once($CFG->dirroot . '/lib/formslib.php');
 
         $data = json_decode($element_response->response_data, true);
         $draft_id = $data['draft_id'];
 
-        if (!isset($data['weka']) || self::is_weka_response_empty($data['weka'])) {
+        $weka_content = null;
+        $response =  null;
+        if (isset($data['weka'])) {
+            $response = document_helper::json_encode_document($data['weka']);
+            $weka_content = $response;
+
+            // Only works for logged-in users but not for external participants
+            if ($USER->id > 0) {
+                $weka_content = file_rewrite_pluginfile_urls(
+                    $response,
+                    'draftfile.php',
+                    \context_user::instance($USER->id)->id,
+                    'user',
+                    'draft',
+                    $draft_id
+                );
+            }
+        }
+
+        if (!$weka_content || self::is_weka_response_empty($weka_content)) {
             $element_response->set_empty_response();
             return;
         }
-
-        $response = document_helper::json_encode_document($data['weka']);
 
         if (!empty($draft_id)) {
             $response = file_save_draft_area_files(
@@ -153,7 +185,7 @@ class long_text extends respondable_element_plugin implements element_response_h
         }
 
         if (is_string($response)) {
-            $response = json_decode($response);
+            $response = json_decode($response, true);
         }
 
         $formatter = new default_formatter();
