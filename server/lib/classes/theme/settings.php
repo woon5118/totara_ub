@@ -169,19 +169,24 @@ final class settings {
      * @param array $categories
      */
     public function validate_categories(array $categories): void {
-        foreach ($categories as $category) {
-            foreach ($category['properties'] as $property) {
-                $this->validate_property($property);
+        // Check if category and its properties are allowed to be updated for tenant.
+        if ($this->tenant_id !== 0) {
+            foreach ($categories as $category) {
+                if (!$this->is_tenant_customizable_category($category['name'])) {
+                    throw new \invalid_parameter_exception("Category '{$category['name']}' is not allowed to be updated for tenant.");
+                }
+                foreach ($category['properties'] as $property) {
+                    if (!$this->is_tenant_customizable_setting($category['name'], $property['name'])) {
+                        throw new \invalid_parameter_exception("Property '{$property['name']}' is not allowed to be updated for tenant.");
+                    }
+                }
             }
         }
 
-        // Only brand and colours for tenants.
-        if ($this->tenant_id !== 0) {
-            $categories = array_filter($categories, function ($category) {
-                return !$this->is_tenant_customizable_category($category['name']);
-            });
-            if (sizeof($categories) > 0) {
-                throw new \invalid_parameter_exception('Tenants are only allowed to update brand and colours.');
+        // Confirm that properties have correct values.
+        foreach ($categories as $category) {
+            foreach ($category['properties'] as $property) {
+                $this->validate_property($property);
             }
         }
     }
@@ -274,7 +279,7 @@ final class settings {
         if ($this->tenant_id > 0 && $copy_site_files) {
             // Make copy of customizable files not yet customized for the tenant
             foreach ($instances as $instance_key => $instance) {
-                if ($this->is_tenant_customizable_image($instance->get_ui_category(), $instance->get_ui_key())) {
+                if ($this->is_tenant_customizable_setting($instance->get_ui_category(), $instance->get_ui_key())) {
                     $instance->copy_site_file_to_tenant();
                 }
             }
@@ -528,7 +533,7 @@ final class settings {
      * @param string $ui_key
      * @return bool
      */
-    private function is_tenant_customizable_image(string $category, string $ui_key): bool {
+    private function is_tenant_customizable_setting(string $category, string $ui_key): bool {
         return $this->tenant_settings_hook->is_tenant_customizable_category_setting($category, $ui_key);
     }
 }

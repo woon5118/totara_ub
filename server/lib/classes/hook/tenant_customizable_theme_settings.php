@@ -65,7 +65,7 @@ class tenant_customizable_theme_settings extends base {
     public function get_customizable_settings(): array {
         return $this->settings;
     }
-    
+
     /**
      * @param string $category
      * @return bool
@@ -73,7 +73,7 @@ class tenant_customizable_theme_settings extends base {
     public function is_tenant_customizable_category(string $category): bool {
         return in_array($category, array_keys($this->settings),true);
     }
-    
+
     /**
      * @param string $category
      * @param string $setting
@@ -88,7 +88,7 @@ class tenant_customizable_theme_settings extends base {
         if (!is_array($settings)) {
             return $settings === '*';
         }
-        
+
         return in_array($setting, $settings, true);
     }
 }

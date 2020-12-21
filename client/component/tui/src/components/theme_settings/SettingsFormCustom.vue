@@ -167,7 +167,7 @@ export default {
     },
 
     customCssEditable() {
-      return this.canEditSetting('formcustom_label_customcss');
+      return this.canEditSetting('formcustom_field_customcss');
     },
   },
 
