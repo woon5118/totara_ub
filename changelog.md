@@ -1,3 +1,382 @@
+Release 13.3 (24th December 2020):
+==================================
+
+
+New features:
+
+    TL-11172       Created virtual meeting service plugin architecture for seminar activities 
+
+                   Created a new pluggable component to support integration with online
+                   meeting service providers, an initial 'virtualmeeting' plugin for Microsoft
+                   Teams, and support for virtualmeeting plugins in seminar rooms. 
+
+                   When a virtualmeeting plugin is selected as a seminar room's 'Virtual room
+                   link', the plugin will attempt to create online meetings to match the
+                   sessions to which the room is assigned. This is carried out via adhoc task
+                   so that the user is not blocked during API calls to meeting service
+                   providers. If the plugin is unable to create or update meetings, a
+                   notification will be sent to the room creator.
+
+                   Because virtualmeeting plugins may rely on OAuth2 delegated permissions,
+                   only the creator of a room may change the date and time of seminar sessions
+                   to which it is assigned. There is also a limit of one virtualmeeting room
+                   per seminar session.
+
+    TL-25355       Rich text responses and file attachments are now supported via the Weka editor for the "Text: Long response" element in a performance activity
+    TL-28632       Implemented bulk adding members to a workspace via an audience
+
+                   This introduces a method to add members in bulk to a workspace by selecting
+                   one or more audiences. All current members in the audience(s) will be added
+                   as members to the workspace. This will happen in the background as an ad
+                   hoc task to not block the interface for the users. The user who is using
+                   this new feature will receive a notification once all members are added.
+
+    TL-28877       Added the new flavour 'Learn Professional'
+
+                   Developed a new flavour of Learn to deliver Learn Professional. See
+                   https://totara.community/mod/forum/discuss.php?d=24797#p98628 and
+                   https://help.totaralearning.com/display/TH13/Totara+Learn+Professional for
+                   details.
+
+Improvements:
+
+    TL-11278       Fixed an accessibility issue in the course and category management page
+    TL-11287       Improved the accessibility of the Filepicker
+    TL-11290       Added the user name in role assign/unassign links
+
+                   For course enrolment, the corresponding user name has been added to the
+                   assign/unassign links so that screen readers can also read it out to the
+                   user. This will assist disabled users in identifying the correct
+                   assign/unassign links in relation to the user.
+
+    TL-11313       Added accessible names to forum advanced searches
+    TL-17223       Added option to make topic course format collapsible
+    TL-21560       Added honoring of 'totara/cohort:managerules' capability in tenant context
+
+                   Tenant members with the 'totara/cohort:managerules' capability are now able
+                   to create or manage dynamic audiences.
+
+    TL-21719       Added a UI for Report Builder default graph colours
+    TL-24018       Improved the TUI popover component
+    TL-24831       Added \core\hook\phpunit to core 
+    TL-25031       Updated SearchBox and SearchFilter component usage and implementation
+
+                   All components using the SearchBox and SearchFIlter components now have the
+                   same look and feel.
+
+    TL-25715       Added an alt text button to enhance the accessibility of images in the Weka editor
+    TL-25795       Improved observers to decrease priority of recommended items that have been seen by user
+    TL-25841       Added aria-haspopup as a prop for button-like components
+    TL-26937       Cleaned up code and improved test coverage for component ml_recommender
+    TL-27221       Improved location of error message when uploading a logo in Ventura theme settings
+    TL-27230       Added a warning when switching tabs or navigating away with unsaved changes in Engage contribution modal
+    TL-27330       Exposed aria label prop for draggable component
+    TL-27336       Updated 'Your Library' side-panel to ensure it will always reach the bottom of the main page container
+    TL-27337       Improved spacing on the log in page
+    TL-27508       Improved display of progress doughnuts when viewing inside a report graph block
+    TL-27624       Improved self-registration language strings
+    TL-27885       Changed user profile social block name to 'contributions'
+    TL-28053       Added support for audio transcript file and video caption file
+    TL-28106       Added front-end tui editor abstraction so the system and user's editor preference settings are respected
+    TL-28110       Added specific components and improved layout for printing performance activities
+    TL-28319       Changed trash icon to remove playlists / resources to a remove icon
+    TL-28384       Added support for custom footer and footer theme colours
+
+                   Theme Appearance settings, for Themes based on Ventura, now have additional
+                   settings:
+                    * "Colours" tab which allows simple application of colour to the footer
+                   background and text/links added to the footer.
+                    * "Custom" tab which allows addition of text that will output into the
+                   footer for the current Theme. This field also supports markup, so HTML
+                   footers can be included and styled by a custom Theme or using the "Custom
+                   CSS" setting.
+
+                   This footer setting equates to the HTML-mode "footnote" setting found in
+                   Roots/Basis Themes.
+
+                   Note that the value of the custom footer field inherits to child Themes.
+                   Within a child Theme the field can be emptied, the form saved, then the
+                   inherited footer is not used.
+
+                   The Footer region affected has also been simplified, with logout button and
+                   username removed.
+
+    TL-28487       Added ability to use pre-login tenant themes, and to customise the login banner image in tenant theme settings
+
+                   Previously, all tenant theme settings have necessarily taken effect after
+                   login, because the tenant in use is determined by the user's tenant
+                   membership.
+
+                   With this patch, administrators can toggle the tenant setting 'Enable
+                   pre-login tenant themes,' which allows them to add
+                   '?tenanttheme=tenantidentifier' to the site URL to create a tenant-specific
+                   login page. The tenant theming will persist from session to session in the
+                   same browser, until a user logs in who is not a tenant member.
+
+                   Tenant theme settings have also been extended to include the login banner
+                   image and associated alt text.
+
+    TL-28497       Prevented interactions with private workspaces and resources from being processed by the recommender system
+    TL-28514       Added 'Course viewed' log record for Totara mobile app
+    TL-28591       'Login as' functionality is now using full site-level switching from course profile if possible
+    TL-28597       Added virtual scroll option for taglist core component
+    TL-28620       Append subject instance creation time to performance activity title in user activity listing to distinguish repeating instances from each other
+    TL-28645       Added workaround for duplicate tag name detection when invalid accent insensitive collation used in MySQL
+
+                   Note that accent and case insensitive collations are not compatible with
+                   tags implementation, please consider upgrading MySQL 5.7 and MariaDB to
+                   MySQL 8.0 and switching to utf8mb4_0900_as_cs collation.
+
+    TL-28702       Improved performance of badge award cron job when using programs criteria when just one of multiple programs is needed to be completed
+    TL-28708       Added Python unit tests for the Recommender engine
+    TL-28724       Modified the user-to-items recommendation process to reduce the weight of items already interacted with
+    TL-28747       Improved weka editor's features
+
+                   Several features have been changed:
+                   1. Weka editor now no longer supports custom extension(s) that can be
+                   introduced as a part of any other plugins
+                   2. Core editor's API is now in charge of defining editor variant. Weka
+                   editor no longer supports custom variants that are introduced by the
+                   plugins. However, the variants for weka that had been introduced by
+                   different plugins prior to this change are now a part of weka and these
+                   should not be used anymore.
+                   3. The file metadata is no longer a part of the weka metadata returned from
+                   GraphQL. However, the file metadata will now be fetched at runtime.
+                   4. APIs deprecation and behaviour of APIs are changed – for more
+                   information please have a look into
+                    * client/
+                     ** component/container_workspace/src/upgrade.txt
+                     ** comoponent/editor_weka/src/upgrade.txt
+                     ** component/engage_article/src/upgrade.txt
+                     ** component/performelement_static_content/src/upgrade.txt
+                     ** component/totara_comment/src/upgrade.txt
+                     ** component/totara_playlist/src/upgrade.txt
+                    * server/
+                     ** lib/editor/weka/upgrade.txt
+                     ** totara/comment/upgrade.txt
+
+    TL-28917       Refactored multi-section toggle to reuse the first section instead of recreating the section in performance activities
+
+                   Previously, when switching from a multi-section to a single-section
+                   performance activity all sections were removed and the single section
+                   recreated. With this patch all elements will be moved to the first section
+                   and only the now-empty sections will be deleted to keep the original
+                   element records.
+
+    TL-28957       Added loading indicator to audience adder add button
+    TL-28984       Added contexturl and HTML-format message to totara_mobile_messages GraphQL query
+    TL-29013       Removed default package name setting for the MS Teams app
+
+                   The MS Teams app package name must be a globally unique value; the old
+                   default value has been removed and cannot be used as a package name.
+
+    TL-29034       Added hook to override which tenant theme settings are customizable
+
+                   Clients can now use the hook \core\hook\tenant_customizable_theme_settings
+                   to define the theme settings that can be customized for tenants.
+
+    TL-29043       Added ARIA live region to Adder component
+
+Bug fixes:
+
+    TL-6314        Added accessible names to smileys in HTML Settings
+    TL-6392        Fixed page titles to meet accessibility standards
+
+                   Fixed titles include
+                   * competencies
+                   * workspace and survey
+                   * Record of Learning
+                   * feedback activities
+                   * forum activities
+                   * quizzes
+                   * catalogue, seminars and assignments
+
+    TL-7251        Mark glossary tables as presentational to fix accessibility
+    TL-7252        Mark wiki comment and map tables as presentational to fix accessibility
+    TL-11279       Added text for the fieldset on the enrolment edit form
+    TL-11322       Improved accessibility of checkboxes for 'View all alerts' page
+    TL-11328       Fixed report builder filter page to add accessible name to inputs
+    TL-12651       Added role attribute to table element for database module
+    TL-23355       Prevented additional system roles from being deleted
+
+                   Added more role ids (managerroleid, learnerroleid, assessorroleid,
+                   performanceactivitycreatornewroleid, creatornewroleid, restorernewroleid)
+                   to the list of roles which cannot be removed if they are assigned under
+                   User Policies, and also introduced a hook to allow plugins to add to the
+                   list.
+
+    TL-25757       Added the ability to restore archived seminar sign-ups
+
+                   When course completions are archived, any completed seminar signups are
+                   also marked as archived, and kept for reporting purposes. Archived seminar
+                   signups cannot be changed or removed from the system.
+
+                   This patch introduces a new capability,
+                   mod/facetoface:managearchivedattendees, which allows a user to 'un-archive'
+                   seminar signups. When a user has this capability they will see a 'Manage
+                   archived users' action in the drop down menu on the 'Attendees' tab, which
+                   will allow them to select archived signups to be restored to a regular
+                   state.
+
+                   When a signup is restored, the attendance is set to 'Not set' and the grade
+                   is set to empty. At that point the signup can be removed, or the
+                   attendance/grade changed as necessary.
+
+    TL-26449       Fixed duplicate IDs in nav menu items
+    TL-26451       Added presentation role to the list item element in sub navigation
+    TL-26542       Made new debounce tui function behat compatible by adding a pending
+    TL-26859       Fixed embed setting for PDF course file resources
+    TL-26999       Fixed content tab single section element count padding
+    TL-27215       Fixed focus order bug on InlineEditing of Playlists on IE11
+    TL-27502       Removed dependency on site theme settings when using custom tenant branding
+    TL-27548       Tui development mode moderated content is now removed from cache when changes occur
+    TL-27558       Fixed incorrect event context name in site logs
+
+                   The event context for containers such as courses, workspaces and
+                   performance activities are now prefixed by the corresponding container
+                   name, rather than 'Course' for all container types.
+
+    TL-27651       Removed 'Enrolled learning' and 'Goals' tabs from tenant audience page
+    TL-27665       Fixed focus issue on buttons when enter key is pressed  
+    TL-28032       Fixed themes inheriting custom settings from parent themes
+    TL-28101       Fixed legacy seminar signup records stuck between 'manager approval required' and 'booked'
+
+                   This patch adds an upgrade step that originally shipped with Totara 9, to
+                   change any remaining seminar signup records with the old 'approved' status
+                   code to 'declined'. All changes are logged.
+
+                   Signups with status code 'approved' were meant to transition immediately to
+                   'booked' but because of bugs or race conditions there may be records which
+                   got stuck at 'approved'. The associated users would not have been notified,
+                   and they would not have been able to complete the activity on the affected
+                   signup. Such a bug was discovered in 2014, and an upgrade step in Totara 9
+                   should have removed any affected records, but the potential for this to
+                   happen exists in Totara 9, 10, and 11.
+
+                   The 'approved' status code (50) was removed in Totara 12; approved seminar
+                   signups transition directly to 'booked' with no intermediate state.
+
+    TL-28127       Fixed incorrect image aspect ratios on 'Recently viewed' dashboard cards
+    TL-28138       Fixed an issue with the enter key incorrectly refreshing the Perform manage activities page while adding a new activity.
+    TL-28297       Fixed notice being thrown during web install due to config cache being created by another request
+    TL-28464       Fixed public access to custom default images for playlists and resources
+
+                   The 'Allow public access to catalog item images' setting allows
+                   administrators to bypass login requirements for catalog images, in case
+                   they need to make preview images available to third-parties such as
+                   Microsoft Teams.
+
+                   Previously there was a bug in this feature that prevented custom default
+                   images for Engage playlists and resources, added via theme settings, from
+                   being available without login. The bug has been fixed, and unit tests were
+                   added to prevent future problems. 
+
+    TL-28582       Added customised alt text for article image
+    TL-28628       Ensured competency achievement paths honour disabled features for Learning Plans
+    TL-28642       Fixed embedded images being lost when editing workspace discussions
+    TL-28648       Fixed bulk user actions not respecting language-specific name order
+    TL-28655       Added badges to user profile on install and upgrade and removed badge preferences link
+    TL-28671       Fixed accessibility for multi-choice component
+    TL-28689       Fixed TUI JSON mediator to return valid JSON data when file is not found instead of "/** File not found */"
+
+                   The TUI mediators, forJSON files that don't exist, used to return "/** File
+                   not found */" but this is not valid JSON syntax. This has been replaced by
+                   a 'null' response instead.
+
+    TL-28762       Fixed seminar facilitator user assignment search limit
+
+                   The selection dialogue for linking a user to a seminar facilitator record
+                   has a display limit of 1000 users; beyond that an admin needs to use the
+                   search feature to select the user they want. However, the search feature
+                   did not remove the 1000-record limit, preventing the selection of most
+                   users in a large site. This has been fixed.
+
+    TL-28766       Fixed missing support for report builder content restriction classes in plugins
+    TL-28777       Fixed logic of delete unconfirmed users task
+
+                   Unconfirmed users task was incorrectly using the firstaccess field to
+                   determine when to delete an unconfirmed user however firstaccess is never
+                   populated until the user first logs in (which requires them to be
+                   confirmed). The task is now correctly using timecreated.
+
+    TL-28779       Fixed image reset icon not displaying in theme settings
+
+                   Fixed bug that caused the trash icon to not display for the program and
+                   certification images in theme settings.
+
+    TL-28785       Added numeric equivalent to 'any' option in assignavailability field for competencies in HR Import
+
+                   All other valid options for for setting 'assignavailability' for a
+                   competency in HR Import have a numeric equivalent to maintain consistency
+                   – '3' has been added as the equivalent to 'any'.
+
+    TL-28807       Replaced Engage Warning Modal component with core Confirmation Modal
+    TL-28808       Fixed SQL in the 'In Progress' column of the Course Completions by Organisation Report Builder report
+    TL-28829       Fixed invalid configuration defaults in Current learning block
+    TL-28838       Removed unused recommender export classes
+    TL-28844       Removed incompatible name 'is empty' filter from seminar room, asset, and facilitator reports
+    TL-28853       Stopped event being fired twice when creating records in database activity
+    TL-28854       Use supplied ariaLabelExtension in ImageUploadSetting component
+    TL-28856       Fixed embedding external images in articles and playlists 
+    TL-28862       Fixed various validation issues in the multichoice-multiselect element in performance activities
+    TL-28864       Fixed microlearning resources not appearing in the 'Recommended For You' block
+    TL-28865       Fixed bug where recommenders engine crashed after moving users between tenants
+    TL-28879       Fixed display of playlist shares on the 'Settings' page when adding a resource to a playlist
+    TL-28918       Fixed error when moving a topic item to the last item in a course topic
+    TL-28929       Added upgrade step removing obsolete static content element files for deleted performance activities
+    TL-28934       Fixed PHP undefined variable notice in the webservices documentation
+    TL-28935       Fixed target="_blank" being removed by XSS cleaning in the Atto editor
+    TL-28936       Removed the hardcoded 60 megabytes upload file size limit in the Weka editor 
+
+                   Weka editor now falls back to the maximum bytes setting from the system
+                   rather than using the hardcoded 60MB.
+
+    TL-28941       Fixed warning about including additional name in user repository
+    TL-28951       Added support to remove the interactions of the users who are not found in tenant user data
+    TL-28961       Learner role now marked as compatible with role assignments in programs
+    TL-28964       Fixed error when accessing courses in program or certification through current learning block
+    TL-28981       Fixed Record of Learning for course to only display course records
+
+                   Without the patch, the record of learning report was displaying the
+                   non-learning course records on the report. This patch fixes the issue and
+                   now only displays course records.
+
+    TL-28982       Converted the hashtag match to a hashtag node in weka editor when export to json document
+    TL-28985       Fixed string debugging parameters not working with Vue
+
+                   When the debugstringids functionality is enabled, lang strings in Vue
+                   components will now show their key and component.
+
+    TL-28996       Fixed "out of memory" issue caused by visibility issue in the Main Menu
+
+                   Some Main menu custom visibility configurations are incompatible with
+                   changes introduced in Totara 13. If a site with these incompatible
+                   configurations is upgraded to Totara 13 it will get into a state where the
+                   site cannot be accessed. This upgrade fix corrects the incompatible
+                   configuration preventing the site from becoming unusable.
+
+    TL-29005       Fixed incorrect unique parameters in DML drivers
+    TL-29017       Fixed custom CSS rendering for the Venture theme in IE11
+    TL-29026       Fixed GraphQL error in the competency profile when an assigned competency's scale had a non-integer numeric scale value
+    TL-29041       Fixed incorrect strings for performance activity visibility conditions
+    TL-29061       Email obfuscation was fixed to be compatible with special characters in emails
+    TL-29066       Fixed display of escaped characters in section title on performance activity content elements edit page
+
+Tui front end framework:
+
+    TL-26518       The TUI framework is now loaded on every page
+
+                   Prior to this change Tui was only ever loaded when needed. This however
+                   meant that components depending on attribute auto-initialisation held a
+                   dependency on at least one other Tui component existing on the page.
+                   The Tui framework is now loaded on all pages, ensuring that attribute
+                   auto-initialisation is always available.
+
+Contributions:
+
+    * Alex Morris at Catalyst - TL-28101
+
+
 Release 13.2 (27th November 2020):
 ==================================
 
