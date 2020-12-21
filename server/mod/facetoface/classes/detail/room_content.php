@@ -94,11 +94,11 @@ class room_content extends content_generator {
      * @return string[]
      */
     private function get_virtual_room_info(?seminar_session $session, room $room): array {
-        if (!$session) {
-            return [];
-        }
         if (!builder::table('facetoface_room_virtualmeeting')->where('roomid', $room->get_id())->exists()) {
             return ['url' => $room->get_url()];
+        }
+        if (!$session) {
+            return [];
         }
         $entity = virtual_meeting_entity::repository()
             ->as('vm')
