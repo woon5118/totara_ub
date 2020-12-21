@@ -201,6 +201,7 @@ export default {
 
 <style lang="scss">
 .tui-engageStarRating {
+  position: relative;
   display: flex;
 
   &--rtl {
