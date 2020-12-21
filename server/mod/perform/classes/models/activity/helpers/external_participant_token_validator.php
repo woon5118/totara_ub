@@ -130,12 +130,13 @@ class external_participant_token_validator {
     public static function find_token_in_session(): ?string {
         global $SESSION;
 
-        if (empty($SESSION->wantsurl)) {
+        $referer = $SESSION->wantsurl ?? $_SERVER['HTTP_REFERER'] ?? null;
+        if (empty($referer)) {
             return null;
         }
 
         $matches = [];
-        $found = preg_match("/token=([a-f0-9]{64})/", $SESSION->wantsurl, $matches);
+        $found = preg_match("/token=([a-f0-9]{64})/", $referer, $matches);
         if ($found > 0 && !empty($matches[1])) {
             return $matches[1];
         }
