@@ -80,6 +80,7 @@ Feature: I can create and use performance activities with any and every custom e
 
     When I click on "One of every element" "link"
     And I click on "Save as draft" "button"
-    And I click on "Submit" "button"
+    Then I should see "Draft saved" in the tui success notification toast and close it
+    When I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Section submitted" in the tui success notification toast
