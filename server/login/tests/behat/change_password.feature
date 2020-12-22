@@ -9,6 +9,7 @@ Feature: Change password
       | username | firstname | lastname | email |
       | testuser | Test | User | moodle@example.com |
 
+  @javascript
   Scenario: A user can change his password manually
     Given I am on site homepage
     And I log in as "testuser"
@@ -25,7 +26,7 @@ Feature: Change password
     And I set the field "Username" to "testuser"
     And I set the field "Password" to "NewPassword1*"
     And I press "Log in"
-    Then I should see "You are logged in as Test User" in the "page-footer" "region"
+    Then I should see "Test User"
 
   Scenario: A user with expired password must change it when log in directly and then be redirected to the home page
     Given I force a password change for user "testuser"

@@ -66,8 +66,8 @@ Feature: Theme settings basic validations for tenants
     And I should not see "Engage" in the ".tui-collapsible__header" "css_element"
 
     When I click on "Custom" "link" in the ".tui-tabs__tabs" "css_element"
-    Then I should see "Custom footer" in the ".tui-tabContent:nth-of-type(3)" "css_element"
-    And I should not see "Custom CSS" in the ".tui-tabContent:nth-of-type(3)" "css_element"
+    Then I should see "Custom footer" in the ".tui-tabContent:nth-of-type(4)" "css_element"
+    And I should not see "Custom CSS" in the ".tui-tabContent:nth-of-type(4)" "css_element"
 
   Scenario: Edit tenant settings
     When I click on "Edit settings for First Tenant" "link"

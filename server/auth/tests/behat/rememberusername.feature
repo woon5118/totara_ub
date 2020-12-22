@@ -13,7 +13,7 @@ Feature: Test the 'remember username' feature works.
   Scenario: Check that 'remember username' works without javascript for teachers.
     # Log in the first time and check the 'remember username' box.
     Given I am on homepage
-    And I click on "Log in" "link" in the ".logininfo" "css_element"
+    And I click on "Log in" "link" in the ".login" "css_element"
     And I set the field "Username" to "teacher1"
     And I set the field "Password" to "teacher1"
     And I set the field "Remember username" to "1"
@@ -21,7 +21,7 @@ Feature: Test the 'remember username' feature works.
     And I log out
     # Log out and check that the username was remembered.
     When I am on homepage
-    And I click on "Log in" "link" in the ".logininfo" "css_element"
+    And I click on "Log in" "link" in the ".login" "css_element"
     Then the field "username" matches value "teacher1"
     And the field "Remember username" matches value "1"
 
@@ -30,7 +30,7 @@ Feature: Test the 'remember username' feature works.
   Scenario: Check that 'remember username' unsetting works without javascript for teachers.
     # Log in the first time and check the 'remember username' box.
     Given I am on homepage
-    And I click on "Log in" "link" in the ".logininfo" "css_element"
+    And I click on "Log in" "link" in the ".login" "css_element"
     And I set the field "Username" to "teacher1"
     And I set the field "Password" to "teacher1"
     And I set the field "Remember username" to "1"
@@ -38,13 +38,13 @@ Feature: Test the 'remember username' feature works.
     And I log out
     # Log in again, unsetting the 'remember username' field.
     When I am on homepage
-    And I click on "Log in" "link" in the ".logininfo" "css_element"
+    And I click on "Log in" "link" in the ".login" "css_element"
     And I set the field "Password" to "teacher1"
     And I set the field "Remember username" to "0"
     And I press "Log in"
     And I log out
     # Check username has been forgotten.
     Then I am on homepage
-    And I click on "Log in" "link" in the ".logininfo" "css_element"
+    And I click on "Log in" "link" in the ".login" "css_element"
     Then the field "username" matches value ""
     And the field "Remember username" matches value "0"

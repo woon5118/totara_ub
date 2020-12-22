@@ -823,7 +823,7 @@ class core_renderer extends renderer_base {
 
         if (isset($SESSION->justloggedin) && !empty($CFG->displayloginfailures)) {
             require_once($CFG->dirroot . '/user/lib.php');
-            // Set second parameter to false as we do not want reset the counter, the same message appears on footer.
+            // Set second parameter to false as we do not want reset the counter.
             if ($count = user_count_login_failures($USER, false)) {
                 $this->page->add_body_class('loginfailures');
             }
@@ -923,7 +923,7 @@ class core_renderer extends renderer_base {
      * @return string HTML code
      */
     protected function render_page_layout($layoutfile) {
-        global $CFG, $SITE, $USER;
+        global $CFG, $SITE, $USER, $SESSION;
         // The next lines are a bit tricky. The point is, here we are in a method
         // of a renderer class, and this object may, or may not, be the same as
         // the global $OUTPUT object. When rendering the page layout file, we want to use

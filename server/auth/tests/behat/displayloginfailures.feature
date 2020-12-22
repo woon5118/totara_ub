@@ -15,7 +15,7 @@ Feature: Test the 'showlogfailures' feature works.
   Scenario: Check that 'displayloginfailures' works without javascript for teachers.
     # Simulate a log in failure for the teacher.
     Given I am on homepage
-    And I click on "Log in" "link" in the ".logininfo" "css_element"
+    And I click on "Log in" "link" in the ".login" "css_element"
     And I set the field "Username" to "teacher1"
     And I set the field "Password" to "wrongpass"
     And I press "Log in"
@@ -26,17 +26,15 @@ Feature: Test the 'showlogfailures' feature works.
     And I press "Log in"
     # Confirm the notices are displayed.
     Then I should see "1 failed logins since your last login" in the ".usermenu" "css_element"
-    And I should see "1 failed logins since your last login" in the "page-footer" "region"
     # Confirm the notices disappear when navigating to another page.
     And I am on homepage
     And I should not see "1 failed logins since your last login" in the ".usermenu" "css_element"
-    And I should not see "1 failed logins since your last login" in the "page-footer" "region"
 
   # Given the user has at least one failed login attempt, when they login, then they should see both header and footer notices.
   Scenario: Check that 'displayloginfailures' works without javascript for admins.
     # Simulate a log in failure for the teacher.
     Given I am on homepage
-    And I click on "Log in" "link" in the ".logininfo" "css_element"
+    And I click on "Log in" "link" in the ".login" "css_element"
     And I set the field "Username" to "admin"
     And I set the field "Password" to "wrongpass"
     And I press "Log in"
@@ -47,9 +45,8 @@ Feature: Test the 'showlogfailures' feature works.
     And I press "Log in"
     # Confirm the notices are displayed.
     Then I should see "1 failed logins since your last login" in the ".usermenu" "css_element"
-    And I should see "1 failed logins since your last login (Logs)" in the "page-footer" "region"
     # Confirm that the link works and that the notices disappear when navigating to another page.
-    And I click on "Logs" "link" in the "page-footer" "region"
-    And I should see "User login failed" in the "table.reportlog" "css_element"
-    And I should not see "1 failed logins since your last login" in the ".usermenu" "css_element"
-    And I should not see "1 failed logins since your last login (Logs)" in the "page-footer" "region"
+    When I navigate to "Server > Logs" in site administration
+    Then I should not see "1 failed logins since your last login" in the ".usermenu" "css_element"
+    When I click on "Get these logs" "button"
+    Then I should see "User login failed" in the "table.reportlog" "css_element"

@@ -55,3 +55,11 @@ Feature: Theme settings basic validations
     And I click on "Save Custom Settings" "button"
     And I reload the page
     Then I should see "Behat Test 123" in the "#behat_test_123" "css_element"
+
+  # XSS test - which it should strip out the bad <script> tag content.
+  Scenario: Custom HTML with XSS protection in the footer.
+    When I click on "Custom" "link"
+    And I set the field "Custom footer" to "<div id='bomba_test_this'>Makag latatag, normalin</div><script id='42_meaning_of_every_thing'>alert('hi there');</script>"
+    And I click on "Save Custom Settings" "button"
+    And I reload the page
+    Then I should see "Makag latatag, normalin" in the "#bomba_test_this" "css_element"

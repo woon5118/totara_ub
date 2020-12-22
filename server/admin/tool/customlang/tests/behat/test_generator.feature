@@ -9,6 +9,6 @@ Feature: Test tool_customlang generator
       | core        | loggedinnot | ya ain't logged in |
       | totara_core | totaralearn | t0T4r\100\x2013aRN |
     And I reload the page
-    Then I should see "ya ain't logged in" in the ".logininfo" "css_element"
-    And I should see "takiuru" in the ".logininfo" "css_element"
+    Then I should see "ya ain't logged in" in the ".login" "css_element"
+    And I should see "takiuru" in the ".login" "css_element"
     And I should see "t0T4r@ 13aRN" in the ".page-footer-poweredby" "css_element"
