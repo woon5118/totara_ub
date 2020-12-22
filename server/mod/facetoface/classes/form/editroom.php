@@ -119,15 +119,8 @@ class editroom extends \moodleform {
                     $conditions_no_auth[] = $pluginname;
                 }
             }
-            if ($virtual_meeting->get_plugin()) {
-                $default = $virtual_meeting->get_plugin();
-            } else if (!empty($room->get_url())) {
-                $default = room_virtualmeeting::VIRTUAL_MEETING_INTERNAL;
-            } else {
-                $default = room_virtualmeeting::VIRTUAL_MEETING_NONE;
-            }
             $mform->addElement('select', 'plugin', get_string('virtual_meeting_add', 'mod_facetoface'), $meeting_options);
-            $mform->setDefault('plugin', $default);
+            $mform->setDefault('plugin', room_virtualmeeting::VIRTUAL_MEETING_NONE);
             $mform->setType('plugin', PARAM_TEXT);
 
             // Virtual room link.
@@ -197,6 +190,15 @@ class editroom extends \moodleform {
             }
             $this->add_action_buttons(true, $label);
         }
+        // Get current plugin value.
+        if ($virtual_meeting->get_plugin()) {
+            $plugin = $virtual_meeting->get_plugin();
+        } else if (!empty($room->get_url())) {
+            $plugin = room_virtualmeeting::VIRTUAL_MEETING_INTERNAL;
+        } else {
+            $plugin = room_virtualmeeting::VIRTUAL_MEETING_NONE;
+        }
+
         // Set default/existing data.
         $formdata = (object)[
             'id' => $room->get_id(),
@@ -204,7 +206,7 @@ class editroom extends \moodleform {
             'roomcapacity' => $room->get_capacity(),
             'allowconflicts' => $room->get_allowconflicts(),
             'url' => $room->get_url(),
-            'plugin' => $virtual_meeting->get_plugin(),
+            'plugin' => $plugin,
             'description_editor' => ['text' => $room->get_description()],
             'notcustom' => $room->get_custom() ? 0 : 1,
             'description' => $room->get_description(),
