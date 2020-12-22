@@ -38,6 +38,7 @@
 <script>
 import tui from 'tui/tui';
 import { throttle } from 'tui/util';
+import pending from 'tui/pending';
 import Editor from '../js/Editor';
 import Toolbar from 'editor_weka/components/toolbar/Toolbar';
 import { loadLangStrings } from 'tui/i18n';
@@ -302,6 +303,8 @@ export default {
         return;
       }
 
+      let pendingDone = pending('weka');
+
       const extensions = await this.getExtensions();
 
       let fileStorage = new FileStorage({
@@ -343,6 +346,8 @@ export default {
       this.view = this.editor.createView(this.$refs.editorHost);
 
       this.updateToolbar();
+
+      pendingDone();
 
       // Event emitted to make the parent component knowing that this editor has been mounted properly.
       this.$emit('ready');
