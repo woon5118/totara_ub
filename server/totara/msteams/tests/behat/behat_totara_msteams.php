@@ -106,7 +106,7 @@ class behat_totara_msteams extends behat_base {
      */
     public function i_log_out_microsoft_teams() {
         // Nothing we can do other than logging out of the current session.
-        $this->getSession()->visit($this->locate_path('login'));
+        $this->getSession()->visit($this->locate_path('login/index.php'));
         $this->wait_for_pending_js();
         $this->execute('behat_general::i_click_on', ['Log out', 'button']);
     }
