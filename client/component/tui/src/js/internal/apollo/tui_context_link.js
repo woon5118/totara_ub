@@ -45,11 +45,25 @@ export function createTuiContextLink() {
         includeQuery: false,
       },
     });
-
     // track pending request
     const done = pending('apollo-request');
     return forward(operation).map(data => {
       done();
+
+      if (data.extensions && data.extensions.performance_data) {
+        const { db, realtime, memory } = data.extensions.performance_data.core;
+        window.dispatchEvent(
+          new CustomEvent('graphql-event', {
+            detail: {
+              operationName: operation.operationName,
+              db: db,
+              realtime: realtime,
+              ram: memory.total,
+              ramPeak: memory.peak,
+            },
+          })
+        );
+      }
       return data;
     });
   });

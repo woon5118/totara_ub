@@ -9798,6 +9798,10 @@ function get_performance_info() {
     }
 
     $info['html'] = '<div class="performanceinfo siteinfo container-fluid">'.$info['html'].'</div>';
+
+    // Totara: render graphql performance data in footer
+    $tui = new \totara_tui\output\component('tui/components/dev/performance/Performance');
+    $info['html'] = $info['html'] . $tui->out_html();
     return $info;
 }
 
