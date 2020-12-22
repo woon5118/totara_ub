@@ -132,7 +132,7 @@ class long_text extends respondable_element_plugin implements element_response_h
         require_once($CFG->dirroot . '/lib/formslib.php');
 
         $data = json_decode($element_response->response_data, true);
-        $draft_id = $data['draft_id'];
+        $draft_id = $data['draft_id'] ?? null;
 
         $weka_content = null;
         $response =  null;
@@ -141,7 +141,7 @@ class long_text extends respondable_element_plugin implements element_response_h
             $weka_content = $response;
 
             // Only works for logged-in users but not for external participants
-            if ($USER->id > 0) {
+            if ($USER->id > 0 && !empty($draft_id)) {
                 $weka_content = file_rewrite_pluginfile_urls(
                     $response,
                     'draftfile.php',
