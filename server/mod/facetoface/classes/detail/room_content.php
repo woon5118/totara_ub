@@ -105,6 +105,7 @@ class room_content extends content_generator {
             ->join(['facetoface_room_dates_virtualmeeting', 'frdvm'], 'frdvm.virtualmeetingid', 'vm.id')
             ->join(['facetoface_room_dates', 'frd'], 'frdvm.roomdateid', 'frd.id')
             ->where('frd.roomid', $room->get_id())
+            ->where('frd.sessionsdateid', $session->get_id())
             ->one();
         if (!$entity) {
             // probably waiting for adhoc task or has failed to create a virtual meeting
