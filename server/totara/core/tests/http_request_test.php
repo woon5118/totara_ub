@@ -46,13 +46,31 @@ class totara_core_http_request_testcase extends advanced_testcase {
     }
 
     public function test_method() {
+        // GET
         $this->request->set_method(method::GET);
         $result = $this->request->get_method();
         $this->assertEquals(method::GET, $result);
+        // POST
         $this->request->set_method('post');
         $result = $this->request->get_method();
         $this->assertEquals(method::POST, $result);
-        // only GET and POST are defined at the moment.
+        // HEAD
+        $this->request->set_method('Head');
+        $result = $this->request->get_method();
+        $this->assertEquals(method::HEAD, $result);
+        // PUT
+        $this->request->set_method('pUT');
+        $result = $this->request->get_method();
+        $this->assertEquals(method::PUT, $result);
+        // PATCH
+        $this->request->set_method('PatCH');
+        $result = $this->request->get_method();
+        $this->assertEquals(method::PATCH, $result);
+        // DELETE
+        $this->request->set_method('DELETE');
+        $result = $this->request->get_method();
+        $this->assertEquals(method::DELETE, $result);
+        // Undefined
         try {
             $this->request->set_method('panepane');
             $this->fail('coding_exception expected');

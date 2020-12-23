@@ -108,17 +108,15 @@ class curl_client implements client {
             case method::POST:
                 $ret = $this->curl->post($url, $postdata);
                 break;
-            // FIXME: TL-28914 support the PUT method
-            // case method::PUT:
-            //     $ret = $this->curl->put($url, ['file' => $file]);
-            //     break;
-            case method::DELETE:
-                $ret = $this->curl->delete($url);
+            case method::PUT:
+                $ret = $this->curl->put_data($url, $postdata);
                 break;
-            // FIXME: TL-28914 support the PATCH method
-            // case method::PATCH:
-            //     $ret = $this->curl->patch($url, $postdata);
-            //     break;
+            case method::DELETE:
+                $ret = $this->curl->delete($url, [], ['CURLOPT_USERPWD' => '']);
+                break;
+            case method::PATCH:
+                $ret = $this->curl->patch($url, $postdata);
+                break;
             default:
                 throw new coding_exception("Unsupported method: '{$request->get_method()}'");
         }

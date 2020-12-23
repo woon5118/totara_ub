@@ -3821,7 +3821,7 @@ class curl {
      * HTTP PUT method
      *
      * @param string $url
-     * @param array $params
+     * @param array $params set $params['file'] to the file path of post data
      * @param array $options
      * @return bool
      */
@@ -3841,6 +3841,36 @@ class curl {
         $ret = $this->request($url, $options);
         fclose($fp);
         return $ret;
+    }
+
+    /**
+     * HTTP PUT method
+     *
+     * @param string $url
+     * @param string $params post data
+     * @param array $options
+     * @return bool
+     * @since Totara 13.4
+     */
+    public function put_data($url, $params = '', $options = array()) {
+        $options['CURLOPT_CUSTOMREQUEST'] = 'PUT';
+        $options['CURLOPT_POSTFIELDS'] = $params;
+        return $this->request($url, $options);
+    }
+
+    /**
+     * HTTP PATCH method
+     *
+     * @param strng $url
+     * @param string $params
+     * @param array $options
+     * @return bool
+     * @since Totara 13.4
+     */
+    public function patch($url, $params = '', $options = array()) {
+        $options['CURLOPT_CUSTOMREQUEST'] = 'PATCH';
+        $options['CURLOPT_POSTFIELDS'] = $params;
+        return $this->request($url, $options);
     }
 
     /**
