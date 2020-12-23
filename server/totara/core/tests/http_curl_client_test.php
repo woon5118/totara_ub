@@ -34,6 +34,12 @@ class totara_core_http_curl_client_testcase extends advanced_testcase {
 
     public function tearDown(): void {
         $this->client = null;
+        // TODO: TL-28914 will provide a real solution
+        global $CFG;
+        require_once($CFG->dirroot.'/lib/filelib.php');
+        $prop = new ReflectionProperty(curl::class, 'mockresponses');
+        $prop->setAccessible(true);
+        $prop->setValue(null, []);
     }
 
     public function test_execute() {
