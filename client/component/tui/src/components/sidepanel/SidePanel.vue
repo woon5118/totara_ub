@@ -49,7 +49,8 @@
 
     <ButtonIcon
       v-if="showButtonControl"
-      :disabled="opening || closing"
+      :disabled="buttonDisabled"
+      :aria-disabled="buttonDisabled"
       :aria-label="$str('sidepanel', 'totara_core')"
       :aria-expanded="isOpen ? 'true' : 'false'"
       class="tui-sidePanel__outsideClose"
@@ -198,6 +199,10 @@ export default {
   computed: {
     shouldBeOpen() {
       return this.initiallyOpen;
+    },
+
+    buttonDisabled() {
+      return this.opening || this.closing;
     },
   },
 

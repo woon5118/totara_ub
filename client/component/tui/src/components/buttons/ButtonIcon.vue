@@ -23,6 +23,7 @@
     :aria-expanded="ariaExpanded"
     :aria-haspopup="ariaHaspopup"
     :aria-label="ariaLabel"
+    :aria-disabled="ariaDisabled"
     :class="{
       'tui-formBtn--alert': styleclass.alert,
       'tui-iconBtn--prim': styleclass.primary,
@@ -84,6 +85,7 @@ export default {
       type: [Boolean, String],
       default: false,
     },
+    ariaDisabled: Boolean,
     ariaHaspopup: [Boolean, String],
     ariaLabel: {
       type: [Boolean, String],
