@@ -67,7 +67,7 @@ Feature: User sees a seminar virtual room meeting
       | Add virtual room link | PoC User   |
     And I click on "Connect" "button" in the "[aria-describedby='editcustomroom1-dialog']" "css_element"
     And I wait "1" seconds
-    And I switch to "totara_virtualmeeting_poc_login" window
+    And I switch to "virtualmeeting_connect" window
     And I set the following fields to these values:
       | Username | creator |
       | Password | creator |
@@ -135,3 +135,95 @@ Feature: User sees a seminar virtual room meeting
     And I click on "Window close" "button_exact"
     And I switch to the main window
     And I press the "back" button in the browser
+
+  Scenario: mod_facetoface_virtualmeeting_004: Test using the same virtualmeeting room in two events
+    Given I log in as "trainer1"
+    When I am on "Virtual gathering" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Pacific/Auckland"
+    And I click on the link "Select rooms" in row 1
+    And I click on "Create" "link_exact" in the "[aria-describedby='selectrooms0-dialog']" "css_element"
+    And I set the following fields to these values:
+      | Name                  | Party night |
+      | Capacity              | 64          |
+      | Add virtual room link | PoC App     |
+    And I click on "OK" "button_exact" in the "[aria-describedby='editcustomroom0-dialog']" "css_element"
+    And I press "Save changes"
+    And I click on the seminar event action "Edit event" in row "Australia/Perth"
+    And I click on the link "Select rooms" in row 1
+    And I click on "Party night (Capacity: 64)" "link"
+    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
+    And I press "Save changes"
+    And I click on the seminar event action "Event details" in row "Australia/Perth"
+    And I follow "Party night"
+    Then I should see "Virtual room is unavailable"
+    And I run all adhoc tasks
+    And I reload the page
+    Then I should see "Join as attendee"
+    And I click on "Go back" "button"
+    And I click on "View all events" "button"
+    And I click on the seminar event action "Event details" in row "Pacific/Auckland"
+    And I follow "Party night"
+    Then I should see "Join as attendee"
+
+  Scenario: mod_facetoface_virtualmeeting_005: One user may not edit session with another user's virtualmeeting room
+    Given I log in as "trainer1"
+    When I am on "Virtual gathering" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Pacific/Auckland"
+    And I click on the link "Select rooms" in row 1
+    And I click on "Create" "link_exact" in the "[aria-describedby='selectrooms0-dialog']" "css_element"
+    And I set the following fields to these values:
+      | Name                  | Party night |
+      | Capacity              | 64          |
+      | Add virtual room link | PoC User    |
+    And I click on "Connect" "button"
+    And I switch to "virtualmeeting_connect" window
+    And I set the following fields to these values:
+      | Username | creator |
+      | Password | creator |
+    And I click on "Log in" "button"
+    And I switch to the main window
+    Then I should see "Connected as" in the "Create new room" "totaradialogue"
+    And I click on "OK" "button_exact" in the "[aria-describedby='editcustomroom0-dialog']" "css_element"
+    And I press "Save changes"
+    And I click on the seminar event action "Edit event" in row "Pacific/Auckland"
+    And I should see "Edit custom room Party night in session"
+    And I log out
+    When I log in as "trainer2"
+    And I am on "Virtual gathering" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Pacific/Auckland"
+    Then I should not see "Edit custom room Party night in session"
+    And I should see "Remove room Party night from session"
+    And I click on "Remove room Party night from session" "link"
+    Then I should not see "Party night"
+    And I press "Save changes"
+    Then I should see "Upcoming events"
+    And I should not see "Party night"
+
+  Scenario: mod_facetoface_virtualmeeting_006: Enable and disable virtualmeeting plugins
+    Given I log in as "admin"
+    And I navigate to "PoC User" node in "Site administration > Plugins > Virtual meetings"
+    And I set the following fields to these values:
+      | Enabled | 0 |
+    And I press "Save changes"
+    Then I should see "Changes saved"
+    When I am on "Virtual gathering" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Pacific/Auckland"
+    And I click on the link "Select rooms" in row 1
+    And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
+    And I should not see "PoC User" in the "Add virtual room link" "field"
+    And I should see "PoC App" in the "Add virtual room link" "field"
+    And I click on "Cancel" "button" in the "Create new room" "totaradialogue"
+    Then I navigate to "PoC User" node in "Site administration > Plugins > Virtual meetings"
+    And I set the following fields to these values:
+      | Enabled | 1 |
+    And I press "Save changes"
+    And I follow "PoC App"
+    And I set the following fields to these values:
+      | Enabled | 0 |
+    And I press "Save changes"
+    When I am on "Virtual gathering" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Pacific/Auckland"
+    And I click on the link "Select rooms" in row 1
+    And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
+    And I should see "PoC User" in the "Add virtual room link" "field"
+    And I should not see "PoC App" in the "Add virtual room link" "field"

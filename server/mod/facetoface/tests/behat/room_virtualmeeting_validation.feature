@@ -59,7 +59,7 @@ Feature: Validation in a seminar virtual room meeting
 
     And I click on "Connect" "button" in the "Edit room" "totaradialogue"
     And I wait "1" seconds
-    And I switch to "totara_virtualmeeting_poc_login" window
+    And I switch to "virtualmeeting_connect" window
     And I set the following fields to these values:
       | Username | creator |
       | Password | creator |

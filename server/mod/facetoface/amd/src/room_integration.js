@@ -128,7 +128,7 @@ define(['core/str'], function(str) {
 
         if (endpoint) {
             if (!popup || popup.closed) {
-                popup = window.open(endpoint.value, '_blank', 'width=400,height=500,opener');
+                popup = window.open(endpoint.value, 'virtualmeeting_connect', 'width=400,height=500,opener');
             } else {
                 popup.focus();
             }
