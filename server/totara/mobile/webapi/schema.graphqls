@@ -431,6 +431,14 @@ extend type Mutation {
   totara_mobile_mark_messages_read(
     input: message_popup_mark_messages_read_input
   ): message_popup_mark_messages_read_result!
+
+  """
+  Mark an activity as view
+  """
+  totara_mobile_completion_activity_view(
+    cmid: core_id!
+    activity: String!
+  ): Boolean!
 }
 
 """

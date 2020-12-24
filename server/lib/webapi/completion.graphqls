@@ -11,4 +11,9 @@ extend type Mutation {
     cmid: core_id!
     complete: Boolean!
   ): Boolean!
+
+  """
+  Mark an activity as view
+  """
+  core_completion_activity_view(cmid: core_id!, activity: String!): Boolean!
 }
