@@ -175,15 +175,6 @@ class totara_core_virtual_meeting_testcase extends advanced_testcase {
     }
 
     /**
-     * @covers ::create_with_user_timezone
-     */
-    public function test_create_with_user_timezone(): void {
-        $user = $this->create_user(['timezone' => 'Indian/Christmas']);
-        $this->markTestIncomplete('TODO: TL-29074 Add test for virtual_meeting::create_with_user_timezone');
-        $model = virtual_meeting::create_with_user_timezone('poc', $user, 'test meeting', 1606780800, 1606867200, '99');
-    }
-
-    /**
      * @covers ::get_join_url
      * @covers ::provider_getter_wrapper
      */
@@ -192,10 +183,10 @@ class totara_core_virtual_meeting_testcase extends advanced_testcase {
         $user = $this->create_user(['username' => 'bob']);
         $model = virtual_meeting::create('poc_app', $user, 'test meeting', new DateTime('+1 hour'), new DateTime('+2 hour'));
         $url = $model->get_join_url();
-        $this->assertStringStartsWith($CFG->wwwroot.'/lib/classes/virtualmeeting/poc/meet.php', $url);
+        $this->assertStringStartsWith($CFG->wwwroot.'/totara/core/classes/virtualmeeting/poc/meet.php', $url);
         $model->update('test update meeting', new DateTime('+3 hour'), new DateTime('+4 hour'));
         $url = $model->get_join_url();
-        $this->assertStringStartsWith($CFG->wwwroot.'/lib/classes/virtualmeeting/poc/meet.php', $url);
+        $this->assertStringStartsWith($CFG->wwwroot.'/totara/core/classes/virtualmeeting/poc/meet.php', $url);
         $model->delete();
         $this->assertSame('', $model->get_join_url(false));
         try {
@@ -214,10 +205,10 @@ class totara_core_virtual_meeting_testcase extends advanced_testcase {
         $user = $this->create_user(['username' => 'bob']);
         $model = virtual_meeting::create('poc_app', $user, 'test meeting', new DateTime('+1 hour'), new DateTime('+2 hour'));
         $url = $model->get_host_url();
-        $this->assertStringStartsWith($CFG->wwwroot.'/lib/classes/virtualmeeting/poc/meet.php', $url);
+        $this->assertStringStartsWith($CFG->wwwroot.'/totara/core/classes/virtualmeeting/poc/meet.php', $url);
         $model->update('test update meeting', new DateTime('+3 hour'), new DateTime('+4 hour'));
         $url = $model->get_host_url();
-        $this->assertStringStartsWith($CFG->wwwroot.'/lib/classes/virtualmeeting/poc/meet.php', $url);
+        $this->assertStringStartsWith($CFG->wwwroot.'/totara/core/classes/virtualmeeting/poc/meet.php', $url);
         $model->delete();
         $this->assertSame('', $model->get_host_url(false));
         try {
@@ -303,7 +294,7 @@ class totara_core_virtual_meeting_testcase extends advanced_testcase {
             ],
             'poc_user' => [
                 'name' => 'PoC User',
-                'auth_endpoint' => $CFG->wwwroot.'/lib/classes/virtualmeeting/poc/index.php?redirect_uri='.rawurlencode($CFG->wwwroot.'/integrations/virtualmeeting/auth_callback.php/poc_user'),
+                'auth_endpoint' => $CFG->wwwroot.'/totara/core/classes/virtualmeeting/poc/index.php?redirect_uri='.rawurlencode($CFG->wwwroot.'/integrations/virtualmeeting/auth_callback.php/poc_user'),
             ]
         ];
         $this->assertEqualsCanonicalizing($expected, $actual);

@@ -1,6 +1,12 @@
 List of upgrade and API changes in Totara core,
 information provided here is intended especially for developers.
 
+=== 13.4 ===
+
+* totara_core\virtualmeeting\dto\meeting_edit_dto::create_with_user_timezone(), an internal function previously marked as 'do not use', has been removed
+* totara_core\virtualmeeting\virtual_meeting::create_with_user_timezone(), previously marked as 'do not use', has been removed
+  please use totara_core\virtualmeeting\virtual_meeting::create() instead
+
 === 13.2 ===
 
 * Added a new method _update_with_data() to totara_dialog.js for sending post requests with body data

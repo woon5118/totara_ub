@@ -30,8 +30,6 @@ use core\orm\entity\model;
 use core\orm\query\builder;
 use core\orm\query\exceptions\record_not_found_exception;
 use core\plugininfo\virtualmeeting as virtualmeeting_plugininfo;
-use core_date;
-use core_user;
 use DateTime;
 use stdClass;
 use Throwable;
@@ -164,33 +162,6 @@ final class virtual_meeting extends model {
         $self = self::load_by_entity($entity, $client);
         $self->plugininfo = $plugin;
         return $self;
-    }
-
-    /**
-     * Create an instance with the current user and their time zone.
-     *
-     * @param virtualmeeting_plugininfo|string $plugin
-     * @param user_entity|stdClass|integer $user
-     * @param string $name meeting name or summary
-     * @param integer $timestart meeting start time
-     * @param integer $timefinish meeting end time
-     * @param mixed $timezone
-     * @return self
-     * @todo Do not use this function until TL-29074 lands
-     */
-    public static function create_with_user_timezone($plugin, $user, string $name, int $timestart, int $timefinish, $timezone): self {
-        if ($timezone === null || $timezone == 99) {
-            if (is_int($user)) {
-                $usertz = core_user::get_user($user, 'timezone');
-            }
-            if (isset($usertz->timezone)) {
-                $timezone = $usertz->timezone;
-            } else {
-                $timezone = core_date::get_server_timezone_object();
-            }
-        }
-        $tz = core_date::get_user_timezone_object($timezone);
-        return self::create($plugin, $user, $name, new DateTime('@'.$timestart, $tz), new DateTime('@'.$timefinish, $tz));
     }
 
     /**

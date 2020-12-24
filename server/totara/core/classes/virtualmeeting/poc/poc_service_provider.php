@@ -53,17 +53,19 @@ class poc_service_provider implements provider {
      *
      * @param meeting_edit_dto $meeting
      * @param string  $username
+     * @param integer $age
      * @param boolean $host
      * @return string
      */
-    private static function make_url(meeting_edit_dto $meeting, string $username, bool $host): string {
+    private static function make_url(meeting_edit_dto $meeting, string $username, int $age, bool $host): string {
         $url = new moodle_url(
-            '/lib/classes/virtualmeeting/poc/meet.php',
+            '/totara/core/classes/virtualmeeting/poc/meet.php',
             [
                 'name' => $meeting->name,
                 'timestart' => $meeting->timestart->getTimestamp(),
                 'timefinish' => $meeting->timefinish->getTimestamp(),
                 'username' => $username,
+                'age' => $age,
                 'host' => (int)$host
             ]
         );
@@ -97,13 +99,14 @@ class poc_service_provider implements provider {
         }
         $username = $this->extract_username($meeting);
         $age = $meeting->get_storage()->get('age') ?? 0;
+        $age++; // new age
         $meeting->get_storage()
             ->delete_all()
             ->set('id', $update ? 'updated' : 'created')
-            ->set('age', ++$age)
-            ->set('join_url', self::make_url($meeting, $username, false));
+            ->set('age', $age)
+            ->set('join_url', self::make_url($meeting, $username, $age, false));
         if (strpos($meeting->name, 'nohost') === false) {
-            $meeting->get_storage()->set('host_url', self::make_url($meeting, $username, true));
+            $meeting->get_storage()->set('host_url', self::make_url($meeting, $username, $age, true));
         }
     }
 

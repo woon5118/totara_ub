@@ -24,7 +24,6 @@
 namespace totara_core\virtualmeeting\dto;
 
 use coding_exception;
-use core_date;
 use DateTime;
 use totara_core\entity\virtual_meeting;
 use totara_core\virtualmeeting\user_auth;
@@ -71,29 +70,6 @@ class meeting_edit_dto extends meeting_dto {
         $this->name = $name;
         $this->timestart = $timestart;
         $this->timefinish = $timefinish;
-    }
-
-    /**
-     * Create an instance with the current user and their time zone.
-     *
-     * @param virtual_meeting $entity
-     * @param string $name meeting name or summary
-     * @param integer $timestart meeting start time
-     * @param integer $timefinish meeting end time
-     * @param mixed $timezone meeting time zone in Totara format
-     * @return self
-     * @todo Do not use this function until TL-29074 lands
-     */
-    public static function create_with_user_timezone(virtual_meeting $entity, string $name, int $timestart, int $timefinish, $timezone): self {
-        if ($timezone === null || $timezone == 99) {
-            if (isset($entity->user->timezone)) {
-                $timezone = $entity->user->timezone;
-            } else {
-                $timezone = core_date::get_server_timezone_object();
-            }
-        }
-        $tz = core_date::get_user_timezone_object($timezone);
-        return new self($entity, $name, new DateTime('@'.$timestart, $tz), new DateTime('@'.$timefinish, $tz));
     }
 
     /**

@@ -73,6 +73,7 @@ define(['core/str'], function(str) {
             }
         }).then(function (string) {
             document.querySelector('.mod_facetoface-connected').innerText = string;
+            M.util.js_complete('nod_facetoface-room_integration-oauth_confirmation');
         }).catch(function() {
             document.querySelector('.mod_facetoface-connected').innerText = '';
             M.util.js_complete('nod_facetoface-room_integration-oauth_confirmation');

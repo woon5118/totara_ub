@@ -54,7 +54,7 @@ class poc_auth_provider implements auth_provider {
     public function get_authentication_endpoint(): string {
         global $CFG;
         $url = new moodle_url(
-            '/lib/classes/virtualmeeting/poc/index.php',
+            '/totara/core/classes/virtualmeeting/poc/index.php',
             [
                 'redirect_uri' => $CFG->wwwroot.'/integrations/virtualmeeting/auth_callback.php/poc_'.$this->name,
             ]

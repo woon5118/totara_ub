@@ -29,7 +29,7 @@ use core\plugininfo\virtualmeeting;
 
 global $CFG;
 if (empty($CFG)) {
-    require_once(__DIR__ . '/../../../../config.php');
+    require_once(__DIR__ . '/../../../../../config.php');
 }
 
 if (!isset($USER) || !isset($PAGE) || !virtualmeeting::is_poc_available()) {
@@ -69,9 +69,10 @@ input,button { line-height: 2; margin-bottom: 1rem; padding: 0 .5rem }
 <h1>Log in</h1>
 <form method="post" autocomplete="off">
 <input type="hidden" name="sesskey" value="<?php echo s(sesskey()); ?>">
-<input type="text" name="username" placeholder="Username" required>
-<input type="password" name="password" placeholder="Password" required>
+<input type="text" name="username" aria-label="Username" placeholder="Username" required>
+<input type="password" name="password" aria-label="Password" placeholder="Password" required>
 <button>Log in</button>
 </form>
+<script>window.name = 'totara_virtualmeeting_poc_login';</script>
 </body>
 </html>

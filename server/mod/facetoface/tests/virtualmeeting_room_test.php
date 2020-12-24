@@ -37,6 +37,7 @@ class virtualmeeting_rooms_testcase extends advanced_testcase {
 
         $user1 = $this->getDataGenerator()->create_user(['username' => 'alice']);
         $this->setUser($user1);
+        /** @var mod_facetoface_generator */
         $seminar_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
         $virtual_room = $seminar_generator->add_virtualmeeting_room(['name' => 'virtual']);
 
@@ -159,6 +160,7 @@ class virtualmeeting_rooms_testcase extends advanced_testcase {
 
         $user1 = $this->getDataGenerator()->create_user(['username' => 'alice']);
         $this->setUser($user1);
+        /** @var mod_facetoface_generator */
         $seminar_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
         $virtual_room1 = $seminar_generator->add_virtualmeeting_room(['name' => 'virtual one']);
         $virtual_room2 = $seminar_generator->add_virtualmeeting_room(['name' => 'virtual two']);

@@ -321,9 +321,10 @@ class mod_facetoface_generator extends testing_module_generator {
      * Add a virtualmeeting room.
      *
      * @param stdClass|array $record
+     * @param array $options
      * @return stdClass
      */
-    public function add_virtualmeeting_room($record): stdClass {
+    public function add_virtualmeeting_room($record, $options = array()): stdClass {
         global $DB, $USER;
 
         // Insert a room.
@@ -333,25 +334,39 @@ class mod_facetoface_generator extends testing_module_generator {
 
         // Insert room_virtualmeeting
         $frvm = new stdClass();
-        $frvm->userid = $USER->id;
-        $frvm->plugin = 'poc_app';
+        if (empty($options['userid'])) {
+            $options['userid'] = $USER->id;
+        }
+        if (empty($options['plugin'])) {
+            $options['plugin'] = 'poc_app';
+        }
+        $frvm->userid = $options['userid'];
+        $frvm->plugin = $options['plugin'];
         $frvm->roomid = $room->id;
         $DB->insert_record('facetoface_room_virtualmeeting', $frvm);
 
         return $room;
     }
 
-    public function create_room_dates_virtualmeeting($room, $sessionid, $virtualmeetingid) {
+    /**
+     * Join virtual room and virtual meeting.
+     *
+     * @param integer $roomid
+     * @param integer $sessionid
+     * @param integer $virtualmeetingid
+     * @return stdClass
+     */
+    public function create_room_dates_virtualmeeting(int $roomid, int $sessionid, int $virtualmeetingid) {
         global $DB;
 
-        $room_dates = $DB->get_records('facetoface_room_dates', ['roomid' => $room->id, 'sessionsdateid' => $sessionid]);
-        $room_date = array_shift($room_dates);
+        $room_date = $DB->get_record('facetoface_room_dates', ['roomid' => $roomid, 'sessionsdateid' => $sessionid], '*', MUST_EXIST);
 
         $frdvm = new stdClass();
-        $frdvm->roomid = $room->id;
+        $frdvm->roomid = $roomid;
         $frdvm->roomdateid = $room_date->id;
         $frdvm->virtualmeetingid = $virtualmeetingid;
-        $DB->insert_record('facetoface_room_dates_virtualmeeting', $frdvm);
+        $id = $DB->insert_record('facetoface_room_dates_virtualmeeting', $frdvm);
+        return $DB->get_record('facetoface_room_dates_virtualmeeting', ['id' => $id], '*', MUST_EXIST);
     }
 
     /**

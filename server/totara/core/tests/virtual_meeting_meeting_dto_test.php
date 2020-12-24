@@ -169,13 +169,6 @@ class totara_core_virtual_meeting_meeting_dto_testcase extends advanced_testcase
     }
 
     /**
-     * @covers totara_core\virtualmeeting\dto\meeting_edit_dto::create_with_user_timezone
-     */
-    public function test_edit_create_with_user_timezone(): void {
-        self::markTestIncomplete('TODO: TL-29074 Add test for meeting_edit_dto::create_with_user_timezone');
-    }
-
-    /**
      * @covers totara_core\virtualmeeting\dto\meeting_edit_dto::get_name
      */
     public function test_edit_get_name(): void {

@@ -220,7 +220,7 @@ class totara_core_virtual_meeting_auth_testcase extends advanced_testcase {
     public function test_get_authentication_endpoint(): void {
         global $CFG;
         $url = virtual_meeting_auth::get_authentication_endpoint('poc_user');
-        $this->assertEquals($CFG->wwwroot.'/lib/classes/virtualmeeting/poc/index.php?redirect_uri='.rawurlencode($CFG->wwwroot.'/integrations/virtualmeeting/auth_callback.php/poc_user'), $url);
+        $this->assertEquals($CFG->wwwroot.'/totara/core/classes/virtualmeeting/poc/index.php?redirect_uri='.rawurlencode($CFG->wwwroot.'/integrations/virtualmeeting/auth_callback.php/poc_user'), $url);
         try {
             virtual_meeting_auth::get_authentication_endpoint('poc_app');
             $this->fail('unsupported_exception expected');
