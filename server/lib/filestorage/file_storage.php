@@ -2264,6 +2264,15 @@ class file_storage {
         $contentdir = $this->path_from_hash($contenthash);
         $contentfile = $contentdir . '/' . $contenthash;
 
+        if ($contenthash === sha1('')) {
+            if (!is_dir($contentdir)) {
+                mkdir($contentdir, $this->dirpermissions, true);
+            }
+            file_put_contents($contentfile, '');
+            @chmod($contentfile, $this->filepermissions); // Fix permissions if needed.
+            return true;
+        }
+
         $prev = ignore_user_abort(true);
 
         $this->try_trashdir_content_recovery($contenthash);
