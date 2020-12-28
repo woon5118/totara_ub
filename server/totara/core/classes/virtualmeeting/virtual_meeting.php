@@ -211,6 +211,15 @@ final class virtual_meeting extends model {
     }
 
     /**
+     * Get the name of the virtualmeeting plugin.
+     *
+     * @return string
+     */
+    public function get_plugin_name(): string {
+        return $this->get_plugininfo()->get_name();
+    }
+
+    /**
      * Get the meeting join URL.
      *
      * @param boolean $strict blow up if a url not available

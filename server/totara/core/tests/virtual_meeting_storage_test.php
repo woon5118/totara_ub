@@ -21,6 +21,7 @@
  * @package totara_core
  */
 
+use core\orm\query\builder;
 use core\orm\query\exceptions\record_not_found_exception;
 use totara_core\entity\virtual_meeting as virtual_meeting_entity;
 use totara_core\entity\virtual_meeting_config as virtual_meeting_config_entity;
@@ -129,5 +130,48 @@ class totara_core_virtual_meeting_storage_testcase extends advanced_testcase {
         $storage->delete_all();
         $this->assertEquals(1, virtual_meeting_config_entity::repository()->count());
         $this->assertEquals('two', virtual_meeting_config_entity::repository()->where('virtualmeetingid', $this->vm2->id)->where('name', 'test')->one(true)->value);
+    }
+
+    /**
+     * @covers ::age
+     */
+    public function test_age(): void {
+        // Simple test...
+        $storage = new storage($this->vm1);
+        $this->assertLessThanOrEqual(1, $storage->age('test'));
+        $entity = virtual_meeting_config_entity::repository()->where('virtualmeetingid', $this->vm1->id)->where('name', 'test')->one(true);
+        $entity->set_updated_timestamp();
+        $this->assertLessThanOrEqual(1, $storage->age('test'));
+
+        // Play with ages.
+        $time = time();
+        $storage = new storage($this->vm2);
+        $this->assertLessThanOrEqual(1, $storage->age('test'));
+        $record = builder::table('virtualmeeting_config')
+            ->where('virtualmeetingid', $this->vm2->id)
+            ->where('name', 'test');
+        $record->update(['timecreated' => $time - 60]);
+        $this->assertEquals(60, $storage->age('test', $time));
+        $record->update(['timemodified' => $time - 30]);
+        $this->assertEquals(30, $storage->age('test', $time));
+        // Set created time to be in future
+        $record->update(['timecreated' => $time + 60]);
+        $this->assertEquals(30, $storage->age('test', $time));
+
+        // Test not found
+        $this->assertNull($storage->age('foo'));
+
+        // Test updated in future
+        $future_time = $time + 30;
+        $record->update(['timemodified' => $future_time]);
+        $this->assertEquals(-30, $storage->age('test', $time));
+
+        // Test strict
+        $this->assertNull($storage->age('not_there'));
+        try {
+            $storage->age('not_there', 0, true);
+            $this->fail('Expected record_not_found_exception');
+        } catch (record_not_found_exception $ex) {
+        }
     }
 }

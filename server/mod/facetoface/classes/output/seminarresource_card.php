@@ -74,24 +74,40 @@ final class seminarresource_card extends template {
      * @param boolean $inactive
      * @param string|null $buttonhint
      * @param string|null $preview
+     * @param array|null $host_info;
      * @return self
      */
-    public static function create(string $heading, string $buttonlabel, $url, bool $accent, ?seminarevent_detail_section $details, bool $inactive, ?string $buttonhint = null, ?string $preview = null): self {
+    public static function create(string $heading, string $buttonlabel, $url, bool $accent, ?seminarevent_detail_section $details, bool $inactive, ?string $buttonhint = null, ?string $preview = null, ?array $host_info = null): self {
         if ($url instanceof moodle_url) {
             $url = $url->out(false);
+        }
+        $multibutton = false;
+        $joinbutton = [
+            'text' => $buttonlabel,
+            'url' => (string)$url,
+            'accent' => $accent,
+            'hint' => $buttonhint,
+        ];
+        if (!is_null($host_info) && !empty($host_info)) {
+            $hostbutton = [
+                'text' => $host_info['buttonlabel'],
+                'url' => (string)$host_info['url'],
+                'accent' => $host_info['accent'],
+                'hint' => $host_info['buttonhint'],
+            ];
+            $multibutton = [
+                'hostbutton' => $hostbutton,
+                'joinbutton' => $joinbutton,
+            ];
         }
         return new static([
             'heading' => $heading,
             'detailsection' => $details ? $details->get_template_data() : false,
             'simple' => !$details,
-            'button' => [
-                'text' => $buttonlabel,
-                'url' => (string)$url,
-                'accent' => $accent,
-                'hint' => $buttonhint,
-            ],
+            'button' => $joinbutton,
             'inactive' => $inactive,
             'preview' => $preview,
+            'multibutton' => $multibutton,
         ]);
     }
 }

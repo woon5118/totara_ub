@@ -106,4 +106,25 @@ final class storage {
         $this->repository()->delete();
         return $this;
     }
+
+    /**
+     * Return the age (in seconds) of a stored configuration value
+     *
+     * @param string $name
+     * @param int $current_time
+     * @param bool $strict
+     * @return int|null
+     */
+    public function age(string $name, int $current_time = 0, bool $strict = false): ?int {
+        $entity = virtual_meeting_config::repository()->find_by_name($this->virtualmeetingid, $name, $strict);
+        if ($entity === null) {
+            return null;
+        }
+        $time = $current_time ?: time();
+        if ($entity->timemodified === null) {
+            return $time - $entity->timecreated;
+        } else {
+            return $time - $entity->timemodified;
+        }
+    }
 }

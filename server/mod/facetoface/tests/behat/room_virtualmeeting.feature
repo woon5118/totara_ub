@@ -96,7 +96,7 @@ Feature: User sees a seminar virtual room meeting
     Given I run all adhoc tasks
 
     When I click on "Party night" "link" in the "Pacific/Auckland" "table_row"
-    And I follow "Go to room"
+    And I follow "Join as attendee"
     And I switch to "totara_virtualmeeting_poc_meet" window
     Then the following fields match these values:
       | Age    | 1                                                    |
@@ -107,7 +107,7 @@ Feature: User sees a seminar virtual room meeting
     And I press the "back" button in the browser
 
     When I click on "Live music" "link" in the "Europe/Prague" "table_row"
-    And I follow "Go to room"
+    And I follow "Join as attendee"
     And I switch to "totara_virtualmeeting_poc_meet" window
     Then the following fields match these values:
       | Age    | 1                                                    |
@@ -118,7 +118,7 @@ Feature: User sees a seminar virtual room meeting
     And I press the "back" button in the browser
 
     When I click on "Party night" "link" in the "America/Toronto" "table_row"
-    And I follow "Go to room"
+    And I follow "Join as attendee"
     And I switch to "totara_virtualmeeting_poc_meet" window
     Then the following fields match these values:
       | Age    | 1                                                    |

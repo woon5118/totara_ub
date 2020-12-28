@@ -114,12 +114,13 @@ class room_content extends content_generator {
         /** @var virtual_meeting_entity $entity */
         $model = virtual_meeting_model::load_by_entity($entity);
         $result = [
-            'url' => $model->get_join_url(true)
+            'url' => $model->get_join_url(true),
+            'plugin' => $model->get_plugin_name(),
         ];
-        // TODO: host url and invitation will be dealt when the zoom plugin is available
-        // if (($host_url = $model->get_host_url(false)) !== '') {
-        //     $result['host_url'] = $host_url;
-        // }
+        if (($host_url = $model->get_host_url(false)) !== '' && room_helper::has_access_at_any_time($session)) {
+            $result['host_url'] = $host_url;
+        }
+        // Invitation is not used by current room card template.
         // if (($invitation = $model->get_invitation(false)) !== '') {
         //     $result['invitation'] = $invitation;
         // }
@@ -143,6 +144,11 @@ class room_content extends content_generator {
             return seminarresource_card::create_simple(get_string('virtualroom_card_unavailable', 'mod_facetoface'), true);
         }
         $roomurl = $info['url'];
+        if (!empty($info['plugin'])) {
+            $header = get_string('virtualroom_heading', 'mod_facetoface') . ': ' . $info['plugin'];
+        } else {
+            $header = get_string('virtualroom_heading', 'mod_facetoface');
+        }
         if ($session === null) {
             // Special case for direct access.
             if ($item->get_custom()) {
@@ -163,15 +169,27 @@ class room_content extends content_generator {
             return seminarresource_card::create_simple(get_string('virtualroom_card_unavailable', 'mod_facetoface'), true);
         }
         if (room_helper::has_access_at_any_time($session)) {
+            $buttonlabel = get_string('roomgoto', 'mod_facetoface');
+            $hostinfo = null;
+            if (isset($info['host_url'])) {
+                $hostinfo = [
+                    'buttonlabel' => get_string('roomhost', 'mod_facetoface'),
+                    'url' => $info['host_url'],
+                    'accent' => true,
+                    'buttonhint' => get_string('roomhostx', 'mod_facetoface', $item->get_name())
+                ];
+                $buttonlabel = get_string('roomhostjoin', 'mod_facetoface');
+            }
             return seminarresource_card::create(
-                get_string('virtualroom_heading', 'mod_facetoface'),
-                get_string('roomgoto', 'mod_facetoface'),
+                $header,
+                $buttonlabel,
                 new moodle_url($roomurl),
-                false,
+                true,
                 null,
                 false,
                 get_string('roomgotox', 'mod_facetoface', $item->get_name()),
-                $info['preview'] ?? null
+                $info['preview'] ?? null,
+                $hostinfo
             );
         }
         if ($session->is_over($time)) {

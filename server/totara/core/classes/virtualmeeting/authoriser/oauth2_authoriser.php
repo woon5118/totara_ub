@@ -51,6 +51,9 @@ final class oauth2_authoriser implements authoriser {
     /** @var formdata */
     private $formdata;
 
+    /** @var null|array */
+    private $headers;
+
     /**
      * Constructor.
      *
@@ -58,12 +61,16 @@ final class oauth2_authoriser implements authoriser {
      * @param string $token_endpoint token endpoint URL
      * @param string $scope
      * @param array $params optional query parameters such as client ID and client secret
+     * @param string[]|null $headers
      */
-    public function __construct(client $client, string $token_endpoint, string $scope, array $params = []) {
+    public function __construct(client $client, string $token_endpoint, string $scope, array $params = [], ?array $headers = null) {
         $this->client = $client;
         $this->token_endpoint = $token_endpoint;
-        $this->formdata = (new formdata($params))
-            ->set('scope', $scope);
+        $this->formdata = (new formdata($params));
+        if ($scope != '') {
+            $this->formdata->set('scope', $scope);
+        }
+        $this->headers = $headers;
     }
 
     /**
@@ -91,10 +98,12 @@ final class oauth2_authoriser implements authoriser {
         $plugin = virtualmeeting::load_available($pluginname);
         $params = array_merge($params, [
             'client_id' => $client_id,
-            'scope' => $scope,
             'response_type' => 'code',
             'redirect_uri' => self::get_auth_redirect_url($plugin->name),
         ]);
+        if ($scope != '') {
+            $params = array_merge($params, ['scope' => $scope]);
+        }
         return (new moodle_url($auth_endpoint, $params))->out(false);
     }
 
@@ -133,7 +142,7 @@ final class oauth2_authoriser implements authoriser {
             ->set('code', $code)
             ->set('grant_type', 'authorization_code')
             ->set('redirect_uri', self::get_auth_redirect_url($entity->plugin));
-        $request = request::post($this->token_endpoint, $formdata);
+        $request = request::post($this->token_endpoint, $formdata, $this->headers);
         $time = time();
         $response = $this->client->execute($request);
         $this->store($entity, $response, $time);
@@ -148,7 +157,7 @@ final class oauth2_authoriser implements authoriser {
         $formdata = (clone $this->formdata)
             ->set('grant_type', 'refresh_token')
             ->set('refresh_token', $entity->refresh_token);
-        $request = request::post($this->token_endpoint, $formdata);
+        $request = request::post($this->token_endpoint, $formdata, $this->headers);
         $time = time();
         $response = $this->client->execute($request);
         $this->store($entity, $response, $time);

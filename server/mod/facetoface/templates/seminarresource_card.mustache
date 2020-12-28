@@ -58,7 +58,14 @@
                 }
             ]
         },
-        "preview": "<p>more data</p>"
+        "button": {
+            "text": "Join now",
+            "url": "https://zoom.us/j/93383039810"
+            "accent": false
+            "hint": "Go to Zoom Meeting Room"
+        }
+        "preview": "<p>more data</p>",
+        "multibutton": false
     }
 }}
 
@@ -67,7 +74,15 @@
         {{#heading}}<h3>{{.}}</h3>{{/heading}}
         {{#subtitle}}<h4>{{.}}</h4>{{/subtitle}}
         {{^simple}}{{#detailsection}}{{> mod_facetoface/seminarevent_detail_section }}{{/detailsection}}{{/simple}}
-        {{#button}}<div class="mod_facetoface__resource-card__button"><a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>{{text}}</a></div>{{/button}}
+        {{#multibutton}}
+            <div class="mod_facetoface__resource-card__button">
+                {{#hostbutton}}<a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>{{text}}</a>{{/hostbutton}}
+                {{#joinbutton}}<a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>{{text}}</a>{{/joinbutton}}
+            </div>
+        {{/multibutton}}
+        {{^multibutton}}
+            {{#button}}<div class="mod_facetoface__resource-card__button"><a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>{{text}}</a></div>{{/button}}
+        {{/multibutton}}
         {{#preview}}<div class="mod_facetoface__resource-card__preview">{{{.}}}</div>{{/preview}}
     </div>
 </div>

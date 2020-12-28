@@ -38,11 +38,11 @@ Feature: Check seminar room link setting
     And I click on the seminar event action "Edit event" in row "Upcoming"
     And I click on "Select room" "link"
     And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
-    And I set the field "plugin" to "internal"
     And I set the following fields to these values:
       | Name                         | Room 1          |
       | Capacity                     | 10              |
       | Allow booking conflicts      | 0               |
+      | Add virtual room link        | Custom virtual room link |
       | Virtual room link            | http://example.com?id=12345 |
       | Building                     | Some Building 1 |
       | Address                      | 123 Main Street |
