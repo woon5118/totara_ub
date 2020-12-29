@@ -195,9 +195,6 @@ if (!core_tables_exist()) {
         $PAGE->set_heading($strinstallation . ' - Totara ' . $TOTARA->release);
         $PAGE->set_cacheable(false);
 
-        // TL-28007 will remove this and find a proper fix. Fighting a race condition here. Not a great solution, but it gets around the problem.
-        sleep(1);
-
         /** @var core_admin_renderer $output */
         $output = $PAGE->get_renderer('core', 'admin');
         echo $output->install_environment_page($maturity, $envstatus, $environment_results, $TOTARA->release);
@@ -295,8 +292,6 @@ if (!$cache and $totarainfo->upgradecore) {
     cache_helper::purge_all(true);
     // We then purge the regular caches.
     purge_all_caches();
-    // TL-28007 will remove this and find a proper fix. Fighting a race condition here. Not a great solution, but it gets around the problem.
-    sleep(1);
 
     // Totara: do not hack themerev here!
 

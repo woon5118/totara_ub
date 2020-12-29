@@ -1641,15 +1641,16 @@ function make_writable_directory($dir, $exceptiononerror = true) {
     umask($CFG->umaskpermissions);
 
     if (!file_exists($dir)) {
-        @mkdir($dir, $CFG->directorypermissions, true);
-        clearstatcache(true, $dir);
-        if (!file_exists($dir)) {
+        if (!@mkdir($dir, $CFG->directorypermissions, true)) {
+            clearstatcache();
             // There might be a race condition when creating directory.
-            if ($exceptiononerror) {
-                throw new invalid_dataroot_permissions($dir.' can not be created, check permissions.');
-            } else {
-                debugging('Can not create directory: '.$dir, DEBUG_DEVELOPER);
-                return false;
+            if (!is_dir($dir)) {
+                if ($exceptiononerror) {
+                    throw new invalid_dataroot_permissions($dir.' can not be created, check permissions.');
+                } else {
+                    debugging('Can not create directory: '.$dir, DEBUG_DEVELOPER);
+                    return false;
+                }
             }
         }
     }
