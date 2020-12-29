@@ -29,6 +29,9 @@ define(['core/str'], function(str) {
     /** @type {HTMLInputElement} */
     var authoriseButton;
 
+    /** @type {HTMLInputElement} */
+    var connectionState;
+
     /**
      * Handles after log in through oAuth works expected
      *
@@ -55,7 +58,8 @@ define(['core/str'], function(str) {
      * @param {String} method The plugin to check
      */
     function verifyConnection(method) {
-        M.util.js_pending('nod_facetoface-room_integration-oauth_confirmation');
+        M.util.js_pending('mod_facetoface-room_integration-oauth_confirmation');
+        connectionState.value = 0;
         new Promise(function (resolve) {
             require(['core/ajax'], resolve);
         }).then(function(ajaxLib) {
@@ -66,17 +70,25 @@ define(['core/str'], function(str) {
                 }
             }])[0];
         }).then(function (data) {
-            if (data.name) {
-                return str.get_string('connectedas', 'mod_facetoface', data.name);
+            if ('name' in data) {
+                if ('friendly_name' in data) {
+                    data.name = data.friendly_name;
+                }
+                if ('email' in data) {
+                    return str.get_string('connectedasx', 'mod_facetoface', data);
+                } else {
+                    return str.get_string('connectedas', 'mod_facetoface', data.name);
+                }
             } else {
                 return Promise.resolve('');
             }
         }).then(function (string) {
+            connectionState.value = string !== '' ? 1 : 0;
             document.querySelector('.mod_facetoface-connected').innerText = string;
-            M.util.js_complete('nod_facetoface-room_integration-oauth_confirmation');
+            M.util.js_complete('mod_facetoface-room_integration-oauth_confirmation');
         }).catch(function() {
             document.querySelector('.mod_facetoface-connected').innerText = '';
-            M.util.js_complete('nod_facetoface-room_integration-oauth_confirmation');
+            M.util.js_complete('mod_facetoface-room_integration-oauth_confirmation');
         });
     }
 
@@ -85,7 +97,7 @@ define(['core/str'], function(str) {
      */
     function changeHandler() {
         /** @type {HTMLInputElement} */
-        var endpoint = document.querySelector('[name=' + pluginSelector.value + '_auth_endpoint]');
+        var endpoint = document.querySelector('[name="' + pluginSelector.value + '_auth_endpoint"]');
 
         if (popup) {
             popup.close();
@@ -96,6 +108,7 @@ define(['core/str'], function(str) {
             verifyConnection(pluginSelector.value);
         } else {
             authoriseButton.disabled = true;
+            connectionState.value = 1;
         }
     }
 
@@ -111,10 +124,14 @@ define(['core/str'], function(str) {
         e.preventDefault();
 
         /** @type {HTMLInputElement} */
-        var endpoint = document.querySelector('[name=' + pluginSelector.value + '_auth_endpoint]');
+        var endpoint = document.querySelector('[name="' + pluginSelector.value + '_auth_endpoint"]');
 
-        if (endpoint && (!popup || popup.closed)) {
-            popup = window.open(endpoint.value, '_blank', 'width=400,height=500,opener');
+        if (endpoint) {
+            if (!popup || popup.closed) {
+                popup = window.open(endpoint.value, '_blank', 'width=400,height=500,opener');
+            } else {
+                popup.focus();
+            }
         }
     }
 
@@ -126,6 +143,8 @@ define(['core/str'], function(str) {
             pluginSelector = document.getElementById('id_plugin');
             authoriseButton = document.getElementById('show-authorise-dialog');
             authoriseButton.disabled = true;
+            connectionState = document.getElementById('plugin-connection-state');
+            connectionState.value = 0;
 
             changeHandler();
 

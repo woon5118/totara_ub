@@ -49,7 +49,7 @@ if (!$seminarevent->exists()) {
 
 ajax_require_login($seminar->get_course(), false, $cm, false, true);
 if (!has_capability('mod/facetoface:manageadhocrooms', $context)) {
-    throw new required_capability_exception($context, 'mod/facetoface:manageadhocrooms', 'nopermissions');
+    throw new required_capability_exception($context, 'mod/facetoface:manageadhocrooms', 'nopermissions', '');
 }
 require_sesskey();
 

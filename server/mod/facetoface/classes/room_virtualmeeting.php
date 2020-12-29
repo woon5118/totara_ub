@@ -36,8 +36,8 @@ class room_virtualmeeting implements seminar_iterator_item {
     /**
      * Virtual meeting identifier options
      */
-    const VIRTUAL_MEETING_NONE = 'none';
-    const VIRTUAL_MEETING_INTERNAL = 'internal';
+    const VIRTUAL_MEETING_NONE = '@none';
+    const VIRTUAL_MEETING_INTERNAL = '@internal';
 
     /**
      * @var int {facetoface_room_virtualmeeting}.id

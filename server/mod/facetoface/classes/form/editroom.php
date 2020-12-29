@@ -129,16 +129,20 @@ class editroom extends \moodleform {
             $mform->setType('url', PARAM_URL);
             $mform->hideIf('url', 'plugin', 'noteq', room_virtualmeeting::VIRTUAL_MEETING_INTERNAL);
 
+            $mform->addElement('hidden', 'connected', '', ['id' => 'plugin-connection-state']);
+            $mform->setType('connected', PARAM_INT);
+
             $connections = [];
-            $connections[] =& $mform->createElement('static', 'connected_text', '', html_writer::span('', 'mod_facetoface-connected'));
             $connections[] =& $mform->createElement('button', 'virtual_meeting_authorise',
                  get_string('virtual_meeting_connect', 'mod_facetoface'), ['id' => 'show-authorise-dialog']);
+            $connections[] =& $mform->createElement('static', 'connected_text', '', html_writer::span('', 'mod_facetoface-connected'));
             $mform->addGroup($connections, 'connections', get_string('virtual_meeting_service_provider', 'mod_facetoface'), null, false);
             $mform->addHelpButton('connections', 'virtual_meeting_service_provider', 'mod_facetoface');
             foreach ($conditions_no_auth as $condition) {
                 $mform->hideIf('connections', 'plugin', 'eq', $condition);
             }
             $PAGE->requires->js_call_amd('mod_facetoface/room_integration', 'init');
+            $PAGE->requires->strings_for_js(['connectedas', 'connectedasx', 'editroom'], 'mod_facetoface');
         } else {
             $mform->addElement('hidden', 'plugin', room_virtualmeeting::VIRTUAL_MEETING_NONE);
             $mform->setType('plugin', PARAM_TEXT);
@@ -243,9 +247,18 @@ class editroom extends \moodleform {
             }
         }
 
-        if (!empty($data->url)) {
-            if (!filter_var($data->url, FILTER_VALIDATE_URL)) {
-                $errors['url'] = get_string('error:urlformat', 'mod_facetoface');
+        if ($data['plugin'] != room_virtualmeeting::VIRTUAL_MEETING_NONE && $data['plugin'] != room_virtualmeeting::VIRTUAL_MEETING_INTERNAL && empty($data['connected'])) {
+            $errors['connections'] = get_string('error:disconnected', 'mod_facetoface');
+        }
+
+        if ($data['plugin'] == room_virtualmeeting::VIRTUAL_MEETING_INTERNAL) {
+            if (empty($data['url'])) {
+                $errors['url'] = get_string('err_required', 'form');
+            } else if (!filter_var($data['url'], FILTER_VALIDATE_URL)) {
+                // whitelist '/mod/facetoface/tests/fixtures/bph4svcr.php' under behat
+                if (!defined('BEHAT_SITE_RUNNING') || $data['url'] !== '/mod/facetoface/tests/fixtures/bph4svcr.php') {
+                    $errors['url'] = get_string('error:urlformat', 'mod_facetoface');
+                }
             }
         }
 
