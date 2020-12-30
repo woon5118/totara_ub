@@ -30,6 +30,7 @@ use moodle_page;
 use moodle_url;
 use renderer_base;
 use totara_msteams\botfw\entity\user_state;
+use totara_msteams\output\banner;
 use totara_msteams\output\spinner;
 
 /**
@@ -121,7 +122,14 @@ class mini_output extends renderer_base {
         $html = self::include_auth_js();
 
         // And the spinner.
-        $html .= $this->render(spinner::create_signingin());
+        $html .= $this->render(spinner::create_signingin(true, 'sso-spinner'));
+
+        // And the banner.
+        $html .= $this->render(banner::create(
+            'sso-banner',
+            get_string('error:sso_failure_title', 'totara_msteams'),
+            get_string('error:sso_failure_desc', 'totara_msteams'),
+            true));
 
         $jsconfig = [
             'oidcLoginUrl' => (new moodle_url('/totara/msteams/oidc_login.php'))->out(false),

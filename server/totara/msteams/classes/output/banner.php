@@ -28,36 +28,24 @@ defined('MOODLE_INTERNAL') || die;
 use core\output\template;
 
 /**
- * A spinning circle.
+ * A simple banner.
  */
-final class spinner extends template {
+final class banner extends template {
     /**
-     * Creating a loading spinner.
+     * Create an instance.
      *
-     * @param boolean $fullscreen
      * @param string $id
+     * @param string $title
+     * @param string $content
+     * @param boolean $icon
      * @return self
      */
-    public static function create_loading(bool $fullscreen = true, string $id = ''): self {
+    public static function create(string $id, string $title, string $content, bool $icon): self {
         return new self([
             'id' => $id,
-            'fullscreen' => $fullscreen,
-            'label' => get_string('spinner_loading', 'totara_msteams'),
-        ]);
-    }
-
-    /**
-     * Creating a loading spinner.
-     *
-     * @param boolean $fullscreen
-     * @param string $id
-     * @return self
-     */
-    public static function create_signingin(bool $fullscreen = true, string $id = ''): self {
-        return new self([
-            'id' => $id,
-            'fullscreen' => $fullscreen,
-            'label' => get_string('spinner_signingin', 'totara_msteams'),
+            'title' => $title,
+            'content' => $content,
+            'icon' => $icon,
         ]);
     }
 }

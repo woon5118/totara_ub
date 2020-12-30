@@ -518,6 +518,34 @@ html.theme_msteams__iframe .totara_msteams__alert {
     width: 7vmin;
 }
 
+body.sso-failure > #sso-spinner {
+    display: none;
+}
+
+#sso-banner {
+    display: none;
+    margin: auto;
+}
+
+body.sso-failure {
+    color: var(--theme_msteams__primary-color);
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    justify-content: center;
+}
+
+body.sso-failure > #sso-banner {
+    display: block;
+}
+
+.totara_msteams__banner__icon {
+    width: 2rem;
+}
+
 body.theme_msteams__theme--default .totara_msteams__spinner,
 body.theme_msteams__theme--dark .totara_msteams__spinner,
 body.theme_msteams__theme--contrast .totara_msteams__spinner {

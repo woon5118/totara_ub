@@ -103,6 +103,7 @@
             };
 
             microsoftTeams.initialize();
+            document.body.classList.remove('sso-failure');
 
             var authTokenRequest = {
                 successCallback: function(result) {
@@ -115,6 +116,7 @@
                 },
                 failureCallback: function(error) {
                     log('getAuthToken failed: ' + error);
+                    document.body.classList.add('sso-failure');
                     reject(error);
                 }
             };

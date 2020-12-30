@@ -21,21 +21,27 @@
 }}
 
 {{!
-    @template totara_msteams/spinner
+    @template totara_msteams/banner
 
-    This template generates a spinning circle that looks like the spinner component of MS Teams.
+    This template generates an banner.
 
     Context variables required for this template:
     * id: the unique id
-    * fullscreen: set true to make the spinner cover the whole screen
-    * label: set the accessibility label
+    * title: the title text
+    * content: the content text
+    * icon: set true to show icon
 
     Example content (json):
     {
-        "id": "msteams-123",
-        "fullscreen": true,
-        "label": "Signing in..."
+        "id": "msteams-123456",
+        "title": "Something went wrong",
+        "content": "Please contact an administrator",
+        "icon": true
     }
 }}
 
-<div class="totara_msteams__spinner{{#fullscreen}} totara_msteams__spinner--full{{/fullscreen}}" role="presentation"{{#id}} id="{{.}}"{{/id}}{{#label}} aria-label="{{.}}"{{/label}}></div>
+<div class="totara_msteams__banner" id="{{id}}">
+    {{#icon}}<svg class="totara_msteams__banner__icon" viewBox="0 0 18 18"><circle cy="9.5" cx="9.5" r="8" fill="none" stroke="currentColor" stroke-width="1.125"/><path d="M9.5 5v6z" fill="none" stroke="currentColor" stroke-width="1.125"/><circle cx="9.5" cy="13.5" r=".75" fill="currentColor"/></svg>{{/icon}}
+    {{#title}}<h2 class="totara_msteams__banner__title">{{.}}</h2>{{/title}}
+    {{#content}}<p class="totara_msteams__banner__content">{{.}}</p>{{/content}}
+</div>

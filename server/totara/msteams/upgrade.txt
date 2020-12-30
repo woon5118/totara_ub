@@ -1,6 +1,12 @@
 This files describes API changes in /totara/msteams,
 information provided here is intended especially for developers.
 
+=== 13.4 ===
+
+* The spinner template added id parameter to set HTML id
+* spinner::create_loading() added 2nd parameter to set HTML id
+* spinner::create_signingin() added 2nd parameter to set HTML id
+
 === 13.2 ===
 
 * listbox_items.mustache template requires the type field of each item entry
