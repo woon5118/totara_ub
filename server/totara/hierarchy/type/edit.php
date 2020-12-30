@@ -90,12 +90,12 @@ if ($id == 0) {
 $PAGE->requires->strings_for_js(array('choosecohort'), 'totara_hierarchy');
 
 // Include JS for icon preview
-local_js(array(
-            TOTARA_JS_ICON_PREVIEW,
-            TOTARA_JS_DIALOG,
-            TOTARA_JS_TREEVIEW,
-            TOTARA_JS_DATEPICKER
-        ));
+local_js([
+    TOTARA_JS_ICON_PREVIEW,
+    TOTARA_JS_DIALOG,
+    TOTARA_JS_TREEVIEW,
+    TOTARA_JS_DATEPICKER
+]);
 
 // Enrolled audiences for personal goals only.
 if ($shortprefix == 'goal_user') {
@@ -109,7 +109,8 @@ if ($shortprefix == 'goal_user') {
     $jsmodule = array(
         'name' => 'totara_cohortdialog',
         'fullpath' => "/totara/cohort/dialog/{$prefix}cohort.js",
-        'requires' => array('json'));
+        'requires' => array('json')
+    );
     $args = array("enrolledselected" => $enrolledselected);
     $PAGE->requires->js_init_call("M.totara_{$prefix}cohort.init", $args, true, $jsmodule);
     unset($enrolledselected);
@@ -126,14 +127,14 @@ $editoroptions = array(
 );
 $type->descriptionformat = FORMAT_HTML;
 $type = file_prepare_standard_editor($type, 'description', $editoroptions, $context,
-                                          'totara_hierarchy', $shortprefix.'_type', $type->id);
+    'totara_hierarchy', $shortprefix.'_type', $type->id
+);
 $datatosend = array('prefix' => $prefix, 'class' => $class, 'page' => $page, 'id' => $id);
 $typeform  = new type_edit_form(null, $datatosend);
 $typeform->set_data($type);
 
 // cancelled
 if ($typeform->is_cancelled()) {
-
     redirect($returnurl);
 
 // update data
@@ -161,7 +162,8 @@ if ($typeform->is_cancelled()) {
     // Existing type.
     } else {
         $typenew = file_postupdate_standard_editor($typenew, 'description', $editoroptions,
-            $context, 'totara_hierarchy', $shortprefix.'_type', $typenew->id);
+            $context, 'totara_hierarchy', $shortprefix.'_type', $typenew->id
+        );
         $DB->update_record($shortprefix.'_type', $typenew);
 
         totara_hierarchy_save_cohorts_for_type($shortprefix, $prefix . 'id', $typenew);
@@ -173,7 +175,7 @@ if ($typeform->is_cancelled()) {
         $notification_text = $prefix . 'updatetype';
     }
 
-    \core\notification::success(get_string($notification_text, 'totara_hierarchy', $typenew->fullname));
+    \core\notification::success(get_string($notification_text, 'totara_hierarchy', format_string($typenew->fullname)));
     redirect($returnurl);
 }
 

@@ -28,7 +28,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
 class item_edit_form extends moodleform {
 
     // Define the form
-    function definition() {
+    public function definition() {
         global $CFG, $TEXTAREA_OPTIONS;
         $mform =& $this->_form;
 
@@ -61,10 +61,10 @@ class item_edit_form extends moodleform {
         $mform->addElement('hidden', 'page', $page);
         $mform->setType('page', PARAM_INT);
 
-        $label = $prefix === 'competency'? get_string('framework', 'totara_hierarchy') : get_string($prefix.'framework', 'totara_hierarchy');
-        $mform->addElement('text', 'framework', $label);
-        $mform->hardFreeze('framework');
-        $mform->setType('framework', PARAM_TEXT);
+        $label = $prefix === 'competency'
+            ? get_string('framework', 'totara_hierarchy')
+            : get_string($prefix.'framework', 'totara_hierarchy');
+        $mform->addElement('static', 'frameworkname', $label, format_string($framework->fullname));
 
         $parents = $hierarchy->get_parent_list($items, $item->id);
         // If we only have one possible parent, it must be the top level, so hide the
@@ -101,7 +101,6 @@ class item_edit_form extends moodleform {
         }
 
         if ($item->id) {
-
             $group = array();
             // display current type (static)
             $group[] = $mform->createElement('static', 'type', '');
@@ -115,14 +114,13 @@ class item_edit_form extends moodleform {
             // store the actual type ID
             $mform->addElement('hidden', 'typeid', $item->typeid);
             $mform->setType('typeid', PARAM_INT);
-
         } else {
             // new item
             if ($types) {
                 // show type picker if there are choices
                 $select = array('0' => '');
                 foreach ($types as $type) {
-                    $select[$type->id] = $type->fullname;
+                    $select[$type->id] = format_string($type->fullname);
                 }
                 $mform->addElement('select', 'typeid', get_string('type', 'totara_hierarchy'), $select, totara_select_width_limiter());
                 $mform->addHelpButton('typeid', $prefix.'type', 'totara_hierarchy');
@@ -150,7 +148,7 @@ class item_edit_form extends moodleform {
         $this->add_action_buttons();
     }
 
-    function set_data($data) {
+    public function set_data($data) {
         // Set the data for any fields specific to the hierarchy type.
         $hierarchy = $this->_customdata['hierarchy'];
         $hierarchy->set_additional_item_form_fields($data);
@@ -158,7 +156,7 @@ class item_edit_form extends moodleform {
         parent::set_data($data);
     }
 
-    function definition_after_data() {
+    public function definition_after_data() {
         global $DB;
 
         $mform =& $this->_form;
@@ -167,14 +165,11 @@ class item_edit_form extends moodleform {
         $shortprefix = hierarchy::get_short_prefix($prefix);
 
         if ($item = $DB->get_record($shortprefix, array('id' => $itemid))) {
-
             customfield_definition_after_data($mform, $item, $prefix, $item->typeid, $shortprefix.'_type');
-
         }
-
     }
 
-    function validation($itemnew, $files) {
+    public function validation($itemnew, $files) {
         global $DB;
 
         $hierarchy = $this->_customdata['hierarchy'];

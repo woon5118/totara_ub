@@ -57,7 +57,6 @@ if ($id == 0) {
     if (!$scale->sortorder) {
         $scale->sortorder = 1;
     }
-
 } else {
     // Editing existing competency scale.
     require_capability('totara/hierarchy:updatecompetencyscale', $sitecontext);
@@ -74,23 +73,22 @@ if ($id == 0) {
 $scale->description = isset($scale->description) ? $scale->description : '';
 $scale->descriptionformat = FORMAT_HTML;
 $scale = file_prepare_standard_editor($scale, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
-                                          'totara_hierarchy', 'comp_scale', $scale->id);
+    'totara_hierarchy', 'comp_scale', $scale->id
+);
 $mform = new edit_scale_form(
     null, // method (default)
     array( // customdata
-      'scaleid' => $id
-      )
-    );
+        'scaleid' => $id
+    )
+);
 $mform->set_data($scale);
 
 // If cancelled
 if ($mform->is_cancelled()) {
+    redirect("$CFG->wwwroot/totara/hierarchy/framework/index.php?prefix=competency");
 
-  redirect("$CFG->wwwroot/totara/hierarchy/framework/index.php?prefix=competency");
-
-  // Update data
+// Update data
 } else if ($scalenew = $mform->get_data()) {
-
     $scalenew->timemodified = time();
     $scalenew->usermodified = $USER->id;
     $scalenew->description = '';
@@ -123,7 +121,7 @@ if ($mform->is_cancelled()) {
         // Set the default scale value to the least competent one, and the
         // minimum proficient scale value to the most competent one
         if (count($scaleidlist)) {
-            $scalenew->defaultid = $scaleidlist[count($scaleidlist)-1];
+            $scalenew->defaultid = $scaleidlist[count($scaleidlist) - 1];
             $scalenew->minproficiencyid = $scaleidlist[0];
             $DB->update_record('comp_scale', $scalenew);
         }
@@ -144,19 +142,20 @@ if ($mform->is_cancelled()) {
         $notification_text = 'scaleupdated';
     }
     $notification_url = new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', ['prefix' => 'competency', 'id' => $scalenew->id]);
-    \core\notification::success(get_string($notification_text, 'totara_hierarchy', $scalenew->name));
+    \core\notification::success(get_string($notification_text, 'totara_hierarchy', format_string($scalenew->name)));
     redirect($notification_url);
 }
 
 /// Print Page
 $PAGE->navbar->add(get_string("competencyframeworks", 'totara_hierarchy'),
-    new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'competency')));
+    new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'competency'))
+);
 if ($id == 0) { // Add
-  $PAGE->navbar->add(get_string('scalescustomcreate'));
-  $heading = get_string('scalescustomcreate');
+    $PAGE->navbar->add(get_string('scalescustomcreate'));
+    $heading = get_string('scalescustomcreate');
 } else {    //Edit
-  $PAGE->navbar->add(get_string('editscale', 'grades', format_string($scale->name)));
-  $heading = get_string('editscale', 'grades');
+    $PAGE->navbar->add(get_string('editscale', 'grades', format_string($scale->name)));
+    $heading = get_string('editscale', 'grades');
 }
 
 echo $OUTPUT->header();

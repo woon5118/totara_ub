@@ -316,6 +316,10 @@ select {
   }
 }
 
+.mform .felement.fstatic {
+  padding-top: 4px;
+}
+
 // despite crazy name, roughly equivalent to bootstrap's .form-inline
 .invisiblefieldset {
   display: inline;
