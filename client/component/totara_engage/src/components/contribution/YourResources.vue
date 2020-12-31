@@ -45,6 +45,7 @@
           :show-access="true"
           :show-type="true"
           :show-topic="true"
+          :initial-filters="pageProps.filters"
           @access="filterAccess"
           @type="filterType"
           @topic="filterTopic"
@@ -69,8 +70,15 @@ export default {
     ContributionBaseContent,
     ContributionFilter,
   },
-
   mixins: [ContributionMixin, LibraryMixin],
+  props: {
+    pageProps: {
+      type: Object,
+      validator: function(value) {
+        return value.filters instanceof Object;
+      },
+    },
+  },
 
   computed: {
     filterChange() {

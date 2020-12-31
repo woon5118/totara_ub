@@ -23,6 +23,8 @@
 
 use totara_core\advanced_feature;
 use totara_engage\access\access_manager;
+use totara_engage\query\query;
+use totara_topic\provider\topic_provider;
 
 require_once(__DIR__ . '/../../config.php');
 global $USER, $OUTPUT, $PAGE;
@@ -39,6 +41,37 @@ $PAGE->set_title($title);
 $PAGE->set_pagelayout('legacynolayout');
 $PAGE->set_url(new moodle_url('/totara/engage/your_resources.php'));
 
+$query = new query();
+$query->set_component('totara_engage');
+$query->set_area('owned');
+
+$topics = [['id' => null, 'label' => get_string('all', 'core')]];
+foreach (topic_provider::get_all() as $topic) {
+    $topics[] = ['id' => $topic->get_id(), 'value' => $topic->get_id(), 'label' => $topic->get_display_name()];
+}
+
+$filters = [
+    'access'  => [
+        'label' => get_string('access', 'totara_engage'),
+        'options' => $query->get_filter_options('ACCESS')
+    ],
+    'type'    => [
+        'label' => get_string('filtertype', 'totara_engage'),
+        'options' => $query->get_filter_options('TYPE')
+    ],
+    'section' => [
+        'label' => get_string('filtersection', 'totara_engage'),
+        'options' => $query->get_filter_options('SECTION')
+    ],
+    'sort'    => [
+        'sort' => get_string('sort', 'totara_engage'),
+        'options' => $query->get_filter_options('SORT')
+    ],
+    'topic'   => [
+        'label' => get_string('topic', 'totara_engage'),
+        'options' => $topics
+    ],
+];
 $tui = new \totara_tui\output\component(
     'totara_engage/pages/LibraryView',
     [
@@ -49,7 +82,8 @@ $tui = new \totara_tui\output\component(
             'tuicomponent' => 'totara_engage/components/contribution/YourResources',
         ],
         'page-props' => [
-            'showNotification' => false
+            'showNotification' => false,
+            'filters' => $filters,
         ],
     ]
 );

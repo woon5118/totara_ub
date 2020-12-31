@@ -149,11 +149,17 @@ export default {
       type: [Array, Object],
       required: true,
     },
+    initialFilters: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
 
   data() {
     return {
       sortLabel: this.$str('sortby', 'core'),
+      filter: this.initialFilters,
       selection: {
         access: this.value.access,
         type: this.value.type,
@@ -172,6 +178,9 @@ export default {
           component: this.component,
           area: this.area,
         };
+      },
+      skip() {
+        return this.initialFilters !== null;
       },
       update({ accesses, types, topics, sorts, sections }) {
         topics = topics.map(({ id, value }) => {
