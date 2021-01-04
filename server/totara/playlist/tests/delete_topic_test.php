@@ -76,6 +76,7 @@ class totara_playlist_delete_topic_testcase extends advanced_testcase {
 
         /** @var topic $topic */
         foreach ($topics as $topic) {
+            $this->setAdminUser();
             $topic->delete();
             $this->execute_adhoc_tasks();
 

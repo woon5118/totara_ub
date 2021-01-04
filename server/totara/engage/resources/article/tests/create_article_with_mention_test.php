@@ -86,8 +86,8 @@ class engage_article_create_article_with_mention_testcase extends advanced_testc
      * @return void
      */
     public function test_create_article_with_mention_trigger_tasks_when_guest_user_is_in_session(): void {
-        global $USER;
         $this->setGuestUser();
+        $guest_user_id = guest_user()->id;
 
         $generator = $this->getDataGenerator();
 
@@ -120,7 +120,7 @@ class engage_article_create_article_with_mention_testcase extends advanced_testc
 
         $message_sink = phpunit_util::start_message_redirection();
 
-        // Triger adhoc tasks, as there should be a message sending out to the user two.
+        // Trigger adhoc tasks, as there should be a message sending out to the user two.
         $this->execute_adhoc_tasks();
         $messages = $message_sink->get_messages();
 
@@ -133,8 +133,8 @@ class engage_article_create_article_with_mention_testcase extends advanced_testc
         self::assertObjectHasAttribute('useridfrom', $message);
 
         // Check that we do not involve any guest user in here.
-        self::assertNotEquals($USER->id, $message->useridfrom);
-        self::assertNotEquals($USER->id, $message->useridto);
+        self::assertNotEquals($guest_user_id, $message->useridfrom);
+        self::assertNotEquals($guest_user_id, $message->useridto);
 
         self::assertEquals($user_one->id, $message->useridfrom);
         self::assertEquals($user_two->id, $message->useridto);

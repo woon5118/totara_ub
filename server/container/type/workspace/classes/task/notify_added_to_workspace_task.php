@@ -27,6 +27,7 @@ use container_workspace\output\added_to_workspace_notification;
 use container_workspace\workspace;
 use core\message\message;
 use core\task\adhoc_task;
+use core_user;
 
 /**
  * This task is to notify the user who had been added to a specific workspace.
@@ -59,6 +60,13 @@ final class notify_added_to_workspace_task extends adhoc_task {
         }
 
         $member = member::from_user($data->user_id, $data->workspace_id);
+        $recipient = core_user::get_user($member->get_user_id());
+        if (!$recipient) {
+            // Skip if user doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $member->get_user_id());
+            return;
+        }
+        cron_setup_user($recipient);
 
         $template = added_to_workspace_notification::create($member);
         $rendered_content = $OUTPUT->render($template);
@@ -71,7 +79,7 @@ final class notify_added_to_workspace_task extends adhoc_task {
         $message->fullmessageformat = FORMAT_PLAIN;
         $message->fullmessage = html_to_text($rendered_content);
         $message->fullmessagehtml = $rendered_content;
-        $message->userto = $member->get_user_id();
+        $message->userto = $recipient;
         $message->userfrom = \core_user::get_noreply_user();
 
         message_send($message);

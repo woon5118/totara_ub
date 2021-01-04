@@ -142,7 +142,6 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
      * @return void
      */
     public function test_process_json_editor_content_that_has_mention_with_user_in_session(): void {
-        global $USER;
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -185,7 +184,7 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
         self::assertObjectHasAttribute('useridfrom', $message);
         self::assertObjectHasAttribute('useridto', $message);
 
-        self::assertEquals($USER->id, $message->useridfrom);
+        self::assertEquals(get_admin()->id, $message->useridfrom);
         self::assertEquals($user_one->id, $message->useridto);
     }
 
@@ -248,7 +247,6 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
      * @return void
      */
     public function test_process_text_content_with_mention(): void {
-        global $USER;
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -280,7 +278,7 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
         self::assertObjectHasAttribute('useridto', $message);
         self::assertObjectHasAttribute('useridfrom', $message);
 
-        self::assertEquals($USER->id, $message->useridfrom);
+        self::assertEquals(get_admin()->id, $message->useridfrom);
         self::assertEquals($user_one->id, $message->useridto);
     }
 }

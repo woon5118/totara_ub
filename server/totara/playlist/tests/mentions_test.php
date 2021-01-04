@@ -49,7 +49,11 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR
         );
 
+
         $this->execute_adhoc_tasks();
+        // Set current user again because tasks use cron_setup_user().
+        $this->setUser($user);
+
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();

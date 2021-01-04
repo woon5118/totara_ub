@@ -28,6 +28,7 @@ use container_workspace\output\join_request_notification;
 use core\message\message;
 use core\task\adhoc_task;
 use container_workspace\workspace;
+use core_user;
 
 /**
  * An adhoc tasks to notify the workspace's owner that there are new request to join to the workspace.
@@ -65,8 +66,8 @@ final class notify_join_request_task extends adhoc_task {
         // There could be a same user origin.
         $requester_id = $member_request->get_user_id();
         if ($requester_id == $workspace_owner_id) {
-            // This should never happened as the workflow will not allow it - but we do extra checks here
-            // to keep it safety.
+            // This should never happen as the workflow will not allow it - but we do extra checks here
+            // to keep it safe.
             debugging(
                 "The user who made a request is the same as the workspace's owner",
                 DEBUG_DEVELOPER
@@ -83,13 +84,21 @@ final class notify_join_request_task extends adhoc_task {
             return;
         }
 
+        $recipient = core_user::get_user($workspace_owner_id);
+        if (!$recipient) {
+            // Ignore if user doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $workspace_owner_id);
+            return;
+        }
+        cron_setup_user($recipient);
+
         $template = join_request_notification::create($member_request);
         $rendered_content = $OUTPUT->render($template);
 
         $message = new message();
         $message->subject = get_string('member_request_title', 'container_workspace');
-        $message->userto = $workspace_owner_id;
-        $message->userfrom = \core_user::get_noreply_user();
+        $message->userto = $recipient;
+        $message->userfrom = core_user::get_noreply_user();
         $message->component = workspace::get_type();
         $message->name = 'join_request';
         $message->fullmessageformat = FORMAT_PLAIN;

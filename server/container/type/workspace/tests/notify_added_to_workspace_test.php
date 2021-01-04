@@ -22,12 +22,15 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/../../../../totara/core/tests/language_pack_faker_trait.php');
+
 use container_workspace\task\notify_added_to_workspace_task;
 use container_workspace\member\member;
 use container_workspace\notification\workspace_notification;
 use container_workspace\output\added_to_workspace_notification;
 
 class container_workspace_notify_added_to_workspace_testcase extends advanced_testcase {
+    use language_pack_faker_trait;
     /**
      * @throws coding_exception
      */
@@ -111,6 +114,43 @@ class container_workspace_notify_added_to_workspace_testcase extends advanced_te
 
         $this->assertEquals($rendered_content, $message->fullmessagehtml);
         $this->assertEquals(html_to_text($rendered_content), $message->fullmessage);
+    }
+
+    public function test_recipients_language_setting_is_observed(): void {
+        $generator = self::getDataGenerator();
+        $fake_language = 'xo_ox';
+        $this->add_fake_language_pack(
+            $fake_language,
+            [
+                'container_workspace' => [
+                    'member_added_title' => 'Fake language subject string'
+                ]
+            ]
+        );
+
+        $user_one = $generator->create_user();
+        self::setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Clear the adhoc tasks.
+        $this->execute_adhoc_tasks();
+
+        // Create user two and add the user to the workspace.
+        $user_two = $generator->create_user(['lang' => $fake_language]);
+        member::added_to_workspace($workspace, $user_two->id);
+
+        // Start the sinks and execute the adhoc tasks.
+        $message_sink = phpunit_util::start_message_redirection();
+        $this->execute_adhoc_tasks();
+
+        $messages = $message_sink->get_messages();
+        self::assertCount(1, $messages);
+        $message = reset($messages);
+
+        self::assertEquals('Fake language subject string', $message->subject);
     }
 
     /**

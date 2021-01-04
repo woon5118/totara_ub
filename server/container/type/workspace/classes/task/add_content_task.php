@@ -50,8 +50,6 @@ final class add_content_task extends adhoc_task {
         $sharer = core_user::get_user($data->sharer_id, '*', MUST_EXIST);
         $members = $this->get_members_for_notification($data->workspace_id, $data->sharer_id);
 
-        cron_setup_user($sharer);
-
         $workspace = workspace::from_id($data->workspace_id);
         $html_url = \html_writer::tag(
             'a',
@@ -60,9 +58,16 @@ final class add_content_task extends adhoc_task {
         );
 
         foreach ($members as $member) {
+            $recipient = core_user::get_user($member->get_member_user_id());
+            if (!$recipient) {
+                // Skip if user doesn't exist.
+                debugging('Skipped sending notification to non-existent user with id ' . $member->get_member_user_id());
+                continue;
+            }
+            cron_setup_user($recipient);
 
             $message = new message();
-            $message_data= new \stdClass();
+            $message_data = new \stdClass();
             $message_data->fullname = fullname($sharer);
             $message_data->item_name = $data->item_name;
             $message_data->workspace_name = format_string($workspace->get_name());
@@ -73,7 +78,7 @@ final class add_content_task extends adhoc_task {
             $message->component = 'container_workspace';
             $message->name = 'notification';
             $message->userfrom = $sharer;
-            $message->userto = core_user::get_user($member->get_member_user_id(), '*', MUST_EXIST);
+            $message->userto = $recipient;
             $message->subject = get_string('message_content_added_subject', 'container_workspace', $data->component);
             $message->fullmessage = html_to_text($message_content);
             $message->fullmessageformat = FORMAT_HTML;
@@ -85,7 +90,7 @@ final class add_content_task extends adhoc_task {
     }
 
     /**
-     * All workspace members have to get notification, except for sharer and members are inactive
+     * All workspace members have to get notification, except for sharer and members that are inactive
      * @param int $workspace_id
      * @param int $sharer_id
      * @return array|member[]

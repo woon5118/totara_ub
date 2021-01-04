@@ -22,6 +22,12 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/../../../totara/core/tests/language_pack_faker_trait.php');
+require_once(__DIR__ . '/fixtures/topic_resolver.php');
+
+use core\task\manager;
+use core_tag\entity\tag_instance;
+use totara_engage\access\access;
 use totara_topic\task\delete_notify_task;
 
 /**
@@ -31,6 +37,8 @@ use totara_topic\task\delete_notify_task;
  * Just a reminder to keep that person to take account of regression :)
  */
 class totara_topic_delete_notify_task_testcase extends advanced_testcase {
+    use language_pack_faker_trait;
+
     /**
      * @return void
      */
@@ -101,5 +109,81 @@ class totara_topic_delete_notify_task_testcase extends advanced_testcase {
         );
 
         $this->resetDebugging();
+    }
+
+    public function test_recipients_language_setting_is_observed(): void {
+        $generator = self::getDataGenerator();
+        $fake_language = 'xo_ox';
+        $this->add_fake_language_pack(
+            $fake_language,
+            [
+                'totara_topic' => [
+                    'topicdeleted' => 'Fake language subject string'
+                ]
+            ]
+        );
+
+        $actor = $generator->create_user();
+        $user_one = $generator->create_user(['lang' => $fake_language]);
+        $user_two = $generator->create_user();
+
+        // Clear adhoc tasks.
+        $this->execute_adhoc_tasks();
+        self::setAdminUser();
+
+        // Create a topic.
+        /** @var totara_topic_generator $topic_generator */
+        $topic_generator = self::getDataGenerator()->get_plugin_generator('totara_topic');
+        $topic_generator->add_default_area();
+        $topic = $topic_generator->create_topic();
+
+        // Create an article for both users.
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $generator->get_plugin_generator('engage_article');
+        foreach ([$user_one, $user_two] as $user) {
+            self::setUser($user);
+            $article_generator->create_article([
+                'userid' => $user->id,
+                'access' => access::PUBLIC,
+                'name' => 'Test article',
+                'topics' => [$topic->get_id()],
+            ]);
+        }
+
+        // Build components metadata.
+        $components['engage_article']['engage_resource'] = [];
+        $repo = tag_instance::repository();
+        $instances = $repo->get_instances_of_tag($topic->get_id());
+        foreach ($instances as $instance) {
+            $components['engage_article']['engage_resource'][] = $instance->itemid;
+        }
+
+        // Create and queue task.
+        $task = new delete_notify_task();
+        $task->set_component('totara_topic');
+        $task->set_custom_data(
+            [
+                'actor' => $actor->id,
+                'topicvalue' => 'Topic test name',
+                'components' => $components
+            ]
+        );
+        manager::queue_adhoc_task($task);
+
+        // Start the sink and execute the adhoc tasks.
+        $message_sink = phpunit_util::start_message_redirection();
+        $this->execute_adhoc_tasks();
+
+        $messages = $message_sink->get_messages();
+        self::assertCount(2, $messages);
+        $message_data = [];
+        foreach ($messages as $message) {
+            $message_data[$message->useridto] = $message->subject;
+        }
+
+        // user_one should receive message in fake language.
+        self::assertEquals('Fake language subject string', $message_data[$user_one->id]);
+        // user_two should receive message in default (en).
+        self::assertEquals('A topic has been deleted', $message_data[$user_two->id]);
     }
 }

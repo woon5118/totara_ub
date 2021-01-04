@@ -51,10 +51,21 @@ final class vote_notify_task extends adhoc_task {
             }
         }
 
-        $owner = core_user::get_user($data->owner, '*', MUST_EXIST);
-        $voter = core_user::get_user($data->voter, '*', MUST_EXIST);
+        $recipient = core_user::get_user($data->owner);
+        if (!$recipient) {
+            // Ignore if owner doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $data->owner);
+            return;
+        }
 
-        cron_setup_user($voter);
+        $voter = core_user::get_user($data->voter);
+        if (!$voter) {
+            // Ignore if voter doesn't exist.
+            debugging('Skipped sending notification from non-existent voter with id ' . $data->voter);
+            return;
+        }
+
+        cron_setup_user($recipient);
 
         $url = new \moodle_url($data->url);
         $template = vote_message::create($data->name ,$url);
@@ -65,7 +76,7 @@ final class vote_notify_task extends adhoc_task {
         $message->component = 'engage_survey';
         $message->name = 'voting_survey_notification';
         $message->userfrom = $voter;
-        $message->userto = $owner;
+        $message->userto = $recipient;
         $message->notification = 1;
         $message->subject = get_string('vote_message_subject', 'engage_survey');
         $message->fullmessage = html_to_text($message_body);

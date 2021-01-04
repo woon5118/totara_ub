@@ -24,6 +24,7 @@ namespace totara_topic\task;
 
 use core\message\message;
 use core\task\adhoc_task;
+use core_user;
 use totara_topic\hook\get_deleted_topic_usages;
 use totara_topic\output\delete_topic_email;
 use totara_topic\usage\item;
@@ -73,8 +74,7 @@ final class delete_notify_task extends adhoc_task {
             }
         }
 
-        $actor = \core_user::get_user($data->actor, '*', MUST_EXIST);
-        cron_setup_user($actor);
+        $actor = core_user::get_user($data->actor, '*', MUST_EXIST);
 
         // Building the list of structure data.
         $components = (array) $data->components;
@@ -95,7 +95,15 @@ final class delete_notify_task extends adhoc_task {
 
         require_once("{$CFG->dirroot}/lib/messagelib.php");
 
-        foreach ($recipients as $recipient => $items) {
+        foreach ($recipients as $recipient_id => $items) {
+            $recipient = core_user::get_user($recipient_id);
+            if (!$recipient) {
+                // Skip if user doesn't exist.
+                debugging('Skipped sending notification to non-existent user with id ' . $recipient_id);
+                continue;
+            }
+            cron_setup_user($recipient);
+
             $message = new message();
 
             $template = delete_topic_email::create($data->topicvalue, $items);

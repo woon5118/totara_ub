@@ -67,7 +67,7 @@ final class manager {
 
     /**
      * This is the main sharing function that will validate the instance that wants to be shared
-     * and if its sharable then a share will be created. The post-share functionality will also
+     * and if it's sharable then a share will be created. The post-share functionality will also be
      * executed.
      *
      * @param shareable $instance

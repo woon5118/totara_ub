@@ -27,7 +27,6 @@ use core\task\adhoc_task;
 use core_user;
 use totara_engage\output\like_message;
 
-
 final class like_notify_task extends adhoc_task {
     /**
      * Constructor.
@@ -52,14 +51,25 @@ final class like_notify_task extends adhoc_task {
             }
         }
 
-        $owner = core_user::get_user($data->owner, '*', MUST_EXIST);
-        $liker = core_user::get_user($data->liker, '*', MUST_EXIST);
+        $recipient = core_user::get_user($data->owner);
+        if (!$recipient) {
+            // Ignore if owner doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $data->owner);
+            return;
+        }
 
-        cron_setup_user($liker);
+        $liker = core_user::get_user($data->liker);
+        if (!$liker) {
+            // Ignore if liker doesn't exist.
+            debugging('Skipped sending notification from non-existent liker with id ' . $data->liker);
+            return;
+        }
+
+        cron_setup_user($recipient);
 
         $url = new \moodle_url($data->url);
 
-        // Initailize message body.
+        // Initialize message body.
         $message_body = new \stdClass();
         $message_body->fullname = fullname($liker);
         $message_body->name = $data->name;
@@ -69,7 +79,7 @@ final class like_notify_task extends adhoc_task {
         $template = like_message::create($message_body);
         $message_body = $OUTPUT->render($template);
 
-        // Initailize message subject.
+        // Initialize message subject.
         $subject = new \stdClass();
         $subject->fullname = fullname($liker);
         $subject->name = $data->resourcetype;
@@ -79,7 +89,7 @@ final class like_notify_task extends adhoc_task {
         $message->component = 'totara_engage';
         $message->name = 'like_notification';
         $message->userfrom = $liker;
-        $message->userto = $owner;
+        $message->userto = $recipient;
         $message->notification = 1;
         $message->subject = get_string('like_message_subject', 'totara_engage', $subject);
         $message->fullmessage = html_to_text($message_body);

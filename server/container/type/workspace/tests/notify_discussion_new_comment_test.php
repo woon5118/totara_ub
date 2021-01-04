@@ -22,6 +22,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/../../../../totara/core/tests/language_pack_faker_trait.php');
+
 use container_workspace\task\notify_discussion_new_comment_task;
 use totara_comment\comment_helper;
 use container_workspace\member\member;
@@ -30,6 +32,7 @@ use container_workspace\output\comment_on_discussion;
 use container_workspace\notification\workspace_notification;
 
 class container_workspace_notify_discussion_new_comment_testcase extends advanced_testcase {
+    use language_pack_faker_trait;
     /**
      * @return void
      */
@@ -92,7 +95,7 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
         // Make sure that we cleared the adhoc tasks first.
         $this->execute_adhoc_tasks();
 
-        // Now log in as user's one and create a comment on the discussion.
+        // Now log in as user one and create a comment on the discussion.
         $this->setUser($user_one);
 
         /** @var totara_comment_generator $comment_generator */
@@ -109,7 +112,7 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
         // Execute the adhoc tasks.
         $this->execute_adhoc_tasks();
 
-        // There should be a message send out to user's two - as the comment was created by user one.
+        // There should be a message sent out to user two - as the comment was created by user one.
         $messages = $message_sink->get_messages();
 
         $this->assertCount(1, $messages);
@@ -150,7 +153,7 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
 
         member::join_workspace($workspace, $user_two->id);
 
-        // Create the discussion as user's two.
+        // Create the discussion as user two.
         $workspace_id = $workspace->get_id();
         $user_two_discussion = $workspace_generator->create_discussion($workspace_id);
 
@@ -214,5 +217,59 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
 
         $messages = $message_sink->get_messages();
         $this->assertEmpty($messages);
+    }
+
+    public function test_recipients_language_setting_is_observed(): void {
+        $generator = self::getDataGenerator();
+        $fake_language = 'xo_ox';
+        $this->add_fake_language_pack(
+            $fake_language,
+            [
+                'container_workspace' => [
+                    'comment_on_discussion_title' => 'Fake language subject string'
+                ]
+            ]
+        );
+
+        $user_one = $generator->create_user();
+        self::setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Join the workspace as user two and create a discussion.
+        $user_two = $generator->create_user(['lang' => $fake_language]);
+        self::setUser($user_two);
+        member::join_workspace($workspace);
+        $user_two_discussion = $workspace_generator->create_discussion($workspace->get_id());
+
+        // Clear adhoc tasks.
+        $this->execute_adhoc_tasks();
+
+        // As user one, create a comment on the discussion.
+        self::setUser($user_one);
+        /** @var totara_comment_generator $comment_generator */
+        $comment_generator = $generator->get_plugin_generator('totara_comment');
+        $comment_generator->create_comment(
+            $user_two_discussion->get_id(),
+            'container_workspace',
+            discussion::AREA
+        );
+
+        // Start the sink.
+        $message_sink = phpunit_util::start_message_redirection();
+
+        // Execute the adhoc tasks.
+        $this->execute_adhoc_tasks();
+
+        // There should be a message sent out to user two - as the comment was created by user one.
+        $messages = $message_sink->get_messages();
+
+        self::assertCount(1, $messages);
+        $message = reset($messages);
+
+        self::assertEquals($user_two->id, $message->useridto);
+        self::assertEquals('Fake language subject string', $message->subject);
     }
 }

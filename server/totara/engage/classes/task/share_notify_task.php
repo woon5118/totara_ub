@@ -51,10 +51,20 @@ final class share_notify_task extends adhoc_task {
             }
         }
 
-        $sharer = core_user::get_user($data->sharer_id, '*', MUST_EXIST);
-        $recipient = core_user::get_user($data->recipient_id, '*', MUST_EXIST);
+        $recipient = core_user::get_user($data->recipient_id);
+        if (!$recipient) {
+            // Ignore if recipient doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $data->recipient_id);
+            return;
+        }
+        $sharer = core_user::get_user($data->sharer_id);
+        if (!$sharer) {
+            // Ignore if sharer doesn't exist.
+            debugging('Skipped sending notification from non-existent sharer with id ' . $data->sharer_id);
+            return;
+        }
 
-        cron_setup_user($sharer);
+        cron_setup_user($recipient);
 
         $message_body = new \stdClass();
         $message_body->fullname = fullname($sharer);

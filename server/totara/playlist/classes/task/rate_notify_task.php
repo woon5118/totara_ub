@@ -52,10 +52,21 @@ final class rate_notify_task extends adhoc_task {
             }
         }
 
-        $owner = core_user::get_user($data->owner, '*', MUST_EXIST);
-        $rater = core_user::get_user($data->rater, '*', MUST_EXIST);
+        $recipient = core_user::get_user($data->owner);
+        if (!$recipient) {
+            // Ignore if owner doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $data->owner);
+            return;
+        }
 
-        cron_setup_user($rater);
+        $rater = core_user::get_user($data->rater);
+        if (!$rater) {
+            // Ignore if rater doesn't exist.
+            debugging('Skipped sending notification from non-existent rater with id ' . $data->rater);
+            return;
+        }
+
+        cron_setup_user($recipient);
 
         $url = new \moodle_url($data->url);
         $template = rating_message::create($data->name ,$url);
@@ -66,7 +77,7 @@ final class rate_notify_task extends adhoc_task {
         $message->component = 'totara_playlist';
         $message->name = 'rating_playlist_notification';
         $message->userfrom = $rater;
-        $message->userto = $owner;
+        $message->userto = $recipient;
         $message->notification = 1;
         $message->subject = get_string('rating_message_subject', 'totara_playlist');
         $message->fullmessage = html_to_text($message_body);

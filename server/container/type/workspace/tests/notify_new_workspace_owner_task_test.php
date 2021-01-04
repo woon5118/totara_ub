@@ -22,10 +22,13 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/../../../../totara/core/tests/language_pack_faker_trait.php');
+
 use container_workspace\task\notify_new_workspace_owner_task;
 use container_workspace\output\transfer_ownership_notification;
 
 class container_workspace_notify_new_workspace_owner_task_testcase extends advanced_testcase {
+    use language_pack_faker_trait;
     /**
      * @return void
      */
@@ -114,4 +117,41 @@ class container_workspace_notify_new_workspace_owner_task_testcase extends advan
 
         $task->execute();
     }
+
+    public function test_recipients_language_setting_is_observed(): void {
+        $generator = self::getDataGenerator();
+        $fake_language = 'xo_ox';
+        $this->add_fake_language_pack(
+            $fake_language,
+            [
+                'container_workspace' => [
+                    'transfer_ownership_title' => 'Fake language subject string'
+                ]
+            ]
+        );
+
+        $user_one = $generator->create_user(['lang' => $fake_language]);
+        self::setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        $admin_user = get_admin();
+
+        $task = notify_new_workspace_owner_task::from_workspace($workspace->get_id(), $admin_user->id);
+
+        $sink = phpunit_util::start_message_redirection();
+        $sink->clear();
+
+        $task->execute();
+        $messages = $sink->get_messages();
+
+        self::assertCount(1, $messages);
+        $message = reset($messages);
+
+        self::assertEquals($user_one->id, $message->useridto);
+        self::assertEquals('Fake language subject string', $message->subject);
+    }
+
 }

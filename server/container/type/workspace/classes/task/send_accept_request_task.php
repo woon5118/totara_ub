@@ -27,6 +27,7 @@ use container_workspace\output\accept_notification;
 use core\message\message;
 use core\task\adhoc_task;
 use container_workspace\workspace;
+use core_user;
 
 /**
  * An adhoc task to send an email out to the user when their request is accepted.
@@ -63,6 +64,14 @@ final class send_accept_request_task extends adhoc_task {
         $target_user_id = $member_request->get_user_id();
         $workspace = $member_request->get_workspace();
 
+        $recipient = core_user::get_user($target_user_id);
+        if (!$recipient) {
+            // Ignore if user doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $target_user_id);
+            return;
+        }
+        cron_setup_user($recipient);
+
         $template = accept_notification::create($member_request);
         $content = $OUTPUT->render($template);
 
@@ -75,7 +84,7 @@ final class send_accept_request_task extends adhoc_task {
         $message_data->fullmessageformat = FORMAT_PLAIN;
         $message_data->fullmessagehtml = $content;
         $message_data->userfrom = $actor_id;
-        $message_data->userto = $target_user_id;
+        $message_data->userto = $recipient;
 
         message_send($message_data);
     }

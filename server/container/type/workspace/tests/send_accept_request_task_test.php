@@ -22,11 +22,14 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/../../../../totara/core/tests/language_pack_faker_trait.php');
+
 use core\orm\query\exceptions\record_not_found_exception;
 use container_workspace\task\send_accept_request_task;
 use container_workspace\member\member_request;
 
 class container_workspace_send_accept_request_task_testcase extends advanced_testcase {
+    use language_pack_faker_trait;
     /**
      * @return void
      */
@@ -96,8 +99,8 @@ class container_workspace_send_accept_request_task_testcase extends advanced_tes
      * @return void
      */
     public function test_execute_adhoc_task(): void {
-        global $USER;
         $this->setAdminUser();
+        $admin_id = get_admin()->id;
 
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
@@ -112,7 +115,7 @@ class container_workspace_send_accept_request_task_testcase extends advanced_tes
         $sink = phpunit_util::start_message_redirection();
         $task = new send_accept_request_task();
 
-        $task->set_userid($USER->id);
+        $task->set_userid($admin_id);
         $task->set_member_request_id($request->get_id());
 
         $task->execute();
@@ -151,9 +154,47 @@ class container_workspace_send_accept_request_task_testcase extends advanced_tes
         );
 
         $this->assertObjectHasAttribute('useridfrom', $message);
-        $this->assertEquals($USER->id, $message->useridfrom);
+        $this->assertEquals($admin_id, $message->useridfrom);
 
         $this->assertObjectHasAttribute('useridto', $message);
         $this->assertEquals($user_one->id, $message->useridto);
+    }
+
+    public function test_recipients_language_setting_is_observed(): void {
+        $generator = self::getDataGenerator();
+        $fake_language = 'xo_ox';
+        $this->add_fake_language_pack(
+            $fake_language,
+            [
+                'container_workspace' => [
+                    'approved_request_title' => 'Fake language subject string'
+                ]
+            ]
+        );
+        self::setAdminUser();
+
+        $user_one = $generator->create_user(['lang' => $fake_language]);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_private_workspace();
+
+        $request = member_request::create($workspace->get_id(), $user_one->id);
+        $request->accept();
+
+        $sink = phpunit_util::start_message_redirection();
+        $task = new send_accept_request_task();
+
+        $task->set_userid(get_admin()->id);
+        $task->set_member_request_id($request->get_id());
+
+        $task->execute();
+        $messages = $sink->get_messages();
+
+        self::assertCount(1, $messages);
+        $message = reset($messages);
+
+        self::assertEquals($user_one->id, $message->useridto);
+        self::assertEquals('Fake language subject string', $message->subject);
     }
 }

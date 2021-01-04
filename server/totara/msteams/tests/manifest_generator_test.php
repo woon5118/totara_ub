@@ -23,6 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+require_once(__DIR__ . '/../../../totara/core/tests/language_pack_faker_trait.php');
+
 use core\oauth2\api;
 use core\oauth2\issuer;
 use totara_msteams\auth_helper;
@@ -35,6 +37,7 @@ use totara_msteams\page_helper;
  * Test manifest\generator class.
  */
 class manifest_generator_testcase extends advanced_testcase {
+    use language_pack_faker_trait;
     /** @var string */
     private $manifestid;
 
@@ -145,37 +148,24 @@ class manifest_generator_testcase extends advanced_testcase {
     /**
      * Install a fake language pack 'xo_ox'.
      */
-    private function add_fake_language_pack() {
-        $sm = get_string_manager();
-        $rc = new ReflectionClass('core_string_manager_standard');
-        $get_key_suffix = $rc->getMethod('get_key_suffix');
-        $get_key_suffix->setAccessible(true);
-        $rccache = $rc->getProperty('menucache');
-        $rccache->setAccessible(true);
-        $cachekey = 'list_'.$get_key_suffix->invokeArgs($sm, array());
-        $cache = $rccache->getValue($sm);
-        $cache->set($cachekey, [
-            'en' => get_string('thislanguage', 'langconfig').' (en)',
-            'xo_ox' => 'Cryptolang (xo_ox)'
+    private function create_fake_language_pack() {
+        $this->add_fake_language_pack('xo_ox', [
+            'totara_msteams' => [
+                'botfw:cmd_help' => 'pleh',
+                'botfw:cmd_signin' => 'ningis',
+                'botfw:cmd_signout' => 'tuongis',
+                'botfw:help_help' => 'pleh yalpsid.',
+                'botfw:help_signin' => 'ni ngis.',
+                'botfw:help_signout' => 'tuo ngis.',
+                'botfw:mx_command_search' => 'eugolatac hcraes',
+                'botfw:mx_command_search_desc' => 'eugolatac hcraes',
+                'botfw:mx_command_search_term' => 'yreuq hcraes',
+                'botfw:mx_command_search_term_desc' => 'smret hcraes retne',
+                'tab:catalog' => 'gninrael dnif',
+                'tab:library' => 'yrarbil',
+                'tab:mylearning' => 'gninrael tnerruc',
+            ]
         ]);
-        $this->assertCount(2, get_string_manager()->get_list_of_translations(true));
-        force_current_language('xo_ox');
-        $this->overrideLangString('botfw:cmd_help', 'totara_msteams', 'pleh');
-        $this->overrideLangString('botfw:cmd_signin', 'totara_msteams', 'ningis');
-        $this->overrideLangString('botfw:cmd_signout', 'totara_msteams', 'tuongis');
-        $this->overrideLangString('botfw:help_help', 'totara_msteams', 'pleh yalpsid.');
-        $this->overrideLangString('botfw:help_signin', 'totara_msteams', 'ni ngis.');
-        $this->overrideLangString('botfw:help_signout', 'totara_msteams', 'tuo ngis.');
-        $this->overrideLangString('botfw:mx_command_search', 'totara_msteams', 'eugolatac hcraes');
-        $this->overrideLangString('botfw:mx_command_search_desc', 'totara_msteams', 'eugolatac hcraes');
-        $this->overrideLangString('botfw:mx_command_search_term', 'totara_msteams', 'yreuq hcraes');
-        $this->overrideLangString('botfw:mx_command_search_term_desc', 'totara_msteams', 'smret hcraes retne');
-        $this->overrideLangString('tab:catalog', 'totara_msteams', 'gninrael dnif');
-        $this->overrideLangString('tab:library', 'totara_msteams', 'yrarbil');
-        $this->overrideLangString('tab:mylearning', 'totara_msteams', 'gninrael tnerruc');
-        $this->assertSame('gninrael dnif', get_string('tab:catalog', 'totara_msteams'));
-        force_current_language('');
-        $this->assertSame('Find learning', get_string('tab:catalog', 'totara_msteams'));
     }
 
     /**
@@ -360,7 +350,7 @@ class manifest_generator_testcase extends advanced_testcase {
      * @dataProvider data_languages
      */
     public function test_generate_localisation(string $primary, string $secondary, string $primary_tag, string $secondary_tag) {
-        $this->add_fake_language_pack();
+        $this->create_fake_language_pack();
 
         set_config('bot_feature_enabled', 1, 'totara_msteams');
         set_config('messaging_extension_enabled', 1, 'totara_msteams');

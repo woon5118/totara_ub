@@ -26,6 +26,7 @@ use container_workspace\notification\workspace_notification;
 use container_workspace\output\comment_on_discussion;
 use container_workspace\workspace;
 use core\message\message;
+use core_user;
 use totara_comment\comment;
 use container_workspace\discussion\discussion;
 use core\task\adhoc_task;
@@ -81,14 +82,22 @@ final class notify_discussion_new_comment_task extends adhoc_task {
             return;
         }
 
+        $recipient = core_user::get_user($discussion_owner_id);
+        if (!$recipient) {
+            // Ignore if user doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $discussion_owner_id);
+            return;
+        }
+        cron_setup_user($recipient);
+
         $template = comment_on_discussion::create($discussion, $comment);
         $rendered_content = $OUTPUT->render($template);
         $author = $comment->get_user();
 
         $message = new message();
         $message->subject = get_string('comment_on_discussion_title', 'container_workspace', fullname($author));
-        $message->userto = $discussion->get_user_id();
-        $message->userfrom = \core_user::get_noreply_user();
+        $message->userto = $recipient;
+        $message->userfrom = core_user::get_noreply_user();
         $message->fullmessage = html_to_text($rendered_content);
         $message->fullmessagehtml = $rendered_content;
         $message->fullmessageformat = FORMAT_PLAIN;

@@ -27,6 +27,7 @@ use container_workspace\workspace;
 use core\task\adhoc_task;
 use core_container\factory;
 use core\message\message;
+use core_user;
 
 /**
  * An adhoc task to notify the new user owner, that they had been added as
@@ -70,12 +71,20 @@ final class notify_new_workspace_owner_task extends adhoc_task {
             throw new \coding_exception("Workspace does not have owner record");
         }
 
+        $recipient = core_user::get_user($new_owner_id);
+        if (!$recipient) {
+            // Ignore if user doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $new_owner_id);
+            return;
+        }
+        cron_setup_user($recipient);
+
         $template = transfer_ownership_notification::create($workspace, $data->author_id);
         $rendered_content = $OUTPUT->render($template);
 
         $message = new message();
-        $message->userfrom = \core_user::get_noreply_user();
-        $message->userto = $new_owner_id;
+        $message->userfrom = core_user::get_noreply_user();
+        $message->userto = $recipient;
         $message->subject = get_string('transfer_ownership_title', 'container_workspace');
         $message->fullmessage = html_to_text($rendered_content);
         $message->fullmessageformat = FORMAT_PLAIN;

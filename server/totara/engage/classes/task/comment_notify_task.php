@@ -51,17 +51,27 @@ final class comment_notify_task extends adhoc_task {
             }
         }
 
-        $owner = core_user::get_user($data->owner, '*', MUST_EXIST);
-        $commenter = core_user::get_user($data->commenter, '*', MUST_EXIST);
+        $recipient = core_user::get_user($data->owner);
+        if (!$recipient) {
+            // Ignore if owner doesn't exist.
+            debugging('Skipped sending notification to non-existent user with id ' . $data->owner);
+            return;
+        }
 
-        cron_setup_user($commenter);
+        $commenter = core_user::get_user($data->commenter);
+        if (!$commenter) {
+            // Ignore if commenter doesn't exist.
+            debugging('Skipped sending notification from non-existent commenter with id ' . $data->commenter);
+            return;
+        }
+        cron_setup_user($recipient);
 
         $url = new \moodle_url($data->url);
 
         $message_content = null;
         $subject_content = null;
 
-        // Initailize message body.
+        // Initialize message body.
         $message_body = new \stdClass();
         $message_body->fullname = fullname($commenter);
         $message_body->name = $data->name;
@@ -70,7 +80,7 @@ final class comment_notify_task extends adhoc_task {
         $template = comment_message::create($message_body, $data->is_comment);
         $message_body = $OUTPUT->render($template);
 
-        // Initailize message subject.
+        // Initialize message subject.
         $subject = new \stdClass();
         $subject->fullname = fullname($commenter);
         if ($data->is_comment) {
@@ -85,7 +95,7 @@ final class comment_notify_task extends adhoc_task {
         $message->component = $data->component;
         $message->name = $data->is_comment ? 'comment_notification' : 'reply_notification';
         $message->userfrom = $commenter;
-        $message->userto = $owner;
+        $message->userto = $recipient;
         $message->notification = 1;
         $message->subject = $subject_content;
         $message->fullmessage = html_to_text($message_body);
