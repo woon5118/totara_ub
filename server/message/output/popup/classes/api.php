@@ -120,6 +120,17 @@ class api {
             $useridto = $USER->id;
         }
 
+        // Is notification enabled?
+        if ($useridto == $USER->id) {
+            $disabled = $USER->emailstop;
+        } else {
+            $user = \core_user::get_user($useridto, "emailstop", MUST_EXIST);
+            $disabled = $user->emailstop;
+        }
+        if ($disabled) {
+            return 0;
+        }
+
         return $DB->count_records_sql(
             "SELECT count(id)
             FROM {message}
