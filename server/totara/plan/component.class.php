@@ -563,7 +563,7 @@ abstract class dp_base_component {
      * to approval confirmation
      */
     public function display_approval_list($pendingitems) {
-        $controls = html_writer::start_tag('div', array('class' => 'fullwidth generaltable', 'style' => 'display: table'));
+        $controls = html_writer::start_tag('div', array('class' => 'fullwidth generaltable', 'style' => 'display: table', 'role' => 'presentation'));
 
         foreach ($pendingitems as $item) {
             // @todo write abstracted display_item_name() and use here

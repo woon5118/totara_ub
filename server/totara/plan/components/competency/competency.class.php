@@ -581,6 +581,7 @@ class dp_competency_component extends dp_base_component {
 
         $table = new html_table();
         $table->attributes['class'] = 'fullwidth generaltable';
+        $table->attributes['role'] = 'presentation';
         foreach ($pendingitems as $item) {
             $row = array();
             // @todo write abstracted display_item_name() and use here
