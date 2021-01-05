@@ -32,9 +32,11 @@ use core\event\course_created;
 use core\event\course_module_created;
 use core\event\course_updated;
 use core\event\course_deleted;
+use stdClass;
 
 /**
  * Container for course
+ * @method static course from_record(stdClass $record)
  */
 class course extends container {
     /**

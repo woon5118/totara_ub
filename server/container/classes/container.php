@@ -22,6 +22,7 @@
  */
 namespace core_container;
 
+use coding_exception;
 use core_container\local\module_supported;
 use core_container\module\helper;
 use core_container\module\module;
@@ -580,6 +581,11 @@ abstract class container {
             $data->timemodified = time();
         }
 
+        if (!property_exists($data, 'id')) {
+            // Popuate the record's id, if it is not set.
+            $data->id = $this->get_id();
+        }
+
         $this->pre_update($data);
 
         $result = $this->do_update($data);
@@ -673,6 +679,9 @@ abstract class container {
             $context->update_moved($newparent);
         }
         $trans->allow_commit();
+
+        // Make sure the modinfo cache is reset, and bump the cacherev.
+        $this->rebuild_cache();
 
         if ($movecat || (isset($data->sortorder) && $this->sortorder != $data->sortorder)) {
             fix_course_sortorder();
