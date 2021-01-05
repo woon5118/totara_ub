@@ -178,6 +178,7 @@
                     :accessible-label="sectionElement.element.title"
                     :required="sectionElement.element.is_required"
                     :aria-describedby="checkboxGroupId"
+                    :active-section-is-closed="activeSectionIsClosed"
                   >
                     <template v-slot:content="{ labelId }">
                       <component

@@ -104,6 +104,9 @@
                   v-if="
                     elementResponse.is_respondable && sectionResponse.can_answer
                   "
+                  :from-print="
+                    elementResponse.is_respondable && sectionResponse.can_answer
+                  "
                 >
                   <template v-slot:content>
                     <component

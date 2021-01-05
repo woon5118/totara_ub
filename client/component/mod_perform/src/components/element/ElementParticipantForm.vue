@@ -17,17 +17,27 @@
 -->
 <template>
   <div class="tui-performElementResponse">
-    <div v-if="error">{{ error }}</div>
-    <FormRow
-      v-slot="{ labelId }"
-      :label="$str('your_response', 'mod_perform')"
-      :accessible-label="accessibleLabel"
-      :required="required"
-      :optional="optional"
-      :aria-describedby="ariaDescribedby"
-    >
-      <slot name="content" :labelId="labelId" />
-    </FormRow>
+    <template v-if="activeSectionIsClosed || fromPrint">
+      <div class="tui-performElementResponse__section">
+        <div class="tui-performElementResponse__label">
+          {{ $str('your_response', 'mod_perform') }}
+        </div>
+        <slot name="content" />
+      </div>
+    </template>
+    <template v-else>
+      <div v-if="error">{{ error }}</div>
+      <FormRow
+        v-slot="{ labelId }"
+        :label="$str('your_response', 'mod_perform')"
+        :accessible-label="accessibleLabel"
+        :required="required"
+        :optional="optional"
+        :aria-describedby="ariaDescribedby"
+      >
+        <slot name="content" :labelId="labelId" />
+      </FormRow>
+    </template>
   </div>
 </template>
 
@@ -44,6 +54,8 @@ export default {
     required: Boolean,
     optional: Boolean,
     ariaDescribedby: String,
+    activeSectionIsClosed: Boolean,
+    fromPrint: Boolean,
   },
 };
 </script>
@@ -54,3 +66,21 @@ export default {
     ]
   }
 </lang-strings>
+<style lang="scss">
+.tui-performElementResponse {
+  &__section {
+    display: flex;
+  }
+
+  @media (max-width: $tui-screen-sm) {
+    &__section {
+      display: block;
+    }
+  }
+
+  &__label {
+    @include tui-font-heading-label();
+    flex-basis: 22rem;
+  }
+}
+</style>
