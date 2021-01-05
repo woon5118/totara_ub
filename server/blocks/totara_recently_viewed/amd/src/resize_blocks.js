@@ -22,9 +22,9 @@
 
 define(['jquery'], function ($) {
     var init = function (block_id) {
-        var block_selector = '#inst' + block_id;
+        var blockSelector = '#inst' + block_id;
         // Only care about tile-based blocks
-        if ($(block_selector).find('.block-totara-recently-viewed.block-trv-tiles').length === 0) {
+        if ($(blockSelector).find('.block-totara-recently-viewed.block-trv-tiles').length === 0) {
             return;
         }
 
@@ -35,24 +35,24 @@ define(['jquery'], function ($) {
             clearTimeout(timer);
             timer = setTimeout(function () {
                 // Only run if the block is inside the main, top or bottom panels
-                var block = $('#region-main, #block-region-top, #block-region-bottom').find(block_selector + ':first');
+                var block = $('#region-main, #block-region-top, #block-region-bottom').find(blockSelector + ':first');
                 if (block.length === 0 || block.is('.hidden')) {
                     return;
                 }
 
                 var width = block.width();
-                var cards_per_row = Math.floor(width / 214);
-                if (!cards_per_row) {
-                    cards_per_row = 1;
+                var cardsPerRow = Math.floor(width / 214);
+                if (!cardsPerRow) {
+                    cardsPerRow = 1;
                 }
-                var flex_basis = 100 / cards_per_row;
-                if (cards_per_row === 1) {
+                var widthPercentage = 100 / cardsPerRow;
+                if (cardsPerRow === 1) {
                     block.find('.block-trv-layout-horizontal').addClass('block-trv-layout-horizontal-single');
                 } else {
                     block.find('.block-trv-layout-horizontal').removeClass('block-trv-layout-horizontal-single');
                 }
 
-                block.find('li.block-trv-card-li').css('flex-basis', flex_basis + '%');
+                block.find('li.block-trv-card-li').css('width', widthPercentage + '%');
 
             }, 200);
         };
