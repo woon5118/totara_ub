@@ -1095,6 +1095,10 @@ select.menuf2f-select {
     &--inactive {
       background: var(--color-neutral-2);
     }
+
+    &__button {
+      text-align: center;
+    }
   }
 }
 
