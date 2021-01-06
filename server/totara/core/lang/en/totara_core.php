@@ -869,6 +869,7 @@ $string['userdataitemexternal_tokens_help'] = 'All access tokens for webservices
 $string['userdataitemportfolios'] = 'Portfolio exports';
 $string['userdataitemportfolios_help'] = 'Records of exports a user has made to portfolios. This does not include or affect the actual data that was exported to the portfolio.';
 $string['userdataitemquickaccess_preferences'] = 'Quick access menu user preferences';
+$string['userdataitemvirtualmeetings'] = 'Virtual meetings';
 $string['validation_invalid_number'] = 'Please enter a valid number';
 $string['validation_invalid_integer'] = 'Please enter a valid whole number';
 $string['validation_invalid_min_length'] = 'Please enter at least {$a->len} characters';
