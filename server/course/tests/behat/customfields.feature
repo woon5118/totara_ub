@@ -95,13 +95,15 @@ Feature: Course customfields can be created and populated
 
     When I click on "Courses" in the totara menu
     And I press "Add a new course"
+    When I expand all fieldsets
     And I set the following fields to these values:
       | Course full name            | Test course                          |
       | Course short name           | Test prog                             |
       | Course checkbox             | 1                                     |
+      | customfield_datetime[enabled] | 1                                   |
       | customfield_datetime[day]   | 20                                    |
       | customfield_datetime[month] | October                               |
-      | customfield_datetime[year]  | 2020                                  |
+      | customfield_datetime[year]  | ## + 1 year ## Y ##                   |
       | customfield_locationaddress | 150 Willis Street, Te Aro, Wellington |
       | Course text area            | This is within an editor              |
       | Course text input           | This is an input                      |

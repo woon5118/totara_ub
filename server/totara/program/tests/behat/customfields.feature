@@ -96,6 +96,7 @@ Feature: Program and certification customfields can be created and populated
 
     When I click on "Programs" in the totara menu
     And I press "Add a new program"
+    And I expand all fieldsets
     And I set the following fields to these values:
       | Full name                     | Test program                          |
       | Short name                    | Test prog                             |
@@ -103,7 +104,7 @@ Feature: Program and certification customfields can be created and populated
       | customfield_datetime[enabled] | 1                                     |
       | customfield_datetime[day]     | 20                                    |
       | customfield_datetime[month]   | October                               |
-      | customfield_datetime[year]    | 2020                                  |
+      | customfield_datetime[year]    | ## + 1 year ## Y ##                   |
       | customfield_locationaddress   | 150 Willis Street, Te Aro, Wellington |
       | Program text area             | This is within an editor              |
       | Program text input            | This is an input                      |
@@ -125,7 +126,8 @@ Feature: Program and certification customfields can be created and populated
     And I press "Save changes"
     And I follow "Overview"
     Then I should see "Yes" for "Program checkbox" in the program overview
-    And I should see "20 October 2020" for "Program date/time" in the program overview
+    # Ignore year as custom fields default to the current year
+    And I should see "20 October" for "Program date/time" in the program overview
     And I should see "leaves-green.png" for "Program file" in the program overview
     And I should see "150 Willis Street, Te Aro, Wellington" for "Program location" in the program overview
     And I should see "This is within an editor" for "Program text area" in the program overview
