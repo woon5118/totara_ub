@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Test the manage_virtualmeetings_adhoc_task task.
  * @coversDefaultClass mod_facetoface\task\manage_virtualmeetings_adhoc_task
  */
-class manage_virtualmeetings_adhoc_task_testcase extends advanced_testcase {
+class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced_testcase {
 
     private $user1;
     private $user2;

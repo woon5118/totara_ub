@@ -2627,6 +2627,7 @@ $string['userdataitemcustomfields'] = 'Sign-up and cancellation custom fields';
 $string['userdataitemfacilitator'] = 'Facilitator records';
 $string['userdataitemfacilitator_customfields'] = 'Facilitator custom fields';
 $string['userdataiteminterest'] = 'Declared interest';
+$string['userdataitemroom_virtualmeeting'] = 'Virtual meeting rooms created by the user';
 $string['userdataitemsignups'] = 'Attendance records';
 $string['userdoesnotexist'] = 'User with {$a->fieldname} "{$a->value}" does not exist';
 $string['useriddoesnotexist'] = 'User with ID "{$a}" does not exist';

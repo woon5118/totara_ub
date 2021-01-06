@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Test vitualmeeting rooms classes
  */
-class virtualmeeting_rooms_testcase extends advanced_testcase {
+class mod_facetoface_virtualmeeting_room_testcase extends advanced_testcase {
 
     public function test_room_virtualmeeting() {
         global $DB;

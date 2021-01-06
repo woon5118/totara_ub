@@ -261,14 +261,13 @@ final class room implements seminar_iterator_item, seminar_attachment_item {
         $this->delete_embedded_files();
 
         // Unlink this room from a virtual meeting.
-        \mod_facetoface\room_virtualmeeting::delete_by_roomid($this->id);
+        room_virtualmeeting::delete_by_roomid($this->id);
 
-        // FIXME: this just draft
         // Get room date ids for this room
         $roomdates = $DB->get_records('facetoface_room_dates', ['roomid' => $this->id]);
         foreach ($roomdates as $roomdate) {
             // Unlink this room from a room dates_virtual meeting.
-            $DB->delete_records('facetoface_room_dates_virtualmeeting', ['roomdateid' => $roomdate->id]);
+            room_dates_virtualmeeting::delete_by_roomdateid($roomdate->id);
         }
 
         // Unlink this room from any session.

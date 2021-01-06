@@ -70,7 +70,7 @@ class room_virtualmeeting implements seminar_iterator_item {
 
     /**
      * Seminar room virtual meeting constructor
-     * @param int $id {facetoface_virtualmeeting}.id If 0 - new Seminar Room virtual meeting will be created
+     * @param int $id {facetoface_room_virtualmeeting}.id If 0 - new Seminar Room virtual meeting will be created
      */
     public function __construct(int $id = 0) {
         if ((int)$id > 0) {
