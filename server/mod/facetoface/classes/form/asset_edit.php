@@ -80,7 +80,7 @@ class asset_edit extends \moodleform {
         $editoropts = $TEXTAREA_OPTIONS;
         $editoropts['autosave'] = false;
         // Asset description.
-        $mform->addElement('editor', 'description_editor', get_string('assetdescription', 'mod_facetoface'), null, $editoropts);
+        $mform->addElement('editor', 'description_editor', get_string('assetdescription', 'mod_facetoface'), ['rows' => 7], $editoropts);
 
         // Asset customfields.
         customfield_definition($mform, (object)['id' => $asset->get_id()], 'facetofaceasset', 0, 'facetoface_asset');

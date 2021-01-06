@@ -128,7 +128,7 @@ class facilitator_edit extends \moodleform {
         $editoropts = $TEXTAREA_OPTIONS;
         $editoropts['autosave'] = false;
         // Facilitator description.
-        $mform->addElement('editor', 'description_editor', get_string('facilitatordescriptionlabel', 'mod_facetoface'), null, $editoropts);
+        $mform->addElement('editor', 'description_editor', get_string('facilitatordescriptionlabel', 'mod_facetoface'), ['rows' => 7], $editoropts);
 
         // Facilitator custom fields.
         customfield_definition($mform, (object)['id' => $facilitator->get_id()], $prefix, 0, $tblprefix);

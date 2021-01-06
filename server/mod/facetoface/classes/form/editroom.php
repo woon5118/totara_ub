@@ -94,7 +94,7 @@ class editroom extends \moodleform {
         $editoropts = $TEXTAREA_OPTIONS;
         $editoropts['autosave'] = false;
         // Room Description.
-        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'mod_facetoface'), null, $editoropts);
+        $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'mod_facetoface'), ['rows' => 7], $editoropts);
 
         // Virtual meeting room.
         $adhoc = $this->_customdata['adhoc'];
