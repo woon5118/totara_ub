@@ -31,6 +31,8 @@ Feature: Add seminar attendees from csv file with custom fields
     And I set the following fields to these values:
       | Full name                   | Signup date/time |
       | Short name (must be unique) | datetime         |
+      | Start year                  | 2020             |
+    # ^^^ do not change the start year ^^^
     And I press "Save changes"
 
   Scenario: Login as manager, upload csv file with custom fields using bulk add attendees from file and check the result.
