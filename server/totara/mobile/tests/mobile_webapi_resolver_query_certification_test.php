@@ -245,7 +245,7 @@ class totara_mobile_webapi_resolver_query_certification_testcase extends advance
                 $cinfo['duedate'] = null;
                 $cinfo['duedateState'] = null;
                 $cinfo['native'] = false;
-                $cinfo['imageSrc'] = '';
+                $cinfo['imageSrc'] = 'https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage';
                 $cinfo['__typename'] = 'totara_mobile_learning_item';
 
                 $cscourses[] = $cinfo;
