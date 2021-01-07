@@ -44,6 +44,6 @@
 }}
 {{#errors_has_items}}
     <div class="totara_form-error-container">
-        {{#errors}}<span class="validation-error" tabindex="0">{{{message}}}</span><br />{{/errors}}
+        {{#errors}}<span id="id_error_{{elementname}}" class="validation-error">{{{message}}}</span><br />{{/errors}}
     </div>
 {{/errors_has_items}}

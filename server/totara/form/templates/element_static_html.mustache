@@ -65,5 +65,7 @@
     {{#label}}
         <div class="tf_element_title"><span class="legend">{{{.}}}</span>{{> totara_form/help_button}}</div>
     {{/label}}
-    <div class="tf_element_input" id="{{id}}">{{> totara_form/validation_errors}}{{{html}}}</div>
+    <div class="tf_element_input" id="{{id}}"
+         {{#errors_has_items}}aria-describedby="{{#errorelementnames}}id_error_{{.}} {{/errorelementnames}}"{{/errors_has_items}}
+    >{{> totara_form/validation_errors}}{{{html}}}</div>
 </div>

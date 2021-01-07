@@ -83,6 +83,7 @@
             {{#size}}size="{{.}}"{{/size}} {{#maxlength}}maxlength="{{.}}"{{/maxlength}}
             {{#cols}}cols="{{.}}"{{/cols}} {{#rows}}rows="{{.}}"{{/rows}} {{#wrap}}wrap="{{.}}"{{/wrap}}
             {{#placeholder}}placeholder="{{.}}"{{/placeholder}}
+            {{#errors_has_items}}aria-describedby="{{#errorelementnames}}id_error_{{.}} {{/errorelementnames}}"{{/errors_has_items}}
         >{{value}}</textarea>
     </div>
 </div>

@@ -158,10 +158,25 @@ trait trait_item_validation {
     protected function set_validator_template_data(&$data, \renderer_base $output) {
         $data['errors_has_items'] = false;
         $data['errors'] = array();
+        $data['errorelementnames'] = [];
         if ($this->errors) {
             $data['errors_has_items'] = true;
+            $errorcount = 0;
             foreach ($this->errors as $error) {
-                $data['errors'][] = array('message' => (string)$error);
+                $error_element_name = $this->get_name();
+                // If there is more than one error for an element we need
+                // to append a number to the end of the name to ensure unique ids
+                if ($errorcount++ > 0) {
+                    $error_element_name = $error_element_name . $errorcount;
+                }
+
+                $data['errors'][] = array(
+                    'message' => (string)$error,
+                    'elementname' => $error_element_name,
+                );
+
+                // Info required when adding aria-describedby tag
+                $data['errorelementnames'][] = $error_element_name;
             }
         }
         foreach ($this->validators as $validator) {

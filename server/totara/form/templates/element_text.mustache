@@ -75,5 +75,6 @@
     <div class="tf_element_input">{{> totara_form/validation_errors}}<input type="text" autocomplete="off" id="{{id}}" {{#frozen}}disabled data-{{/frozen}}name="{{name}}" value="{{value}}"
         {{#required}}required{{/required}} {{#size}}size="{{.}}"{{/size}} {{#maxlength}}maxlength="{{.}}"{{/maxlength}}
         {{#placeholder}}placeholder="{{.}}"{{/placeholder}}
+        {{#errors_has_items}}aria-describedby="{{#errorelementnames}}id_error_{{.}} {{/errorelementnames}}"{{/errors_has_items}}
     /></div>
 </div>

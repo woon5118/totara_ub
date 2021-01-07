@@ -188,6 +188,7 @@ class checkboxes extends element {
             'name__' . $this->get_name() => true,
             'name' => $this->get_name(),
             'id' => $id,
+            'legendid' => 'tfiid_' . $this->get_name() . '_' . $model->get_id_suffix() . '__legend',
             'label' => (string)$this->label,
             'frozen' => $this->is_frozen(),
             'options' => array(),

@@ -1,7 +1,27 @@
 This file describes API changes in Totara forms,
 information provided here is intended especially for developers.
 
-=== 13.0 ===
+=== 13.4 ===
+
+* Accessibility attributes Aria-describedby and aria-labelledby have been added to the following templates:
+** totara/form/templates/element_action_button.mustache
+** totara/form/templates/element_checkbox.mustache
+** totara/form/templates/element_checkboxes.mustache
+** totara/form/templates/element_datetime.mustache
+** totara/form/templates/element_email.mustache
+** totara/form/templates/element_multiselect.mustache
+** totara/form/templates/element_number.mustache
+** totara/form/templates/element_passwordunmask.mustache
+** totara/form/templates/element_radios.mustache
+** totara/form/templates/element_select.mustache
+** totara/form/templates/element_static_html.mustache
+** totara/form/templates/element_tel.mustache
+** totara/form/templates/element_text.mustache
+** totara/form/templates/element_textarea.mustache
+** totara/form/templates/element_url.mustache
+** totara/form/templates/element_utc10date.mustache
+** totara/form/templates/element_yesno.mustache
+* Added id and removed tabindex in totara/form/templates/validation_errors.mustache
 
 === 12.0 ===
 

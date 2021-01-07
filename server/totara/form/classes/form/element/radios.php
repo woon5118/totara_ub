@@ -171,6 +171,7 @@ class radios extends element implements supports_onchange_clientactions {
             'name__' . $this->get_name() => true,
             'name' => $this->get_name(),
             'id' => $id,
+            'legendid' => 'tfiid_' . $this->get_name() . '_' . $this->get_model()->get_id_suffix() . '__legend',
             'label' => (string)$this->label,
             'frozen' => $this->is_frozen(),
             'options' => array(),

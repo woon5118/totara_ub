@@ -77,6 +77,7 @@
 <div class="tf_element totara_form_element_multiselect">
     <div class="tf_element_title"><label class="legend" for="{{id}}">{{label}}{{#required}}{{> totara_form/required_suffix}}{{/required}}</label>{{> totara_form/help_button}}</div>
     <div class="tf_element_input">{{> totara_form/validation_errors}}<select multiple id="{{id}}" {{#frozen}}disabled data-{{/frozen}}name="{{name}}[]"
+        {{#errors_has_items}}aria-describedby="{{#errorelementnames}}id_error_{{.}} {{/errorelementnames}}"{{/errors_has_items}}
         {{#required}}required{{/required}} {{#size}}size="{{.}}"{{/size}} >
         {{#options}}
             <option value="{{value}}" {{#selected}}selected{{/selected}}>{{{text}}}</option>
