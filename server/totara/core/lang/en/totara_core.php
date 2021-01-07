@@ -35,6 +35,7 @@ $string['activate'] = 'Activate';
 $string['activitycompletionunlockedtext'] = 'When you save changes, completion state for all learners who have completed this activity will be erased. If you change your mind about this, do not save the form.';
 $string['activitycompletionunlockednoresettext'] = 'Completion has been unlocked without deleting activity completion data. After this change different users may have received their completion status for different reasons.';
 $string['accordion:accordionitem'] = 'Accordion Item';
+$string['accordion_aria_expand'] = 'Expand {$a}';
 $string['add'] = 'Add';
 $string['addextended'] = 'Add {$a}';
 $string['addanothercolumn'] = 'Add another column...';

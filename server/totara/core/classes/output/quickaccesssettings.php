@@ -63,14 +63,17 @@ final class quickaccesssettings extends \core\output\template {
         $actions = self::get_group_actions();
 
         foreach (self::organise_items_by_group($menu->get_items(), $allgroups) as $group => $items) {
+            $title = (string)$allgroups[$group]->get_label();
+
             $groups[$group] = [
                 'key'           => $group,
-                'title'         => (string)$allgroups[$group]->get_label(),
+                'title'         => $title,
                 'has_items'     => !empty($items),
                 'item_count'    => count($items),
                 'items'         => [],
                 'actions'       => $actions->export_for_template($OUTPUT),
                 'tree_selector' => $tree_selector,
+                'expandlabel'   => get_string('accordion_aria_expand', 'totara_core', $title)
             ];
             /** @var item $item */
             foreach ($items as $item) {

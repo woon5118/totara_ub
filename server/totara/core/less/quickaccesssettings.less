@@ -26,6 +26,22 @@
     &-header {
       background-color: @totara_core__QuickAccessSettings__accordion-header--bg-color;
       padding: @totara_core__QuickAccessSettings__spacing;
+      
+      button.totara_core__Accordion__item__header__icon {
+        background: none;
+        border: 0px;
+
+        &:hover {
+          border: 0px;
+          box-shadow: none;
+        }
+
+        &:focus {
+          outline: 1px dashed;
+          outline-offset: 1px;
+          box-shadow: none;
+        }
+      }
 
       &::after {
         content: '';

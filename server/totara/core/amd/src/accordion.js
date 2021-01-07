@@ -119,7 +119,7 @@ define(['core/templates'], function(templates) {
             elem.classList.add('collapsed');
         }
 
-        elem.querySelector('.totara_core__Accordion__item__header').setAttribute('aria-expanded', newState);
+        elem.querySelector('.totara_core__Accordion__item__header__icon').setAttribute('aria-expanded', newState);
 
         var icon = newState ? 'totara_core|accordion-expanded' : 'totara_core|accordion-collapsed';
 
@@ -152,7 +152,7 @@ define(['core/templates'], function(templates) {
             var child = children.item(i);
 
             child.classList.add('collapsed');
-            child.querySelector('.totara_core__Accordion__item__header').setAttribute('aria-expanded', false);
+            child.querySelector('.totara_core__Accordion__item__header__icon').setAttribute('aria-expanded', false);
         }
 
         //Run this loop seperately so icon loading doesn't delay collapse

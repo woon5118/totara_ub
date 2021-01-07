@@ -38,6 +38,22 @@
       padding: $quickAccessSettings-spacing-medium;
       background-color: $quickAccessSettings-accordion-header-bg-color;
 
+      button.totara_core__Accordion__item__header__icon {
+        background: none;
+        border: 0px;
+
+        &:hover {
+          border: 0px;
+          box-shadow: none;
+        }
+
+        &:focus {
+          outline: 1px dashed;
+          outline-offset: 1px;
+          box-shadow: none;
+        }
+      }
+
       .fa-pencil {
         font-size: $quickAccessSettings-accordion-icon-size;
       }
