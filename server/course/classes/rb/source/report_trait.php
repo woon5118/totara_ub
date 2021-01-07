@@ -196,6 +196,17 @@ trait report_trait {
         );
         $columnoptions[] = new \rb_column_option(
             'course',
+            'enddate',
+            get_string('course_enddate', 'totara_reportbuilder'),
+            "$join.enddate",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp'
+            )
+        );
+        $columnoptions[] = new \rb_column_option(
+            'course',
             'name_and_summary',
             get_string('coursenameandsummary', 'totara_reportbuilder'),
             // Case used to merge even if one value is null.
@@ -352,6 +363,13 @@ trait report_trait {
             'course',
             'startdate',
             get_string('coursestartdate', 'totara_reportbuilder'),
+            'date',
+            array('castdate' => true)
+        );
+        $filteroptions[] = new \rb_filter_option(
+            'course',
+            'enddate',
+            get_string('course_enddate', 'totara_reportbuilder'),
             'date',
             array('castdate' => true)
         );

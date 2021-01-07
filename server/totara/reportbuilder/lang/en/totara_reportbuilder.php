@@ -193,6 +193,7 @@ $string['contentdesc_delim'] = '" or "';
 $string['context'] = 'Context';
 $string['couldnotsortjoinlist'] = 'Could not sort join list. Source either contains circular dependencies or references a non-existent join';
 $string['course_completion'] = 'Course Completion';
+$string['course_enddate'] = 'Course End date';
 $string['courseenddate'] = 'End date';
 $string['courseenrolavailable'] = 'Open enrolment';
 $string['courseenroltype'] = 'Enrolment type';
