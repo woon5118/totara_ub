@@ -41,6 +41,7 @@ $string['errorcsvcolumnsextra'] = 'Following unknown columns cannot be present i
 $string['eventtenantcreated'] = 'Tenant created';
 $string['eventtenantdeleted'] = 'Tenant deleted';
 $string['eventtenantupdated'] = 'Tenant updated';
+$string['loginlink'] = 'Tennant login page';
 $string['membercount'] = 'Number of members';
 $string['migrationtomemberwarning'] = 'Warning: user account will be migrated to dedicated Tenant account, participation in all other tenants will be terminated.';
 $string['migrationtononmemberwarning'] = 'Warning: dedicated tenant user account will be migrated to global user account.';

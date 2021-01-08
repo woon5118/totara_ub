@@ -109,6 +109,19 @@ final class rb_source_tenants extends rb_base_source {
 
         $columnoptions[] = new \rb_column_option(
             'tenant',
+            'login_link',
+            get_string('loginlink', 'totara_tenant'),
+            "base.idnumber",
+            array(
+                'dbdatatype' => 'char',
+                'displayfunc' => 'tenant_login_link',
+                'outputformat' => 'html',
+            )
+        );
+
+
+        $columnoptions[] = new \rb_column_option(
+            'tenant',
             'idnumber',
             get_string('tenantidnumber', 'totara_tenant'),
             "base.idnumber",
