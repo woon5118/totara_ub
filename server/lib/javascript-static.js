@@ -758,7 +758,7 @@ M.util.add_strings = function(strs) {
  *
  * @param {String} identifier string identifier
  * @param {String} component the component providing the string
- * @param {Object|String} a optional variable to populate placeholder with
+ * @param {Object|String} [a] optional variable to populate placeholder with
  */
 M.util.get_string = function(identifier, component, a) {
     var stringvalue;

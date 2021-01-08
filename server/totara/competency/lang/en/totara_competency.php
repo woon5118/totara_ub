@@ -374,6 +374,7 @@ $string['toggle_table'] = 'Show tables';
 $string['type'] = 'Type';
 $string['unassigned'] = 'Unassigned';
 $string['undo_remove_linked_course'] = 'Undo remove linked course';
+$string['unsaved_changes_warning'] = 'Your unsaved changes will be lost.';
 $string['user_assignment_page_heading_other'] = 'Assign competencies';
 $string['user_assignment_page_heading_self'] = 'Self-assign competencies';
 $string['user_assignment_page_title_other'] = 'Competency assignment';

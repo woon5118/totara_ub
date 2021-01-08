@@ -37,6 +37,7 @@ function (str, templates, ModalList, ajax, notification, Loader) {
         this.competencyID = 0; // The id of the competency these courses are linked to.
         this.courseAdderModal = {}; // The Modal that will show for the user to select new linked courses to be added to the list.
         this.courses = []; // Array of courses that are or will be linked to this competency
+        this.initialCourses = []; // Initial courses state for change detection
         this.existingCourses = []; // Any existing linked courses (different delete UI)
         this.iconList = [];
         this.loader = null; // Loading overlay manager
@@ -81,7 +82,9 @@ function (str, templates, ModalList, ajax, notification, Loader) {
                     e.preventDefault();
                     var btn = e.target.closest('[data-tw-editLinkedCourses-cancel]'),
                         url = btn.getAttribute('data-tw-editLinkedCourses-cancel');
+
                     if (url) {
+                        // This will trigger the beforeunload handler.
                         window.location.href = url;
                     }
                 }
@@ -108,6 +111,16 @@ function (str, templates, ModalList, ajax, notification, Loader) {
                         break;
                     case 'undoDeleteClicked':
                         that.undoRemoveSavedRow(id);
+                }
+            });
+
+            window.addEventListener('beforeunload', function(e) {
+                var modified = that.haveLinkedCoursesChanged();
+                var str = M.util.get_string('unsaved_changes_warning', 'totara_competency');
+
+                if (modified) {
+                    e.returnValue = str; // For IE and Firefox (before version 4)
+                    return str; // For Safari
                 }
             });
         },
@@ -203,6 +216,7 @@ function (str, templates, ModalList, ajax, notification, Loader) {
             return new Promise(function (resolve) {
                 ajax.getData(webserviceRequestObject).then(function (data) {
                     that.courses = data.results.items;
+                    that.resetInitialCourses();
 
                     // Crate an array of pre-exising linked course ids
                     for (var s = 0; s < data.results.items.length; s++) {
@@ -370,7 +384,11 @@ function (str, templates, ModalList, ajax, notification, Loader) {
                 {
                     component: 'totara_competency',
                     key: 'no_courses_linked_yet',
-                }
+                },
+                {
+                    component: 'totara_competency',
+                    key: 'unsaved_changes_warning',
+                },
             ];
 
             return new Promise(function (resolve, reject) {
@@ -528,6 +546,35 @@ function (str, templates, ModalList, ajax, notification, Loader) {
 
             this.loader.show();
             this.refreshRowsDisplay();
+        },
+
+        /**
+         * Have the linked courses changed
+         *
+         * @return {boolean}
+         */
+        haveLinkedCoursesChanged: function () {
+            if (this.courses.length !== this.initialCourses.length) {
+                return true;
+            }
+
+            var initialCourses = this.initialCourses;
+            return this.courses.some(function (course, index) {
+                return course.id !== initialCourses[index].id ||
+                    course.mandatory !== initialCourses[index].mandatory;
+            });
+        },
+
+        /**
+         * Create a copy of courses for state change detection.
+         */
+        resetInitialCourses: function () {
+            this.initialCourses = this.courses.map(function (item) {
+                return {
+                    id: item.id,
+                    mandatory: item.mandatory
+                };
+            });
         }
     };
 
@@ -558,6 +605,6 @@ function (str, templates, ModalList, ajax, notification, Loader) {
     };
 
     return {
-        init: init
+        init: init,
     };
 });
