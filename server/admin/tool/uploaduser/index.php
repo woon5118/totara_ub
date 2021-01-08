@@ -308,7 +308,11 @@ if ($formdata = $mform2->is_cancelled()) {
 
         // Make sure idnumber is unique and it's not assigned to another user.
         if (isset($user->idnumber)) {
-            $idnumbertaken = $DB->record_exists_select('user', 'idnumber = :idnumber AND username != :username', array('idnumber' => $user->idnumber, 'username' => $user->username));
+            if (isset($user->oldusername)) {
+                $idnumbertaken = $DB->record_exists_select('user', 'idnumber = :idnumber AND username != :oldusername', array('idnumber' => $user->idnumber, 'oldusername' => $user->oldusername));
+            } else {
+                $idnumbertaken = $DB->record_exists_select('user', 'idnumber = :idnumber AND username != :username', array('idnumber' => $user->idnumber, 'username' => $user->username));
+            }
             if (!empty($idnumbertaken)) {
                 $upt->track('status', get_string('idnumbertaken', 'error'), 'error');
                 $userserrors++;
@@ -1257,7 +1261,11 @@ while ($linenum <= $previewrows and $fields = $cir->next()) {
     }
 
     if (isset($rowcols['username']) && isset($rowcols['idnumber'])) {
-        $idnumbertaken = $DB->record_exists_select('user', 'idnumber = :idnumber AND username != :username', array('idnumber' => $rowcols['idnumber'], 'username' => $stdusername));
+        if (isset($rowcols['oldusername'])) {
+            $idnumbertaken = $DB->record_exists_select('user', 'idnumber = :idnumber AND username != :oldusername', array('idnumber' => $rowcols['idnumber'], 'oldusername' => $rowcols['oldusername']));
+        } else {
+            $idnumbertaken = $DB->record_exists_select('user', 'idnumber = :idnumber AND username != :username', array('idnumber' => $rowcols['idnumber'], 'username' => $stdusername));
+        }
         if ($idnumbertaken) {
             $rowcols['status'][] = get_string('idnumbertaken', 'error');
         }
