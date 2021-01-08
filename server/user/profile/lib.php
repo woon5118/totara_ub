@@ -719,7 +719,7 @@ function profile_signup_position($mform, $nojs, $positionid = 0) {
             $mform->addElement('select', 'positionid', get_string('chooseposition', 'totara_job'),
                 array(0 => get_string('chooseposition', 'totara_job')) + $allpositions);
         } else {
-            $mform->addElement('static', 'positionid', get_string('chooseposition', 'totara_job'), get_string('noposition', 'totara_job') );
+            $mform->addElement('static', 'positionid', get_string('chooseposition', 'totara_job'), get_string('noposition', 'totara_hierarchy'));
         }
         $mform->addHelpButton('positionid', 'chooseposition', 'totara_job');
     } else {
@@ -751,7 +751,7 @@ function profile_signup_organisation($mform, $nojs, $organisationid = 0) {
             $mform->addElement('select', 'organisationid', get_string('chooseorganisation', 'totara_job'),
                 array(0 => get_string('chooseorganisation', 'totara_job')) + $allorgs);
         } else {
-            $mform->addElement('static', 'organisationid', get_string('chooseorganisation', 'totara_job'), get_string('noorganisation', 'totara_job') );
+            $mform->addElement('static', 'organisationid', get_string('chooseorganisation', 'totara_job'), get_string('noorganisation', 'totara_hierarchy'));
         }
         $mform->addHelpButton('organisationid', 'chooseorganisation', 'totara_job');
     } else {
