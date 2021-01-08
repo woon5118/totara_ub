@@ -27,6 +27,7 @@ use core\format;
 use core\webapi\formatter\field\string_field_formatter;
 use pathway_manual\controllers\rate_competencies;
 use pathway_manual\models\user_competencies;
+use totara_competency\aggregation_users_table;
 use totara_competency\helpers\capability_helper;
 use totara_mvc\tui_view;
 use user_picture;
@@ -51,6 +52,7 @@ class index extends base {
             'can-assign' => capability_helper::can_assign($this->user->id, $this->context),
             'can-rate-competencies' => user_competencies::can_rate_competencies($this->user->id),
             'toast-message' => user_assignment::get_toast_message_from_url() ?? rate_competencies::get_toast_message_from_url(),
+            'has-pending-aggregation' => (new aggregation_users_table())->has_pending_aggregation($this->user->id),
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyProfile', $props)

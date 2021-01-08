@@ -723,4 +723,21 @@ class aggregation_users_table {
         return $this;
     }
 
+    /**
+     * Find out if there is any aggregation pending for the given user.
+     *
+     * @param int $user_id
+     * @param int|null $competency_id  When given, only check for the user/competency combination.
+     * @return bool
+     */
+    public function has_pending_aggregation(int $user_id, int $competency_id = null): bool {
+        global $DB;
+
+        $conditions = ['user_id' => $user_id];
+        if ($competency_id) {
+            $conditions['competency_id'] = $competency_id;
+        }
+
+        return $DB->record_exists($this->table_name, $conditions);
+    }
 }

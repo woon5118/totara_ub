@@ -23,6 +23,15 @@
     :title="data.competency ? data.competency.fullname : ''"
     class="tui-competencyDetail"
   >
+    <template v-if="hasPendingAggregation" v-slot:feedback-banner>
+      <NotificationBanner
+        type="warning"
+        :message="
+          $str('warning_pending_aggregation_detail', 'totara_competency')
+        "
+      />
+    </template>
+
     <template v-if="user && !isMine" v-slot:user-overview>
       <MiniProfileCard :display="user.card_display" />
     </template>
@@ -135,6 +144,7 @@ import Layout from 'tui/components/layouts/LayoutOneColumn';
 import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import Modal from 'tui/components/modal/Modal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import PageBackLink from 'tui/components/layouts/PageBackLink';
 import Progress from 'totara_competency/components/details/Progress';
 import { notify } from 'tui/notifications';
@@ -155,6 +165,7 @@ export default {
     MiniProfileCard,
     Modal,
     ModalPresenter,
+    NotificationBanner,
     PageBackLink,
     Progress,
   },
@@ -186,6 +197,9 @@ export default {
     },
     toastMessage: {
       type: String,
+    },
+    hasPendingAggregation: {
+      type: Boolean,
     },
   },
 
@@ -410,7 +424,8 @@ export default {
       "archived_assignments",
       "current_assignment_details",
       "competency_does_not_exist",
-      "no_active_assignments"
+      "no_active_assignments",
+      "warning_pending_aggregation_detail"
     ]
   }
 </lang-strings>

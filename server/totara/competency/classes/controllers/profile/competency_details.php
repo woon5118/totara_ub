@@ -24,6 +24,7 @@
 namespace totara_competency\controllers\profile;
 
 use pathway_manual\controllers\rate_competencies;
+use totara_competency\aggregation_users_table;
 use totara_competency\entity\competency;
 use totara_mvc\tui_view;
 
@@ -65,6 +66,10 @@ class competency_details extends base {
             'go-back-text'                 => $this->get_back_to_profile_text(),
             'show-activity-log-by-default' => $show_activity_log_by_default,
             'toast-message'                => rate_competencies::get_toast_message_from_url(),
+            'has-pending-aggregation'      => (new aggregation_users_table())->has_pending_aggregation(
+                $this->user->id,
+                $competency_id
+            ),
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyDetail', $props)

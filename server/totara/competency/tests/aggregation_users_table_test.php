@@ -762,4 +762,14 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
 
         $sink->close();
     }
+
+    public function test_has_pending_aggregation(): void {
+        $data = $this->setup_data();
+
+        self::assertTrue($data->tbl->has_pending_aggregation(1));
+        self::assertFalse($data->tbl->has_pending_aggregation(- 1));
+
+        self::assertTrue($data->tbl->has_pending_aggregation(1, 10));
+        self::assertFalse($data->tbl->has_pending_aggregation(1, 9));
+    }
 }

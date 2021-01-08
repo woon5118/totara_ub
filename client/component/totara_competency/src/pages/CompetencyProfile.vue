@@ -19,6 +19,14 @@
 <template>
   <Loader :loading="$apollo.loading">
     <div class="tui-competencyProfile">
+      <NotificationBanner
+        v-if="hasPendingAggregation"
+        type="warning"
+        :message="
+          $str('warning_pending_aggregation_profile', 'totara_competency')
+        "
+      />
+
       <div class="tui-competencyProfile__header">
         <MiniProfileCard v-if="user && !isMine" :display="user.card_display" />
         <PageHeading :title="$str('competency_profile', 'totara_competency')" />
@@ -135,6 +143,7 @@ import ListIcon from 'tui/components/icons/List';
 import Loader from 'tui/components/loading/Loader';
 import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import NoCompetencyAssignments from 'totara_competency/components/profile/NoCompetencyAssignments';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import PageHeading from 'tui/components/layouts/PageHeading';
 import ProgressAssignmentFilters from 'totara_competency/components/ProgressAssignmentFilters';
 import Responsive from 'tui/components/responsive/Responsive';
@@ -159,6 +168,7 @@ export default {
     Loader,
     MiniProfileCard,
     NoCompetencyAssignments,
+    NotificationBanner,
     PageHeading,
     ProgressAssignmentFilters,
     Responsive,
@@ -189,6 +199,9 @@ export default {
     },
     toastMessage: {
       type: String,
+    },
+    hasPendingAggregation: {
+      type: Boolean,
     },
   },
 
@@ -376,14 +389,15 @@ export default {
 <lang-strings>
 {
   "totara_competency": [
+    "assign_competencies",
     "competency_profile",
+    "current_assignment_progress",
+    "header_competencies",
+    "self_assign_competencies",
     "toggle_charts",
     "toggle_competency_view_format",
     "toggle_table",
-    "assign_competencies",
-    "self_assign_competencies",
-    "current_assignment_progress",
-    "header_competencies"
+    "warning_pending_aggregation_profile"
   ],
   "pathway_manual": [
     "rate_competencies"

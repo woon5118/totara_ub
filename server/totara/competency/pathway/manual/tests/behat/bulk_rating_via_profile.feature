@@ -30,9 +30,14 @@ Feature: Test rating a competency for a user as different roles via the user's c
     When I run the scheduled task "totara_competency\task\expand_assignments_task"
 
   Scenario: Make a rating for myself
-    Given I log in as "user1"
+    # Clear pending aggregations first.
+    When I run the scheduled task "totara_competency\task\competency_aggregation_queue"
+    And I log in as "user1"
+    And I navigate to the competency profile details page for the "Comp1" competency
+    Then I should not see "There is a task scheduled to update this competency"
     When I navigate to the competency profile of user "user1"
-    And I click on "Rate competencies" "link"
+    Then I should not see "There is a task scheduled to update one or more of these competencies."
+    When I click on "Rate competencies" "link"
     Then I should see "Rate competencies" in the ".tui-pageHeading__title" "css_element"
     And ".tui-miniProfileCard" "css_element" should not exist
     And I should not see "Rating as self"
@@ -45,6 +50,9 @@ Feature: Test rating a competency for a user as different roles via the user's c
     And I click on "OK" "button"
     Then I should see "Competency profile"
     And I should see "Your rating has been saved." in the tui success notification toast
+    And I should see "There is a task scheduled to update one or more of these competencies."
+    When I navigate to the competency profile details page for the "Comp1" competency
+    Then I should see "There is a task scheduled to update this competency"
 
   Scenario: As a manager, make a rating for a user via their competency profile
     Given I log in as "user2"

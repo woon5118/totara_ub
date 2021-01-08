@@ -394,5 +394,7 @@ $string['users_to_assign'] = 'Users to assign';
 $string['view_selected_competencies'] = 'View selected competencies';
 $string['viewing'] = 'Viewing';
 $string['viewing_by_assignment'] = 'Viewing by assignment';
+$string['warning_pending_aggregation_detail'] = 'There is a task scheduled to update this competency, which may result in a change to proficiency.';
+$string['warning_pending_aggregation_profile'] = 'There is a task scheduled to update one or more of these competencies. This may result in a change to proficiency.';
 $string['ways_to_achieve_proficiency'] = 'Ways to achieve proficiency in this competency';
 $string['work_towards_level'] = 'Work towards level';

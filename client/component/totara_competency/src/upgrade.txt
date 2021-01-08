@@ -1,0 +1,5 @@
+This file describes API changes in /client/component/totara_competency,
+information provided here is intended especially for developers.
+
+=== 13.4 ===
+* Extended the page templates CompetencyDetail.vue and CompetencyProfile.vue to have a conditional NotificationBanner warning.
