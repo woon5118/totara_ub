@@ -22,7 +22,9 @@
  */
 
 use container_workspace\local\workspace_helper;
+use container_workspace\task\delete_workspace_task;
 use container_workspace\tracker\tracker;
+use core\orm\query\builder;
 use core\webapi\execution_context;
 use totara_core\advanced_feature;
 use totara_webapi\graphql;
@@ -66,30 +68,36 @@ class container_workspace_delete_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
-        $workspace = workspace_helper::create_workspace('Workspace 1010',  $user->id);
+        $workspace = workspace_helper::create_workspace('Workspace 1010', $user->id);
 
         $tracker = new tracker($user->id);
         $tracker->visit_workspace($workspace);
         $this->assertEquals($workspace->id, $tracker->get_last_visit_workspace(), 'wrong visited workspace');
+        $this->assertEquals(0, $this->get_queued_delete_task_count());
 
         $ec = execution_context::create('ajax', self::MUTATION);
-        $result = graphql::execute_operation(
-            $ec,
-            ['workspace_id' => $workspace->get_id()]
-        );
 
-        $this->assertEmpty($result->errors);
-        $this->assertNotEmpty($result->data);
+        // We will call the endpoint multiple times, but the task will only ever be queued once.
+        for ($i = 0; $i <= 2; $i++) {
+            $result = graphql::execute_operation(
+                $ec,
+                ['workspace_id' => $workspace->get_id()]
+            );
 
-        $sql = '
-            SELECT 1 FROM "ttr_course" c
-            INNER JOIN "ttr_workspace" wo ON wo.course_id = c.id
-            WHERE c.id = :course_id
-            AND wo.to_be_deleted = 0
-        ';
+            $this->assertEmpty($result->errors);
+            $this->assertNotEmpty($result->data);
+            $this->assertEquals(1, $this->get_queued_delete_task_count());
 
-        $this->assertFalse($DB->record_exists_sql($sql, ['course_id' => $workspace->id]));
-        $this->assertNull($tracker->get_last_visit_workspace(), 'wrong visited workspace');
+            $sql = '
+                SELECT 1 FROM "ttr_course" c
+                INNER JOIN "ttr_workspace" wo ON wo.course_id = c.id
+                WHERE c.id = :course_id
+                AND wo.to_be_deleted = 0
+            ';
+
+            $this->assertFalse($DB->record_exists_sql($sql, ['course_id' => $workspace->id]));
+            $this->assertNull($tracker->get_last_visit_workspace(), 'wrong visited workspace');
+        }
     }
 
     /**
@@ -99,7 +107,7 @@ class container_workspace_delete_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
-        $workspace = workspace_helper::create_workspace('Workspace 1010',  $user->id);
+        $workspace = workspace_helper::create_workspace('Workspace 1010', $user->id);
         $args = ['workspace_id' => $workspace->get_id()];
 
         $feature = 'container_workspace';
@@ -200,4 +208,9 @@ class container_workspace_delete_testcase extends advanced_testcase {
         self::assertFalse($DB->record_exists('engage_share_recipient', ['id' => $share->get_recipient_id()]));
         self::assertFalse($DB->record_exists('course', ['id' => $workspace->get_id()]));
     }
+
+    private function get_queued_delete_task_count(): int {
+        return builder::table('task_adhoc')->where('classname', '\\' . delete_workspace_task::class)->count();
+    }
+
 }

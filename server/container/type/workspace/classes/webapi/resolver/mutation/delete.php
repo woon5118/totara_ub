@@ -67,7 +67,7 @@ final class delete implements mutation_resolver, has_middleware {
         }
 
         $task = delete_workspace_task::from_workspace_id($workspace->get_id(), $USER->id);
-        task_manager::queue_adhoc_task($task);
+        task_manager::queue_adhoc_task($task, true);
 
         $workspace->mark_to_be_deleted(true);
 
