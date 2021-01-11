@@ -35,6 +35,7 @@
     <div class="tui-notificationToast__dismiss" aria-hidden="true">
       <CloseButton
         class="tui-notificationToast__dismiss_button"
+        :size="300"
         @click="dismiss"
       />
     </div>
@@ -167,7 +168,7 @@ export default {
     display: flex;
 
     &_button {
-      color: var(--color-neutral-4);
+      color: var(--color-neutral-3);
 
       &:hover {
         color: var(--color-neutral-1);
