@@ -23,6 +23,8 @@
 
 namespace tabexport_csv_excel;
 
+use totara_core\tabexport_source;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -31,6 +33,10 @@ defined('MOODLE_INTERNAL') || die();
  * Final as we don't want multiple dependencies to be formed unintentionally.
  */
 final class writer extends \tabexport_csv\writer {
+    public function __construct(tabexport_source $source) {
+        $this->addbom = true;
+        parent::__construct($source);
+    }
 
     /**
      * The character to use as the escape character.

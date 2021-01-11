@@ -38,6 +38,9 @@ class writer extends tabexport_writer {
     /** @var string */
     protected $enclosure;
 
+    /** @var bool add BOM to the start of file */
+    protected $addbom = false;
+
     /**
      * Constructor.
      *
@@ -65,6 +68,10 @@ class writer extends tabexport_writer {
      * @param resource $handle
      */
     protected function add_all_data($handle) {
+        if ($this->addbom) {
+            fputs($handle, "\xef\xbb\xbf");
+        }
+
         foreach ($this->source->get_headings() as $heading) {
             $row[] = $heading;
         }
