@@ -17,7 +17,7 @@
  */
 
 import tui from 'tui/tui';
-import { throttle } from 'tui/util';
+import { throttle, createNewEvent } from 'tui/util';
 import Weka from 'editor_weka/components/Weka';
 import WekaValue from './WekaValue';
 
@@ -79,8 +79,9 @@ class IntegrationView {
 
     const update = () => {
       if (this.wekaValue) {
+        let event = createNewEvent('change');
         this.textareaEl.value = JSON.stringify(this.wekaValue.getDoc());
-        this.textareaEl.dispatchEvent(new Event('change', { bubbles: true }));
+        this.textareaEl.dispatchEvent(event);
       }
     };
     const throttledUpdate = throttle(update, 250);
