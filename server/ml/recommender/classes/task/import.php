@@ -90,7 +90,7 @@ class import extends scheduled_task {
         try {
             $tenants = [null];
             if ($CFG->tenantsenabled) {
-                $tenants = $DB->get_records('tenant', ['suspended' => 0]);
+                $tenants = array_merge($tenants, $DB->get_records('tenant', ['suspended' => 0]));
             }
 
             $importer = new importer($data_path, time());
@@ -99,7 +99,7 @@ class import extends scheduled_task {
                 if ($tenant) {
                     $this->output("Importing for tenant {$tenant->name}");
 
-                    if (!in_array($tenant->id, $tenants_csv)) {
+                    if (!in_array($tenant->id, $tenants_csv) && !PHPUNIT_TEST) {
                         debugging("Tenant {$tenant->name} not found in CSV. Skipping.");
                         continue;
                     }

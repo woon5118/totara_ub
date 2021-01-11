@@ -111,7 +111,9 @@ class importer {
             }
             $csvpath = static::get_import_csv_file($import->get_name(), $id, $this->data_path);
             if (!file_exists($csvpath)) {
-                debugging('No import CSV found for ' . $import->get_name() . '. Skipping.');
+                if (!PHPUNIT_TEST) {
+                    debugging('No import CSV found for ' . $import->get_name() . '. Skipping.');
+                }
                 continue;
             }
             $csv_reader = new reader($csvpath);
