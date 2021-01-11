@@ -293,6 +293,7 @@ $string['error:menuitemurltoolong'] = 'Menu url address too long';
 $string['error:morethanxitemsatthislevel'] = 'There are more than {$a} items at this level.';
 $string['error:norolesfound'] = 'No roles found';
 $string['error:notificationsparamtypewrong'] = 'Incorrect param type sent to Totara notifications';
+$string['error:pagepermissions'] = 'You do not have permission to view this page';
 $string['error:pagerender'] = 'An error occurred while rendering the page.';
 $string['error:parentnotexists'] = '"{$a}" parent item does not exists, please check your settings';
 $string['error:staffmanagerroleexists'] = 'A role "staffmanager" already exists. This role must be renamed before the upgrade can proceed.';

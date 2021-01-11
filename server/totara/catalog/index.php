@@ -79,7 +79,14 @@ if ($CFG->catalogtype !== 'totara') {
         , 'info'
     );
 } else {
-    echo $OUTPUT->render(\totara_catalog\local\param_processor::get_template());
+    try {
+        echo $OUTPUT->render(\totara_catalog\local\param_processor::get_template());
+    } catch (coding_exception $ex) {
+        if (empty($CFG->debugdeveloper)) {
+            $ex = new moodle_exception('error:pagepermissions', 'totara_core');
+        }
+        throw $ex;
+    }
 }
 
 echo $OUTPUT->footer();
