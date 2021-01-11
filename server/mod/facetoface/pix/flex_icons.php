@@ -32,6 +32,13 @@ $icons = array(
                     'classes' => 'tfont-var-person_group',
                 ),
         ),
+    'mod_facetoface|copy_virtual_room_link' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'tfont-var-files_copy',
+                ),
+        ),
     'mod_facetoface|filters' =>
         array(
             'data' =>

@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.5 ===
 
+* mod_facetoface/seminarresource_card template has been updated, adding a copy button to copy the virtual meeting link
 * room_helper::can_update_virtualmeeting() has been deprecated; please use room_virtualmeeting::can_manage() instead
 
 === 13.3 ===
