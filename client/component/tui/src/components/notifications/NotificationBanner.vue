@@ -38,6 +38,7 @@
     >
       <CloseButton
         class="tui-notificationBanner__dismiss_button"
+        :size="300"
         @click="dismiss"
       />
     </div>

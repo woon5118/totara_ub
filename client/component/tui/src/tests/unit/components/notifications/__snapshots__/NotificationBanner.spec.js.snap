@@ -26,7 +26,7 @@ exports[`NotificationBanner Checks snapshot 1`] = `
   >
     <closebutton-stub
       class="tui-notificationBanner__dismiss_button"
-      size="200"
+      size="300"
     />
   </div>
 </div>
