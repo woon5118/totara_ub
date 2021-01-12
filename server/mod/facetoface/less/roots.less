@@ -179,12 +179,28 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
 
 .mod_facetoface-date-other-virtual-room {
     .mod_facetoface-show-selectdate-dialog,
-    [data-action="clonedate"],
-    [data-can-manage="false"] [data-action="editresource"] {
+    [data-action="clonedate"] {
         display: none;
     }
 }
 
+.mod_facetoface-date-lock {
+    display: none;
+    float: right;
+  
+    .mod_facetoface-date-other-virtual-room & {
+        display: block;
+    }
+}
+  
+.mod_facetoface-duplicate-lock {
+    display: none;
+  
+    .mod_facetoface-date-other-virtual-room & {
+        display: inline;
+    }
+  }
+  
 .mod_facetoface-assetlist,
 .mod_facetoface-roomlist,
 .mod_facetoface-facilitatorlist {

@@ -378,6 +378,8 @@ class event extends \moodleform {
         $strdelete = get_string('delete');
         $streditdate = get_string('editdate', 'facetoface');
 
+        $lockicon = $OUTPUT->render(new \core\output\flex_icon('lock', ['title' => get_string('virtual_meeting_date_locked', 'mod_facetoface')]));
+        $lockspan = \html_writer::span($lockicon, 'mod_facetoface-date-lock');
         $editicon = $OUTPUT->action_icon('#', new \pix_icon('t/edit', $streditdate), null,
             array(
                 'id' => "show-selectdate{$offset}-dialog",
@@ -385,7 +387,7 @@ class event extends \moodleform {
                 'data-offset' => $offset
             )
         );
-        $row[] = $editicon . \html_writer::span($dateshtml, 'timeframe-text', array('id' => 'timeframe-text' . $offset));
+        $row[] = $editicon . $lockspan . \html_writer::span($dateshtml, 'timeframe-text', array('id' => 'timeframe-text' . $offset));
 
         // Room.
         $selectrooms = \html_writer::link("#", get_string('selectrooms', 'facetoface'), array(

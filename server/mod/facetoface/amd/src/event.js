@@ -171,7 +171,6 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
             var that = this;
             return this.getResource(id)
                 .then(function(resource) {
-                    var edit = Promise.resolve('');
                     var remove = strLib.get_string('remove' + that.type + 'x', 'mod_facetoface', resource.name_only)
                         .then(function(name) {
                             return templatesLib.renderIcon('delete', name);
@@ -179,15 +178,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
                             return '<a href="#" data-action="removeresource">' + deleteIcon + '</a>';
                         });
 
-                    if (that.manageCustom && resource.custom) {
-                        edit = strLib.get_string('editcustom' + that.type + 'x', 'mod_facetoface', resource.name_only)
-                        .then(function(name) {
-                            return templatesLib.renderIcon('edit', name);
-                        }).then(function(editIcon) {
-                            return '<a href="#" data-action="editresource">' + editIcon + '</a>';
-                        });
-                    }
-                    return Promise.all([resource, edit, remove]);
+                    return Promise.all([resource, that.editIcon(resource), remove]);
                 }).then(function(results) {
                     var resource = results[0];
                     var resourceElement = document.createElement('li');
@@ -196,6 +187,27 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
 
                     return resourceElement;
                 });
+        },
+
+        /**
+         * Generates the edit icon
+         *
+         * @param {Resource} resource The resource that the edit icon is being derrived from
+         * @returns {Promise} Resolves with the icon or an empty string if edit icon is not displayed
+         */
+        editIcon: function(resource) {
+            var that = this;
+            if (that.manageCustom && resource.custom) {
+                return strLib
+                    .get_string('editcustom' + that.type + 'x', 'mod_facetoface', resource.name_only)
+                    .then(function(name) {
+                        return templatesLib.renderIcon('edit', name);
+                    }).then(function(editIcon) {
+                        return '<a href="#" data-action="editresource">' + editIcon + '</a>';
+                    });
+            } else {
+                return Promise.resolve('');
+            }
         },
 
         /**
@@ -516,6 +528,35 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
         listItem.setAttribute('data-capacity', resource.capacity);
         listItem.setAttribute('data-can-manage', resource.can_manage);
         listItem.classList.add(this.cssClass);
+    };
+
+    /**
+     * Renders the edit icon (if required for the Room)
+     *
+     * @param {Room} resource The Room to render
+     * @returns {Promise} Resolves with what should go where the edit icon belongs
+     */
+    Rooms.prototype.editIcon = function(resource) {
+        var that = this;
+        if (that.manageCustom && resource.custom) {
+            if (resource.can_manage) {
+                return strLib
+                    .get_string('editcustom' + that.type + 'x', 'mod_facetoface', resource.name_only)
+                    .then(function(name) {
+                        return templatesLib.renderIcon('edit', name);
+                    }).then(function(editIcon) {
+                        return '<a href="#" data-action="editresource">' + editIcon + '</a>';
+                    });
+            } else {
+                return strLib
+                    .get_string('virtual_meeting_not_owner', 'mod_facetoface', resource.name_only)
+                    .then(function(name) {
+                        return templatesLib.renderIcon('lock', name);
+                    });
+            }
+        } else {
+            return Promise.resolve('');
+        }
     };
 
     /**
