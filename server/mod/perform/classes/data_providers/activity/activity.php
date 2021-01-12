@@ -79,12 +79,7 @@ class activity extends provider {
             // The following relations are all needed for reducing the amount of queries
             // triggered by the activity status conditions
             ->with('tracks')
-            ->with([
-                'sections_ordered' => function (repository $repository) {
-                    $repository->with('section_relationships.core_relationship')
-                        ->with('section_elements.element');
-                }
-            ]);
+            ->with('sections_ordered_with_respondable_element_count.section_relationships.core_relationship');
     }
 
     /**

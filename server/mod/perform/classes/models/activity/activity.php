@@ -117,6 +117,7 @@ class activity extends model {
         'visibility_condition_options',
         'context_id',
         'container',
+        'sections_ordered_with_respondable_element_count'
     ];
 
     public const NAME_MAX_LENGTH = 1024;
@@ -324,6 +325,9 @@ class activity extends model {
             }
             if ($this->entity->relation_loaded('settings')) {
                 $this->entity->load_relation('settings');
+            }
+            if ($this->entity->relation_loaded('sections_ordered_with_respondable_element_count')) {
+                $this->entity->load_relation('sections_ordered_with_respondable_element_count');
             }
         }
         return $this;
@@ -776,4 +780,12 @@ class activity extends model {
         return (new visibility_manager())->get_options();
     }
 
+    /**
+     * Get all sections with respondable element count
+     *
+     * @return collection|section[]
+     */
+    public function get_sections_ordered_with_respondable_element_count(): collection {
+        return $this->entity->sections_ordered_with_respondable_element_count->map_to(section::class);
+    }
 }
