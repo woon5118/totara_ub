@@ -104,7 +104,7 @@ export default {
   }
 
   &__radio {
-    margin: var(--gap-1) 0;
+    margin: var(--gap-2) 0;
   }
 }
 </style>
