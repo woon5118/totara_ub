@@ -12,6 +12,7 @@ exports[`totara_engage/components/form/access/EngageTopicsSelector.vue Checks sn
    
   <topicsselector-stub
     id="id-topic"
+    inputplaceholder="enter_topics, totara_engage"
     selectedtopics=""
   />
 </div>

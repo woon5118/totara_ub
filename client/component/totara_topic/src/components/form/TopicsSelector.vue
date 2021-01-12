@@ -21,6 +21,7 @@
     :filter="searchTerm"
     :items="topics"
     :tags="pickedTopics"
+    :input-placeholder="inputPlaceholder"
     @filter="findTopics"
     @select="selectTopic"
     @remove="removeTopic"
@@ -57,6 +58,8 @@ export default {
         return 0 === items.length;
       },
     },
+
+    inputPlaceholder: String,
   },
 
   apollo: {

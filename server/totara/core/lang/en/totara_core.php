@@ -774,6 +774,7 @@ $string['tab:futurebookings'] = 'Future Bookings';
 $string['tab:pastbookings'] = 'Past Bookings';
 $string['tabexports'] = 'Tabular exports';
 $string['tag_list'] = 'Tag list';
+$string['tag_list_placeholder'] = 'Start typing name(s)...';
 $string['tag_remove'] = 'Remove {$a}';
 $string['tags_selected'] = 'Selected tags';
 $string['task_visibility_map_regenerate_all'] = 'Regenerates all visibility maps used to optimise visibility checks';

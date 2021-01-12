@@ -1,6 +1,11 @@
 This file describes API changes in /client/component/tui,
 information provided here is intended especially for developers.
 
+=== 13.4 ===
+* Updated TagList.vue to display placeholder and color change on icon. 
+  * LangString, template & SCSS changes
+* Included an optional inputPlaceholder prop to customise placeholder text in TagList.vue
+
 === 13.3 ===
 * Updated Input.vue, Button.vue and ButtonIcon.vue to handle prop "autofocus" in JS
   * Template changes
@@ -21,7 +26,7 @@ information provided here is intended especially for developers.
   * Langstring, template, SCSS and script block changes
 * Updated AudioBlock.vue to display transcript button and expose a slot
   * Template changes
-* Added ariaDisabled prop to ButtonIcon.vue to cater for accessibility
+* Added ariaDisabled prop to ButtonIcon.vue to cater for accessibility  
 
 === 13.2 ===
 

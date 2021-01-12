@@ -65,12 +65,13 @@
               </template>
               <div class="tui-tagList__input">
                 <InputText
-                  v-show="isOpen"
                   :ref="inputRef"
                   v-model="itemName"
                   :styleclass="{ transparent: true }"
                   :disabled="disabled"
+                  :placeholder="placeholderText"
                   :aria-label="$str('tag_list', 'totara_core')"
+                  @focus.native="!isOpen && toggle()"
                 />
               </div>
             </div>
@@ -95,7 +96,7 @@
           :styleclass="{ transparent: true }"
           @click.stop.prevent="expandList(toggle, isOpen)"
         >
-          <Expand />
+          <Expand custom-class="tui-tagList__caret" />
         </ButtonIcon>
       </div>
     </template>
@@ -195,6 +196,12 @@ export default {
         return validatePropObject({ options, properties, required });
       },
     },
+    inputPlaceholder: {
+      type: String,
+      default() {
+        return this.$str('tag_list_placeholder', 'totara_core');
+      },
+    },
   },
 
   data() {
@@ -204,6 +211,12 @@ export default {
       itemName: this.filter || '',
       visible: Infinity,
     };
+  },
+
+  computed: {
+    placeholderText() {
+      return this.tags.length === 0 ? this.inputPlaceholder : null;
+    },
   },
   watch: {
     itemName() {
@@ -284,6 +297,7 @@ export default {
   "totara_core": [
     "n_more",
     "tag_list",
+    "tag_list_placeholder",
     "tag_remove",
     "tags_selected"
   ]
@@ -339,6 +353,10 @@ export default {
 
   &__expandArrow {
     height: calc(var(--tag-height) + (2 * var(--border-width-thin)));
+  }
+
+  &__caret {
+    fill: var(--color-neutral-7);
   }
 }
 </style>

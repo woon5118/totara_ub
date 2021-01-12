@@ -67,7 +67,6 @@ exports[`presentation/tag/TagList.vue Checks snapshot 1`] = `
           >
             <inputtext-stub
               arialabel="[[tag_list, totara_core]]"
-              style="display: none;"
               styleclass="[object Object]"
               value=""
             />
@@ -100,6 +99,7 @@ exports[`presentation/tag/TagList.vue Checks snapshot 1`] = `
               class="tui-iconBtn__icon"
             >
               <expand-stub
+                customclass="tui-tagList__caret"
                 size="200"
               />
             </span>

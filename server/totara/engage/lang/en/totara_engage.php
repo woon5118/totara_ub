@@ -116,6 +116,7 @@ $string['engage_category'] = 'Contributions';
 $string['engagecontent'] = 'Content Engagement';
 $string['engagedusers'] = 'User Engagement';
 $string['engagedworkspace'] = 'Workspaces Engagement and Activity';
+$string['enter_topics'] = 'Enter topic(s)';
 $string['expand'] = 'Expand';
 $string['filteraccess'] = 'Visibility';
 $string['filterbartitle'] = 'Filter resources';

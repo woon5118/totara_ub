@@ -27,6 +27,7 @@
     <TopicsSelector
       :id="generatedId"
       :selected-topics="selectedTopics"
+      :input-placeholder="$str('enter_topics', 'totara_engage')"
       @change="$emit('change', $event)"
     />
   </div>
@@ -80,7 +81,8 @@ export default {
 <lang-strings>
   {
     "totara_engage": [
-      "assigntopics"
+      "assigntopics",
+      "enter_topics"
     ]
   }
 </lang-strings>
