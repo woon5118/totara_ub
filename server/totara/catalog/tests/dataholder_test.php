@@ -64,8 +64,8 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
             'core_course\totara_catalog\course' => 21,
             'totara_certification\totara_catalog\certification' => 17,
             'totara_program\totara_catalog\program' => 16,
-            'engage_article\totara_catalog\article' => 4,
-            'totara_playlist\totara_catalog\playlist' => 5,
+            'engage_article\totara_catalog\article' => 5,
+            'totara_playlist\totara_catalog\playlist' => 6,
         ];
 
         foreach ($expected_factory_counts as $provider_class => $count) {

@@ -97,6 +97,7 @@ $string['error:update_order'] = "Order is out of bounds";
 $string['field:name'] = 'Name';
 $string['field:resourcenames'] = 'Resource Name(s)';
 $string['field:summary'] = 'Summary';
+$string['field:timecreated'] = 'Time created';
 $string['field:topics'] = 'Topics';
 
 // Capability strings

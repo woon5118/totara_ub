@@ -24,6 +24,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\provider_handler;
+use \totara_catalog\task\refresh_catalog_data;
+
+use totara_engage\access\access;
 
 class engage_article_catalog_item_testcase extends advanced_testcase {
 
@@ -43,5 +46,31 @@ class engage_article_catalog_item_testcase extends advanced_testcase {
         }
 
         $this->assertTrue($found, 'article catalog provider not found.');
+    }
+
+    /**
+     * @return void
+     */
+    public function test_article_sorttime_value(): void {
+        global $DB;
+
+        $this->setAdminUser();
+
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $this->getDataGenerator()->get_plugin_generator('engage_article');
+        $article = $article_generator->create_article([
+            'name' => 'articleItem',
+            'access' => access::PUBLIC,
+            'timecreated' => time() - 60 // Make this unique so we can check against it.
+        ]);
+
+        $refreshtask = new refresh_catalog_data();
+        $refreshtask->execute();
+
+        $catalogitems = $DB->get_records('catalog');
+        $this->assertCount(1, $catalogitems);
+
+        $item = array_pop($catalogitems);
+        $this->assertEquals($article->get_timecreated(), $item->sorttime);
     }
 }

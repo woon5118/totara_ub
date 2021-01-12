@@ -85,6 +85,7 @@ $string['error:update'] = "Cannot update the resource";
 
 // Field names
 $string['field:name'] = 'Name';
+$string['field:timecreated'] = 'Time created';
 $string['field:topics'] = 'Topics';
 $string['field:content'] = 'Content';
 

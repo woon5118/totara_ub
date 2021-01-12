@@ -24,6 +24,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\provider_handler;
+use \totara_catalog\task\refresh_catalog_data;
+
+use totara_engage\access\access;
 
 class totara_playlist_catalog_item_testcase extends advanced_testcase {
 
@@ -43,5 +46,31 @@ class totara_playlist_catalog_item_testcase extends advanced_testcase {
         }
 
         $this->assertTrue($found, 'playlist catalog provider not found.');
+    }
+
+    /**
+     * @return void
+     */
+    public function test_playlist_sorttime_value(): void {
+        global $DB;
+
+        $this->setAdminUser();
+
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $this->getDataGenerator()->get_plugin_generator('totara_playlist');
+        $playlist = $playlist_generator->create_playlist([
+            'name' => 'playlistItem',
+            'access' => access::PUBLIC,
+            'timecreated' => time() - 60 // Make this unique so we can check against it.
+        ]);
+
+        $refreshtask = new refresh_catalog_data();
+        $refreshtask->execute();
+
+        $catalogitems = $DB->get_records('catalog');
+        $this->assertCount(1, $catalogitems);
+
+        $item = array_pop($catalogitems);
+        $this->assertEquals($playlist->get_timecreated(), $item->sorttime);
     }
 }
