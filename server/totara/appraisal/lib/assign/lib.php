@@ -579,7 +579,7 @@ class totara_assign_appraisal extends totara_assign_core {
         [$assign_sql, $assign_params, $assign_alias] = $this->get_users_from_assignments_sql(
             'u', 'id'
         );
-        $status_active = [\appraisal::STATUS_ACTIVE];
+        $relevant_status = [\appraisal::STATUS_ACTIVE, \appraisal::STATUS_COMPLETED];
 
         // Find users in appraisal groupings that have still not been assigned
         // to the appraisal.
@@ -591,11 +591,11 @@ class totara_assign_appraisal extends totara_assign_core {
             SELECT u.id
               FROM {user} u
               {$assign_sql}
-              WHERE $assign_alias.status = ?
+              WHERE $assign_alias.status IN (?, ?)
          )
         ";
 
-        $params = array_merge($group_params, $assign_params, $status_active);
+        $params = array_merge($group_params, $assign_params, $relevant_status);
         $count = $DB->count_records_sql($in_groups_but_not_assigned, $params);
         if ($count > 0) {
             return false;
@@ -612,9 +612,9 @@ class totara_assign_appraisal extends totara_assign_core {
               FROM {user} u
               {$grouping_sql}
          )
-         AND $assign_alias.status = ?
+         AND $assign_alias.status IN (?, ?)
         ";
-        $params = array_merge($assign_params, $group_params, $status_active);
+        $params = array_merge($assign_params, $group_params, $relevant_status);
         $count = $DB->count_records_sql($assigned_but_not_in_groups, $params);
         if ($count > 0) {
             return false;

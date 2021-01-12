@@ -486,6 +486,81 @@ class totara_appraisal_appraisal_testcase extends appraisal_testcase {
         $CFG->fullnamedisplay = $oldconfig;
     }
 
+    public function test_is_synced() {
+        global $DB;
+
+        self::setAdminUser();
+
+        /** @var appraisal $appraisal */
+        [$appraisal, [$user1, $user2]] = $this->prepare_appraisal_with_users();
+
+        // Get cohort id and make sure both users are in there.
+        $cohort_id = $DB->get_field('cohort_members', 'cohortid', ['userid' => $user1->id], MUST_EXIST);
+        self::assertTrue($DB->record_exists('cohort_members', ['userid' => $user2->id, 'cohortid' => $cohort_id]));
+
+        // Not in sync before activation.
+        $assign = new totara_assign_appraisal('appraisal', $appraisal);
+        self::assertFalse($assign->is_synced());
+
+        // In sync after activation
+        $appraisal->activate();
+        $this->update_job_assignments($appraisal);
+        $count = $DB->count_records('appraisal_user_assignment', ['appraisalid' => $appraisal->id]);
+        self::assertEquals(2, $count);
+        self::assertTrue($assign->is_synced());
+
+        // Remove one user from cohort.
+        cohort_remove_member($cohort_id, $user1->id);
+        self::assertFalse($assign->is_synced());
+        // is_synced() should always return true after updating user assignments.
+        $appraisal->check_assignment_changes();
+        self::assertTrue($assign->is_synced());
+
+        // Re-add user to cohort.
+        cohort_add_member($cohort_id, $user1->id);
+        self::assertFalse($assign->is_synced());
+        // is_synced() should always return true after updating user assignments.
+        $appraisal->check_assignment_changes();
+        self::assertTrue($assign->is_synced());
+
+        // Add another user to cohort.
+        $generator = self::getDataGenerator();
+        $user3 = $generator->create_user();
+        cohort_add_member($cohort_id, $user3->id);
+        self::assertFalse($assign->is_synced());
+        // is_synced() should always return true after updating user assignments.
+        $appraisal->check_assignment_changes();
+        self::assertTrue($assign->is_synced());
+
+        // Complete the appraisal for user1 by anwering the question. This sets the user assignment status to complete
+        // and it should still count as synced (It used to be a bug that it did not count as synced).
+        $role_assignment = appraisal_role_assignment::get_role($appraisal->id, $user1->id, $user1->id, appraisal::ROLE_LEARNER);
+        $this->answer_question($appraisal, $role_assignment, '', 'completestage');
+        self::assertEquals(
+            appraisal::STATUS_COMPLETED,
+            $DB->get_field('appraisal_user_assignment', 'status', ['appraisalid' => $appraisal->id, 'userid' => $user1->id])
+        );
+        self::assertTrue($assign->is_synced());
+        $appraisal->check_assignment_changes();
+        self::assertTrue($assign->is_synced());
+
+        // Remove the user with completed appraisal from the cohort. This also leads to an out-of-sync state
+        // because the user assignment is due to be updated to "closed" status (It also used to be a bug that is_synced()
+        // returned true here).
+        cohort_remove_member($cohort_id, $user1->id);
+        self::assertFalse($assign->is_synced());
+        // is_synced() should always return true after updating user assignments.
+        $appraisal->check_assignment_changes();
+        self::assertTrue($assign->is_synced());
+
+        // Re-add the user with completed appraisal.
+        cohort_add_member($cohort_id, $user1->id);
+        self::assertFalse($assign->is_synced());
+        // is_synced() should always return true after updating user assignments.
+        $appraisal->check_assignment_changes();
+        self::assertTrue($assign->is_synced());
+    }
+
     public function test_active_appraisal_add_group() {
         global $DB;
 
