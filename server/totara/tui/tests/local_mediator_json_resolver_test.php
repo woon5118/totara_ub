@@ -53,7 +53,7 @@ class totara_tui_local_mediation_json_resolver_testcase extends advanced_testcas
 
         self::assertTrue(resolver::validate_requested_file($file));
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.sha1('tui-json ' . $rev . ' '.$component.' '.$file).'"',
             'Header: Content-Disposition: inline; filename="json.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -64,10 +64,16 @@ class totara_tui_local_mediation_json_resolver_testcase extends advanced_testcas
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/json;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file_path),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file_path);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('{', $json);
         self::assertStringEndsWith("}", $json);
@@ -97,7 +103,7 @@ class totara_tui_local_mediation_json_resolver_testcase extends advanced_testcas
 
         self::assertTrue(resolver::validate_requested_file($file));
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.sha1('tui-json ' . $rev . ' '.$component.' '.$file).'"',
             'Header: Content-Disposition: inline; filename="json.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -108,10 +114,16 @@ class totara_tui_local_mediation_json_resolver_testcase extends advanced_testcas
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/json;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file_path),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file_path);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringContainsString('null', $json);
     }

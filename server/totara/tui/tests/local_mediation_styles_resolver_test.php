@@ -61,7 +61,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
 
         self::assertSame('p', bundle::get_css_suffix_for_url());
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.$this->get_etag($rev, 'p' , false).'"',
             'Header: Content-Disposition: inline; filename="styles.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -72,10 +72,15 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Header: Accept-Ranges: none',
             'Header: Content-Type: text/css;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('@import \'definitions_only!internal_absolute:', $css);
     }
@@ -91,7 +96,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
         [$css, $messages, $file] = $this->get_resolver($rev, 'pl');
         self::assertSame('pl', bundle::get_css_suffix_for_url());
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.$this->get_etag($rev, 'pl' , false).'"',
             'Header: Content-Disposition: inline; filename="styles.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -102,10 +107,15 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Header: Accept-Ranges: none',
             'Header: Content-Type: text/css;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('@import \'definitions_only!internal_absolute:', $css);
     }
@@ -122,7 +132,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
 
         self::assertSame('d', bundle::get_css_suffix_for_url());
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.$this->get_etag($rev, 'd' , false).'"',
             'Header: Content-Disposition: inline; filename="styles.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -133,10 +143,15 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Header: Accept-Ranges: none',
             'Header: Content-Type: text/css;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('@import \'definitions_only!internal_absolute:', $css);
     }
@@ -156,7 +171,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
 
         self::assertSame('dl', bundle::get_css_suffix_for_url());
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.$this->get_etag($rev, 'dl' , false).'"',
             'Header: Content-Disposition: inline; filename="styles.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -167,10 +182,15 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Header: Accept-Ranges: none',
             'Header: Content-Type: text/css;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('@import \'definitions_only!internal_absolute:', $css);
     }

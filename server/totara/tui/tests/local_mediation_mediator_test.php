@@ -120,10 +120,14 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
             'Header: Accept-Ranges: none',
             'Header: Content-Type: text/phpunit;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: 12',
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: 12';
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting'
-        ];
+        ]);
         self::assertSame($expected, self::strip_debugging_messages($actual));
     }
 
@@ -148,10 +152,14 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
             'Header: Accept-Ranges: none',
             'Header: Content-Type: text/phpunit;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize(__FILE__),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize(__FILE__);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting'
-        ];
+        ]);
         self::assertSame($expected, self::strip_debugging_messages($actual));
     }
 

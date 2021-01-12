@@ -51,7 +51,7 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
 
         self::assertSame('p', bundle::get_js_suffix_for_url());
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.sha1('tui ' . $rev . ' tui p').'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -62,10 +62,16 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/javascript;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('!function(', $js);
     }
@@ -80,7 +86,7 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         [$js, $messages, $file] = $this->get_resolver($rev, 'pl');
         self::assertSame('pl', bundle::get_js_suffix_for_url());
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.sha1('tui ' . $rev . ' tui pl').'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -91,10 +97,15 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/javascript;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('!function(', $js);
     }
@@ -111,7 +122,7 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
 
         self::assertSame('d', bundle::get_js_suffix_for_url());
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.sha1('tui ' . $rev . ' tui d').'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -122,10 +133,16 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/javascript;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('/******/ (function(', $js);
     }
@@ -145,7 +162,7 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
 
         self::assertSame('dl', bundle::get_js_suffix_for_url());
 
-        self::assertSame([
+        $expected = [
             'Header: Etag: "'.sha1('tui ' . $rev . ' tui dl').'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -156,10 +173,16 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/javascript;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+
+        self::assertSame($expected, self::strip_debugging_messages($messages));
 
         self::assertStringStartsWith('/******/ (function(', $js);
     }
@@ -364,7 +387,8 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         $rev = time();
         [$js, $messages, $file] = $this->get_resolver(time(), 'p', 'monkeys');
         self::assertSame('/** File not found */', $js);
-        self::assertSame([
+
+        $expected = [
             'Header: Etag: "'.sha1('tui ' . $rev . ' monkeys p').'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -375,10 +399,16 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/javascript;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+
+        self::assertSame($expected, self::strip_debugging_messages($messages));
     }
 
     public function test_non_existent_component_development() {
@@ -406,7 +436,8 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         [$js, $messages, $file] = $this->get_resolver(time(), 'p', 'vendors');
         self::assertStringStartsWith('(window.webpackJsonp=window.webpackJsonp||[])', $js);
         self::assertStringNotContainsString('/*!******************************************', $js);
-        self::assertSame([
+
+        $expected = [
             'Header: Etag: "'.sha1('tui ' . $rev . ' vendors p').'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -417,10 +448,16 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/javascript;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+
+        self::assertSame($expected, self::strip_debugging_messages($messages));
     }
 
     public function test_vendors_development() {
@@ -459,7 +496,8 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         [$js, $messages, $file] = $this->get_resolver(time(), 'p', 'theme_ventura');
         self::assertStringStartsWith("/* theme: ventura */\n!function(", $js);
         self::assertStringNotContainsString('/*!******************************************', $js);
-        self::assertSame([
+
+        $expected = [
             'Header: Etag: "'.sha1('tui ' . $rev . ' theme_ventura p').'"',
             'Header: Content-Disposition: inline; filename="javascript.php"',
             'Header: Date: ' . gmdate('D, d M Y', time()),
@@ -470,10 +508,16 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
             'Header: Accept-Ranges: none',
             'Header: Content-Type: application/javascript;charset=utf-8',
             'Header: X-Content-Type-Options: nosniff',
-            'Header: Content-Length: ' . filesize($file),
+        ];
+        if (!\min_enable_zlib_compression()) {
+            $expected[] = 'Header: Content-Length: ' . filesize($file);
+        }
+        array_push($expected, ...[
             'Header: Vary: Accept-Encoding',
             'Exiting',
-        ], self::strip_debugging_messages($messages));
+        ]);
+
+        self::assertSame($expected, self::strip_debugging_messages($messages));
     }
 
     public function test_theme_ventura_development() {
