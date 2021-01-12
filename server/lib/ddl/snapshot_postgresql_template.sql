@@ -71,11 +71,15 @@ CREATE OR REPLACE FUNCTION ss_reset_phpu_() RETURNS INTEGER AS $$
 DECLARE
   result RECORD;
   tablecount INTEGER;
+  issuperuser VARCHAR;
 BEGIN
+  EXECUTE 'SHOW is_superuser' INTO issuperuser;
 
-  -- No need to disable triggers and foreign keys because LMS does not use them yet,
-  -- note that changing session_replication_role requires superuser privileges.
-  --SET session_replication_role = replica;
+  -- We should disable system triggers used by foreign keys because Totara uses them in core tables,
+  -- but we should still make it kind of work even without superuser privilege.
+  IF issuperuser = 'on' THEN
+    SET session_replication_role = replica;
+  END IF;
 
   tablecount = 0;
 
@@ -84,6 +88,7 @@ BEGIN
     SELECT *
     FROM ss_tables_phpu_
     WHERE modifications = 1
+    ORDER BY tablename
 
   LOOP
 
@@ -97,7 +102,42 @@ BEGIN
 
     tablecount = tablecount + 1;
 
+    IF issuperuser = 'off' THEN
+      UPDATE ss_tables_phpu_ SET modifications = 0 WHERE tablename = result.tablename;
+    END IF;
+
   END LOOP;
+
+  -- If we cannot disable triggers and any tables got updated via cascading when resetting above
+  -- then do a slow full reset.
+  IF issuperuser = 'off' THEN
+    IF EXISTS (SELECT 1 FROM ss_tables_phpu_ WHERE modifications = 1) THEN
+      FOR result IN
+
+        SELECT *
+        FROM ss_tables_phpu_
+        ORDER BY tablename
+
+      LOOP
+        EXECUTE 'DELETE FROM ' || result.tablename;
+      END LOOP;
+
+      FOR result IN
+
+        SELECT *
+        FROM ss_tables_phpu_
+        ORDER BY tablename
+
+      LOOP
+        IF result.records > 0 THEN
+          EXECUTE 'INSERT INTO ' || result.tablename || ' SELECT * FROM ss_t_' || result.tablename;
+        END IF;
+        IF result.nextid > 0 THEN
+          EXECUTE 'ALTER SEQUENCE ' || result.tablename || '_id_seq RESTART WITH ' || result.nextid;
+        END IF;
+      END LOOP;
+    END IF;
+  END IF;
 
   UPDATE ss_tables_phpu_ SET modifications = 0 WHERE modifications = 1;
 
@@ -117,7 +157,9 @@ BEGIN
 
   END LOOP;
 
-  --SET session_replication_role = origin;
+  IF issuperuser = 'on' THEN
+    SET session_replication_role = origin;
+  END IF;
 
   RETURN tablecount;
 
