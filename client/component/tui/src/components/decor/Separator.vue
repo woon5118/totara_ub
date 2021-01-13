@@ -21,6 +21,7 @@
     v-if="this.$slots['default']"
     class="tui-separator tui-separator--wrapped"
     :class="[
+      normal ? 'tui-separator--normal' : '',
       thick ? 'tui-separator--thick' : '',
       spread ? 'tui-separator--spread' : '',
     ]"
@@ -34,6 +35,7 @@
     v-else
     class="tui-separator tui-separator-rule"
     :class="[
+      normal ? 'tui-separator--normal' : '',
       thick ? 'tui-separator--thick' : '',
       spread ? 'tui-separator--spread' : '',
     ]"
@@ -42,6 +44,17 @@
 <script>
 export default {
   props: {
+    /**
+     * When provided, a modifier className is added to the element that
+     * references a SCSS variable to set a normal visible horizontal rule
+     **/
+    normal: {
+      type: Boolean,
+      default: function() {
+        return false;
+      },
+    },
+
     /**
      * When provided, a modifier className is added to the element that
      * references a SCSS variable to set a thicker visible horizontal rule
@@ -86,6 +99,11 @@ export default {
       height: var(--border-width-thick);
       line-height: var(--border-width-thick);
     }
+
+    &.tui-separator--normal {
+      height: var(--border-width-normal);
+      line-height: var(--border-width-normal);
+    }
   }
 
   // alternative implementation with wrapper markup to center slotted content
@@ -114,6 +132,12 @@ export default {
     &.tui-separator--thick:after {
       height: var(--border-width-thick);
       line-height: var(--border-width-thick);
+    }
+
+    &.tui-separator--normal:before,
+    &.tui-separator--normal:after {
+      height: var(--border-width-normal);
+      line-height: var(--border-width-normal);
     }
   }
 }

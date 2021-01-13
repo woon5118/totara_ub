@@ -20,13 +20,17 @@
   <div id="testSeparator">
     <Separator />
     <br />
+    <Separator :normal="true" />
+    <br />
     <Separator :thick="true" />
     <br />
     <Separator :spread="true" />
     <br />
+    <Separator :normal="true" :spread="true" />
+    <br />
     <Separator :thick="true" :spread="true" />
     <br />
-    <Separator :thick="true" :spread="true">
+    <Separator :normal="true" :spread="true">
       hello world
     </Separator>
     <Separator :thick="true" :spread="true">

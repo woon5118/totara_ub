@@ -28,7 +28,7 @@
         @submit="submit"
       />
 
-      <Separator />
+      <Separator :normal="true" />
     </template>
 
     <DiscussionFilter
