@@ -223,27 +223,41 @@ class award_criteria_cohort extends award_criteria {
     public function get_completed_criteria_sql() {
         global $DB;
 
-        $join = '';
-        $where = '';
-        $params = array ();
-
         // Build the joins and where SQL required to retrieve
-        // a list of newly qualifying members of an audience.
-        foreach ($this->params as $param) {
-            $field_param = $DB->get_unique_param('cohort');
-            $table_alias = 'cm' . preg_replace('/.*(\d+)$/', '\\1', $field_param);
-            $join .= 'JOIN {cohort_members} ' . $table_alias .' ON u.id = ' . $table_alias . '.userid ';
-            $where .= $this->method == BADGE_CRITERIA_AGGREGATION_ANY ? ' OR' : ' AND';
-            $where .= ' ' . $table_alias . '.cohortid = :' . $field_param;
-            $params[$field_param] = $param['cohort'];
+        // a list of newly qualifying users who are audience members.
+
+        if (!$this->params) {
+            // Invalid configuration.
+            return array('', "AND 1=0", []);
         }
 
-        // If this aggregation is for ANY audience then we need to
-        // manipulate $where to make sure the SQL is correct.
         if ($this->method == BADGE_CRITERIA_AGGREGATION_ANY) {
-            $where = 'AND (' . substr ($where, 4) . ')';
+            $ta = $DB->get_unique_param('cm');
+            $join = "JOIN {cohort_members} $ta ON u.id = $ta.userid";
+            $wheres = [];
+            foreach ($this->params as $param) {
+                $cohortid = intval($param['cohort']);
+                $wheres[] = "$ta.cohortid = $cohortid";
+            }
+            $where = implode(" OR ", $wheres);
+
+        } else if ($this->method == BADGE_CRITERIA_AGGREGATION_ALL) {
+            $joins = [];
+            $wheres = [];
+            foreach ($this->params as $param) {
+                $ta = $DB->get_unique_param('cm');
+                $cohortid = intval($param['cohort']);
+                $joins[] = "JOIN {cohort_members} $ta ON u.id = $ta.userid";
+                $wheres[] = "$ta.cohortid = $cohortid";
+            }
+            $join = implode("\n", $joins);
+            $where = implode(" AND ", $wheres);
+
+        } else {
+            // Invalid configuration.
+            return array('', "AND 1=0", []);
         }
 
-        return array($join, $where, $params);
+        return array($join, "AND ($where)", []);
     }
 }

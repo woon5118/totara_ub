@@ -6,10 +6,12 @@ Feature: Verify badge issue based on cohort / audience completion criterion.
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | learner1 | Bob1      | Learner1 | learner1@example.com |
+      | learner2 | Bob2      | Learner2 | learner2@example.com |
     And the following "cohorts" exist:
       | name       | idnumber |
       | Audience 1 | A1       |
       | Audience 2 | A2       |
+      | Audience 3 | A3       |
     And the following "cohort members" exist:
       | user     | cohort |
       | learner1 | A1     |
@@ -51,6 +53,44 @@ Feature: Verify badge issue based on cohort / audience completion criterion.
     # Check that the user has been issued the badge.
     When I follow "Recipients (1)"
     Then I should see "Bob1 Learner1"
+
+  Scenario: Verify badge issuing when ALL audiences required
+    Given the following "cohort members" exist:
+      | user     | cohort |
+      | learner2 | A2     |
+      | learner2 | A3     |
+    And I navigate to "Manage badges" node in "Site administration > Badges"
+    And I click on "Add a new badge" "button"
+    And I set the following fields to these values:
+      | Name        | Cohort ALL Badge             |
+      | Description | Cohort ALL badge description |
+    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
+    And I press "Create badge"
+    And I set the field "Add badge criteria" to "Audience membership"
+    And I set the field "Qualifying audience(s)" to "Audience 2,Audience 3"
+    And I expand all fieldsets
+    And I set the field "Membership in all the selected audiences" to "1"
+    And I press "Save"
+    And I should see "Badge criteria successfully created"
+    And I press "Enable access"
+    And I should see "Changes in badge access"
+    And I press "Continue"
+
+    When I follow "Recipients (1)"
+    Then I should see "Bob2 Learner2"
+    And I should not see "Bob1 Learner1"
+    And I log out
+
+    # Just make sure there are no errors or changes.
+    When I run the scheduled task "\core\task\badges_cron_task"
+    And I log in as "learner1"
+    And I follow "Profile" in the user menu
+    Then I should not see "Cohort ALL Badge"
+    And I log out
+    When I log in as "learner2"
+    And I follow "Profile" in the user menu
+    Then I should see "Cohort ALL Badge"
+    And I log out
 
   Scenario: Verify audience badge can still be enabled and issued when multiple criteria is only partially available.
 
