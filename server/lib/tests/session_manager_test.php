@@ -546,7 +546,7 @@ class core_session_manager_testcase extends advanced_testcase {
         $this->assertFalse($DB->record_exists('sessions', array('id'=>$r2)));
         $this->assertTrue($DB->record_exists('sessions', array('id'=>$r3)));
         $this->assertFalse($DB->record_exists('sessions', array('id'=>$r4)));
-        $this->assertFalse($DB->record_exists('sessions', array('id'=>$r5)));
+        $this->assertTrue($DB->record_exists('sessions', array('id'=>$r5)));
         $this->assertFalse($DB->record_exists('sessions', array('id'=>$r6)));
         $this->assertTrue($DB->record_exists('sessions', array('id'=>$r7)));
     }

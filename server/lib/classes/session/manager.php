@@ -1002,14 +1002,6 @@ class manager {
             }
             $rs->close();
 
-            // Cleanup letfovers from the first browser access because it may set multiple cookies and then use only one.
-            $params = array('purgebefore' => (time() - 60*3));
-            $rs = $DB->get_recordset_select('sessions', 'userid = 0 AND timemodified = timecreated AND timemodified < :purgebefore', $params, 'id ASC', 'id, sid');
-            foreach ($rs as $session) {
-                self::kill_session($session->sid);
-            }
-            $rs->close();
-
         } catch (\Exception $ex) {
             debugging('Error gc-ing sessions: '.$ex->getMessage(), DEBUG_NORMAL, $ex->getTrace());
         }
