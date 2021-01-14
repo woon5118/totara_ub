@@ -177,7 +177,9 @@ define([], function() {
                         nodeList[activeNodeIndex].getElementsByClassName('tw-selectTree__list_row_link')[0].focus();
                     break;
                     case 'Tab':
-                        if (activeNodeIndex === nodeList.length - 1 && that.visibility) {
+                        var modifer = e.shiftKey ? -1 : 1;
+                        var isLast = e.shiftKey ? activeNodeIndex === 0 : activeNodeIndex === nodeList.length - 1;
+                        if (isLast && that.visibility) {
                             that.toggleTree();
                             return;
                         }
@@ -185,7 +187,7 @@ define([], function() {
                         var selectLastElement = true;
 
                         // Find next visible node
-                        for (var t = activeNodeIndex + 1; t < nodeList.length; ++t) {
+                        for (var t = activeNodeIndex + modifer; t < nodeList.length && t >= 0; t += modifer) {
                             var nodeT = nodeList[t].getElementsByClassName('tw-selectTree__list_row_link')[0];
                             if (nodeT && nodeT.offsetHeight !== 0) {
                                 e.preventDefault();
