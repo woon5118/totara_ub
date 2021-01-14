@@ -44,15 +44,14 @@ Feature: Verify the case insensitive shortnames for certification completion imp
 
   Scenario: Basic certification completion import case insensitive is turned on
     When I log in as "admin"
-    And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "Certification CSV file to upload" filemanager
+    And I navigate to "Upload certification records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload certification Create evidence" to "1"
-    And I click on "Show more" "link" in the ".totara_completionimport__uploadcertification_form" "css_element"
     And I set the field "Upload certification Case insensitive shortnames" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "Certification completion file successfully imported"
     And I should see "12 Records imported pending processing"
-    And I run all adhoc tasks
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_certification_completions_task"
 
     When I follow "Certification import report"
     And "1" row "Imported as evidence?" column of "completionimport_certification" table should contain "No"
@@ -97,13 +96,13 @@ Feature: Verify the case insensitive shortnames for certification completion imp
 
   Scenario: Basic certification completion import case insensitive is turned off
     When I log in as "admin"
-    And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "Certification CSV file to upload" filemanager
+    And I navigate to "Upload certification records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload certification Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "Certification completion file successfully imported"
     And I should see "12 Records imported pending processing"
-    And I run all adhoc tasks
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_certification_completions_task"
 
     When I follow "Certification import report"
     And "1" row "Imported as evidence?" column of "completionimport_certification" table should contain "No"

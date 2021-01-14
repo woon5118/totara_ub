@@ -23,6 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/totara/completionimport/lib.php');
+
 /**
  * Class totara_completionimport_csv_import_testcase
  *
@@ -77,12 +80,12 @@ class totara_completionimport_csv_import_testcase extends advanced_testcase {
         );
     }
 
-    // For testing the import() method of this class, much of the full testing is done in other files
+    // For testing the basic_import() method of this class, much of the full testing is done in other files
     // where we test the process overall.
     // See course_upload_test.php, importcertification_test.php and importcourse_test.php.
 
     /**
-     * Tests the import() method when an empty string is supplied for content.
+     * Tests the basic_import() method when an empty string is supplied for content.
      */
     public function test_import_with_empty_content() {
         global $DB;
@@ -90,7 +93,7 @@ class totara_completionimport_csv_import_testcase extends advanced_testcase {
         $importname = 'course';
         $importime = time();
         $content = '';
-        $errors = \totara_completionimport\csv_import::import($content, $importname, $importime);
+        $errors = \totara_completionimport\csv_import::basic_import($content, $importname, $importime);
 
         // We should get the errors returned by validation.
         $this->assertContains("Missing required column 'username'", $errors);

@@ -33,12 +33,7 @@ class import_results extends \core\output\template {
             if ($importtype === 'course') {
                 $data['importmessage'] = get_string('importdonecourse', 'totara_completionimport');
 
-                $resultdata = [];
-                $resultdata[] = get_string('importerrors', 'totara_completionimport', $importresults->errorcount);
-                $resultdata[] = get_string('importevidence', 'totara_completionimport', $importresults->evidencecount);
-                $resultdata[] = get_string('importcourse', 'totara_completionimport', $importresults->totalrows - $importresults->errorcount - $importresults->evidencecount);
-                $resultdata[] = get_string('importtotal', 'totara_completionimport', $importresults->totalrows);
-
+                $resultdata[] = get_string('importrecordcount', 'totara_completionimport', $importresults->totalrows);
                 $data['results'] = $resultdata;
 
             } else if ($importtype == 'certification') {

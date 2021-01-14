@@ -39,12 +39,13 @@ Feature: Make sure course completion depending on completion of other course is 
     # Run cron to make sure the reaggregate flag is set to 0.
     And I run the scheduled task "core\task\completion_regular_task"
     # Import course completion for the dependent course.
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
     And I set the field "Override current course completions" to "1"
-    And I upload "completion/tests/fixtures/completion_criteria_course_cron.csv" file to "Course CSV file to upload" filemanager
+    And I upload "completion/tests/fixtures/completion_criteria_course_cron.csv" file to "CSV file to upload" filemanager
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as courses"
+    Then I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
     # Check that the resulting course is NOT marked complete.
     And I am on "Resulting course" course homepage
     And I navigate to "Course completion" node in "Course administration > Reports"

@@ -34,12 +34,16 @@ define('COURSE_IMPORT_USERS', 11);
 define('COURSE_IMPORT_COURSES', 11);
 define('COURSE_IMPORT_CSV_ROWS', 100);
 
+global $CFG;
+
+require_once($CFG->dirroot . '/totara/completionimport/tests/completionimport_advanced_testcase.php');
+
 /**
  * Class clean_course_data_task_testcase
  *
  * @group totara_completionimport
  */
-class totara_completionimport_clean_course_data_task_testcase extends advanced_testcase {
+class totara_completionimport_clean_course_data_task_testcase extends completionimport_advanced_testcase {
 
     public function test_task() {
         global $CFG, $DB;
@@ -114,7 +118,7 @@ class totara_completionimport_clean_course_data_task_testcase extends advanced_t
         $totalcourserows = COURSE_IMPORT_CSV_ROWS + $countevidence;
 
         $importstart = time();
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        self::import($content, $importname, $importstart);
 
         // Test total number of records before running reset_course_report_data_task.
         $this->assertEquals($totalcourserows, $DB->count_records('totara_compl_import_course'), 'Record count mismatch in the totara_compl_import_course table');

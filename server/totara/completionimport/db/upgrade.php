@@ -127,5 +127,22 @@ function xmldb_totara_completionimport_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020050100, 'totara', 'completionimport');
     }
 
+    if ($oldversion < 2020100101) {
+        // Define field processed to be added to totara_compl_import_course.
+        $table = new xmldb_table('totara_compl_import_course');
+        $field = new xmldb_field('processed', XMLDB_TYPE_INTEGER, '1', null, null, null, 0, 'completiondateparsed');
+
+        // Conditionally launch add field processed.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // Update all existing records to be imported
+            $DB->execute('UPDATE {totara_compl_import_course} SET processed = 1');
+        }
+
+        // Completionimport savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100101, 'totara', 'completionimport');
+    }
+
     return true;
 }

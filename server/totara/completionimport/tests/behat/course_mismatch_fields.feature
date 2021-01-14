@@ -44,17 +44,14 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
 
   Scenario: Basic course completion import case insensitive is turned on
     When I log in as "admin"
-    And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_mismatch_fields_1.csv" file to "Course CSV file to upload" filemanager
+    And I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_mismatch_fields_1.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
-    And I click on "Show more" "link" in the ".totara_completionimport__uploadcourse_form" "css_element"
     And I set the field "Upload course Case insensitive shortnames" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors - these were ignored"
-    And I should see "5 Records created as evidence"
-    And I should see "7 Records successfully imported as courses"
-    And I should see "12 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "12 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     And "1" row "Imported as evidence?" column of "completionimport_course" table should contain "No"
@@ -98,17 +95,14 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
     Then I should see "Completed course : CP101"
 
   Scenario: Basic course completion import case insensitive is turned off
-
     When I log in as "admin"
-    And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_mismatch_fields_1.csv" file to "Course CSV file to upload" filemanager
+    And I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_mismatch_fields_1.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "9 Records with data errors - these were ignored"
-    And I should see "2 Records created as evidence"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "12 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "12 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     And "1" row "Imported as evidence?" column of "completionimport_course" table should contain "No"

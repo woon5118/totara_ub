@@ -41,30 +41,11 @@ require_capability('totara/completionimport:import', $context);
 
 $PAGE->set_context($context);
 
-// Create the forms before $OUTPUT.
-$coursedata = get_config_data($filesource, 'course');
-$coursedata->importname = 'course';
-$coursedata->showheader = true;
-$coursedata->showdescription = true;
-$courseform = new upload_form(null, $coursedata);
-
+// Create the form before $OUTPUT.
 $certdata = get_config_data($filesource, 'certification');
 $certdata->importname = 'certification';
-$certdata->showheader = true;
 $certdata->showdescription = true;
 $certform = new upload_form(null, $certdata);
-
-$importname = '';
-if ($data = $courseform->get_data()) {
-    $importname = 'course';
-} else if ($data = $certform->get_data()) {
-    $importname = 'certification';
-}
-if (!empty($importname)) {
-    $heading = get_string('importing', 'totara_completionimport', $importname);
-} else {
-    $heading = get_string('pluginheading', 'totara_completionimport');
-}
 
 if (!in_array($filesource, array(TCI_SOURCE_EXTERNAL, TCI_SOURCE_UPLOAD))) {
     print_error('error:invalidfilesource', 'totara_completionimport');
@@ -72,10 +53,12 @@ if (!in_array($filesource, array(TCI_SOURCE_EXTERNAL, TCI_SOURCE_UPLOAD))) {
     set_config('filesource', $filesource, 'totara_completionimport');
 }
 
+$heading = get_string('uploadrecords_certification', 'totara_completionimport');
+
 $PAGE->set_heading($heading);
 $PAGE->set_title($heading);
-$PAGE->set_url('/totara/completionimport/upload.php');
-admin_externalpage_setup('totara_completionimport_upload');
+$PAGE->set_url('/totara/completionimport/upload_certification.php');
+admin_externalpage_setup('totara_completionimport_certification_upload');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading);
@@ -84,18 +67,18 @@ if (($filesource == TCI_SOURCE_EXTERNAL) and empty($CFG->completionimportdir)) {
     // To set an external file on the server, the setting $CFG->completionimportdir must be set in the config file.
     echo $OUTPUT->notification(get_string('sourcefile_noconfig', 'totara_completionimport'), 'notifyproblem');
 
-    $importurl = new moodle_url('/totara/completionimport/upload.php', array('filesource' => TCI_SOURCE_UPLOAD));
+    $importurl = new moodle_url('/totara/completionimport/upload_certification.php', array('filesource' => TCI_SOURCE_UPLOAD));
     echo html_writer::link($importurl, format_string(get_string('uploadvia_form', 'totara_completionimport')));
     echo $OUTPUT->footer();
     exit;
 }
 
-if (!empty($importname)) {
+if ($data = $certform->get_data()) {
     // Lets do it!
     require_sesskey();
 
     // Save the form settings for next time.
-    set_config_data($data, $importname);
+    set_config_data($data, 'certification');
 
     if ($filesource == TCI_SOURCE_EXTERNAL) {
         // File should already be uploaded by FTP.
@@ -118,7 +101,7 @@ if (!empty($importname)) {
             exit;
         }
         // Create a temporary file name.
-        if (!($tempfilename = tempnam($temppath, get_tempprefix($importname)))) {
+        if (!($tempfilename = tempnam($temppath, get_tempprefix('certification')))) {
             echo $OUTPUT->notification(get_string('cannotcreatetempname', 'totara_completionimport'), 'notifyproblem');
             echo $OUTPUT->footer();
             exit;
@@ -133,11 +116,7 @@ if (!empty($importname)) {
 
     } else if ($filesource == TCI_SOURCE_UPLOAD) {
         // Uploading via a form.
-        if ($importname == 'course') {
-            $content = $courseform->get_file_content('course_uploadfile');
-        } else if ($importname == 'certification') {
-            $content = $certform->get_file_content('certification_uploadfile');
-        }
+        $content = $certform->get_file_content('certification_uploadfile');
     } else {
         echo $OUTPUT->notification(get_string('invalidfilesource', 'totara_completionimport', $filesource), 'notifyproblem');
         echo $OUTPUT->footer();
@@ -145,49 +124,36 @@ if (!empty($importname)) {
     }
 
     $importtime = time();
-    if ($importname === 'course') {
-        // Importtime is used to filter the import table for this run.
-        $errors = \totara_completionimport\csv_import::import($content, $importname, $importtime);
-        if (empty($errors)) {
-            echo $OUTPUT->notification(get_string('csvimportdone', 'totara_completionimport'), 'notifysuccess');
-        } else {
-            echo $OUTPUT->notification(get_string('importerror_' . $importname, 'totara_completionimport'), 'notifyproblem');
-        }
-    } else if ($importname === 'certification') {
-        // Run basic sanity check
-        //$errors = \totara_completionimport\csv_import::sanity_check_csv($content, $importname);
 
-        // Do initial import (sanity check and import data into import table)
-        $errors = \totara_completionimport\csv_import::basic_import($content, $importname, $importtime);
+    // Do initial import (sanity check and import data into import table)
+    $errors = \totara_completionimport\csv_import::basic_import($content, 'certification', $importtime);
 
-        if (empty($errors)) {
+    if (empty($errors)) {
+        // Run adhoc task to process imported data
+        $adhoctask = new \totara_completionimport\task\import_certification_completions_task();
+        $adhoctask->set_custom_data(['importname' => 'certification', 'importtime' => $importtime]);
 
-            // Run adhoc task to process imported data
-            $adhoctask = new \totara_completionimport\task\import_certification_completions_task();
-            $adhoctask->set_custom_data(['importname' => $importname, 'importtime' => $importtime]);
+        \core\task\manager::queue_adhoc_task($adhoctask);
 
-            \core\task\manager::queue_adhoc_task($adhoctask);
-
-            echo $OUTPUT->notification(get_string('certificationcsvdone', 'totara_completionimport'), 'notifysuccess');
-        } else {
-            echo $OUTPUT->notification(get_string('importerror_' . $importname, 'totara_completionimport'), 'notifyproblem');
-        }
+        echo $OUTPUT->notification(get_string('certificationcsvdone', 'totara_completionimport'), 'notifysuccess');
+    } else {
+        echo $OUTPUT->notification(get_string('importerror_' . 'certification', 'totara_completionimport'), 'notifyproblem');
     }
 
-    $data = get_import_results_data($importname, $importtime);
+    $data = get_import_results_data('certification', $importtime);
 
     $viewurl = new moodle_url('/totara/completionimport/viewreport.php',
-                ['importname' => $importname, 'timecreated' => $importtime, 'importuserid' => $USER->id, 'clearfilters' => 1]);
+        ['importname' => 'certification', 'timecreated' => $importtime, 'importuserid' => $USER->id, 'clearfilters' => 1]);
 
     $data->reportlink = [
-        'text' => format_string(get_string('report_' . $importname, 'totara_completionimport')),
+        'text' => format_string(get_string('report_' . 'certification', 'totara_completionimport')),
         'link' => $viewurl
     ];
 
     // Add errors to data for rendering
     $data->errors = $errors;
 
-    $import_results_output = \totara_completionimport\output\import_results::create_from_import($data, $importname);
+    $import_results_output = \totara_completionimport\output\import_results::create_from_import($data, 'certification');
     $results_template_data = $import_results_output->get_template_data();
 
     echo $OUTPUT->render_from_template('totara_completionimport/completionimport_import_results', $results_template_data);
@@ -196,19 +162,16 @@ if (!empty($importname)) {
     exit;
 }
 
-// Display upload course heading + fields to import.
-$courseform->display();
-
 // Display upload certification heading + fields to import.
 if (advanced_feature::is_enabled('certifications')) {
     $certform->display();
 }
 
 if ($filesource == TCI_SOURCE_EXTERNAL) {
-    $importurl = new moodle_url('/totara/completionimport/upload.php', array('filesource' => TCI_SOURCE_UPLOAD));
+    $importurl = new moodle_url('/totara/completionimport/upload_certification.php', array('filesource' => TCI_SOURCE_UPLOAD));
     echo html_writer::link($importurl, format_string(get_string('uploadvia_form', 'totara_completionimport')));
 } else {
-    $importurl = new moodle_url('/totara/completionimport/upload.php', array('filesource' => TCI_SOURCE_EXTERNAL));
+    $importurl = new moodle_url('/totara/completionimport/upload_certification.php', array('filesource' => TCI_SOURCE_EXTERNAL));
     echo html_writer::link($importurl, format_string(get_string('uploadvia_directory', 'totara_completionimport')));
 }
 

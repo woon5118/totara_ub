@@ -31,13 +31,14 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/totara/completionimport/lib.php');
+require_once($CFG->dirroot . '/totara/completionimport/tests/completionimport_advanced_testcase.php');
 
 /**
  * Class totara_completionimport_course_upload_testcase
  *
  * @group totara_completionimport
  */
-class totara_completionimport_course_upload_testcase extends advanced_testcase {
+class totara_completionimport_course_upload_testcase extends completionimport_advanced_testcase {
 
     protected $user1, $course1;
 
@@ -84,7 +85,7 @@ class totara_completionimport_course_upload_testcase extends advanced_testcase {
         $this->assertGreaterThan(0, $size);
         $content = fread($handle, $size);
         $this->assertNotSame(false, $content);
-        \totara_completionimport\csv_import::import($content, $importname, $importtime);
+        self::import($content, $importname, $importtime);
 
         $this->assertEquals(1, $DB->count_records('course_completions'));
         $this->assertEquals(0, $DB->count_records('course_completion_history'));
@@ -130,7 +131,7 @@ class totara_completionimport_course_upload_testcase extends advanced_testcase {
         $this->assertGreaterThan(0, $size);
         $content = fread($handle, $size);
         $this->assertNotSame(false, $content);
-        \totara_completionimport\csv_import::import($content, $importname, $importtime);
+        self::import($content, $importname, $importtime);
 
         $this->assertEquals(1, $DB->count_records('course_completions'));
         $this->assertEquals(1, $DB->count_records('course_completion_history'));

@@ -42,14 +42,15 @@ Feature: Make sure the grade column of CSV differs
     And I run the scheduled task "core\task\completion_regular_task"
 
     # Import course completion for the dependent course.
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
     And I set the following fields to these values:
       | Upload course CSV Grade format | <grade_unit> |
       | Override current course completions | 0 |
-    And I upload "totara/completionimport/tests/behat/fixtures/completion_upload_23158.csv" file to "Course CSV file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/completion_upload_23158.csv" file to "CSV file to upload" filemanager
     And I click on "Save" "button" in the "#mform1" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as courses"
+    Then I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
     And I log out
 
     And I log in as "student1"
@@ -75,14 +76,15 @@ Feature: Make sure the grade column of CSV differs
     And the field with xpath "//tr[contains(.,'Ass3')]//input[@type='text']" matches value "25.0"
     And the field with xpath "//tr[contains(.,'Ass4')]//input[@type='text']" matches value "25.0"
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
     And I set the following fields to these values:
       | Upload course CSV Grade format | <grade_unit> |
       | Override current course completions | 1 |
-    And I upload "totara/completionimport/tests/behat/fixtures/completion_upload_23158.csv" file to "Course CSV file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/completion_upload_23158.csv" file to "CSV file to upload" filemanager
     And I click on "Save" "button" in the "#mform1" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as courses"
+    Then I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I navigate to my "CCIH report" report
     Then the "ccih_report" table should contain the following:

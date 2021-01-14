@@ -96,6 +96,11 @@ class rb_completionimport_course_embedded extends rb_base_embedded {
                 'value' => 'grade',
                 'heading' => get_string('columnbasegrade', 'rb_source_completionimport_course'),
             ),
+            array(
+                'type' => 'base',
+                'value' => 'processed',
+                'heading' => get_string('columnbaseprocessed', 'rb_source_completionimport_course'),
+            ),
         );
 
         $this->filters = array(
@@ -143,6 +148,11 @@ class rb_completionimport_course_embedded extends rb_base_embedded {
                 'type' => 'base',
                 'value' => 'grade',
                 'advanced' => 1,
+            ),
+            array(
+                'type' => 'base',
+                'value' => 'processed',
+                'advanced' => 0,
             ),
         );
 

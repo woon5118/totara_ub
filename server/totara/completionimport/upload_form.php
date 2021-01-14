@@ -41,19 +41,16 @@ class upload_form extends moodleform {
 
         switch ($data->importname) {
             case 'course':
-                $upload_label = 'choosecoursefile';
                 $upload_field = 'course_uploadfile';
                 $header_label = 'uploadcourse';
                 $field_aria_label = 'coursefieldarialabel';
                 break;
             case 'certification':
-                $upload_label = 'choosecertificationfile';
                 $upload_field = 'certification_uploadfile';
                 $header_label = 'uploadcertification';
                 $field_aria_label = 'certificationfieldarialabel';
                 break;
             default:
-                $upload_label = 'choosefile';
                 $upload_field = 'uploadfile';
                 $header_label = 'uploadfile';
                 $field_aria_label = 'fieldarialabel';
@@ -62,16 +59,12 @@ class upload_form extends moodleform {
         // Prepend a reasonable CSS class to 'mform'.
         $mform->updateAttributes(['class' => "totara_completionimport__{$header_label}_form " . $mform->getAttribute('class')]);
 
-        $upload_label = get_string($upload_label, 'totara_completionimport');
+        $upload_label = get_string('choosefile', 'totara_completionimport');
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'filesource');
         $mform->setType('filesource', PARAM_INT);
-
-        if ($data->showheader ?? false) {
-            $mform->addElement('header', 'uploadheader', get_string($header_label, 'totara_completionimport'));
-        }
 
         if ($data->showdescription ?? false) {
             $uploadintro = '';
@@ -185,12 +178,7 @@ class upload_form extends moodleform {
         $mform->addHelpButton('forcecaseinsensitive'.$data->importname, 'caseinsensitive'.$data->importname, 'totara_completionimport');
         $mform->setAdvanced('forcecaseinsensitive'.$data->importname);
 
-        if ($this->showheader ?? false) {
-            // Manually add the upload button because add_action_buttons() closes the fieldset.
-            $mform->addElement('submit', 'submitbutton', get_string('submit', 'totara_completionimport'));
-        } else {
-            $this->add_action_buttons(false, get_string('submit', 'totara_completionimport'));
-        }
+        $this->add_action_buttons(false, get_string('submit', 'totara_completionimport'));
 
         $this->set_data($data);
     }

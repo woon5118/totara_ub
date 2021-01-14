@@ -170,12 +170,14 @@ function get_shortnameoridnumber($relatedtable, $importtable, $shortnamefield, $
 /**
  * Returns the standard filter for the import table and related parameters
  *
+ * @deprecated since Torara 12.28
  * @global object $USER
  * @param int $importtime time() of the import
  * @param string $alias alias to use
  * @return array array($sql, $params)
  */
 function get_importsqlwhere($importtime, $alias = 'i.') {
+    debugging("get_importsqlwhere() has been deprecated. Please use \totara_completionimport\helper::get_importsqlwhere()", DEBUG_DEVELOPER);
     $sql = "WHERE {$alias}timecreated = :timecreated
             AND {$alias}importerror = 0
             AND {$alias}timeupdated = 0
@@ -204,14 +206,16 @@ function get_default_config($pluginname, $configname, $default) {
 /**
  * Gets the list of users who imported a certification completion for the given time.
  *
+ * @deprecated since Torara 12.28
  * @global object $DB
  * @param int $importtime time of the import
  * @return array
  */
 function get_list_of_certification_import_users($importtime) {
+    debugging("get_list_of_certification_import_users has been deprecated. Please use \totara_completionimport\helper::get_list_of_import_users()", DEBUG_DEVELOPER);
     global $DB;
 
-    list($sqlwhere, $sqlparams) = get_importsqlwhere($importtime, '');
+    list($sqlwhere, $sqlparams) = \totara_completionimport\helper::get_importsqlwhere($importtime, '');
     $sql = "SELECT * 
             FROM {user}
             WHERE id IN (
@@ -240,7 +244,7 @@ function import_data_checks($importname, $importtime) {
     // Must be done before import data checks is actually run.
     totara_completionimport_resolve_references($importname, $importtime);
 
-    list($sqlwhere, $stdparams) = get_importsqlwhere($importtime, '');
+    list($sqlwhere, $stdparams) = \totara_completionimport\helper::get_importsqlwhere($importtime, '');
 
     $shortnamefield = $importname . 'shortname';
     $idnumberfield = $importname . 'idnumber';
@@ -452,7 +456,7 @@ function import_data_adjustments($importname, $importtime) {
 
     require_once($CFG->libdir.'/gradelib.php'); // Used for conversion from grade to point
 
-    list($sqlwhere, $stdparams) = get_importsqlwhere($importtime, '');
+    list($sqlwhere, $stdparams) = \totara_completionimport\helper::get_importsqlwhere($importtime, '');
 
     $tablename = get_tablename($importname);
     $columnnames = get_columnnames($importname);
@@ -501,7 +505,7 @@ function totara_completionimport_apply_case_insensitive_mapping($importname, $im
         return;
     }
 
-    list($sqlwhere, $stdparams) = get_importsqlwhere($importtime, '');
+    list($sqlwhere, $stdparams) = \totara_completionimport\helper::get_importsqlwhere($importtime, '');
 
     $shortnamefield = $importname . 'shortname';
     $idnumberfield = $importname . 'idnumber';
@@ -573,8 +577,8 @@ function totara_completionimport_resolve_references($importname, $importtime) {
     $importname = ($importname === 'course') ? 'course' : 'certification';
 
     $tablename = get_tablename($importname);
-    list($timewhere, $timeparams) = get_importsqlwhere($importtime);
-    list($timewhereraw, $timeparamsraw) = get_importsqlwhere($importtime, '');
+    list($timewhere, $timeparams) = \totara_completionimport\helper::get_importsqlwhere($importtime);
+    list($timewhereraw, $timeparamsraw) = \totara_completionimport\helper::get_importsqlwhere($importtime, '');
 
     if ($importname === 'course') {
         $ref_field = 'courseid';
@@ -664,7 +668,7 @@ function totara_completionimport_resolve_references($importname, $importtime) {
 function create_evidence($importname, $importtime) {
     global $DB;
 
-    list($sqlwhere, $params) = get_importsqlwhere($importtime);
+    list($sqlwhere, $params) = \totara_completionimport\helper::get_importsqlwhere($importtime);
 
     $tablename = get_tablename($importname);
     $shortnamefield = $importname . 'shortname';
@@ -811,7 +815,7 @@ function import_course($importname, $importtime) {
     $pluginname = 'totara_completionimport_' . $importname;
     $overridecurrentcompletion = get_default_config($pluginname, 'overrideactive' . $importname, COMPLETION_IMPORT_NEVER_OVERRIDE);
 
-    list($sqlwhere, $params) = get_importsqlwhere($importtime);
+    list($sqlwhere, $params) = \totara_completionimport\helper::get_importsqlwhere($importtime);
     $params['enrolname'] = 'manual';
 
     $tablename = get_tablename($importname);
@@ -1166,7 +1170,7 @@ function import_certification($importname, $importtime) {
 
     $importaction = get_default_config('totara_completionimport_certification', 'importactioncertification', COMPLETION_IMPORT_TO_HISTORY);
 
-    list($importsqlwhere, $importsqlparams) = get_importsqlwhere($importtime);
+    list($importsqlwhere, $importsqlparams) = \totara_completionimport\helper::get_importsqlwhere($importtime);
 
     // First find all programs that have a user who is in the import but who isn't yet assigned.
     $sql = "SELECT DISTINCT p.id

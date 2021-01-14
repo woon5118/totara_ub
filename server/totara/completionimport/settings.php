@@ -70,10 +70,18 @@ $ADMIN->add('totara_completionimport', $settings);
 
 $ADMIN->add('totara_completionimport',
         new admin_externalpage(
-                'totara_completionimport_upload',
-                get_string('completionimport', 'totara_completionimport'),
-                new moodle_url('/totara/completionimport/upload.php'),
+                'totara_completionimport_course_upload',
+                get_string('uploadrecords_course', 'totara_completionimport'),
+                new moodle_url('/totara/completionimport/upload_course.php'),
                 array('totara/completionimport:import')));
+
+$ADMIN->add('totara_completionimport',
+    new admin_externalpage(
+        'totara_completionimport_certification_upload',
+        get_string('uploadrecords_certification', 'totara_completionimport'),
+        new moodle_url('/totara/completionimport/upload_certification.php'),
+        array('totara/completionimport:import'),
+        \totara_core\advanced_feature::is_disabled('certifications')));
 
 $ADMIN->add('totara_completionimport',
         new admin_externalpage(

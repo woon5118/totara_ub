@@ -28,18 +28,16 @@ Feature: Verify grade unit and override option when uploading course completion
     And I press "Save changes"
 
   Scenario Outline: Upload course completion with grade format and no override
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -47,18 +45,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2011-11-11      | <grade_imported_1st> |
       | 3           | evidence_a       | 2012-12-12      | 90                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -66,18 +62,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2016-06-06      | <grade_imported_2nd> |
       | 3           | evidence_b       | 2018-08-08      | 40                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -85,18 +79,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2003-03-03      | <grade_imported_3rd> |
       | 3           | evidence_c       | 2004-04-04      | 60                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors"
-    And I should see "0 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -168,18 +160,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | Real       | 80                 | 50                 | 70                 | 26.7%     | 16.7%             | 23.3%             |
 
   Scenario Outline: Upload course completion with grade format and always override
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Always |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -187,18 +177,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2011-11-11      | <grade_imported_1st> |
       | 3           | evidence_a       | 2012-12-12      | 90                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Always |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -206,18 +194,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2016-06-06      | <grade_imported_2nd> |
       | 3           | evidence_b       | 2018-08-08      | 40                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Always |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -225,18 +211,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2003-03-03      | <grade_imported_3rd> |
       | 3           | evidence_c       | 2004-04-04      | 60                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Always |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -274,18 +258,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | Real       | 80                 | 50                 | 70                 | 30                 | 10.0%     |
 
   Scenario Outline: Upload course completion with grade format and override if new
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -293,18 +275,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2011-11-11      | <grade_imported_1st> |
       | 3           | evidence_a       | 2012-12-12      | 90                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | If more recent |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -312,18 +292,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2016-06-06      | <grade_imported_2nd> |
       | 3           | evidence_b       | 2018-08-08      | 40                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | If more recent |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
@@ -331,18 +309,16 @@ Feature: Verify grade unit and override option when uploading course completion
       | 2           | C1               | 2003-03-03      | <grade_imported_3rd> |
       | 3           | evidence_c       | 2004-04-04      | 60                   |
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "CSV file to upload" filemanager
     And I set the following fields to these values:
       | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | If more recent |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors"
-    And I should see "0 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:

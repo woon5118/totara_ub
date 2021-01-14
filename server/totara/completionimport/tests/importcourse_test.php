@@ -40,6 +40,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/completionimport/lib.php');
 require_once($CFG->libdir . '/csvlib.class.php');
 require_once($CFG->libdir . '/completionlib.php');
+require_once($CFG->dirroot . '/totara/completionimport/tests/completionimport_advanced_testcase.php');
 
 /**
  * Class totara_completionimport_importcourse_testcase
@@ -47,7 +48,7 @@ require_once($CFG->libdir . '/completionlib.php');
  * @group totara_completionimport
  * @group totara_evidence
  */
-class totara_completionimport_importcourse_testcase extends advanced_testcase {
+class totara_completionimport_importcourse_testcase extends completionimport_advanced_testcase {
 
     const COUNT_USERS = 11;
     const COUNT_COURSES = 11;
@@ -146,7 +147,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         set_config('create_evidence', 1, 'totara_completionimport_' . $importname);
 
         $importstart = time();
-        csv_import::import($content, $importname, $importstart);
+        self::import($content, $importname, $importstart);
         $importstop = time();
 
         $importtablename = get_tablename($importname);
@@ -216,7 +217,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $content .= implode(",", $data) . "\n";
 
         $sink = $this->redirectEvents();
-        csv_import::import($content, $importname, $importstart);
+        self::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -244,7 +245,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $data['grade'] = 77;
         $content .= implode(",", $data) . "\n";
 
-        csv_import::import($content, $importname, $importstart);
+        self::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -269,7 +270,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $data['grade'] = 77;
         $content .= implode(",", $data) . "\n";
 
-        csv_import::import($content, $importname, $importstart);
+        self::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -296,7 +297,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $data['grade'] = 77;
         $content .= implode(",", $data) . "\n";
 
-        csv_import::import($content, $importname, $importstart);
+        self::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -323,7 +324,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
 
         set_config('create_evidence', 1, 'totara_completionimport_' . $importname);
 
-        csv_import::import($content, $importname, $importstart);
+        self::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -415,7 +416,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
 
         $sink = $this->redirectEvents();
 
-        csv_import::import($content, $importname, $importstart);
+        self::import($content, $importname, $importstart);
 
         // Expect 1 event for each course
         $this->verify_bulk_import_events($sink, [

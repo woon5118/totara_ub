@@ -51,7 +51,7 @@ class import_certification_completions_task extends \core\task\adhoc_task {
             $importtime = $customdata->importtime;
 
             // Get the users who uploaded certification completion in the given time to notify them after importing.
-            $userstonotify = get_list_of_certification_import_users($importtime);
+            $userstonotify = \totara_completionimport\helper::get_list_of_import_users('certification', $importtime);
 
             import_data_checks($importname, $importtime);
             import_data_adjustments($importname, $importtime);
@@ -66,7 +66,7 @@ class import_certification_completions_task extends \core\task\adhoc_task {
                 $functionname = 'import_' . $importname;
                 $functionname($importname, $importtime);
 
-                mtrace("Certification completion import with timestamp '$importtime' processed");
+                PHPUNIT_TEST || mtrace("Certification completion import with timestamp '$importtime' processed");
 
                 // Update processed flag flag of records
                 $params = ['timecreated' => $importtime];

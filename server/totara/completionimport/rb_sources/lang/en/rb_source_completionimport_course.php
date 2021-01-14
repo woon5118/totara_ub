@@ -36,6 +36,7 @@ $string['columnbaseimportevidence'] = 'Imported as evidence?';
 $string['columnbaseimportuserid'] = 'Imported by user id';
 $string['columnbaseimportusername'] = 'Imported by username';
 $string['columnbaseimportuserfullname'] = 'Imported by';
+$string['columnbaseprocessed'] = 'Record processed';
 $string['columnbaserownumber'] = 'Line number';
 $string['columnbasetimecreated'] = 'Time uploaded';
 $string['columnbaseusername'] = 'Username to import';

@@ -359,7 +359,7 @@ class totara_completionimport_lib_testcase extends advanced_testcase {
 
         totara_completionimport_resolve_references('course', $importtime);
 
-        list($timewhere, $params) = get_importsqlwhere($importtime);
+        list($timewhere, $params) = \totara_completionimport\helper::get_importsqlwhere($importtime);
         $sql = "SELECT i.id, i.courseidnumber, i.courseshortname, i.courseid, c.idnumber AS actualcourseidnumber, i.customfields, i.grade
                   FROM {totara_compl_import_course} i
              LEFT JOIN {course} c ON c.id = i.courseid
@@ -472,7 +472,7 @@ class totara_completionimport_lib_testcase extends advanced_testcase {
 
         totara_completionimport_resolve_references('certification', $importtime);
 
-        list($timewhere, $params) = get_importsqlwhere($importtime);
+        list($timewhere, $params) = \totara_completionimport\helper::get_importsqlwhere($importtime);
         $sql = "SELECT i.id, i.certificationidnumber, i.certificationshortname, i.certificationid, p.idnumber AS actualcertificationidnumber, i.customfields, i.completiondate
                   FROM {totara_compl_import_cert} i
              LEFT JOIN {prog} p ON p.id = i.certificationid

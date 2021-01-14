@@ -14,34 +14,43 @@ Feature: Verify course completion data can be successfully uploaded.
 
   Scenario: Verify an empty course completion upload fails.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors - these were ignored"
+    And I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
+    And I follow "Course import report"
+    Then I should see "1 record shown"
+    And "1" row "Errors" column of "completionimport_course" table should contain "Blank user name"
+    And "1" row "Errors" column of "completionimport_course" table should contain "Blank completion date"
+    And "1" row "Errors" column of "completionimport_course" table should contain "Blank grade"
+    And "1" row "Errors" column of "completionimport_course" table should contain "Blank course shortname and course ID number"
+
 
   Scenario: Verify an course completion with no username fails.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1a.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1a.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors - these were ignored"
-    And I should see "1 Records in total"
+    And I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
     And I follow "Course import report"
-    Then I should see "Blank user name" in the "1" "table_row"
+    Then I should see "1 record shown"
+    And "1" row "Errors" column of "completionimport_course" table should contain "Blank user name"
 
   Scenario: Verify a successful course completion with no courseshortname.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1b.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1b.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -50,13 +59,13 @@ Feature: Verify course completion data can be successfully uploaded.
 
   Scenario: Verify a successful course completion with no courseidnumber.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1c.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1c.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -65,38 +74,39 @@ Feature: Verify course completion data can be successfully uploaded.
 
   Scenario: Verify an course completion with no completiondate fails.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1d.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1d.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors - these were ignored"
-    And I should see "1 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
     And I follow "Course import report"
-    Then I should see "Blank completion date" in the "1" "table_row"
+    And I should see "1 record shown"
+    And "1" row "Errors" column of "completionimport_course" table should contain "Blank completion date"
 
   Scenario: Verify an course completion with no grade fails.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1e.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1e.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors - these were ignored"
-    And I should see "1 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    When I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
     And I follow "Course import report"
-    Then I should see "Blank grade" in the "1" "table_row"
+    Then I should see "1 record shown"
+    And "1" row "Errors" column of "completionimport_course" table should contain "Blank grade"
 
   Scenario: Verify a successful course completion upload.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -129,15 +139,13 @@ Feature: Verify course completion data can be successfully uploaded.
 
   Scenario: Verify a successful course completion upload specifying that no evidence should be created.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_2.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "0"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors - these were ignored"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "0 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -147,14 +155,13 @@ Feature: Verify course completion data can be successfully uploaded.
 
   Scenario: Course completions can be successfully uploaded with a file that uses CR for line endings
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_CR_line_endings.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_CR_line_endings.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -172,16 +179,16 @@ Feature: Verify course completion data can be successfully uploaded.
 
   Scenario: Course completions can not be uploaded via a directory if config setting completionimportdir is not set
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
     And I click on "Alternatively upload CSV files via a directory on the server" "link"
     Then I should see "Additional configuration settings are required to specify a file location on the server. Please contact your system administrator."
     When I click on "Alternatively upload CSV files via a form" "link"
-    Then I should see "Course CSV file to upload"
+    Then I should see "CSV file to upload"
 
   Scenario: Verify a course completion import csv with incorrect columns shows an error
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_badcolumns.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_badcolumns.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
     Then I should see "There were errors while importing the courses"
@@ -198,12 +205,12 @@ Feature: Verify course completion data can be successfully uploaded.
     And I set the field "Status" to "Suspended"
     And I press "Save changes"
 
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1b.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1b.csv" file to "CSV file to upload" filemanager
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as courses"
-    And I should see "1 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "1 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -212,15 +219,13 @@ Feature: Verify course completion data can be successfully uploaded.
 
   Scenario: Verify long field values are handled in the course completion upload
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_long_fields.csv" file to "Course CSV file to upload" filemanager
+    When I navigate to "Upload course records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_long_fields.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors - these were ignored"
-    And I should see "1 Records created as evidence"
-    And I should see "0 Records successfully imported as courses"
-    And I should see "2 Records in total"
+    Then I should see "Course completion file successfully imported."
+    And I should see "2 Records imported pending processing"
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_course_completions_task"
 
     When I follow "Course import report"
     Then I should see "2 records shown"

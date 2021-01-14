@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/totara/completionimport/lib.php');
 require_once($CFG->dirroot . '/totara/certification/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 require_once($CFG->libdir  . '/csvlib.class.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
+require_once($CFG->dirroot . '/totara/completionimport/tests/completionimport_advanced_testcase.php');
 
 /**
  * Class totara_completionimport_importcertification_testcase
@@ -45,7 +45,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
  * @group totara_completionimport
  * @group totara_evidence
  */
-class totara_completionimport_importcertification_testcase extends reportcache_advanced_testcase {
+class totara_completionimport_importcertification_testcase extends completionimport_advanced_testcase {
 
     const COUNT_USERS = 11;
     const COUNT_CERTIFICATIONS = 11;
@@ -157,11 +157,8 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $imports->close();
         $this->assertEquals(self::COUNT_CSV_ROWS, $count, 'Record count mismatch when creating CSV file');
 
-        $generatorstop = time();
-
         $importstart = time();
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
-        $importstop = time();
+        self::import($content, 'certification', $importstart);
 
         $importtablename = get_tablename($importname);
         $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records($importtablename),
@@ -226,7 +223,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $data['duedate'] = $completiondate;
         $content .= implode(",", $data) . "\n";
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        self::import($content, 'certification', $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -248,7 +245,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $data['duedate'] = $completiondate;
         $content .= implode(",", $data) . "\n";
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        self::import($content, 'certification', $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -270,7 +267,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $data['duedate'] = $completiondate;
         $content .= implode(",", $data) . "\n";
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        self::import($content, 'certification', $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -292,7 +289,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $data['duedate'] = $completiondate;
         $content .= implode(",", $data) . "\n";
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        self::import($content, 'certification', $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -316,7 +313,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
 
         set_config('create_evidence', 1, 'totara_completionimport_' . $importname);
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        self::import($content, 'certification', $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -418,11 +415,8 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $imports->close();
         $this->assertEquals(self::COUNT_USERS+2, $count, 'Record count mismatch when creating CSV file');
 
-        $generatorstop = time();
-
         $importstart = time();
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
-        $importstop = time();
+        self::import($content, 'certification', $importstart);
 
         // Check assignments were created correctly.
         $params = array($program->id);
@@ -742,7 +736,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $handle = fopen($this->filename, 'r');
         $size = filesize($this->filename);
         $content = fread($handle, $size);
-        \totara_completionimport\csv_import::import($content, 'certification', $importtime);
+        self::import($content, 'certification', $importtime);
 
         // Key: i => initial, f => future, p => past, fp => far past, cd => completion, ed => expiry date, h => history.
         $icd = $this->initialcompletiondate;
@@ -844,7 +838,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $handle = fopen($this->filename, 'r');
         $size = filesize($this->filename);
         $content = fread($handle, $size);
-        \totara_completionimport\csv_import::import($content, 'certification', $importtime);
+        self::import($content, 'certification', $importtime);
 
         // Key: i => initial, f => future, p => past, fp => far past, cd => completion, ed => expiry date, h => history.
         $icd = $this->initialcompletiondate;
@@ -948,7 +942,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $handle = fopen($this->filename, 'r');
         $size = filesize($this->filename);
         $content = fread($handle, $size);
-        \totara_completionimport\csv_import::import($content, 'certification', $importtime);
+        self::import($content, 'certification', $importtime);
 
         // Key: i => initial, f => future, p => past, fp => far past, cd => completion, ed => expiry date, h => history.
         $icd = $this->initialcompletiondate;

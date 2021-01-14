@@ -14,14 +14,14 @@ Feature: Verify certification completion data can be successfully uploaded.
 
   Scenario: Verify a successful simple certification completion upload.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Certification CSV file to upload" filemanager
+    When I navigate to "Upload certification records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload certification Create evidence" to "1"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "Certification completion file successfully imported"
     And I should see "2 Records imported pending processing"
-    And I run all adhoc tasks
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_certification_completions_task"
 
     When I am on homepage
     Then I should see "Certification completion import successfully completed"
@@ -43,14 +43,14 @@ Feature: Verify certification completion data can be successfully uploaded.
 
   Scenario: Verify a successful certification completion upload specifying that no evidence should be created.
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Certification CSV file to upload" filemanager
+    When I navigate to "Upload certification records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload certification Create evidence" to "0"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "Certification completion file successfully imported"
     And I should see "2 Records imported pending processing"
-    And I run all adhoc tasks
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_certification_completions_task"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -63,8 +63,8 @@ Feature: Verify certification completion data can be successfully uploaded.
 
   Scenario: Verify a certification completion import csv with incorrect columns shows an error
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_badcolumns.csv" file to "Certification CSV file to upload" filemanager
+    When I navigate to "Upload certification records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_badcolumns.csv" file to "CSV file to upload" filemanager
     And I set the field "Upload certification Import action" to "Certify uncertified users"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "There were errors while importing the certifications"
@@ -74,11 +74,11 @@ Feature: Verify certification completion data can be successfully uploaded.
 
   Scenario: Verify long field values are handled in the certification completion upload
     Given I log in as "admin"
-    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_long_fields.csv" file to "Certification CSV file to upload" filemanager
+    When I navigate to "Upload certification records" node in "Site administration > Courses > Upload completion records"
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_long_fields.csv" file to "CSV file to upload" filemanager
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "2 Records imported pending processing"
-    And I run all adhoc tasks
+    And I run the adhoc scheduled tasks "totara_completionimport\task\import_certification_completions_task"
 
     When I am on homepage
     Then I should see "Certification completion import completed with errors"

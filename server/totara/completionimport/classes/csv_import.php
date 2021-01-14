@@ -41,12 +41,14 @@ class csv_import {
      *
      * Pre-processing, such as converting to UTF-8, is done by methods called within this function.
      *
+     * @deprecated since Torara 12.28
      * @param string $content containing full content of csv file.
      * @param string $importname either course or certification.
      * @param int $importtime timestamp of import time.
      * @return array of any error strings.
      */
     public static function import($content, $importname, $importtime) {
+        debugging("totara_completionimport\csv_import::import() has been deprecated.", DEBUG_DEVELOPER);
         global $CFG, $DB;
         require_once($CFG->libdir . '/csvlib.class.php');
         require_once($CFG->dirroot . '/totara/completionimport/lib.php');
