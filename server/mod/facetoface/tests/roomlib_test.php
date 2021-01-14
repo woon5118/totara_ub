@@ -1722,6 +1722,46 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertEquals(true, $can_manage);
     }
 
+    /**
+     * Test room_helper::save() api to test converting room from internal to none
+     */
+    public function test_update_internal_room_to_none() {
+
+        $data = new \stdClass();
+        $data->id = 0;
+        $data->name = 'Internal room';
+        $data->roomcapacity = floor(rand(5, 50));
+        $data->allowconflicts = 0;
+        $data->plugin = \mod_facetoface\room_virtualmeeting::VIRTUAL_MEETING_INTERNAL;
+        $data->url = 'https://example.com/totara/room/id/14151267';
+        $data->notcustom = false;
+        $data->description_editor = ['text' => '', 'itemid' => 0, 'format' => FORMAT_HTML];
+
+        $record = \mod_facetoface\room_helper::save($data);
+        $room = new \mod_facetoface\room($record->get_id());
+
+        $this->assertEquals($data->name, $room->get_name());
+        $this->assertEquals($data->url, $room->get_url());
+        $this->assertNotEmpty($room->get_url());
+
+        // Les't update the room
+        $data = new \stdClass();
+        $data->id = $room->get_id();
+        $data->name = 'None room';
+        $data->roomcapacity = floor(rand(5, 50));
+        $data->allowconflicts = 0;
+        $data->plugin = \mod_facetoface\room_virtualmeeting::VIRTUAL_MEETING_NONE;
+        $data->url = 'https://example.com/totara/room/id/14151267'; // Ooops we forgot to remove the url!?
+        $data->notcustom = false;
+        $data->description_editor = ['text' => '', 'itemid' => 0, 'format' => FORMAT_HTML];
+
+        $record = \mod_facetoface\room_helper::save($data);
+        $room = new \mod_facetoface\room($record->get_id());
+
+        $this->assertEquals($data->name, $room->get_name());
+        $this->assertEmpty($room->get_url());
+    }
+
     protected function prepare_date($timestart, $timeend, $roomid) {
         $sessiondate = new stdClass();
         $sessiondate->timestart = (string)$timestart;

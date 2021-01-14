@@ -996,5 +996,14 @@ function xmldb_facetoface_upgrade($oldversion) {
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2020100103, 'facetoface');
     }
+
+    if ($oldversion < 2020100104) {
+        // Fixed the orphaned url records left after a room is changed from 'Internal' to 'MS teams'.
+        facetoface_upgradelib_clear_room_url();
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020100104, 'facetoface');
+    }
+
     return true;
 }

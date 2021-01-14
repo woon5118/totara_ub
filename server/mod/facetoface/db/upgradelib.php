@@ -344,3 +344,22 @@ function facetoface_upgradelib_approval_to_declined_status() {
     }
     $trans->allow_commit();
 }
+
+/**
+ * Fixed the orphaned url records left after a room is changed from 'Internal' to 'MS teams'.
+ */
+function facetoface_upgradelib_clear_room_url() {
+    global $DB;
+
+    $trans = $DB->start_delegated_transaction();
+    $rooms = $DB->get_records_sql(
+        "SELECT frvm.roomid
+           FROM {facetoface_room_virtualmeeting} frvm
+           JOIN {facetoface_room} fr ON fr.id = frvm.roomid
+          WHERE fr.url != ''"
+    );
+    foreach ($rooms as $room) {
+        $DB->set_field('facetoface_room', 'url', '', ['id' => $room->roomid]);
+    }
+    $trans->allow_commit();
+}

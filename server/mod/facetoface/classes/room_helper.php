@@ -70,6 +70,11 @@ final class room_helper {
         $room->set_name($data->name);
         $room->set_allowconflicts($data->allowconflicts);
         $room->set_capacity($data->roomcapacity);
+        if (room_virtualmeeting::VIRTUAL_MEETING_INTERNAL != $data->plugin) {
+            // Clear the value if the update is changing the value
+            // from 'internal' plugin to 'none/zoom/msteams'
+            $data->url = '';
+        }
         $room->set_url($data->url);
         if (empty($data->custom)) {
             $room->publish();
