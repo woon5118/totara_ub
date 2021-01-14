@@ -2,6 +2,9 @@ This files describes API changes for course formats,
 information provided here is intended especially for developers.
 Overview of this plugin type at http://docs.moodle.org/dev/Course_formats
 
+=== 13.4 ===
+* format_base:create_edit_form_elements() has a new param $remove_collapse to support skipping collapse setting for first topic section
+
 === 13.3 ===
 
 * Support for collapsible topics has been added to format_topics, and the renderer has changed as a result.

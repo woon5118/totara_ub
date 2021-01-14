@@ -94,7 +94,7 @@ class format_topics_renderer extends format_section_renderer_base {
 
         $title = $this->render(course_get_format($course)->inplace_editable_render_section_name($section));
 
-        if ($PAGE->user_is_editing() || !$course->collapsiblesections) {
+        if ($PAGE->user_is_editing() || !$course->collapsiblesections || $section->section == 0) {
             return $title;
         }
 
@@ -326,7 +326,7 @@ class format_topics_renderer extends format_section_renderer_base {
 
         $styles = '';
         if ($course->headercolor && !$PAGE->user_is_editing()) {
-            if ($course->headerbgcolor) {
+            if ($course->headerbgcolor && $section->section != 0) {
                 $styles .= 'background-color:' . s($course->headerbgcolor) .';';
             }
             if ($course->headerfgcolor) {

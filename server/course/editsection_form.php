@@ -54,8 +54,11 @@ class editsection_form extends moodleform {
         // additional fields that course format has defined
         $courseformat = course_get_format($course);
         $formatoptions = $courseformat->section_format_options(true);
+
+        // Totara: skip reomove collapse setting for general first topic.
+        $remove_collapse = $this->_customdata['removeDefaultCollapse'];
         if (!empty($formatoptions)) {
-            $elements = $courseformat->create_edit_form_elements($mform, true);
+            $courseformat->create_edit_form_elements($mform, true, $remove_collapse);
         }
 
         $mform->_registerCancelButton('cancel');
