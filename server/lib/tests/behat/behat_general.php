@@ -1355,40 +1355,23 @@ class behat_general extends behat_base {
     /**
      * Runs all ad-hoc tasks in the queue.
      *
-     * This is faster and more reliable than running cron (running cron won't
-     * work more than once in the same test, for instance). However it is
-     * a little less 'realistic'.
-     *
-     * While the task is running, we suppress mtrace output because it makes
-     * the Behat result look ugly.
+     * This used to execute stuff in Behat CLI thread which was sometimes failing very badly,
+     * instead since Totara 13.4 it executes via regular web cron page and returns back to the original URL.
      *
      * @Given /^I run all adhoc tasks$/
-     * @throws DriverException
      */
     public function i_run_all_adhoc_tasks() {
         \behat_hooks::set_step_readonly(false);
+        global $CFG;
 
-        // Do setup for cron task.
-        cron_setup_user();
+        // Totara: Returning back to original URL is a hack, tests may need to be tweaked if necessary.
+        $previousurl = $this->getSession()->getCurrentUrl();
 
-        // Run tasks. Locking is handled by get_next_adhoc_task.
-        $now = time();
-        ob_start(); // Discard task output as not appropriate for Behat output!
-        while (($task = \core\task\manager::get_next_adhoc_task($now)) !== null) {
+        $this->getSession()->visit("$CFG->wwwroot/$CFG->admin/cron.php?behat_adhoc_tasks_only=1");
+        // No need to wait for JS, this is a plain text page.
 
-            try {
-                $task->execute();
-
-                // Mark task complete.
-                \core\task\manager::adhoc_task_complete($task);
-            } catch (Exception $e) {
-                // Mark task failed and throw exception.
-                \core\task\manager::adhoc_task_failed($task);
-                ob_end_clean();
-                throw new DriverException('An adhoc task failed', 0, $e);
-            }
-        }
-        ob_end_clean();
+        $this->getSession()->visit($previousurl);
+        $this->wait_for_pending_js();
     }
 
     /**
