@@ -51,12 +51,15 @@ class virtualmeeting_msteams_factory implements factory, auth_factory {
      * @inheritDoc
      */
     public function create_setting_page(string $section, string $displayname, bool $fulltree, bool $hidden): ?admin_settingpage {
+        global $CFG;
         $page = new admin_settingpage($section, $displayname, 'moodle/site:config', $hidden);
         if ($fulltree) {
+            $a = new stdClass();
+            $a->redirect_url = $CFG->wwwroot . '/integrations/virtualmeeting/auth_callback.php/msteams';
             $page->add(new admin_setting_heading(
                 'virtualmeeting_msteams/header_app',
                 new lang_string('setting_header_app', 'virtualmeeting_msteams'),
-                new lang_string('setting_header_app_desc', 'virtualmeeting_msteams')));
+                new lang_string('setting_header_app_desc', 'virtualmeeting_msteams', $a)));
             $page->add(new admin_setting_configtext(
                 'virtualmeeting_msteams/client_id',
                 new lang_string('setting_client_id', 'virtualmeeting_msteams'),
