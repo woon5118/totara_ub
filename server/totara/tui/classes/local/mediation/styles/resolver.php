@@ -119,20 +119,11 @@ final class resolver extends \totara_tui\local\mediation\resolver {
 
     /**
      * @inheritDoc
-     * @return string
+     * @return path
      */
     protected function calculate_cachefile(): path {
         global $CFG;
-        $cachefile = new path(
-            $CFG->localcachedir,
-            'totara_tui',
-            $this->get_rev(),
-            $this->themename,
-            ($this->option_rtl) ? 'rtl' : 'ltr',
-            $this->tenant,
-            "{$this->component}-{$this->suffix}.css"
-        );
-        return $cachefile;
+        return new path($CFG->localcachedir, 'totara_tui-styles', $this->get_etag());
     }
 
     /**
