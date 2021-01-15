@@ -367,6 +367,17 @@ class rb_source_dp_course extends rb_base_source {
         );
 
         $columnoptions[] = new rb_column_option(
+            'course_completion',
+            'coursestatus',
+            get_string('completionstatus', 'rb_source_dp_course'),
+            'course_completion.status',
+            array(
+                'displayfunc' => 'course_completion_status',
+                'outputformat' => 'text',
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
                 'template',
                 'name',
                 get_string('templatename', 'rb_source_dp_course'),
