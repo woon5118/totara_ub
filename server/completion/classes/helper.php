@@ -305,6 +305,13 @@ final class helper {
 
         $transaction->allow_commit();
 
+        // Invalidate the core completion cache so it updates.
+        if ($courseid = $DB->get_field('course_modules', 'course', ['id' => $modulecompletion->coursemoduleid])) {
+            $key =  $modulecompletion->userid . '_' . $courseid;
+            $cache = \cache::make('core', 'completion');
+            $cache->delete($key);
+        }
+
         // Mark progress caches stale
         \totara_program\progress\program_progress_cache::mark_user_cache_stale($modulecompletion->userid);
 

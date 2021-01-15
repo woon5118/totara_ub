@@ -22,11 +22,25 @@ Feature: Activity completion records can be edited
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name        | Test quiz 1           |
       | Description | Test quiz description |
+      | Completion tracking | Show activity as complete when conditions are met |
+      | Require view        | 1                                                 |
+
+    # Check the completion indicator is incomplete, and setup the cache.
+    When I log out
+    And I log in as "user001"
+    And I am on "Course One" course homepage
+
+    Then I should see "Not completed: Test quiz 1" in the ".autocompletion" "css_element"
+
+    When I log out
+    And I log in as "admin"
+    And I am on "Course One" course homepage
+
     And I navigate to "Completion editor" node in "Course administration"
     Then I should see "FirstName1 LastName1"
 
     # Completion editor criteria and activities tab/list.
-    When I click on "Edit course completion" "link" in the "FirstName1 LastName1" "table_row"
+    And I click on "Edit course completion" "link" in the "FirstName1 LastName1" "table_row"
     And I switch to "Criteria and Activities" tab
     Then I should see "Course completion criteria"
     And I should see "No completion criteria set for this course"
@@ -61,6 +75,22 @@ Feature: Activity completion records can be edited
     And the field "Activity status" matches value "Completed"
     And the field "Activity time completed" matches value "2011-02-03T04:56:00"
 
+    # Check the completion indicator is now complete, i.e. we invalidated the cache.
+    When I log out
+    And I log in as "user001"
+    And I am on "Course One" course homepage
+
+    Then I should see "Completed: Test quiz 1" in the ".autocompletion" "css_element"
+
+    # Navigate back as admin
+    When I log out
+    And I log in as "admin"
+    And I am on "Course One" course homepage
+    And I navigate to "Completion editor" node in "Course administration"
+    And I click on "Edit course completion" "link" in the "FirstName1 LastName1" "table_row"
+    When I switch to "Criteria and Activities" tab
+    And I follow "Edit"
+
     # Update course_modules_completion record.
     When I set the field "Viewed" to "0"
     And I set the "Activity status" Totara form field to "Completed (did not achieve pass grade)"
@@ -80,6 +110,13 @@ Feature: Activity completion records can be edited
     Then the field "Viewed" matches value "0"
     And the field "Activity status" matches value "Completed (did not achieve pass grade)"
     And the field "Activity time completed" matches value "2027-07-08T16:34:00"
+
+    # Check the completion indicator is incomplete again, i.e. the cache has reset.
+    When I log out
+    And I log in as "user001"
+    And I am on "Course One" course homepage
+
+    Then I should see "Completed: Test quiz 1 (did not achieve pass grade)" in the ".autocompletion" "css_element"
 
   Scenario: Activity completion records based on timecompleted and grades (Seminar) can be edited
     # Completion editor list of users.
