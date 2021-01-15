@@ -116,12 +116,29 @@ class totara_msteams_notification_helper_testcase extends botfw_bot_base_testcas
     }
 
     public function test_subscribe_and_reply() {
+
         $activity = $this->mock_activity();
         // 0: obtaining a conversation id, 1: the first notification, 2: the second notification
         $this->mock_response('{"id":"a:nEWc0n_v3-RSA_T10N"}');
         $this->mock_response();
         $this->mock_response();
 
+        // Make sure we not send notification if bot is disable
+        $this->bot->process_callback($activity, function (activity $activity, $x) {
+            $this->assertEquals(0, subscription_entity::repository()->count());
+
+            $result = notification_helper::subscribe_and_reply($this->bot, $activity, $this->msuser);
+            $this->assertFalse($result);
+            $this->assertEquals(0, subscription_entity::repository()->count());
+
+            return true;
+        });
+
+        $requests = $this->client->get_requests();
+        $this->assertCount(0, $requests);
+
+        // Enable bot
+        set_config('bot_feature_enabled', 1, 'totara_msteams');
         $this->bot->process_callback($activity, function (activity $activity, $x) {
             $this->assertEquals(0, subscription_entity::repository()->count());
 

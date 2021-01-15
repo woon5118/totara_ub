@@ -42,6 +42,10 @@ class notification_helper {
      * @return boolean
      */
     public static function subscribe_and_reply(bot $bot, activity $activity, user $user): bool {
+        $botfeatureenabled = get_config('totara_msteams', 'bot_feature_enabled');
+        if (!$botfeatureenabled) {
+            return false;
+        }
         $name = user_helper::get_friendly_name($user);
         $result = $bot->get_notification()->subscribe($user, $activity->conversation->tenantId, $bot->get_account());
         if ($result) {
