@@ -53,12 +53,13 @@ class manage_virtualmeetings_adhoc_task extends adhoc_task {
      * @return manage_virtualmeetings_adhoc_task
      */
     public static function create_from_seminar_event_id(int $seminar_event_id): manage_virtualmeetings_adhoc_task {
+        global $USER;
         if (empty($seminar_event_id)) {
             throw new coding_exception('No seminar event id set.');
         }
         $task = new self();
         $task->set_component('mod_facetoface');
-        $task->set_custom_data(['seminar_event_id' => $seminar_event_id]);
+        $task->set_custom_data(['seminar_event_id' => $seminar_event_id, 'user_id' => $USER->id]);
 
         return $task;
     }
@@ -90,7 +91,14 @@ class manage_virtualmeetings_adhoc_task extends adhoc_task {
 
         // Ignore virtualmeeting rooms where plugin is not available
         foreach ($virtualmeeting_rooms as $room) {
+            if (empty($custom_data->user_id)) {
+                $failures[] = 'No user id set. Perhaps a left over task from a previous version.';
+                break;
+            }
             $room_virtualmeeting = room_virtualmeeting::from_roomid($room->get_id());
+            if ($custom_data->user_id != $room_virtualmeeting->get_userid()) {
+                continue;
+            }
             // Set operative $user
             $user = new user($room_virtualmeeting->get_userid());
             try {
@@ -129,16 +137,7 @@ class manage_virtualmeetings_adhoc_task extends adhoc_task {
                             $meeting->update($seminar->get_name(), DateTime::createFromFormat('U', $session->get_timestart()), DateTime::createFromFormat('U', $session->get_timefinish()));
                         } else {
                             // Different plugin, create a new virtualmeeting
-                            $meeting = virtualmeeting_model::create(
-                                $room_virtualmeeting->get_plugin(),
-                                $user,
-                                $seminar->get_name(),
-                                DateTime::createFromFormat('U', $session->get_timestart()),
-                                DateTime::createFromFormat('U', $session->get_timefinish())
-                            );
-                            $room_dates_virtualmeeting = new room_dates_virtualmeeting($room_date->roomdatevirtualmeetingid);
-                            $room_dates_virtualmeeting->set_virtualmeetingid($meeting->get_id());
-                            $room_dates_virtualmeeting->save();
+                            throw new \Exception("Cannot switch a virtualmeeting plugin.");
                         }
                     }
                 }

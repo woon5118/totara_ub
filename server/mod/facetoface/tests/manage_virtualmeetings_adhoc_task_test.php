@@ -23,6 +23,7 @@
 
 use totara_core\virtualmeeting\virtual_meeting as virtualmeeting_model;
 use mod_facetoface\seminar_event;
+use mod_facetoface\seminar_session;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -44,6 +45,8 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
     private $virtualmeeting2;
 
     public function setUp(): void {
+        $this->fail_in_totara_14(); // must be removed as soon as problems are solved in 14.
+
         $this->user1 = $this->getDataGenerator()->create_user(['username' => 'bob']);
         $this->user2 = $this->getDataGenerator()->create_user(['username' => 'ann']);
         $course = $this->getDataGenerator()->create_course();
@@ -131,23 +134,46 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
         $url2 = $this->virtualmeeting2->get_join_url();
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
-        $this->nothing_happened($url1, $url2);
+        $this->nothing_happened_in_totara_14($url1, $url2);
     }
 
-    private function nothing_happened($url1, $url2) {
+    private function nothing_happened_in_totara_14($url1, $url2) {
         global $DB;
         // There should be two each of virtualmeetings, room_virtualmeetings, and room_dates_virtualmeetings.
-        $virtualmeetings = $DB->get_records('virtualmeeting');
-        $this->assertCount(2, $virtualmeetings);
-        $room_virtualmeetings = $DB->get_records('facetoface_room_virtualmeeting');
-        $this->assertCount(2, $room_virtualmeetings);
-        $room_date_virtualmeetings = $DB->get_records('facetoface_room_dates_virtualmeeting');
-        $this->assertCount(2, $room_date_virtualmeetings);
+        $virtualmeetings = $DB->count_records('virtualmeeting');
+        $this->assertEquals(2, $virtualmeetings);
+        $room_virtualmeetings = $DB->count_records('facetoface_room_virtualmeeting');
+        $this->assertEquals(2, $room_virtualmeetings);
+        $room_date_virtualmeetings = $DB->count_records('facetoface_room_dates_virtualmeeting');
+        $this->assertEquals(2, $room_date_virtualmeetings);
         $vm1 = \totara_core\virtualmeeting\virtual_meeting::load_by_id($this->virtualmeeting1->get_id());
         $vm2 = \totara_core\virtualmeeting\virtual_meeting::load_by_id($this->virtualmeeting2->get_id());
-        $this->markTestSkipped('TODO: will be fixed in TL-29120');
-        $this->assertEquals($url1, $vm1->get_join_url());
-        $this->assertEquals($url2, $vm2->get_join_url());
+        $this->assert_url_in_totara_13($url1, $vm1->get_join_url());
+        $this->assert_url_in_totara_13($url2, $vm2->get_join_url());
+    }
+
+    /**
+     * @deprecated Totara 14
+     */
+    private function assert_url_in_totara_13($expected, $url) {
+        $this->fail_in_totara_14();
+        // URLs don't actually match because virtual rooms are always updated in 13.
+        $expected = new moodle_url($expected);
+        $expected->param('age', 1 + (int)$expected->param('age'));
+        $expected = $expected->out(false);
+        $this->assertEquals($expected, $url);
+    }
+
+    /**
+     * @deprecated Totara 14
+     */
+    private function fail_in_totara_14() {
+        global $CFG;
+        require($CFG->dirroot.'/version.php');
+        // Make sure we fix problems before 14 hits beta.
+        if ((int)$TOTARA->version >= 14 && $maturity >= MATURITY_BETA) {
+            $this->fail();
+        }
     }
 
     /**
@@ -174,7 +200,7 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
 
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
-        $this->nothing_happened($url1, $url2);
+        $this->nothing_happened_in_totara_14($url1, $url2);
     }
 
     /**
@@ -197,7 +223,7 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
 
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
-        $this->nothing_happened($url1, $url2);
+        $this->nothing_happened_in_totara_14($url1, $url2);
     }
 
     /**
@@ -223,17 +249,16 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
 
-        $virtualmeetings = $DB->get_records('virtualmeeting');
-        $this->assertCount(3, $virtualmeetings);
-        $room_virtualmeetings = $DB->get_records('facetoface_room_virtualmeeting');
-        $this->assertCount(2, $room_virtualmeetings);
-        $room_date_virtualmeetings = $DB->get_records('facetoface_room_dates_virtualmeeting');
-        $this->assertCount(3, $room_date_virtualmeetings);
+        $virtualmeetings = $DB->count_records('virtualmeeting');
+        $this->assertEquals(3, $virtualmeetings);
+        $room_virtualmeetings = $DB->count_records('facetoface_room_virtualmeeting');
+        $this->assertEquals(2, $room_virtualmeetings);
+        $room_date_virtualmeetings = $DB->count_records('facetoface_room_dates_virtualmeeting');
+        $this->assertEquals(3, $room_date_virtualmeetings);
         $vm1 = \totara_core\virtualmeeting\virtual_meeting::load_by_id($this->virtualmeeting1->get_id());
         $vm2 = \totara_core\virtualmeeting\virtual_meeting::load_by_id($this->virtualmeeting2->get_id());
-        $this->markTestSkipped('TODO: will be fixed in TL-29120');
-        $this->assertEquals($url1, $vm1->get_join_url());
-        $this->assertEquals($url2, $vm2->get_join_url());
+        $this->assert_url_in_totara_13($url1, $vm1->get_join_url());
+        $this->assert_url_in_totara_13($url2, $vm2->get_join_url());
     }
 
     /**
@@ -261,16 +286,52 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
 
-        $virtualmeetings = $DB->get_records('virtualmeeting');
-        $this->assertCount(2, $virtualmeetings);
-        $room_virtualmeetings = $DB->get_records('facetoface_room_virtualmeeting');
-        $this->assertCount(2, $room_virtualmeetings);
-        $room_date_virtualmeetings = $DB->get_records('facetoface_room_dates_virtualmeeting');
-        $this->assertCount(2, $room_date_virtualmeetings);
+        $virtualmeetings = $DB->count_records('virtualmeeting');
+        $this->assertEquals(2, $virtualmeetings);
+        $room_virtualmeetings = $DB->count_records('facetoface_room_virtualmeeting');
+        $this->assertEquals(2, $room_virtualmeetings);
+        $room_date_virtualmeetings = $DB->count_records('facetoface_room_dates_virtualmeeting');
+        $this->assertEquals(2, $room_date_virtualmeetings);
         $vm1 = \totara_core\virtualmeeting\virtual_meeting::load_by_id($this->virtualmeeting1->get_id());
         $vm2 = \totara_core\virtualmeeting\virtual_meeting::load_by_id($this->virtualmeeting2->get_id());
-        $this->markTestSkipped('TODO: will be fixed in TL-29120');
         $this->assertNotEquals($url1, $vm1->get_join_url());
+        $this->assert_url_in_totara_13($url2, $vm2->get_join_url());
+    }
+
+    public function test_execute_update_foreign_room() {
+        // add a session with a new virtual room as user2
+        // call execute()
+        // ensure vroom1 and vroom2 are not affected
+        global $DB;
+        $url1 = $this->virtualmeeting1->get_join_url();
+        $url2 = $this->virtualmeeting2->get_join_url();
+
+        $this->setUser($this->user2);
+
+        $seminar_event = new seminar_event($this->event1);
+        $session = new seminar_session();
+        $session->set_sessionid($seminar_event->get_id())
+            ->set_timestart(time() + 10800)
+            ->set_timefinish(time() + 12600)
+            ->set_sessiontimezone('Pacific/Auckland')
+            ->save();
+        /** @var mod_facetoface_generator */
+        $seminar_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $virtual_room3 = $seminar_generator->add_virtualmeeting_room(['name' => 'vroom3']);
+        $DB->insert_record('facetoface_room_dates', ['roomid' => $virtual_room3->id, 'sessionsdateid' => $session->get_id()]);
+
+        $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
+        $task->execute();
+
+        $virtualmeetings = $DB->count_records('virtualmeeting');
+        $this->assertEquals(3, $virtualmeetings);
+        $room_virtualmeetings = $DB->count_records('facetoface_room_virtualmeeting');
+        $this->assertEquals(3, $room_virtualmeetings);
+        $room_date_virtualmeetings = $DB->count_records('facetoface_room_dates_virtualmeeting');
+        $this->assertEquals(3, $room_date_virtualmeetings);
+        $vm1 = \totara_core\virtualmeeting\virtual_meeting::load_by_id($this->virtualmeeting1->get_id());
+        $vm2 = \totara_core\virtualmeeting\virtual_meeting::load_by_id($this->virtualmeeting2->get_id());
+        $this->assertEquals($url1, $vm1->get_join_url());
         $this->assertEquals($url2, $vm2->get_join_url());
     }
 
