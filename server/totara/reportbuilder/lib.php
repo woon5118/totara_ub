@@ -4834,7 +4834,7 @@ class reportbuilder {
         }
 
         // Prevent notifications boxes inside the table.
-        echo $OUTPUT->container_start('nobox rb-display-table-container no-overflow' . $classes, $this->_id);
+        echo $OUTPUT->box_start('nobox rb-display-table-container no-overflow' . $classes, $this->_id, array('tabindex' => '0', 'role' => 'region', 'aria-label' => $this->fullname));
 
         // Output cache information if needed.
         $cacheschedule = $this->get_cache_schedule();
@@ -4986,7 +4986,7 @@ class reportbuilder {
         $table->finish_html();
 
         // end of .nobox div
-        echo $OUTPUT->container_end();
+        echo $OUTPUT->box_end();
 
         $tablehtml = ob_get_clean();
 
