@@ -57,23 +57,24 @@ final class role_list implements \Iterator {
     }
 
     /**
-     * Get seminar roles for current seminar event.
+     * Get seminar roles for current seminar event,
+     * if user has multiple roles then only one is returned.
+     *
      * @param seminar_event $seminarevent
      * @return role_list
      */
     public static function get_distinct_users_from_seminarevent(seminar_event $seminarevent): role_list {
-        global $DB;
+        $list = new static(['sessionid' => $seminarevent->get_id()], 'roleid, userid');
 
-        $list = new static();
-
-        $sql = "SELECT DISTINCT fsr.*
-                  FROM {facetoface_session_roles} fsr
-            INNER JOIN {user} u ON u.id = fsr.userid
-                 WHERE fsr.sessionid = :sessionid AND u.deleted = 0";
-        $sessionroles = $DB->get_recordset_sql($sql, ['sessionid' => $seminarevent->get_id()]);
-        foreach ($sessionroles as $sessionrole) {
-            $role = new role();
-            $list->add($role->from_record($sessionrole));
+        $uniqueusers = [];
+        foreach ($list as $role) {
+            /** @var role $role */
+            $userid = $role->get_userid();
+            if (isset($uniqueusers[$userid])) {
+                $list->remove($role->get_id());
+                continue;
+            }
+            $uniqueusers[$userid] = true;
         }
         return $list;
     }
