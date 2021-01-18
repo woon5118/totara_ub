@@ -104,7 +104,6 @@ final class room_helper {
 
         // Set room virtual meeting record.
         if (!empty($data->plugin)) {
-
             /** @var room_virtualmeeting $virtual_meeting */
             $virtual_meeting = room_virtualmeeting::get_virtual_meeting($room);
             // Lets check if this room a new or an update.
@@ -114,16 +113,16 @@ final class room_helper {
                     throw new coding_exception("you cannot update or delete virtual meeting!");
                 }
                 // This is the update.
-                // We want to check if the update is changing the value
-                // from 'zoom/msteams/etc' plugin to 'none/internal'
-                // we must remove virtual meeting record then
+                // Once a virtualmeeting provider is created and saved, an indeterminate state is created which is difficult
+                // to resolve in real time if a manager changed a mind, so we disable it in meantime
                 if ($virtual_meeting->exists() &&
                     (room_virtualmeeting::VIRTUAL_MEETING_NONE == $data->plugin ||
-                     room_virtualmeeting::VIRTUAL_MEETING_INTERNAL == $data->plugin)
+                        room_virtualmeeting::VIRTUAL_MEETING_INTERNAL == $data->plugin)
                 ) {
-                        $virtual_meeting->delete();
+                    $data->plugin = $virtual_meeting->get_plugin();
                 }
             }
+
             if (room_virtualmeeting::VIRTUAL_MEETING_NONE != $data->plugin &&
                 room_virtualmeeting::VIRTUAL_MEETING_INTERNAL != $data->plugin) {
                 $virtual_meeting->set_plugin($data->plugin)

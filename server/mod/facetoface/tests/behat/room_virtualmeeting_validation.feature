@@ -52,6 +52,30 @@ Feature: Validation in a seminar virtual room meeting
     And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
 
     When I click on "Virtual Room" "link" in the "Christmas" "table_row"
+    Then the "id_plugin" "select_exact" should be disabled
+
+  Scenario: mod_facetoface_virtualmeeting_003: Virtual meeting link
+    Given I log in as "trainer1"
+    And I am on "Virtual seminar" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Christmas"
+    And I click on "Virtual Room" "link" in the "Christmas" "table_row"
+    When I set the field "Add virtual room link" to "Custom virtual room link"
+    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    Then I should see "You must supply a value here"
+    When I set the field "Virtual room link" to "invalid.url/format"
+    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    Then I should see "Invalid URL format"
+    When I set the field "Virtual room link" to "http://example.com"
+    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    And I press "Save changes"
+    Then I should see "Virtual seminar" in the page title
+
+  Scenario: mod_facetoface_virtualmeeting_004: Connect button
+    Given I log in as "trainer1"
+    And I am on "Virtual seminar" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Christmas"
+
+    When I click on "Virtual Room" "link" in the "Christmas" "table_row"
     And I set the field "Add virtual room link" to "PoC User"
     Then the "Connect" "button_exact" should be enabled
     When I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
@@ -71,18 +95,3 @@ Feature: Validation in a seminar virtual room meeting
     And I press "Save changes"
     Then I should see "Virtual seminar" in the page title
 
-  Scenario: mod_facetoface_virtualmeeting_003: Virtual meeting link
-    Given I log in as "trainer1"
-    And I am on "Virtual seminar" seminar homepage
-    And I click on the seminar event action "Edit event" in row "Christmas"
-    And I click on "Virtual Room" "link" in the "Christmas" "table_row"
-    When I set the field "Add virtual room link" to "Custom virtual room link"
-    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
-    Then I should see "You must supply a value here"
-    When I set the field "Virtual room link" to "invalid.url/format"
-    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
-    Then I should see "Invalid URL format"
-    When I set the field "Virtual room link" to "http://example.com"
-    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
-    And I press "Save changes"
-    Then I should see "Virtual seminar" in the page title

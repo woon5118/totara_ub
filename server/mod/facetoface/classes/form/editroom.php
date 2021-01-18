@@ -119,8 +119,10 @@ class editroom extends \moodleform {
                     $conditions_no_auth[] = $pluginname;
                 }
             }
-            $mform->addElement('select', 'plugin', get_string('virtual_meeting_add', 'mod_facetoface'), $meeting_options);
-            $mform->setDefault('plugin', room_virtualmeeting::VIRTUAL_MEETING_NONE);
+            // Once a virtualmeeting provider is created and saved, an indeterminate state is created which is difficult
+            // to resolve in real time if a manager changed a mind, so we disable it in meantime
+            $attrs = $virtual_meeting->exists() ? ['disabled' => 'disabled'] : [];
+            $mform->addElement('select', 'plugin', get_string('virtual_meeting_add', 'mod_facetoface'), $meeting_options, $attrs);
             $mform->setType('plugin', PARAM_TEXT);
 
             // Virtual room link.
@@ -234,6 +236,8 @@ class editroom extends \moodleform {
 
         /** @var \mod_facetoface\room $room */
         $room = $this->_customdata['room'];
+        /** @var room_virtualmeeting $virtual_meeting */
+        $virtual_meeting = $this->_customdata['virtual_meeting'];
 
         if ((int)$data['roomcapacity'] <= 0) {
             // Client side JS validation does not work much in the hacky dialog forms - do it on server side!
@@ -262,6 +266,12 @@ class editroom extends \moodleform {
             }
         }
 
+        if ($virtual_meeting->exists() &&
+            (room_virtualmeeting::VIRTUAL_MEETING_NONE == $data['plugin'] ||
+             room_virtualmeeting::VIRTUAL_MEETING_INTERNAL == $data['plugin'])
+        ) {
+            $errors['plugin'] = get_string('error:plugin_is_disabled', 'mod_facetoface');
+        }
         return $errors;
     }
 }

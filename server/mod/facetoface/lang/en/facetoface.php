@@ -700,6 +700,7 @@ $string['error:notificationdoesnotexist'] = 'Notification does not exist';
 $string['error:notificationnonduplicate'] = 'Can not delete non-duplicate auto notification';
 $string['error:notificationtemplatemissing'] = 'The following notification templates are missing (notifications could not be created for them):';
 $string['error:notificationnocopy'] = 'Notification copy failed.';
+$string['error:plugin_is_disabled'] = 'Virtual meeting is disabled on this event';
 $string['error:problemsigningup'] = 'There was a problem signing you up.';
 $string['error:removeattendee'] = 'Could not remove {$a} from the event.';
 $string['error:roomconflicts'] = 'Room has conflicting usage';
