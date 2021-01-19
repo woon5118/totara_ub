@@ -1798,34 +1798,6 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
     }
 
     /**
-     * Test to make sure user cannot update an another user's virtual meeting room
-     */
-    public function test_can_update_virtualmeeting() {
-
-        $user1 = $this->getDataGenerator()->create_user();
-        $user2 = $this->getDataGenerator()->create_user();
-        $customroom = $this->facetoface_generator->add_custom_room(['name' => 'virtual', 'url' => 'link', 'usercreated' => $user2->id]);
-        $customroom2 = $this->facetoface_generator->add_custom_room(['name' => 'casual', 'usercreated' => $user2->id]);
-        $room = new \mod_facetoface\room($customroom->id);
-        $room2 = new \mod_facetoface\room($customroom2->id);
-        self::create_room_virtualmeeting($room->get_id(), $user2->id);
-
-        // Non-creator cannot update virtualmeeting
-        $this->setUser($user1);
-        $can_manage = room_helper::can_update_virtualmeeting($room);
-        $this->assertEquals(false, $can_manage);
-
-        // And can update casual room
-        $can_manage = room_helper::can_update_virtualmeeting($room2);
-        $this->assertEquals(true, $can_manage);
-
-        // Creator can update virtualmeeting
-        $this->setUser($user2);
-        $can_manage = room_helper::can_update_virtualmeeting($room);
-        $this->assertEquals(true, $can_manage);
-    }
-
-    /**
      * Test room_helper::save() api to test converting room from internal to none
      */
     public function test_update_internal_room_to_none() {

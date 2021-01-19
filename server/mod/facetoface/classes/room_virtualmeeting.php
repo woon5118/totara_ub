@@ -26,6 +26,7 @@ namespace mod_facetoface;
 use core\orm\collection;
 use mod_facetoface\traits\crud_mapper;
 use core\orm\query\builder;
+use core_user;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -201,6 +202,25 @@ class room_virtualmeeting implements seminar_iterator_item {
     public function set_userid(int $userid): room_virtualmeeting {
         $this->userid = $userid;
         return $this;
+    }
+
+    /**
+     * Is the user capable to update the virtual room?
+     *
+     * @param integer $userid userid or 0 for the current user
+     * @return boolean
+     */
+    public function can_manage(int $userid = 0): bool {
+        global $USER;
+        $userid = $userid ?: $USER->id;
+        if (!$userid) {
+            return false;
+        }
+        $user = core_user::get_user($userid, 'deleted');
+        if (!$user || $user->deleted) {
+            return false;
+        }
+        return !$this->exists() || $this->get_userid() == $userid;
     }
 
     /**

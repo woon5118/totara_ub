@@ -1,6 +1,10 @@
 This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
+=== 13.5 ===
+
+* room_helper::can_update_virtualmeeting() has been deprecated; please use room_virtualmeeting::can_manage() instead
+
 === 13.3 ===
 
 * Added new notification template for virtual meeting creation failure

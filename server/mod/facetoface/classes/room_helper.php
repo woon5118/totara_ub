@@ -113,7 +113,7 @@ final class room_helper {
             // Lets check if this room a new or an update.
             if ($data->id) {
                 // Nobody can update or delete another user's virtual meeting room
-                if ($virtual_meeting->exists() && !self::can_update_virtualmeeting($room)) {
+                if ($virtual_meeting->exists() && !$virtual_meeting->can_manage()) {
                     throw new coding_exception("you cannot update or delete virtual meeting!");
                 }
                 // This is the update.
@@ -223,19 +223,12 @@ final class room_helper {
      *
      * @param room $room
      * @return boolean
+     * @deprecated since Totara 13.5
      */
     public static function can_update_virtualmeeting(room $room): bool {
-        global $USER;
-
-        /** @var room_virtualmeeting $virtual_meeting */
+        debugging('room_helper::' . __FUNCTION__ . '() is deprecated. Please use room_virtualmeeting::can_manage() instead.', DEBUG_DEVELOPER);
         $virtual_meeting = room_virtualmeeting::get_virtual_meeting($room);
-        $can_manage = true;
-        if ($virtual_meeting->exists()) {
-            if ($virtual_meeting->get_userid() != $USER->id) {
-                $can_manage = false;
-            }
-        }
-        return $can_manage;
+        return $virtual_meeting->can_manage();
     }
 
     /**

@@ -184,6 +184,66 @@ class mod_facetoface_virtualmeeting_room_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Test to make sure user cannot update an another user's virtual meeting room
+     */
+    public function test_can_manage(){
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user(['deleted' => 1]);
+        $this->setUser($user2);
+        /** @var mod_facetoface_generator */
+        $seminar_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $customroom = $seminar_generator->add_virtualmeeting_room(['name' => 'virtual', 'url' => 'link', 'usercreated' => $user2->id], ['userid' => $user2->id]);
+        $customroom2 = $seminar_generator->add_custom_room(['name' => 'casual', 'usercreated' => $user2->id]);
+        $room = new \mod_facetoface\room($customroom->id);
+        $room2 = new \mod_facetoface\room($customroom2->id);
+
+        // Anyone can create virtualmeeting
+        $this->setAdminUser();
+        $can_manage = (new room_virtualmeeting())->can_manage($user1->id);
+        $this->assertTrue($can_manage);
+        // Unless they are deleted
+        $can_manage = (new room_virtualmeeting())->can_manage($user3->id);
+        $this->assertFalse($can_manage);
+        // Or they do not exist
+        $can_manage = (new room_virtualmeeting())->can_manage(-42);
+        $this->assertFalse($can_manage);
+
+        // Non-creator cannot update virtualmeeting
+        $this->setUser($user1);
+        $can_manage = room_virtualmeeting::get_virtual_meeting($room)->can_manage();
+        $this->assertFalse($can_manage);
+
+        // And can update casual room
+        $this->setUser($user2);
+        $can_manage = room_virtualmeeting::from_roomid($customroom2->id)->can_manage($user1->id);
+        $this->assertTrue($can_manage);
+
+        // Creator can update virtualmeeting
+        $can_manage = room_virtualmeeting::get_virtual_meeting($room)->can_manage();
+        $this->assertTrue($can_manage);
+
+        // And can update casual room
+        $this->setUser($user1);
+        $can_manage = room_virtualmeeting::from_roomid($customroom2->id)->can_manage($user2->id);
+        $this->assertTrue($can_manage);
+
+        // Deleted user cannot update virtualmeeting
+        $this->setAdminUser();
+        $can_manage = room_virtualmeeting::get_virtual_meeting($room)->can_manage($user3->id);
+        $this->assertFalse($can_manage);
+        $can_manage = room_virtualmeeting::from_roomid($customroom2->id)->can_manage($user3->id);
+        $this->assertFalse($can_manage);
+
+        // Non-existent user cannot update virtualmeeting
+        $can_manage = room_virtualmeeting::get_virtual_meeting($room)->can_manage(0);
+        $this->assertFalse($can_manage);
+        $can_manage = room_virtualmeeting::from_roomid($customroom2->id)->can_manage(-42);
+        $this->assertFalse($can_manage);
+    }
+
     public function test_is_virtual_meeting() {
         $this->assertFalse(room_virtualmeeting::is_virtual_meeting('@none'), '@none');
         $this->assertFalse(room_virtualmeeting::is_virtual_meeting('@internal'), '@internal');
