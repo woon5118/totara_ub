@@ -1083,6 +1083,12 @@ class core_theme_settings_testcase extends advanced_testcase {
         }, $categories);
 
         $this->assertFalse(in_array('test_base_category', $category_names));
+        $this->assertTrue(in_array('images', $category_names));
+        $this->assertTrue(in_array('brand', $category_names));
+
+        // Exclude default file categories.
+        $categories = $ventura_settings->get_categories(false, false);
+        $this->assertEmpty($categories);
     }
 
     public function test_tenant_theme_hooks_default() {

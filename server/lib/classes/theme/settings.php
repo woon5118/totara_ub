@@ -72,15 +72,16 @@ final class settings {
      * Get setting categories for theme.
      *
      * @param bool $tenant_enabled
+     * @param bool $include_default_file_categories
      *
      * @return array|mixed
      */
-    public function get_categories($tenant_enabled = true): array {
+    public function get_categories(bool $tenant_enabled = true, bool $include_default_file_categories = true): array {
         global $DB;
 
         $theme = $this->theme_config->name;
+        $categories = $this->get_default_categories($include_default_file_categories);
 
-        $categories = $this->get_default_categories();
         // Get all variables for site.
         $values = $DB->get_field('config_plugins', 'value', [
             'name' => "tenant_0_settings",
@@ -145,16 +146,22 @@ final class settings {
     /**
      * Get default category properties.
      *
+     * @param bool $include_files
+     *
      * @return array
      */
-    private function get_default_categories(): array {
+    private function get_default_categories(bool $include_files): array {
         $categories = [];
-        $instances = $this->get_file_instances();
-        foreach ($instances as $instance) {
-            if ($instance->is_enabled() && $this->can_manage($instance)) {
-                $categories = array_merge($categories, $instance->get_default_categories());
+
+        if ($include_files) {
+            $instances = $this->get_file_instances();
+            foreach ($instances as $instance) {
+                if ($instance->is_enabled() && $this->can_manage($instance)) {
+                    $categories = array_merge($categories, $instance->get_default_categories());
+                }
             }
         }
+
         return $categories;
     }
 
@@ -365,7 +372,7 @@ final class settings {
 
         $css = '';
         $custom_css = '';
-        $categories = $this->get_categories($tenant_enabled);
+        $categories = $this->get_categories($tenant_enabled, false);
         foreach ($categories as $category) {
             // Each colour property needs to be in the root element
             // of the document tree.
@@ -488,6 +495,19 @@ final class settings {
      * @return bool
      */
     public function can_manage(theme_file $theme_file): bool {
+        global $USER;
+
+        // Site admin always has access.
+        if (is_siteadmin($USER)) {
+            return true;
+        }
+
+        // Check if capability exists (might not exist during upgrade from version < t13).
+        if (!get_capability_info('totara/tui:themesettings')) {
+            return false;
+        }
+
+        // Get context of user and check capability.
         $context = $theme_file->get_context();
         if ($context instanceof \context_tenant) {
             $tenant = \core\record\tenant::fetch($context->tenantid);

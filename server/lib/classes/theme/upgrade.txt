@@ -1,0 +1,7 @@
+This file describes API changes in core theme libraries and APIs,
+information provided here is intended especially for developers.
+
+=== 13.4 ===
+
+* Added optional second parameter (bool $include_default_file_categories) to function core\theme\settings::get_categories
+  to specify if default file categories should be included in the output.
