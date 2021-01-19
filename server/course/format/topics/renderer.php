@@ -245,7 +245,7 @@ class format_topics_renderer extends format_section_renderer_base {
             'aria-label' => get_section_name($course, $section),
         ]);
 
-        if (!$PAGE->user_is_editing() && $course->collapsiblesectionscollapseall && $section->section == 1) {
+        if (!$PAGE->user_is_editing() && $course->collapsiblesections && $course->collapsiblesectionscollapseall && $section->section == 1) {
             $modinfo = get_fast_modinfo($course);
             $collapse_all = html_writer::tag('a', get_string('collapseall'), ['href' => '#', 'class' => "{$prefix}__collapse_all"]);
             $expand_all = html_writer::tag('a', get_string('expandall'), ['href' => '#', 'class' => "{$prefix}__expand_all"]);

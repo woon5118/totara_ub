@@ -420,6 +420,8 @@ class format_topics extends format_base {
                 }
             }
 
+            $mform->disabledIf('collapsiblesectionscollapseall', 'collapsiblesections', 'notchecked');
+
             $mform->hideIf('headerbgcolor', 'headercolor', 'notchecked');
             $mform->hideIf('headerfgcolor', 'headercolor', 'notchecked');
         }
