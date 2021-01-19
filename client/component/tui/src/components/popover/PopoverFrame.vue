@@ -104,6 +104,7 @@ export default {
     height: 100%;
     box-shadow: 0 0 0 1px var(--color-neutral-5);
     content: '';
+    z-index: -1;
   }
 
   &--size-sm {
