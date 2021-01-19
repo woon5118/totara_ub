@@ -109,7 +109,7 @@ class rb_playlistengagement_embedded extends rb_base_embedded {
      * @return bool
      */
     public static function is_report_ignored() {
-        return advanced_feature::is_disabled('engage_resources');
+        return \rb_source_playlistengagement::is_source_ignored();
     }
 
 }

@@ -84,8 +84,8 @@ class rb_source_engagecontent extends rb_base_source {
             'taglist',
             'LEFT',
             '(
-                SELECT ti.itemid, 
-                ' . $DB->sql_group_concat('t.name', ' , ') . ' AS tagname 
+                SELECT ti.itemid,
+                ' . $DB->sql_group_concat('t.name', ' , ') . ' AS tagname
                 FROM {tag_instance} ti
                 INNER JOIN {tag} t ON t.id = ti.tagid
                 WHERE itemtype = \'engage_resource\' GROUP BY ti.itemid
@@ -167,9 +167,9 @@ class rb_source_engagecontent extends rb_base_source {
             FROM {engage_share_recipient} r
             INNER JOIN {engage_share} s
             ON s.id = r.shareid
-            WHERE 
+            WHERE
             s.itemid = base.id
-            AND 
+            AND
             (r.area <> '{$area}' OR r.component <> 'container_workspace')
             )",
             [
@@ -189,9 +189,9 @@ class rb_source_engagecontent extends rb_base_source {
                 FROM {engage_share_recipient} r
                 INNER JOIN {engage_share} s
                 ON s.id = r.shareid
-                WHERE 
+                WHERE
                 s.itemid = base.id
-                AND 
+                AND
                 (r.area = '{$area}' OR r.component = 'container_workspace')
                 )",
                 [
@@ -235,10 +235,10 @@ class rb_source_engagecontent extends rb_base_source {
                 'views',
                 get_string('views', 'rb_source_engagecontent'),
                 "(
-                SELECT COUNT(mrt.id) 
+                SELECT COUNT(mrt.id)
                 FROM {ml_recommender_interactions} mrt
                 INNER JOIN {ml_recommender_components} mrc ON (mrc.id = mrt.component_id)
-                INNER JOIN {ml_recommender_interaction_types} mrit ON (mrit.id = mrt.interaction_type_id) 
+                INNER JOIN {ml_recommender_interaction_types} mrit ON (mrit.id = mrt.interaction_type_id)
                 WHERE mrt.item_id = base.id
                 AND mrt.user_id <> base.userid
                 AND mrc.component = '{$component}'
@@ -284,7 +284,7 @@ class rb_source_engagecontent extends rb_base_source {
      * @return array
      */
     public static function get_default_columns() {
-        return [
+        $cols = [
             [
                 'type' => 'user',
                 'value' => 'namelink',
@@ -317,11 +317,6 @@ class rb_source_engagecontent extends rb_base_source {
             ],
             [
                 'type' => 'engagecontent',
-                'value' => 'workspaces',
-                'heading' => get_string('workspaces', 'rb_source_engagecontent')
-            ],
-            [
-                'type' => 'engagecontent',
                 'value' => 'views',
                 'heading' => get_string('views', 'rb_source_engagecontent')
             ],
@@ -341,6 +336,16 @@ class rb_source_engagecontent extends rb_base_source {
                 'heading' => get_string('topics', 'rb_source_engagecontent')
             ],
         ];
+
+        if (advanced_feature::is_enabled('container_workspace')) {
+            $cols[] = [
+                'type' => 'engagecontent',
+                'value' => 'workspaces',
+                'heading' => get_string('workspaces', 'rb_source_engagecontent')
+            ];
+        }
+
+        return $cols;
     }
 
     /**

@@ -97,8 +97,8 @@ class rb_source_playlistengagement extends rb_base_source {
             'taglist',
             'LEFT',
             '(
-                SELECT ti.itemid, 
-                ' . $DB->sql_group_concat('t.name', ' , ') . ' AS tagname 
+                SELECT ti.itemid,
+                ' . $DB->sql_group_concat('t.name', ' , ') . ' AS tagname
                 FROM {tag_instance} ti
                 INNER JOIN {tag} t ON t.id = ti.tagid
                 WHERE itemtype = \'playlist\' GROUP BY ti.itemid
@@ -152,7 +152,7 @@ class rb_source_playlistengagement extends rb_base_source {
             'playlistengagement',
             'resources',
             get_string('resourceinplaylist', 'rb_source_playlistengagement'),
-            '(SELECT COUNT(*) FROM {playlist_resource} pr 
+            '(SELECT COUNT(*) FROM {playlist_resource} pr
             WHERE pr.playlistid = base.id)',
             [
                 'displayfunc' => 'plaintext',
@@ -261,7 +261,7 @@ class rb_source_playlistengagement extends rb_base_source {
                 "(
                 SELECT COUNT(*) FROM {ml_recommender_interactions} mrt
                 INNER JOIN {ml_recommender_components} mrc ON (mrc.id = mrt.component_id)
-                INNER JOIN {ml_recommender_interaction_types} mrit ON (mrit.id = mrt.interaction_type_id) 
+                INNER JOIN {ml_recommender_interaction_types} mrit ON (mrit.id = mrt.interaction_type_id)
                 WHERE mrt.item_id = base.id
                 AND mrt.user_id <> base.userid
                 AND mrc.component = '{$component}'
@@ -321,7 +321,7 @@ class rb_source_playlistengagement extends rb_base_source {
      * @return array
      */
     public static function get_default_columns() {
-        return [
+        $cols = [
             [
                 'type' => 'playlistengagement',
                 'value' => 'title',
@@ -353,11 +353,6 @@ class rb_source_playlistengagement extends rb_base_source {
                 'heading' => get_string('shares', 'rb_source_playlistengagement')
             ],
             [
-                'type' => 'playlistengagement',
-                'value' => 'workspaces',
-                'heading' => get_string('workspaces', 'rb_source_playlistengagement')
-            ],
-            [
                 'type' => 'user',
                 'value' => 'namelink',
                 'heading' => get_string('creator', 'rb_source_playlistengagement'),
@@ -383,6 +378,16 @@ class rb_source_playlistengagement extends rb_base_source {
                 'heading' => get_string('topics', 'rb_source_playlistengagement')
             ],
         ];
+
+        if (advanced_feature::is_enabled('container_workspace')) {
+            $cols[] = [
+                'type' => 'playlistengagement',
+                'value' => 'workspaces',
+                'heading' => get_string('workspaces', 'rb_source_playlistengagement')
+            ];
+        }
+
+        return $cols;
     }
 
     /**

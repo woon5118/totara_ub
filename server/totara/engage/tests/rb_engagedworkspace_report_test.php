@@ -22,11 +22,16 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use totara_core\advanced_feature;
 use container_workspace\discussion\discussion;
 use totara_comment\comment_helper;
 use core\json_editor\node\image;
 use core\json_editor\node\paragraph;
 
+/**
+ * @group totara_reportbuilder
+ * @group totara_engage
+ */
 class totara_engage_rb_engagedworkspace_report_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
@@ -263,6 +268,27 @@ class totara_engage_rb_engagedworkspace_report_testcase extends advanced_testcas
             $this->assertNotEquals($workspace4->get_name(), $record->engagedworkspace_title);
             $this->assertNotEquals($workspace5->get_name(), $record->engagedworkspace_title);
         }
+    }
+
+    /**
+     *  @return void
+     */
+    public function test_engagedworkspace_report_access(): void {
+        self::setAdminUser();
+        $report_source_class = reportbuilder::get_source_class('engagedworkspace');
+        $report_embedded_class = reportbuilder::get_embedded_report_class('engagedworkspace');
+
+        $this->assertFalse($report_source_class::is_source_ignored());
+        $this->assertFalse($report_embedded_class::is_report_ignored());
+
+        advanced_feature::disable('engage_resources');
+        $this->assertFalse($report_source_class::is_source_ignored());
+        $this->assertFalse($report_embedded_class::is_report_ignored());
+
+        advanced_feature::enable('engage_resources');
+        advanced_feature::disable('container_workspace');
+        $this->assertTrue($report_source_class::is_source_ignored());
+        $this->assertTrue($report_embedded_class::is_report_ignored());
     }
 
     /**

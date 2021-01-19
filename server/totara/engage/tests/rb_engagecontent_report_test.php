@@ -22,12 +22,17 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use totara_core\advanced_feature;
 use totara_engage\access\access;
 use totara_engage\answer\answer_type;
 use totara_reaction\resolver\resolver_factory as reaction_resolver_factory;
 use totara_reaction\reaction_helper;
 use totara_engage\resource\resource_factory;
 
+/**
+ * @group totara_reportbuilder
+ * @group totara_engage
+ */
 class totara_engage_rb_engagecontent_report_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
     /**
@@ -379,6 +384,27 @@ class totara_engage_rb_engagecontent_report_testcase extends advanced_testcase {
             $this->assertNotEquals($article2->get_name(), $record->engagecontent_resource_name);
             $this->assertNotEquals($article3->get_name(), $record->engagecontent_resource_name);
         }
+    }
+
+    /**
+     *  @return void
+     */
+    public function test_engagecontent_report_access(): void {
+        self::setAdminUser();
+        $report_source_class = reportbuilder::get_source_class('engagecontent');
+        $report_embedded_class = reportbuilder::get_embedded_report_class('engagecontent');
+
+        $this->assertFalse($report_source_class::is_source_ignored());
+        $this->assertFalse($report_embedded_class::is_report_ignored());
+
+        advanced_feature::disable('engage_resources');
+        $this->assertTrue($report_source_class::is_source_ignored());
+        $this->assertTrue($report_embedded_class::is_report_ignored());
+
+        advanced_feature::enable('engage_resources');
+        advanced_feature::disable('container_workspace');
+        $this->assertFalse($report_source_class::is_source_ignored());
+        $this->assertFalse($report_embedded_class::is_report_ignored());
     }
 
     /**

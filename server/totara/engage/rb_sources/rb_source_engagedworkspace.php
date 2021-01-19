@@ -150,50 +150,52 @@ class rb_source_engagedworkspace extends rb_base_source {
             ]
         );
 
-        $area = library::AREA;
-        $columnoptions[] = new rb_column_option(
-            'engagedworkspace',
-            'playlists',
-            get_string('playlists', 'rb_source_engagedworkspace'),
-            "(
-            SELECT COUNT(r.id)
-            FROM {playlist} p
-            INNER JOIN {engage_share} s
-            ON p.id = s.itemid
-            INNER JOIN {engage_share_recipient} r
-            ON s.id = r.shareid
-            WHERE r.instanceid = base.course_id
-            AND (r.area = '{$area}'
-            OR r.component = '{$component}')
-            )",
-            [
-                'displayfunc' => 'plaintext',
-                'dbdatatype' => 'text',
-                'iscompound' => true
-            ]
-        );
+        if (advanced_feature::is_enabled('engage_resources')) {
+            $area = library::AREA;
+            $columnoptions[] = new rb_column_option(
+                'engagedworkspace',
+                'playlists',
+                get_string('playlists', 'rb_source_engagedworkspace'),
+                "(
+                SELECT COUNT(r.id)
+                FROM {playlist} p
+                INNER JOIN {engage_share} s
+                ON p.id = s.itemid
+                INNER JOIN {engage_share_recipient} r
+                ON s.id = r.shareid
+                WHERE r.instanceid = base.course_id
+                AND (r.area = '{$area}'
+                OR r.component = '{$component}')
+                )",
+                [
+                    'displayfunc' => 'plaintext',
+                    'dbdatatype' => 'text',
+                    'iscompound' => true
+                ]
+            );
 
-        $columnoptions[] = new rb_column_option(
-            'engagedworkspace',
-            'resources',
-            get_string('resources', 'rb_source_engagedworkspace'),
-            "(
-            SELECT COUNT(r.id)
-            FROM {engage_resource} er
-            INNER JOIN {engage_share} s
-            ON er.id = s.itemid
-            INNER JOIN {engage_share_recipient} r
-            ON s.id = r.shareid
-            WHERE r.instanceid = base.course_id
-            AND (r.area = '{$area}'
-            OR r.component = '{$component}')
-            )",
-            [
-                'displayfunc' => 'plaintext',
-                'dbdatatype' => 'text',
-                'iscompound' => true
-            ]
-        );
+            $columnoptions[] = new rb_column_option(
+                'engagedworkspace',
+                'resources',
+                get_string('resources', 'rb_source_engagedworkspace'),
+                "(
+                SELECT COUNT(r.id)
+                FROM {engage_resource} er
+                INNER JOIN {engage_share} s
+                ON er.id = s.itemid
+                INNER JOIN {engage_share_recipient} r
+                ON s.id = r.shareid
+                WHERE r.instanceid = base.course_id
+                AND (r.area = '{$area}'
+                OR r.component = '{$component}')
+                )",
+                [
+                    'displayfunc' => 'plaintext',
+                    'dbdatatype' => 'text',
+                    'iscompound' => true
+                ]
+            );
+        }
 
         $area = discussion::AREA;
         $comment_area = \totara_comment\comment::COMMENT_AREA;
@@ -231,7 +233,7 @@ class rb_source_engagedworkspace extends rb_base_source {
             'engagedworkspace',
             'visibility',
             get_string('visibility', 'rb_source_engagedworkspace'),
-            'CASE 
+            'CASE
             WHEN course.visible = 0 AND base.private = 1 THEN 2
             WHEN base.private = 1 AND course.visible = 1 THEN 1
             ELSE 0
@@ -300,7 +302,7 @@ class rb_source_engagedworkspace extends rb_base_source {
      * @return array
      */
     public static function get_default_columns() {
-        return [
+        $cols = [
             [
                 'type' => 'engagedworkspace',
                 'value' => 'title',
@@ -318,16 +320,6 @@ class rb_source_engagedworkspace extends rb_base_source {
             ],
             [
                 'type' => 'engagedworkspace',
-                'value' => 'playlists',
-                'heading' => get_string('playlists', 'rb_source_engagedworkspace')
-            ],
-            [
-                'type' => 'engagedworkspace',
-                'value' => 'resources',
-                'heading' => get_string('resources', 'rb_source_engagedworkspace')
-            ],
-            [
-                'type' => 'engagedworkspace',
                 'value' => 'files',
                 'heading' => get_string('files', 'rb_source_engagedworkspace')
             ],
@@ -342,6 +334,22 @@ class rb_source_engagedworkspace extends rb_base_source {
                 'heading' => get_string('members', 'rb_source_engagedworkspace')
             ],
         ];
+
+        if (advanced_feature::is_enabled('engage_resources')) {
+            $cols[] = [
+                'type' => 'engagedworkspace',
+                'value' => 'playlists',
+                'heading' => get_string('playlists', 'rb_source_engagedworkspace')
+            ];
+
+            $cols[] = [
+                'type' => 'engagedworkspace',
+                'value' => 'resources',
+                'heading' => get_string('resources', 'rb_source_engagedworkspace')
+            ];
+        }
+
+        return $cols;
     }
 
     /**
@@ -456,7 +464,6 @@ class rb_source_engagedworkspace extends rb_base_source {
      * @return bool
      */
     public static function is_source_ignored() {
-        return advanced_feature::is_disabled('engage_resources') &&
-            advanced_feature::is_disabled('container_workspace');
+        return advanced_feature::is_disabled('container_workspace');
     }
 }

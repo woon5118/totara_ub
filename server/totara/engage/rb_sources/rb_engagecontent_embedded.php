@@ -41,7 +41,7 @@ final class rb_engagecontent_embedded extends rb_base_embedded {
      * @var int
      */
     public $defaultsortorder;
-    
+
     /**
      * rb_engagecontent_embedded constructor.
      * @param array $data
@@ -119,6 +119,6 @@ final class rb_engagecontent_embedded extends rb_base_embedded {
      * @return bool
      */
     public static function is_report_ignored() {
-        return advanced_feature::is_disabled('engage_resources');
+        return \rb_source_engagecontent::is_source_ignored();
     }
 }

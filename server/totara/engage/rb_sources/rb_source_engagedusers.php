@@ -86,12 +86,12 @@ class rb_source_engagedusers extends rb_base_source {
             'LEFT',
             '(
                 SELECT
-                ue.userid, 
+                ue.userid,
                 ' . $DB->sql_group_concat($DB->sql_cast_2char('c.fullname'), ", <br/>") . ' AS workspaces,
                 ' . $DB->sql_group_concat('c.id', ',') . ' AS courseids
-                FROM {user_enrolments} ue 
+                FROM {user_enrolments} ue
                 LEFT JOIN {enrol} e ON ue.enrolid = e.id
-                LEFT JOIN {course} c ON c.id = e.courseid 
+                LEFT JOIN {course} c ON c.id = e.courseid
                 WHERE ue.status = 0 AND e.status = 0
                 GROUP BY ue.userid
             )',
@@ -116,21 +116,21 @@ class rb_source_engagedusers extends rb_base_source {
 
         $this->add_core_user_columns($columnoptions);
 
-        if ($has_resources) {
-            $usednamefields = totara_get_all_user_name_fields_join('auser');
-            $columnoptions[] = new \rb_column_option(
-                'engagedusers',
-                'creator',
-                get_string('creator', 'rb_source_engagedusers'),
-                $DB->sql_concat_join("' '", $usednamefields),
-                [
-                    'joins' => 'auser',
-                    'displayfunc' => 'engagedusers_namelink',
-                    'extrafields' => array_merge(['id' => "base.id", 'deleted' => "auser.deleted"], $usednamefields),
-                    'outputformat' => 'html'
-                ]
-            );
+        $usednamefields = totara_get_all_user_name_fields_join('auser');
+        $columnoptions[] = new \rb_column_option(
+            'engagedusers',
+            'creator',
+            get_string('creator', 'rb_source_engagedusers'),
+            $DB->sql_concat_join("' '", $usednamefields),
+            [
+                'joins' => 'auser',
+                'displayfunc' => 'engagedusers_namelink',
+                'extrafields' => array_merge(['id' => "base.id", 'deleted' => "auser.deleted"], $usednamefields),
+                'outputformat' => 'html'
+            ]
+        );
 
+        if ($has_resources) {
             $columnoptions[] = new rb_column_option(
                 'engagedusers',
                 'created_resource',
@@ -196,7 +196,7 @@ class rb_source_engagedusers extends rb_base_source {
                 SELECT COUNT(c.id) FROM {totara_comment} c
                 INNER JOIN {engage_resource} r ON c.instanceid = r.id
                 WHERE r.userid <> base.id AND c.userid = base.id
-                AND 
+                AND
                 (c.component = '{$playlist}'OR c.component = '{$artcle}')
                 )",
                 [
@@ -298,53 +298,72 @@ class rb_source_engagedusers extends rb_base_source {
      * @return array
      */
     public static function get_default_columns() {
-        return [
+        $cols = [
             [
                 'type' => 'engagedusers',
                 'value' => 'creator',
                 'heading' => get_string('creator', 'rb_source_engagedusers'),
-            ],
-            [
+            ]
+        ];
+
+        $has_resources = advanced_feature::is_enabled('engage_resources');
+        $has_workspaces = advanced_feature::is_enabled('container_workspace');
+
+        if ($has_resources) {
+            $cols[] = [
                 'type' => 'engagedusers',
                 'value' => 'created_resource',
                 'heading' => get_string('createdresource', 'rb_source_engagedusers')
-            ],
-            [
+            ];
+
+            $cols[] = [
                 'type' => 'engagedusers',
                 'value' => 'public_resource',
                 'heading' => get_string('publicresource', 'rb_source_engagedusers')
-            ],
-            [
+            ];
+
+            $cols[] = [
                 'type' => 'engagedusers',
                 'value' => 'private_resource',
                 'heading' => get_string('privateresource', 'rb_source_engagedusers')
-            ],
-            [
+            ];
+
+            $cols[] = [
                 'type' => 'engagedusers',
                 'value' => 'restricted_resource',
                 'heading' => get_string('restrictedresource', 'rb_source_engagedusers')
-            ],
-            [
+            ];
+
+            $cols[] = [
                 'type' => 'engagedusers',
                 'value' => 'created_comment',
                 'heading' => get_string('createdcomment', 'rb_source_engagedusers')
-            ],
-            [
+            ];
+
+            $cols[] = [
                 'type' => 'engagedusers',
                 'value' => 'created_playlist',
                 'heading' => get_string('createdplaylist', 'rb_source_engagedusers')
-            ],
-            [
+            ];
+        }
+
+        if ($has_workspaces && $has_resources) {
+            $cols[] = [
                 'type' => 'engagedusers',
                 'value' => 'resource_in_workspace',
                 'heading' => get_string('resourceinworkspace', 'rb_source_engagedusers')
-            ],
-            [
+            ];
+        }
+
+        if ($has_workspaces) {
+            $cols[] = [
                 'type' => 'engagedusers',
                 'value' => 'created_workspace',
                 'heading' => get_string('createdworkspace', 'rb_source_engagedusers')
-            ]
-        ];
+            ];
+        }
+
+        return $cols;
     }
 
     /**

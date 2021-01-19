@@ -22,9 +22,14 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use totara_core\advanced_feature;
 use totara_comment\comment_helper;
 use totara_engage\access\access;
 
+/**
+ * @group totara_reportbuilder
+ * @group totara_playlist
+ */
 class totara_playlist_rb_playlistengagement_report_testcase extends advanced_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
@@ -134,7 +139,7 @@ class totara_playlist_rb_playlistengagement_report_testcase extends advanced_tes
         $playlist1->add_topics_by_ids($topics);
         $playlist3->add_topics_by_ids($topics);
         $playlist5->add_topics_by_ids($topics);
-        
+
         $report_id = $this->get_report_id();
         $report = reportbuilder::create($report_id);
         list($sql, $params) = $report->build_query();
@@ -317,5 +322,26 @@ class totara_playlist_rb_playlistengagement_report_testcase extends advanced_tes
             $this->assertNotEquals($playlist2->get_name(), $record->playlistengagement_title);
             $this->assertNotEquals($playlist3->get_name(), $record->playlistengagement_title);
         }
+    }
+
+    /**
+     *  @return void
+     */
+    public function test_playlistengagement_report_access(): void {
+        self::setAdminUser();
+        $report_source_class = reportbuilder::get_source_class('playlistengagement');
+        $report_embedded_class = reportbuilder::get_embedded_report_class('playlistengagement');
+
+        $this->assertFalse($report_source_class::is_source_ignored());
+        $this->assertFalse($report_embedded_class::is_report_ignored());
+
+        advanced_feature::disable('engage_resources');
+        $this->assertTrue($report_source_class::is_source_ignored());
+        $this->assertTrue($report_embedded_class::is_report_ignored());
+
+        advanced_feature::enable('engage_resources');
+        advanced_feature::disable('container_workspace');
+        $this->assertFalse($report_source_class::is_source_ignored());
+        $this->assertFalse($report_embedded_class::is_report_ignored());
     }
 }

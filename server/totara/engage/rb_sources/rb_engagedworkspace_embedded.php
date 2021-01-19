@@ -119,7 +119,6 @@ final class rb_engagedworkspace_embedded extends rb_base_embedded {
      * @return bool
      */
     public static function is_report_ignored() {
-        return advanced_feature::is_disabled('engage_resources') &&
-            advanced_feature::is_disabled('container_workspace');
+        return \rb_source_engagedworkspace::is_source_ignored();
     }
 }
