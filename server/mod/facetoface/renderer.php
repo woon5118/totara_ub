@@ -22,6 +22,10 @@
  */
 
 use core\output\flex_icon;
+use core\orm\query\builder;
+
+use totara_core\virtualmeeting\virtual_meeting as vm_model;
+
 use mod_facetoface\asset;
 use mod_facetoface\asset_list;
 use mod_facetoface\attendance_taking_status;
@@ -712,15 +716,31 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string containing room details with relevant html tags.
      */
     public function get_session_room_details_html(seminar_session $date, room $room, string $backurl = null, bool $joinnow = false): string {
-        global $CFG;
+        global $CFG, $DB;
+
         $url = new moodle_url('/mod/facetoface/reports/rooms.php', array(
             'roomid' => $room->get_id(),
             'sdid' => $date->get_id(),
         ));
 
+        $roomurl = $room->get_url();
+        if (empty($roomurl)) {
+            // This isn't a basic linked room, check if it's a virtual room.
+            $sql = "SELECT vm.id
+                      FROM {facetoface_room_dates_virtualmeeting} AS vm
+                INNER JOIN {facetoface_room_dates} AS rd
+                        ON vm.roomdateid = rd.id
+                     WHERE rd.sessionsdateid = :sdid
+                       AND rd.roomid = :rid";
+            $vmid = $DB->get_field_sql($sql, ['sdid' => $date->get_id(), 'rid' => $room->get_id()]);
+            if ($vmid && $model = vm_model::load_by_id($vmid)) {
+                $roomurl = $model->get_join_url(false);
+            }
+        }
+
         $roomhtml = '';
-        if ($joinnow && !empty($room->get_url())) {
-            $roomurl = new moodle_url(s($room->get_url()));
+        if ($joinnow && !empty($roomurl)) {
+            $roomurl = new moodle_url(s($roomurl));
             $roomlinklabel = get_string('roomjoinnowx', 'mod_facetoface', $room->get_name());
             $roomhtml .= '<br>' . html_writer::link(
                 $roomurl,
@@ -1684,7 +1704,10 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     /** @var \mod_facetoface\room $room */
                     foreach ($rooms as $room) {
                         $joinnow = false;
-                        if ((bool)$room->get_url()) {
+                        $roomurl = '';
+
+                        $isvirtual = builder::table('facetoface_room_virtualmeeting')->where('roomid', $room->get_id())->exists();
+                        if ((bool)$room->get_url() || $isvirtual) {
                             $joinnow = \mod_facetoface\room_helper::show_joinnow($seminarevent, $date, $signup);
                             if ($joinnow && !in_array('joinnow', $states)) {
                                 $states[] = 'joinnow';
@@ -1890,7 +1913,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         /** @var \mod_facetoface\room $room */
         foreach ($rooms as $room) {
             $joinnow = false;
-            if ((bool)$room->get_url()) {
+            $isvirtual = builder::table('facetoface_room_virtualmeeting')->where('roomid', $room->get_id())->exists();
+            if ((bool)$room->get_url() || $isvirtual) {
                 $joinnow = \mod_facetoface\room_helper::show_joinnow($seminarevent, $date, null, $time);
             }
             $listitems[] = $this->get_session_room_details_html($date, $room, $currenturl, $joinnow);

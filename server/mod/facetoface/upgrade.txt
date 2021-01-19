@@ -6,6 +6,7 @@ information provided here is intended especially for developers.
 * Added new notification template for virtual meeting creation failure
 * Added new facetoface_room_virtualmeeting table to link rooms to a virtual meeting plugin type
 * Added new facetoface_room_dates_virtualmeeting table to link room dates to an instance of a virtual meeting
+* mod_facetoface_renderer::get_session_room_details_html() has been updated to show join now button for virtual meetings
 
 === 13.2 ===
 
