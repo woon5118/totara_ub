@@ -100,11 +100,11 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
+    z-index: -1;
     width: 100%;
     height: 100%;
     box-shadow: 0 0 0 1px var(--color-neutral-5);
     content: '';
-    z-index: -1;
   }
 
   &--size-sm {

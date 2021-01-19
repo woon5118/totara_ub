@@ -34,7 +34,7 @@
 
       {{ showRates }}
 
-      <Popover
+      <PlaylistPopover
         v-if="showPopover"
         @rating="$emit('rating', Math.ceil(innerValue))"
       >
@@ -46,19 +46,19 @@
             :max-rating="5"
           />
         </template>
-      </Popover>
+      </PlaylistPopover>
     </div>
   </div>
 </template>
 
 <script>
+import PlaylistPopover from 'totara_playlist/components/popover/PlaylistPopover';
 import StarRating from 'totara_engage/components/icons/StarRating';
-import Popover from 'totara_playlist/components/popover/PlaylistPopover';
 
 export default {
   components: {
+    PlaylistPopover,
     StarRating,
-    Popover,
   },
 
   props: {

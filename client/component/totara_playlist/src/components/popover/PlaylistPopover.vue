@@ -79,10 +79,6 @@ export default {
 
 <style lang="scss">
 .tui-playlistPopover {
-  .tui-popoverFrame {
-    width: 190px;
-  }
-
   &__buttons {
     display: flex;
     justify-content: flex-end;
