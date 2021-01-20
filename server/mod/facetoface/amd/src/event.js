@@ -527,6 +527,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
         listItem.setAttribute('data-custom', resource.custom);
         listItem.setAttribute('data-capacity', resource.capacity);
         listItem.setAttribute('data-can-manage', resource.can_manage);
+        listItem.setAttribute('data-is-virtual', resource.virtualmeeting);
         listItem.classList.add(this.cssClass);
     };
 
@@ -604,17 +605,33 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
         document.getElementById('id_defaultcapacity').disabled = !capacityButton;
     };
 
+    /**
+     * Does any work required when a resource has beed updated
+     * @param {Number|String} offset The session number that is being looked at
+     */
     Rooms.prototype.resourcesUpdated = function(offset) {
         var roomnames = document.querySelectorAll('#roomlist' + offset + ' .roomname');
         var dateLink = document.getElementById('show-selectdate' + offset + '-dialog');
         var row = dateLink.closest('tr');
         var canManage = true;
+        var virtualCount = 0;
 
         roomnames.forEach(function (name) {
             if (name.getAttribute('data-can-manage') === 'false') {
                 canManage = false;
             }
+
+            if (name.getAttribute('data-is-virtual') === 'true') {
+                virtualCount++;
+            }
         });
+
+        NotificationLib.clearNotifications();
+        if (virtualCount > 1) {
+            strLib.get_string('error:toomanyvirtualmeetings', 'mod_facetoface').then(function(string) {
+                NotificationLib.addNotification({message: string});
+            });
+        }
 
         if (!canManage) {
             row.classList.add('mod_facetoface-date-other-virtual-room');
@@ -713,6 +730,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
         addDOMEvents: function() {
             var that = this;
             var sessionTable = document.querySelector('.sessiondates .f2fmanagedates');
+            var form = document.getElementById('mform_seminar_event');
 
             sessionTable.addEventListener('click', function(event) {
                 var actionElement = event.target.closest('[data-action]');
@@ -746,6 +764,27 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
                             that._editResource(actionElement);
                             break;
                     }
+                }
+            });
+
+            // Prevent form submission if more than virtual room per session is detected
+            form.addEventListener('submit', function(ev) {
+                var isValid = true;
+
+                sessionTable.querySelectorAll('.mod_facetoface-roomlist').forEach(function(node) {
+                    var hasVirtual = false;
+                    node.querySelectorAll('.roomname').forEach(function(room) {
+                        if (room.getAttribute('data-is-virtual') === "true") {
+                            if (hasVirtual) {
+                                isValid = false;
+                            }
+                            hasVirtual = true;
+                        }
+                    });
+                });
+
+                if (!isValid) {
+                    ev.preventDefault();
                 }
             });
         },
