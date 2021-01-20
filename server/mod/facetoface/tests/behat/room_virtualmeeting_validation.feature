@@ -168,6 +168,7 @@ Feature: Validation in a seminar virtual room meeting
 
     When I click on "Virtual Meeting" "link" in the "Christmas" "table_row"
     Then the "Add virtual room link" "select" should be disabled
+    And I should not see "Add to sitewide list"
 
   Scenario: mod_facetoface_virtualmeeting_106: Site-wide virtual room changeability
     Given the following "global rooms" exist in "mod_facetoface" plugin:
@@ -204,7 +205,46 @@ Feature: Validation in a seminar virtual room meeting
     Then I should not see "Virtual room"
     And "Go to room" "link" should not exist
 
-  Scenario: mod_facetoface_virtualmeeting_107: Virtualmeeting plugin availability
+  Scenario: mod_facetoface_virtualmeeting_107: Ad-hoc virtual room promoted to sitewide changeability
+    Given I log in as "admin"
+    And I am on "Virtual seminar" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Christmas"
+
+    When I click on "Virtual Room" "link" in the "Christmas" "table_row"
+    And "None" "option" should exist in the "Add virtual room link" "select"
+    And "Custom virtual room link" "option" should exist in the "Add virtual room link" "select"
+    And "PoC App" "option" should exist in the "Add virtual room link" "select"
+    And "PoC User" "option" should exist in the "Add virtual room link" "select"
+    And I set the following fields to these values:
+      | Add virtual room link | Custom virtual room link    |
+      | Virtual room link     | http://example.com?id=12345 |
+      | Add to sitewide list  | 1                           |
+    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    And I press "Save changes"
+    Then I should not see "Editing event in"
+
+    When I follow "Virtual Room"
+    Then I should see "Go to room"
+
+    When I press "Edit room"
+    Then the "Add virtual room link" "select" should be enabled
+    And "None" "option" should exist in the "Add virtual room link" "select"
+    And "Custom virtual room link" "option" should exist in the "Add virtual room link" "select"
+    And "PoC App" "option" should not exist in the "Add virtual room link" "select"
+    And "PoC User" "option" should not exist in the "Add virtual room link" "select"
+    And I set the field "Add virtual room link" to "None"
+    And I press "Save changes"
+    Then I should not see "Go to room"
+
+    When I press "Edit room"
+    And I set the field "Add virtual room link" to "Custom virtual room link"
+    And I press "Save changes"
+    Then I should see "You must supply a value here"
+    And I set the field "Virtual room link" to "http://example.com?id=12345"
+    And I press "Save changes"
+    Then I should see "Go to room"
+
+  Scenario: mod_facetoface_virtualmeeting_108: Virtualmeeting plugin availability
     Given I log in as "trainer1"
     And I am on "Virtual seminar" seminar homepage
     And I click on the seminar event action "Edit event" in row "Christmas"
