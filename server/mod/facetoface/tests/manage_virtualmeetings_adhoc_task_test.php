@@ -45,8 +45,6 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
     private $virtualmeeting2;
 
     public function setUp(): void {
-        $this->fail_in_totara_14(); // must be removed as soon as problems are solved in 14.
-
         $this->user1 = $this->getDataGenerator()->create_user(['username' => 'bob']);
         $this->user2 = $this->getDataGenerator()->create_user(['username' => 'ann']);
         $course = $this->getDataGenerator()->create_course();
@@ -134,10 +132,10 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
         $url2 = $this->virtualmeeting2->get_join_url();
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
-        $this->nothing_happened_in_totara_14($url1, $url2);
+        $this->nothing_happened($url1, $url2);
     }
 
-    private function nothing_happened_in_totara_14($url1, $url2) {
+    private function nothing_happened($url1, $url2) {
         global $DB;
         // There should be two each of virtualmeetings, room_virtualmeetings, and room_dates_virtualmeetings.
         $virtualmeetings = $DB->count_records('virtualmeeting');
@@ -152,28 +150,12 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
         $this->assert_url_in_totara_13($url2, $vm2->get_join_url());
     }
 
-    /**
-     * @deprecated Totara 14
-     */
     private function assert_url_in_totara_13($expected, $url) {
-        $this->fail_in_totara_14();
         // URLs don't actually match because virtual rooms are always updated in 13.
         $expected = new moodle_url($expected);
         $expected->param('age', 1 + (int)$expected->param('age'));
         $expected = $expected->out(false);
         $this->assertEquals($expected, $url);
-    }
-
-    /**
-     * @deprecated Totara 14
-     */
-    private function fail_in_totara_14() {
-        global $CFG;
-        require($CFG->dirroot.'/version.php');
-        // Make sure we fix problems before 14 hits beta.
-        if ((int)$TOTARA->version >= 14 && $maturity >= MATURITY_BETA) {
-            $this->fail();
-        }
     }
 
     /**
@@ -200,7 +182,7 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
 
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
-        $this->nothing_happened_in_totara_14($url1, $url2);
+        $this->nothing_happened($url1, $url2);
     }
 
     /**
@@ -223,7 +205,7 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
 
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
-        $this->nothing_happened_in_totara_14($url1, $url2);
+        $this->nothing_happened($url1, $url2);
     }
 
     /**
