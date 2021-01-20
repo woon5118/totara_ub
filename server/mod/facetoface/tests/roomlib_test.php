@@ -28,7 +28,6 @@
 use mod_facetoface\room;
 use mod_facetoface\room_helper;
 use mod_facetoface\room_virtualmeeting;
-use mod_facetoface\seminar_session;
 use mod_facetoface\seminar_event;
 use mod_facetoface\signup;
 use mod_facetoface\signup\state\booked;
@@ -624,6 +623,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom4->id));
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available(0, 0, $event00));
             } else {
@@ -639,6 +639,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom4->id));
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * -1), $now + (DAYSECS * 1), $event00));
             } else {
@@ -652,6 +653,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom4->id));
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 2), $event00));
             } else {
@@ -664,6 +666,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom4->id));
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 0), $now + (DAYSECS * 3), $event00));
             } else {
@@ -682,6 +685,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available(0, 0, $event10));
             } else {
@@ -697,6 +701,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         $this->assertTrue($rooms->contains($customroom3->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available(0, 0, $event20));
             } else {
@@ -714,6 +719,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * -1), $now + (DAYSECS * 1), $event10));
             } else {
@@ -730,6 +736,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 2), $event10));
             } else {
@@ -745,6 +752,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 0), $now + (DAYSECS * 3), $event10));
             } else {
@@ -758,6 +766,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 20), $event10));
             } else {
@@ -770,6 +779,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom4->id));
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 20), $event20));
             } else {
@@ -789,6 +799,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available(0, 0, $event11));
             } else {
@@ -806,6 +817,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available(0, 0, $event12));
             } else {
@@ -821,6 +833,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         $this->assertTrue($rooms->contains($customroom3->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available(0, 0, $event21));
             } else {
@@ -839,6 +852,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * -1), $now + (DAYSECS * 1), $event11));
             } else {
@@ -855,6 +869,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 2), $event13));
             } else {
@@ -872,6 +887,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * -1), $now + (DAYSECS * 1), $event12));
             } else {
@@ -890,6 +906,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 2), $event11));
             } else {
@@ -906,6 +923,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 2), $event12));
             } else {
@@ -924,6 +942,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 0), $now + (DAYSECS * 3), $event11));
             } else {
@@ -939,6 +958,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom3->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 0), $now + (DAYSECS * 3), $event12));
             } else {
@@ -956,6 +976,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom1->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 20), $event11));
             } else {
@@ -969,6 +990,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         $this->assertTrue($rooms->contains($customroom4->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 20), $event12));
             } else {
@@ -981,6 +1003,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($sitewideroom4->id));
         $this->assertTrue($rooms->contains($sitewideroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 20), $event21));
             } else {
@@ -1000,6 +1023,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom2->id));
         $this->assertTrue($rooms->contains($customroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * -1), $now + (DAYSECS * 1), $event00));
             } else {
@@ -1016,6 +1040,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom2->id));
         $this->assertTrue($rooms->contains($customroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * -1), $now + (DAYSECS * 1), $event00));
             } else {
@@ -1030,6 +1055,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom2->id));
         $this->assertTrue($rooms->contains($customroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 0), $now + (DAYSECS * 3), $event00));
             } else {
@@ -1050,6 +1076,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom4->id));
         $this->assertTrue($rooms->contains($customroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available(0, 0, $event11));
             } else {
@@ -1069,6 +1096,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom4->id));
         $this->assertTrue($rooms->contains($customroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available(0, 0, $event12));
             } else {
@@ -1088,6 +1116,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom4->id));
         $this->assertTrue($rooms->contains($customroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 20), $event11));
             } else {
@@ -1103,6 +1132,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom4->id));
         $this->assertTrue($rooms->contains($customroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 20), $event12));
             } else {
@@ -1117,6 +1147,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertTrue($rooms->contains($customroom2->id));
         $this->assertTrue($rooms->contains($customroom5->id));
         foreach ($allrooms as $room) {
+            /** @var room $room */
             if ($rooms->contains($room->get_id())) {
                 $this->assertTrue($room->is_available($now + (DAYSECS * 1), $now + (DAYSECS * 20), $event21));
             } else {
@@ -1694,10 +1725,82 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         return $virtual_meeting;
     }
 
+    public function data_save_virtual_room() {
+        return [
+            'empty' => ['', ''], // empty should acts as none
+            'none' => [room_virtualmeeting::VIRTUAL_MEETING_NONE, ''],
+            'custom' => [room_virtualmeeting::VIRTUAL_MEETING_INTERNAL, 'https://example.com'],
+        ];
+    }
+
+    /**
+     * @var string $plugin
+     * @var string $url
+     * @dataProvider data_save_virtual_room
+     * @covers mod_facetoface\room_helper::save
+     */
+    public function test_save_virtual_room(string $plugin, string $url) {
+        $user1 = $this->getDataGenerator()->create_user();
+        $this->setUser($user1);
+
+        foreach ([false, true] as $notcustom) {
+            $room = room_helper::save((object)[
+                'id' => 0,
+                'name' => sprintf('Virtual room %s #%d', $plugin, (int)$notcustom),
+                'roomcapacity' => 11,
+                'allowconflicts' => 0,
+                'plugin' => $plugin,
+                'url' => 'https://example.com',
+                'notcustom' => $notcustom,
+                'description_editor' => ['text' => '', 'itemid' => 0, 'format' => FORMAT_HTML],
+            ]);
+            $this->assertTrue($room->exists());
+            $this->assertNotEquals($notcustom, $room->get_custom());
+            $this->assertEquals($url, $room->get_url());
+        }
+    }
+
+    /**
+     * @covers mod_facetoface\room_helper::save
+     */
+    public function test_save_virtualmeeting() {
+        $user1 = $this->getDataGenerator()->create_user();
+        $this->setUser($user1);
+
+        $room1 = room_helper::save((object)[
+            'id' => 0,
+            'name' => 'Virtual meeting #0',
+            'roomcapacity' => 11,
+            'allowconflicts' => 0,
+            'plugin' => 'poc_app',
+            'url' => '',
+            'notcustom' => false,
+            'description_editor' => ['text' => '', 'itemid' => 0, 'format' => FORMAT_HTML],
+        ]);
+        $this->assertTrue($room1->exists());
+        $this->assertTrue($room1->get_custom());
+
+        try {
+            $room1 = room_helper::save((object)[
+                'id' => 0,
+                'name' => 'Virtual meeting #1',
+                'roomcapacity' => 11,
+                'allowconflicts' => 0,
+                'plugin' => 'poc_app',
+                'url' => '',
+                'notcustom' => true,
+                'description_editor' => ['text' => '', 'itemid' => 0, 'format' => FORMAT_HTML],
+            ]);
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertStringContainsString('you cannot create a site-wide virtual meeting!', $ex->getMessage());
+        }
+    }
+
     /**
      * Test to make sure user cannot update an another user's virtual meeting room
      */
-    public function test_can_update_virtualmeeting(){
+    public function test_can_update_virtualmeeting() {
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -1744,7 +1847,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         $this->assertEquals($data->url, $room->get_url());
         $this->assertNotEmpty($room->get_url());
 
-        // Les't update the room
+        // Let's update the room
         $data = new \stdClass();
         $data->id = $room->get_id();
         $data->name = 'None room';

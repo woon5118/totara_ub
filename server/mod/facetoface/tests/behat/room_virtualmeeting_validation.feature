@@ -5,7 +5,12 @@ Feature: Validation in a seminar virtual room meeting
     And the following "users" exist:
       | username     | firstname | lastname | email                | alternatename |
       | trainer1     | Trainer   | First    | trainer1@example.com |               |
+      | manager1     | Manager   | First    | manager1@example.com |               |
+      | manager2     | Manager   | First    | manager1@example.com |               |
       | creator      | Creator   | Host     | creator@example.com  | Bobby         |
+    And the following "role assigns" exist:
+      | user     | role    | contextlevel | reference |
+      | manager1 | manager | System       |           |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
@@ -21,6 +26,7 @@ Feature: Validation in a seminar virtual room meeting
     And the following "course enrolments" exist:
       | user     | course | role    |
       | trainer1 | C1     | teacher |
+      | manager2 | C1     | manager |
     And the following "seminar sessions" exist in "mod_facetoface" plugin:
       | eventdetails  | start      | finish     | rooms        | sessiontimezone  |
       | Virtual event | +3 day 6am | +3 day 9am | Virtual Room | Indian/Christmas |
@@ -32,7 +38,7 @@ Feature: Validation in a seminar virtual room meeting
     And I click on "Hide" "link" in the "Location" "table_row"
     And I log out
 
-  Scenario: mod_facetoface_virtualmeeting_002: Connect button
+  Scenario: mod_facetoface_virtualmeeting_101: Connect button of custom virtualmeeting
     Given I log in as "trainer1"
     And I am on "Virtual seminar" seminar homepage
     And I click on the seminar event action "Edit event" in row "Christmas"
@@ -40,21 +46,73 @@ Feature: Validation in a seminar virtual room meeting
     When I click on "Virtual Room" "link" in the "Christmas" "table_row"
     Then the "Connect" "button_exact" should be disabled
     And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    And I press "Save changes"
+    Then I should not see "Editing event in"
+
+    Given I click on the seminar event action "Edit event" in row "Christmas"
     When I click on "Virtual Room" "link" in the "Christmas" "table_row"
     And I set the field "Add virtual room link" to "Custom virtual room link"
     Then the "Connect" "button_exact" should be disabled
     And I set the field "Virtual room link" to "/mod/facetoface/tests/fixtures/bph4svcr.php"
     And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    And I press "Save changes"
+    Then I should not see "Editing event in"
+
+  Scenario: mod_facetoface_virtualmeeting_102: Connect button of app virtualmeeting
+    Given I log in as "trainer1"
+    And I am on "Virtual seminar" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Christmas"
 
     When I click on "Virtual Room" "link" in the "Christmas" "table_row"
     And I set the field "Add virtual room link" to "PoC App"
     Then the "Connect" "button_exact" should be disabled
     And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    And I press "Save changes"
+    Then I should not see "Editing event in"
+
+  Scenario: mod_facetoface_virtualmeeting_103: Connect button of user virtualmeeting
+    Given I log in as "trainer1"
+    And I am on "Virtual seminar" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Christmas"
 
     When I click on "Virtual Room" "link" in the "Christmas" "table_row"
-    Then the "id_plugin" "select_exact" should be disabled
+    And I set the field "Add virtual room link" to "PoC User"
+    Then the "Connect" "button_exact" should be enabled
+    When I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    Then I should see "Authorisation required"
 
-  Scenario: mod_facetoface_virtualmeeting_003: Virtual meeting link
+    And I click on "Connect" "button" in the "Edit room" "totaradialogue"
+    And I switch to "virtualmeeting_connect" window
+    And I set the following fields to these values:
+      | Username | creator |
+      | Password | creator |
+    And I click on "Log in" "button"
+    And I switch to the main window
+    And I wait for pending js
+    Then I should see "Connected as Bobby (creator@example.com)"
+    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    And I press "Save changes"
+    Then I should not see "Editing event in"
+
+  Scenario: mod_facetoface_virtualmeeting_104: Virtual room links
+    Given the following "global rooms" exist in "mod_facetoface" plugin:
+      | name           |
+      | Site-wide room |
+
+    Given I log in as "admin"
+    And I navigate to "Rooms" node in "Site administration > Seminars"
+    And I click on "Edit room" "link" in the "Site-wide room" "table_row"
+    When I set the field "Add virtual room link" to "Custom virtual room link"
+    And I press "Save changes"
+    Then I should see "You must supply a value here"
+    When I set the field "Virtual room link" to "invalid.url/format"
+    And I press "Save changes"
+    Then I should see "Invalid URL format"
+    When I set the field "Virtual room link" to "http://example.com"
+    And I press "Save changes"
+    Then I should see "Manage rooms" in the page title
+    And I log out
+
     Given I log in as "trainer1"
     And I am on "Virtual seminar" seminar homepage
     And I click on the seminar event action "Edit event" in row "Christmas"
@@ -68,30 +126,120 @@ Feature: Validation in a seminar virtual room meeting
     When I set the field "Virtual room link" to "http://example.com"
     And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Virtual seminar" in the page title
+    Then I should not see "Editing event in"
 
-  Scenario: mod_facetoface_virtualmeeting_004: Connect button
+  Scenario: mod_facetoface_virtualmeeting_105: Ad-hoc virtual room changeability
+    Given the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro | course |
+      | Virtual seminar 2 |       | C1     |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details         |
+      | Virtual seminar 2 | Virtual event 2 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails    | start      | finish     | sessiontimezone  |
+      | Virtual event 2 | +3 day 6am | +3 day 9am | Indian/Christmas |
+
+    And I log in as "manager1"
+    And I am on "Virtual seminar 2" seminar homepage
+    And I click on the seminar event action "Edit event" in row "Christmas"
+
+    Given I click on "Select rooms" "link" in the "Christmas" "table_row"
+    And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
+    Then the "Add to sitewide list" "checkbox" should be enabled
+    And I set the following fields to these values:
+      | Name     | Virtual Meeting |
+      | Capacity | 11              |
+    And I click on "OK" "button_exact" in the "Create new room" "totaradialogue"
+
+    When I click on "Virtual Meeting" "link" in the "Christmas" "table_row"
+    Then the "Add virtual room link" "select" should be enabled
+
+    Given I set the field "Add virtual room link" to "Custom virtual room link"
+    Then the "Add to sitewide list" "checkbox" should be enabled
+    And I set the field "Virtual room link" to "http://example.com"
+    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+
+    When I click on "Virtual Meeting" "link" in the "Christmas" "table_row"
+    Then the "Add virtual room link" "select" should be enabled
+
+    Given I set the field "Add virtual room link" to "PoC App"
+    Then the "Add to sitewide list" "checkbox" should be disabled
+    And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+
+    When I click on "Virtual Meeting" "link" in the "Christmas" "table_row"
+    Then the "Add virtual room link" "select" should be disabled
+
+  Scenario: mod_facetoface_virtualmeeting_106: Site-wide virtual room changeability
+    Given the following "global rooms" exist in "mod_facetoface" plugin:
+      | name                    | url                |
+      | Physical site-wide room |                    |
+      | Virtual site-wide room  | http://example.com |
+
+    And I log in as "admin"
+    And I navigate to "Rooms" node in "Site administration > Seminars"
+
+    Given I click on "Edit room" "link" in the "Physical site-wide room" "table_row"
+    And I set the following fields to these values:
+      | Name                  | Another virtual site-wide room              |
+      | Add virtual room link | Custom virtual room link                    |
+      | Virtual room link     | /mod/facetoface/tests/fixtures/bph4svcr.php |
+    And I press "Save changes"
+
+    Given I click on "Edit room" "link" in the "Virtual site-wide room" "table_row"
+    And I set the following fields to these values:
+      | Name                  | Another physical site-wide room |
+      | Add virtual room link | None                            |
+    And I press "Save changes"
+
+    When I click on "Another virtual site-wide room" "link"
+    Then I should see "Virtual room"
+    And I follow "Go to room"
+    And I switch to "totara_bph4svcr" window
+    Then I should see "Behat: Virtual Room Placeholder Page" in the page title
+    And I click on "Window close" "button_exact"
+    And I switch to the main window
+    And I click on "Back to rooms" "link"
+
+    When I click on "Another physical site-wide room" "link"
+    Then I should not see "Virtual room"
+    And "Go to room" "link" should not exist
+
+  Scenario: mod_facetoface_virtualmeeting_107: Virtualmeeting plugin availability
     Given I log in as "trainer1"
     And I am on "Virtual seminar" seminar homepage
     And I click on the seminar event action "Edit event" in row "Christmas"
 
     When I click on "Virtual Room" "link" in the "Christmas" "table_row"
-    And I set the field "Add virtual room link" to "PoC User"
-    Then the "Connect" "button_exact" should be enabled
-    When I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
-    Then I should see "Authorisation required"
-
-    And I click on "Connect" "button" in the "Edit room" "totaradialogue"
-    And I wait "1" seconds
-    And I switch to "virtualmeeting_connect" window
-    And I set the following fields to these values:
-      | Username | creator |
-      | Password | creator |
-    And I click on "Log in" "button"
-    And I switch to the main window
-    And I wait "1" seconds
-    Then I should see "Connected as Bobby (creator@example.com)"
+    And I set the field "Add virtual room link" to "PoC App"
     And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Virtual seminar" in the page title
 
+    Given I run all adhoc tasks
+    When I click on "Virtual Room" "link" in the "Christmas" "table_row"
+    Then "Host meeting" "link_exact" should exist
+    And "Join as attendee" "link_exact" should exist
+    And I log out
+
+    Given I log in as "admin"
+    And I navigate to "PoC App" node in "Site administration > Plugins > Virtual meetings"
+    And I set the following fields to these values:
+      | Enabled | 0 |
+    And I press "Save changes"
+    And I log out
+
+    Given I log in as "trainer1"
+    And I am on "Virtual seminar" seminar homepage
+
+    When I click on "Virtual Room" "link" in the "Christmas" "table_row"
+    Then I should see "Virtual room is unavailable"
+    And I press the "back" button in the browser
+    And I click on the seminar event action "Edit event" in row "Christmas"
+
+    When I click on "Virtual Room" "link" in the "Christmas" "table_row"
+    Then the field "Add virtual room link" matches value "(Unavailable)"
+    And the "Add virtual room link" "select" should be disabled
+    And "Add to sitewide list" "checkbox" should not exist
+
+    When I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
+    And I press "Save changes"
+    Then I should not see "Editing event in"

@@ -170,6 +170,7 @@ class mod_facetoface_virtualmeeting_room_testcase extends advanced_testcase {
         $virtualmeeting_list = room_virtualmeeting_list::from_roomids([$sitewide_room->id, $virtual_room1->id, $virtual_room2->id, $custom_room->id]);
         $this->assertCount(2, $virtualmeeting_list);
         foreach($virtualmeeting_list as $virtualmeeting_room) {
+            /** @var room_virtualmeeting $virtualmeeting_room */
             if ($virtual_room1->id == $virtualmeeting_room->get_roomid()) {
                 $this->assertEquals($virtual_room1->id, $virtualmeeting_room->get_roomid());
                 $this->assertEquals('poc_app', $virtualmeeting_room->get_plugin());
@@ -181,5 +182,13 @@ class mod_facetoface_virtualmeeting_room_testcase extends advanced_testcase {
                 $this->assertEquals($user1->id, $virtualmeeting_room->get_userid());
             }
         }
+    }
+
+    public function test_is_virtual_meeting() {
+        $this->assertFalse(room_virtualmeeting::is_virtual_meeting('@none'), '@none');
+        $this->assertFalse(room_virtualmeeting::is_virtual_meeting('@internal'), '@internal');
+        $this->assertTrue(room_virtualmeeting::is_virtual_meeting(''), '(empty)');
+        $this->assertTrue(room_virtualmeeting::is_virtual_meeting('poc_app'), 'poc_app');
+        $this->assertTrue(room_virtualmeeting::is_virtual_meeting('he_who_must_not_be_named'), 'he_who_must_not_be_named');
     }
 }

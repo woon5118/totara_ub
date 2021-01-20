@@ -275,6 +275,9 @@ final class virtual_meeting extends model {
             }
         }
         try {
+            if (!$this->is_plugin_available()) {
+                throw new meeting_exception($this->entity->plugin.' plugin not available');
+            }
             $provider = $this->create_service_provider();
             $meeting = new meeting_dto($this->entity);
             if ($what === 'url') {
@@ -314,6 +317,21 @@ final class virtual_meeting extends model {
     }
 
     /**
+     * @return boolean
+     * @internal
+     */
+    private function is_plugin_available(): bool {
+        if ($this->plugininfo) {
+            return $this->plugininfo->is_available();
+        }
+        $plugins = virtualmeeting_plugininfo::get_all_plugins();
+        if (!isset($plugins[$this->entity->plugin])) {
+            return false;
+        }
+        return $plugins[$this->entity->plugin]->is_available();
+    }
+
+    /**
      * Determines whether the current user can manage the meeting instance.
      *
      * @param integer $userid
@@ -325,11 +343,7 @@ final class virtual_meeting extends model {
             return false;
         }
         // Check plugin availability.
-        try {
-            if (!$this->get_plugininfo()->is_available()) {
-                return false;
-            }
-        } catch (coding_exception $ex) {
+        if (!$this->is_plugin_available()) {
             return false;
         }
         // If user ids are identical, the instance is manageable.

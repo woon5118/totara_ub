@@ -104,6 +104,10 @@ final class room_helper {
 
         // Set room virtual meeting record.
         if (!empty($data->plugin)) {
+            if (empty($data->custom) && room_virtualmeeting::is_virtual_meeting($data->plugin)) {
+                throw new coding_exception("you cannot create a site-wide virtual meeting!");
+            }
+
             /** @var room_virtualmeeting $virtual_meeting */
             $virtual_meeting = room_virtualmeeting::get_virtual_meeting($room);
             // Lets check if this room a new or an update.
@@ -115,16 +119,12 @@ final class room_helper {
                 // This is the update.
                 // Once a virtualmeeting provider is created and saved, an indeterminate state is created which is difficult
                 // to resolve in real time if a manager changed a mind, so we disable it in meantime
-                if ($virtual_meeting->exists() &&
-                    (room_virtualmeeting::VIRTUAL_MEETING_NONE == $data->plugin ||
-                        room_virtualmeeting::VIRTUAL_MEETING_INTERNAL == $data->plugin)
-                ) {
+                if ($virtual_meeting->exists() && !room_virtualmeeting::is_virtual_meeting($data->plugin)) {
                     $data->plugin = $virtual_meeting->get_plugin();
                 }
             }
 
-            if (room_virtualmeeting::VIRTUAL_MEETING_NONE != $data->plugin &&
-                room_virtualmeeting::VIRTUAL_MEETING_INTERNAL != $data->plugin) {
+            if (room_virtualmeeting::is_virtual_meeting($data->plugin)) {
                 $virtual_meeting->set_plugin($data->plugin)
                     ->set_roomid($room->get_id())
                     ->set_userid($USER->id)

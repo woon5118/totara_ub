@@ -204,6 +204,17 @@ class room_virtualmeeting implements seminar_iterator_item {
     }
 
     /**
+     * Is the plugin name field is a virtualmeeting plugin?
+     * NOTE: the function doesn't check the availability of a plugin
+     *
+     * @param string $pluginfield
+     * @return boolean
+     */
+    public static function is_virtual_meeting(string $pluginfield): bool {
+        return $pluginfield != self::VIRTUAL_MEETING_NONE && $pluginfield != self::VIRTUAL_MEETING_INTERNAL;
+    }
+
+    /**
      * Get room_virtualmeeting instance by room id
      * @param room $room
      * @return room_virtualmeeting

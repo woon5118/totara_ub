@@ -96,14 +96,16 @@ class editroom extends \moodleform {
         // Room Description.
         $mform->addElement('editor', 'description_editor', get_string('roomdescriptionedit', 'mod_facetoface'), ['rows' => 7], $editoropts);
 
+        $mform->addElement('header', 'virtualroom', get_string('virtualroom_heading', 'mod_facetoface'));
         // Virtual meeting room.
         $adhoc = $this->_customdata['adhoc'];
-        if ($adhoc && defined('AJAX_SCRIPT') || AJAX_SCRIPT) {
-            $mform->addElement('header', 'virtualroom', get_string('virtualroom_heading', 'mod_facetoface'));
-            $meeting_options = [
-                room_virtualmeeting::VIRTUAL_MEETING_NONE => get_string('none', 'mod_facetoface'),
-                room_virtualmeeting::VIRTUAL_MEETING_INTERNAL => get_string('internal', 'mod_facetoface')
-            ];
+        $meeting_options = [
+            room_virtualmeeting::VIRTUAL_MEETING_NONE => get_string('none', 'mod_facetoface'),
+            room_virtualmeeting::VIRTUAL_MEETING_INTERNAL => get_string('internal', 'mod_facetoface')
+        ];
+        $pluginsadded = [];
+
+        if ($adhoc) {
             $plugindata = virtual_meeting::get_availale_plugins_info();
             $conditions_no_auth = array_keys($meeting_options);
             foreach ($plugindata as $pluginname => $info) {
@@ -119,17 +121,20 @@ class editroom extends \moodleform {
                     $conditions_no_auth[] = $pluginname;
                 }
             }
+
+            $pluginsadded = array_keys($plugindata);
+            $pluginname = $virtual_meeting->get_plugin();
+            if ($virtual_meeting->exists() && room_virtualmeeting::is_virtual_meeting($pluginname) && !isset($plugindata[$pluginname])) {
+                $pluginsadded[] = $pluginname;
+                $meeting_options[$pluginname] = get_string('unavailableplugin', 'mod_facetoface');
+                $mform->hideIf('connections', 'plugin', 'eq', $pluginname);
+            }
+
             // Once a virtualmeeting provider is created and saved, an indeterminate state is created which is difficult
             // to resolve in real time if a manager changed a mind, so we disable it in meantime
             $attrs = $virtual_meeting->exists() ? ['disabled' => 'disabled'] : [];
             $mform->addElement('select', 'plugin', get_string('virtual_meeting_add', 'mod_facetoface'), $meeting_options, $attrs);
             $mform->setType('plugin', PARAM_TEXT);
-
-            // Virtual room link.
-            $mform->addElement('text', 'url', get_string('roomurl', 'mod_facetoface'), ['maxlength' => '1024', 'size' => '45']);
-            $mform->addHelpButton('url', 'roomurl', 'mod_facetoface');
-            $mform->setType('url', PARAM_URL);
-            $mform->hideIf('url', 'plugin', 'noteq', room_virtualmeeting::VIRTUAL_MEETING_INTERNAL);
 
             $mform->addElement('hidden', 'connected', '', ['id' => 'plugin-connection-state']);
             $mform->setType('connected', PARAM_INT);
@@ -146,21 +151,26 @@ class editroom extends \moodleform {
             $PAGE->requires->js_call_amd('mod_facetoface/room_integration', 'init');
             $PAGE->requires->strings_for_js(['connectedas', 'connectedasx', 'editroom'], 'mod_facetoface');
         } else {
-            $mform->addElement('hidden', 'plugin', room_virtualmeeting::VIRTUAL_MEETING_NONE);
+            $mform->addElement('select', 'plugin', get_string('virtual_meeting_add', 'mod_facetoface'), $meeting_options);
             $mform->setType('plugin', PARAM_TEXT);
-            $mform->addElement('hidden', 'url');
-            $mform->setType('url', PARAM_URL);
         }
+
+        // Virtual room link.
+        $mform->addElement('text', 'url', get_string('roomurl', 'mod_facetoface'), ['maxlength' => '1024', 'size' => '45']);
+        $mform->addHelpButton('url', 'roomurl', 'mod_facetoface');
+        $mform->setType('url', PARAM_URL);
+        $mform->hideIf('url', 'plugin', 'noteq', room_virtualmeeting::VIRTUAL_MEETING_INTERNAL);
 
         // Custom fields: Building and Location.
         customfield_definition($mform, (object)['id' => $room->get_id()], 'facetofaceroom', 0, 'facetoface_room');
 
         // Add to sitewide list.
         $capability = has_capability('mod/facetoface:managesitewiderooms', \context_system::instance());
-        if ($capability and !empty($seminar) and $room->get_custom()) {
-            $sitewide = [];
-            $sitewide[] =& $mform->createElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
-            $mform->addGroup($sitewide, 'sitewide', get_string('addtositewidelist', 'mod_facetoface'), null, false);
+        if ($capability && !empty($seminar) && (!$room->exists() || $room->get_custom())) {
+            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
+            foreach ($pluginsadded as $pluginname) {
+                $mform->hideIf('notcustom', 'plugin', 'eq', $pluginname);
+            }
         } else {
             $mform->addElement('hidden', 'notcustom');
         }
@@ -251,7 +261,7 @@ class editroom extends \moodleform {
             }
         }
 
-        if ($data['plugin'] != room_virtualmeeting::VIRTUAL_MEETING_NONE && $data['plugin'] != room_virtualmeeting::VIRTUAL_MEETING_INTERNAL && empty($data['connected'])) {
+        if (room_virtualmeeting::is_virtual_meeting($data['plugin']) && empty($data['connected'])) {
             $errors['connections'] = get_string('error:disconnected', 'mod_facetoface');
         }
 
@@ -266,10 +276,7 @@ class editroom extends \moodleform {
             }
         }
 
-        if ($virtual_meeting->exists() &&
-            (room_virtualmeeting::VIRTUAL_MEETING_NONE == $data['plugin'] ||
-             room_virtualmeeting::VIRTUAL_MEETING_INTERNAL == $data['plugin'])
-        ) {
+        if ($virtual_meeting->exists() && !room_virtualmeeting::is_virtual_meeting($data['plugin'])) {
             $errors['plugin'] = get_string('error:plugin_is_disabled', 'mod_facetoface');
         }
         return $errors;

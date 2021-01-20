@@ -2597,6 +2597,7 @@ $string['type'] = 'Type';
 $string['unapprovedrequests'] = 'Unapproved Requests';
 $string['unavailable'] = 'Unavailable';
 $string['unavailablenotifications'] = 'This seminar has unavailable notifications.<br/><a href=\'{$a->url1}\'>Restore them for this seminar only</a> or go to <a href=\'{$a->url2}\'>Manage notification templates</a> to restore them for all seminars.';
+$string['unavailableplugin'] = '(Unavailable)';
 $string['unavailabletemplates'] = '{$a} notification templates below are <strong>unavailable</strong> to any seminars created in an older version of this product. Please review and restore where necessary.';
 $string['undo'] = 'Undo';
 $string['unknowndate'] = '(unknown date)';
