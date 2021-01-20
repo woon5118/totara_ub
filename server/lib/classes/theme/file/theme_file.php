@@ -66,9 +66,9 @@ abstract class theme_file {
      * @param string|null $theme
      */
     public function __construct(?theme_config $theme_config = null, ?string $theme = null) {
-        global $CFG;
+        global $PAGE;
         $this->theme_config = $theme_config
-            ?? theme_config::load($theme ?? $CFG->theme);
+            ?? theme_config::load($theme ?? $PAGE->theme->name);
     }
 
     /**
