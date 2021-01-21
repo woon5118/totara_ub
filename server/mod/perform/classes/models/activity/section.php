@@ -68,7 +68,6 @@ class section extends model {
         'section_relationships',
         'participant_sections',
         'section_elements_summary',
-        'respondable_element_count'
     ];
 
     /**
@@ -572,19 +571,5 @@ class section extends model {
      */
     private function is_section_deleted(): bool {
         return $this->entity->deleted();
-    }
-
-    /**
-     * Get respondable element count of each section.
-     *
-     * @return int
-     */
-    public function get_respondable_element_count(): int {
-        if (!$this->entity->has_attribute('respondable_element_count')) {
-            // Load the count for element entity.
-            return $this->get_respondable_section_elements()->count();
-        }
-
-        return $this->entity->respondable_element_count;
     }
 }

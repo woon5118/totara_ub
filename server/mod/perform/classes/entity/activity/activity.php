@@ -30,7 +30,6 @@ use core\orm\entity\relations\has_one;
 use core\orm\query\builder;
 use mod_perform\notification\factory;
 use mod_perform\notification\loader;
-use mod_perform\models\activity\element_plugin;
 
 /**
  * Activity entity
@@ -55,7 +54,6 @@ use mod_perform\models\activity\element_plugin;
  * @property-read collection|activity_setting[] $settings
  * @property-read collection|manual_relationship_selection[] $manual_relation_selection
  * @property-read activity_type $type
- * @property-read collection|section[] sections_ordered_with_respondable_element_count
  *
  * @method static activity_repository repository()
  *
@@ -85,25 +83,6 @@ class activity extends entity {
     public function sections_ordered(): has_many {
         return $this->has_many(section::class, 'activity_id')
             ->order_by('sort_order');
-    }
-
-    /**
-     * Relationship with section and count element for each section
-     *
-     * @return has_many
-     */
-    public function sections_ordered_with_respondable_element_count(): has_many {
-        $elements = element_plugin::get_element_plugins(false, true);
-        $non_respondable_plugins = array_keys($elements);
-
-        return $this->has_many(section::class, 'activity_id')
-            ->as('s')
-            ->left_join([section_element::TABLE, 'se'], 's.id', 'se.section_id')
-            ->left_join([element::TABLE, 'e'], 'se.element_id', 'e.id')
-            ->select_raw('s.*, COUNT(se.id) AS respondable_element_count')
-            ->where_not_in('e.plugin_name', $non_respondable_plugins)
-            ->group_by_raw('s.id, s.sort_order')
-            ->order_by_raw('s.id, s.sort_order');
     }
 
     /**
