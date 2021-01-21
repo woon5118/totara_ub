@@ -37,7 +37,7 @@ class at_least_one_section_with_question_and_answering_relationship extends cond
         /** @var activity $activity */
         $activity = $this->object;
 
-        $sections = $activity->get_sections();
+        $sections = $activity->get_sections_ordered_with_respondable_element_count();
         if ($sections->count() == 0) {
             return false;
         }
@@ -46,8 +46,7 @@ class at_least_one_section_with_question_and_answering_relationship extends cond
         // and one answering relationship for a section
         foreach ($sections as $section) {
             $relationships = $section->get_answering_section_relationships();
-            $respondable_section_elements = $section->get_respondable_section_elements();
-            if ($relationships->count() < 1 || $respondable_section_elements->count() < 1) {
+            if ($relationships->count() < 1 || $section->get_respondable_element_count() < 1) {
                 // One of the section does not meet criteria.
                 return false;
             }

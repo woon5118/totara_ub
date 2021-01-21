@@ -48,6 +48,7 @@ use totara_core\entity\relationship;
  * @property-read collection|section_element[] $section_elements
  * @property-read collection|section_relationship[] $section_relationships
  * @property-read collection|participant_section[] $participant_sections
+ * @property-read collection|section_element[] $respondable_section_elements
  *
  * @method static section_repository repository()
  */

@@ -98,6 +98,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
     public function test_can_activate(): void {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
@@ -120,6 +121,13 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
 
         $this->assertFalse($active_activity->can_potentially_activate());
         $this->assertFalse($active_activity->can_activate());
+
+        $this->setUser($user3);
+
+        // An activity with section only including static element, it can not be activated.
+        $draft_activity = $this->create_valid_activity(0, 'static_content');
+        $this->assertTrue($draft_activity->can_potentially_activate());
+        $this->assertFalse($draft_activity->can_activate());
     }
 
     public function test_get_all_translated(): void {

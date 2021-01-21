@@ -423,4 +423,35 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectExceptionMessage("Cannot change type of activity {$activity->id} since it is no longer a draft");
         $activity->set_general_info($activity->name, null, $original_type->id)->update();
     }
+
+    public function test_get_sections_with_respondable_element_count(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $activity = $this->perform_generator->create_activity_in_container();
+
+        // No element in the section will not be returned.
+        $sections = $activity->get_sections_ordered_with_respondable_element_count();
+        // one default section is for activity.
+        self::assertCount(1, $activity->sections);
+        
+        $section = $this->perform_generator->create_section($activity);
+        $element_one = $this->perform_generator->create_element();
+        $element_two = $this->perform_generator->create_element();
+
+        // Create two elements.
+        $this->perform_generator->create_section_element($section, $element_one);
+        $this->perform_generator->create_section_element($section, $element_two);
+
+        $activity->refresh(true);
+
+        $sections = $activity->get_sections_ordered_with_respondable_element_count();
+
+        // One default section and one is the customized section.
+        self::assertEquals(2, count($sections));
+
+        foreach ($sections as $section) {
+            self::assertGreaterThanOrEqual(0, $section->get_respondable_element_count());
+        }
+
+    }
 }
