@@ -106,6 +106,7 @@ Feature: Contribute new resource and share with workspace
 
     # Remove the workspace from the share dialog
     When I click on "Remove Test Workspace 1" "button" in the ".tui-engageSharedRecipientsSelector" "css_element"
+    And I click on "Less than 5 mins" "text"
     Then I should not see "Test Workspace 1" in the ".tui-engageSharedRecipientsSelector" "css_element"
 
     # Try adding the workspace back in again
