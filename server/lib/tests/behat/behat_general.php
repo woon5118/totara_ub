@@ -217,9 +217,20 @@ class behat_general extends behat_base {
         $this->wait_for_pending_js();
 
         // Totara: this sleep is mega super important, if we do not do it Chrome may get stuck randomly!
-        sleep(1);
+        sleep(self::get_real_timeout(1));
 
-        $this->getSession()->switchToWindow($windowname);
+        try {
+            $this->getSession()->switchToWindow($windowname);
+        } catch (\WebDriver\Exception\NoSuchWindow $ex) {
+            // Totara: wait for a mega super few seconds and retry.
+            $seconds = self::get_reduced_timeout();
+            if ($this->running_javascript()) {
+                $this->getSession()->wait($seconds * 1000);
+            } else {
+                sleep($seconds);
+            }
+            $this->getSession()->switchToWindow($windowname);
+        }
     }
 
     /**
