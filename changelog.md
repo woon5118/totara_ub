@@ -1,3 +1,171 @@
+Release 13.4 (26th January 2021):
+=================================
+
+
+Important:
+
+    TL-29285       Fixed incorrect seminar notification for users with event role in other courses when event is cancelled
+
+                   In Totara 13 prior to this patch, when a seminar event was cancelled or
+                   deleted, the code that generated the cancellation notification mistakenly
+                   loaded a list of users who held an event role on any seminar event, rather
+                   than the current event.
+
+                   This caused an event cancellation notification to be sent to users (and
+                   their managers) who had nothing to do with the affected seminar. This has
+                   now been fixed.
+
+                   Sites that use seminar event roles are strongly encouraged to upgrade.
+
+Security issues:
+
+    TL-21540       Fixed potential XSS bug in developer debugging messages
+
+                   Prior to this patch, the debuginfo part of developer debugging messages was
+                   not properly escaped, which could lead to a situation where a cross-site
+                   scripting attack was possible. The debuginfo message is only ever sent to
+                   output when 'Debug messages' is set to developer, and
+                   'Display debug messages' is on. This should never be the case on a
+                   production site. Nevertheless, it is a potential attack vector on staging
+                   or development sites and has been fixed.
+
+New features:
+
+    TL-28886       Created Zoom Meeting virtualmeeting plugin for use with seminar sessions
+
+                   See
+                   https://help.totaralearning.com/display/TH13/Working+with+virtual+rooms for
+                   more information on using the new virtualmeeting plugins with seminars.
+
+Improvements:
+
+    TL-17516       Added a 'course end date' column and filter to course report sources
+    TL-24483       Improved accessibility of selected items area in the competency assignments list
+    TL-28474       Added a placeholder text and changed icon colour in taglist component for consistency
+    TL-28523       Added 'Activity viewed' GraphQL mutation for Totara mobile app
+    TL-28606       Added aria attributes for Totara form elements when there is a validation error
+    TL-28658       Added GraphQL/DB performance metrics in the footer 
+    TL-28738       Added a warning on competency profile and detail pages when a relevant competency aggregation task is pending
+    TL-28806       Added a 'Tenant login link' column to the manage tenants report source
+    TL-28822       Added support for migration from Moodle 3.5.15, 3.7.9, 3.8.6 and 3.9.3
+    TL-28914       Added support for PUT and PATCH requests to Totara cURL client
+    TL-29011       Updated tag form fields to use background and accent colours from the theme
+    TL-29020       Added GDPR support for virtualmeeting plugins and seminar virtual meeting rooms
+    TL-29035       Improved Engage 'Your resources' page performance by loading filters via page loads 
+    TL-29102       Added an error message to be displayed when single sign-on is not working on MS Teams
+    TL-29109       Added visual indicators for seminar virtual meeting rooms that are not editable by the current user, because they were created by someone else
+    TL-29228       Added Byte-Order-Mark to CSV optimised for Excel to improve Unicode detection in MS Excel
+    TL-29256       Improved performance of the badge award cron job when using audience criteria when just one of multiple audiences is needed to be completed
+    TL-29270       Improved reliability of Behat test step "I run all adhoc tasks"
+
+Bug fixes:
+
+    TL-25650       Updated width rules on "Recently viewed" dashboard block to not be affected by title length
+    TL-26557       Fixed random PHPUnit failures caused by missing content file
+    TL-27368       Fixed highlighting of the toggle switch to indicate when it has focus
+    TL-28007       Fixed race condition when creating universal cache file
+
+                   This patch fixes an issue where parallel requests try to write to the same
+                   universal cache file. Previously, during installation of a fresh instance
+                   all the CSS files were requested which caused the system to write to cache.
+                   During cache creation the system will try to create a universal cache file
+                   which stores all the cache's metadata. Due to the CSS file being requested
+                   this process was triggered in parallel. This caused debugging messages
+                   being triggered as the locks could not be acquired for the universal cache
+                   file could to be written.
+
+    TL-28025       Updated mobile current learning GraphQL query to use theme default images for courses, programs and certifications
+    TL-28070       Fixed cache not being updated after using the course completion editor
+    TL-28508       Ensured keyboard controls are trapped in Totara dialogues when opened
+    TL-28510       Added correct aria attributes when viewing report builder tables to improve accessibility
+    TL-28555       Increased margin between radio button and date selector form input
+    TL-28657       Modified the size of the close 'x' button to 300 on the notification banner
+    TL-28659       Fixed wrong size and colour for close 'x' button on toast 
+    TL-28687       Fixed invalid page URL in LTI enrolment proxy page
+    TL-28703       Updated form autocomplete hover background to use a standard colour
+    TL-28718       Increased the width of the decorator separator line in posting new discussion form by involving the new normal prop
+    TL-28769       Replaced label and form tag with div for performance activity print page and fixed style
+    TL-28849       Added aria-disabled on side panel toggle button for better accessibility support 
+    TL-28900       Ensured the PDF annotation review panel is hidden for 'Online text' only assignment submissions
+    TL-28954       Fixed misalignment of labels when creating seminar rooms, assets, and facilitators
+    TL-28989       Fixed Weka editor error on course edit page in IE11
+    TL-29000       Fixed a JavaScript error when rearranging a playlist by dragging the resource image
+    TL-29004       Added user-friendly error when attempting to view a hidden category in the grid catalogue
+    TL-29007       Fixed conditions for displaying a warning about pending updates for appraisal assignments
+
+                   Previously, a warning about pending updates was wrongly displayed in the
+                   assignments tab of the appraisal administration when there were users that
+                   had completed that appraisal, even when no updates were pending. This has
+                   been fixed with this patch.
+
+    TL-29016       Fixed formatting of multi-lang names used in competency types, scales and frameworks
+    TL-29027       Fixed error creating Engage reports when Engage feature is disabled
+    TL-29028       Updated workspace delete endpoint to not queue duplicate delete tasks
+    TL-29032       Fixed Engage notifications to observe the recipient's language preference
+    TL-29042       Fixed Vimeo video not being responsive when placed in dashboard block
+    TL-29072       Fixed PHPUnit failures caused by incorrect PostgreSQL database snapshot reset
+    TL-29086       Added a pending js to the Weka editor initialisation code and made the long text question response saving more robust
+    TL-29095       Fixed theme settings validation for tenants
+    TL-29098       Fixed popover content not being clickable
+    TL-29112       Added missing 'Join now' buttons to seminar events dashboard for seminar virtual meeting rooms
+    TL-29114       Prevented Totara sending any notifications to a bot when bot feature is disabled
+
+                   Previously, when a bot was disabled, it still received a message about
+                   sign-in into the system. Now to send notifications, you need to enable the
+                   bot feature first.
+
+    TL-29122       Fixed an issue that caused out-of-date course images to appear in the catalogue
+    TL-29150       Fixed an error message which displayed above seminar events when event roles were enabled, but no users were enrolled with those roles
+    TL-29159       Ensured notifications count is not displayed if notifications are disabled for the user
+    TL-29160       Fixed the ordering of Engage content on the grid catalogue
+
+                   When a site has multiple languages installed and potentially uses the
+                   multi-lang filter, we can not alphabetically sort catalogue items by their
+                   name and default to sorting by the timecreated field instead. Previously
+                   the Engage resource and playlist items were not getting this value set in
+                   the catalogue data, this has been rectified.
+
+                   Note: The catalogue data will not be updated until the next time the
+                   "refresh_catalog_data" scheduled task runs.
+
+    TL-29161       Fixed an exception when attempting to edit a seminar facilitator without permission
+    TL-29187       Added presentation role to tables when approving changes to a learning plan
+    TL-29212       Fixed bug causing the recommendation engine to skip non-tenants when multitenancy is enabled
+    TL-29217       Fixed updating of usernames when using user upload functionality
+
+                   When updating usernames using 'oldusername' and the idnumber was present
+                   the duplicate idnumber validation check would incorrectly report that the
+                   username was a duplicate for users who were having their username changed.
+                   The idnumber validation now works correctly with updating usernames.
+
+    TL-29218       Fixed incorrect string component for 'noposition' and 'noorganisation' in the signup form
+
+                   When using email based self registration and there are no positions set up
+                   on the site, the signup form no longer uses an invalid string when users
+                   try to sign up.
+
+    TL-29219       Fixed keyboard accessibility of grid catalogue category drop down
+
+                   Shift-tabbing in the category selector now moves to the previous option as
+                   expected.
+
+    TL-29244       Fixed PHPUnit failures occurring when zlib compression is not enabled
+
+                   When zlib compression is not enabled on a test site tests will no longer
+                   expect Content-Length headers.
+
+    TL-29255       Removed aggressive user session cleanup code to eliminate some session timeouts on login page
+    TL-29261       Fixed inability to remove custom room link from a seminar room
+    TL-29264       Prevented changing the virtualmeeting provider for a seminar room
+    TL-29269       Fixed TUI CSS being cached when caching was disabled in development mode
+    TL-29342       Fixed "expand/collapse all" link showing when Collapsible topics is not enabled
+    TL-29357       Restored the ability to create and edit site-wide seminar rooms with custom virtual room links
+
+Contributions:
+
+    * Russell England, Kineo USA - TL-29159
+
+
 Release 13.3 (24th December 2020):
 ==================================
 
