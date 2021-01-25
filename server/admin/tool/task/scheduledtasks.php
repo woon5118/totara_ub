@@ -26,16 +26,7 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/tablelib.php');
 
-$PAGE->set_url('/admin/tool/task/scheduledtasks.php');
-$PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('admin');
-$strheading = get_string('scheduledtasks', 'tool_task');
-$PAGE->set_title($strheading);
-$PAGE->set_heading($strheading);
-
-require_login();
-
-require_capability('moodle/site:config', context_system::instance());
+admin_externalpage_setup('scheduledtasks');
 
 $renderer = $PAGE->get_renderer('tool_task');
 
@@ -126,9 +117,6 @@ if ($mform && ($mform->is_cancelled() || !empty($CFG->preventscheduledtaskchange
     }
 
 } else {
-    // TOTARA: add a button to add/remove the scheduledtasks externalpage to the users quick access menu.
-    \totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, 'scheduledtasks');
-
     echo $OUTPUT->header();
 
     // Check if the cron has run recently, if not notify the admin about configuration recommendations.
