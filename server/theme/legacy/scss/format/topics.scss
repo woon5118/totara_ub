@@ -43,6 +43,10 @@
 
   &__collapse_link {
     padding: 0 var(--gap-2);
+    // 1.3em is the width of the font icon
+    margin-left: calc(-1.3em - var(--gap-2));
+    display: block;
+    float: left;
   }
 
   &__collapse_link_icon {
@@ -51,6 +55,12 @@
 
   &__topic--collapsible &__collapse_handle {
     cursor: pointer;
+  }
+
+  &__topic--collapsible &__topic_header > span {
+    // 1.3em is the width of the font icon
+    margin-left: calc(1.3em + var(--gap-2));
+    display: block;
   }
 
   &__topic--collapsible:not([data-open]) &__topic_content {

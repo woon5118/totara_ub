@@ -43,6 +43,10 @@
 
     &__collapse_link {
         padding: 0 @totara_style-spacing_small;
+        // roughly width of the flex icon + 2 lots of padding
+        margin-left: -1.6em;
+        float: left;
+        display: block;
     }
 
     &__collapse_link_icon {
@@ -51,6 +55,12 @@
 
     &__topic--collapsible &__collapse_handle {
         cursor: pointer;
+    }
+
+    &__topic--collapsible &__topic_header > span {
+        // roughly width of the flex icon + 2 lots of padding
+        margin-left: 1.6em;
+        display: block;
     }
 
     &__topic--collapsible:not([data-open]) &__topic_content {
