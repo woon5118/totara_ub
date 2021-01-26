@@ -1,6 +1,10 @@
 This files describes API changes for code that uses the question API,
 information provided here is intended especially for developers.
 
+=== 13.5 ===
+
+* customfield_textarea::display_item_data() is now required to use format_text() for display value
+
 === 13.0 ===
 
 * Removed deprecated function customfield_get_fields()

@@ -175,6 +175,9 @@ class customfield_textarea extends customfield_base {
             return $data;
         }
 
+        $options = new stdClass();
+        $options->para = false;
+
         if (!empty($extradata['altprefix'])) {
             $extradata['prefix'] = $extradata['altprefix'];
         }
@@ -182,7 +185,7 @@ class customfield_textarea extends customfield_base {
             if (empty($data)) {
                 return get_string('readonlyemptyfield', 'totara_customfield');
             } else {
-                return $data;
+                return format_text($data, FORMAT_MOODLE, $options);
             }
         }
 
@@ -195,7 +198,7 @@ class customfield_textarea extends customfield_base {
             if (empty($data)) {
                 return get_string('readonlyemptyfield', 'totara_customfield');
             } else {
-                return $data;
+                return format_text($data, FORMAT_MOODLE, $options);
             }
         }
     }
