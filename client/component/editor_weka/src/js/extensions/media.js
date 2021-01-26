@@ -182,6 +182,7 @@ class MediaExtension extends BaseExtension {
                   filename: node.attrs.filename,
                   url: node.attrs.url,
                   mime_type: node.attrs.mime_type,
+                  transcript: node.attrs.transcript,
                 }),
               },
             ];
@@ -267,6 +268,7 @@ class MediaExtension extends BaseExtension {
               url: url,
               filename: filename,
               mime_type: mime_type,
+              transcript: null,
             });
           }
         })

@@ -21,7 +21,7 @@
   <div class="tui-wekaAudioBlock">
     <template v-if="!$apollo.loading">
       <div class="tui-wekaAudioBlock__inner">
-        <ModalPresenter :open="showModal" @request-close="hideModal">
+        <ModalPresenter :open="showModal" @request-close="cancel">
           <ExtraFileUploadModal
             :item-id="itemId"
             :context-id="contextId"
@@ -35,9 +35,17 @@
             "
             :modal-help-text="$str('audio_alt_help', 'editor_weka')"
             :filename="transcriptFilename"
-            @change="updateTranscript"
+            @change="onTranscriptChange"
           />
         </ModalPresenter>
+
+        <Button
+          v-if="transcriptButtonVisible"
+          class="tui-wekaAudioBlock__inner-addtranscriptButton"
+          :text="$str('upload_transcript', 'editor_weka')"
+          @click="openModal"
+        />
+
         <CoreAudioBlock
           :filename="filename"
           :item-id="itemId"
@@ -64,9 +72,11 @@ import getDraftFile from 'editor_weka/graphql/get_draft_file';
 import NodeBar from 'editor_weka/components/toolbar/NodeBar';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import ExtraFileUploadModal from 'editor_weka/components/upload/ExtraFileUploadModal';
+import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {
+    Button,
     CoreAudioBlock,
     NodeBar,
     ModalPresenter,
@@ -102,7 +112,7 @@ export default {
         },
         {
           label: this.$str('upload_transcript', 'editor_weka'),
-          action: this.$_showModal,
+          action: this.openModal,
         },
         {
           label: this.$str('remove', 'core'),
@@ -153,6 +163,10 @@ export default {
     hasAttachmentNode() {
       return this.context.hasAttachmentNode();
     },
+
+    transcriptButtonVisible() {
+      return this.attrs.transcript === null;
+    },
   },
 
   methods: {
@@ -178,12 +192,24 @@ export default {
       window.open(await this.context.getDownloadUrl(this.filename));
     },
 
-    $_showModal() {
+    openModal() {
       this.showModal = true;
     },
 
     hideModal() {
       this.showModal = false;
+    },
+
+    cancel() {
+      if (this.transcriptFilename === null) {
+        this.updateTranscript('');
+      } else {
+        this.hideModal();
+      }
+    },
+
+    onTranscriptChange(file) {
+      this.updateTranscript(file || '');
     },
 
     /**
@@ -196,7 +222,9 @@ export default {
         return;
       }
 
-      const audioAttrs = Object.assign({}, this.attrs, { transcript: null });
+      const audioAttrs = Object.assign({}, this.attrs, {
+        transcript: transcriptFile,
+      });
 
       if (transcriptFile) {
         audioAttrs.transcript = {
@@ -244,6 +272,7 @@ export default {
   }
 
   &__inner {
+    position: relative;
     display: inline-block;
 
     .tui-audioBlock {
@@ -254,6 +283,13 @@ export default {
         // Removing self outlininga
         outline: none;
       }
+    }
+
+    &-addtranscriptButton {
+      position: absolute;
+      top: var(--gap-2);
+      right: var(--gap-2);
+      z-index: 1;
     }
   }
 }

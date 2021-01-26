@@ -63,7 +63,7 @@ final class audio extends base_file implements block_node, has_extra_linked_file
         $audio->mime_type = $attrs['mime_type'];
         $audio->transcript = null;
 
-        if (array_key_exists('transcript', $attrs)) {
+        if (array_key_exists('transcript', $attrs) && !empty($attrs['transcript'])) {
             $transcript = $attrs['transcript'];
             if (!is_array($transcript)) {
                 throw new coding_exception("Expecting 'transcript' attribute to be an array");

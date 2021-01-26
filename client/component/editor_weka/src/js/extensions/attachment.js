@@ -443,14 +443,8 @@ class AttachmentExtension extends BaseExtension {
       filename: filename,
       url: info.url,
       mime_type: mimeType,
+      transcript: transcript,
     };
-
-    if (transcript) {
-      audioAttrs.transcript = {
-        filename: transcript.filename,
-        url: transcript.url,
-      };
-    }
 
     this.editor.execute((state, dispatch) => {
       const node = state.schema.node('audio', audioAttrs);
