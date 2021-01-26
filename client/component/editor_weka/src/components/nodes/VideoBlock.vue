@@ -20,7 +20,7 @@
   <div class="tui-wekaVideoBlock">
     <template v-if="!$apollo.loading">
       <div class="tui-wekaVideoBlock__inner">
-        <ModalPresenter :open="showModal" @request-close="hideModal">
+        <ModalPresenter :open="showModal" @request-close="cancel">
           <ExtraFileUploadModal
             :item-id="itemId"
             :context-id="contextId"
@@ -31,9 +31,16 @@
             "
             :modal-help-text="$str('video_alt_help', 'editor_weka')"
             :filename="subtitleFilename"
-            @change="updateSubtitle"
+            @change="onSubtitleChange"
           />
         </ModalPresenter>
+
+        <Button
+          v-if="subtitleButtonVisible"
+          class="tui-wekaVideoBlock__inner-addCaptionButton"
+          :text="$str('upload_captions', 'editor_weka')"
+          @click="openModal"
+        />
 
         <CoreVideoBlock
           :key="coreVideoBlockKey"
@@ -60,6 +67,7 @@
 
 <script>
 import BaseNode from 'editor_weka/components/nodes/BaseNode';
+import Button from 'tui/components/buttons/Button';
 import CoreVideoBlock from 'tui/components/json_editor/nodes/VideoBlock';
 import getDraftFile from 'editor_weka/graphql/get_draft_file';
 import NodeBar from 'editor_weka/components/toolbar/NodeBar';
@@ -69,6 +77,7 @@ import { notify } from 'tui/notifications';
 
 export default {
   components: {
+    Button,
     CoreVideoBlock,
     NodeBar,
     ModalPresenter,
@@ -127,7 +136,7 @@ export default {
         },
         {
           label: this.$str('upload_captions', 'editor_weka'),
-          action: this.$_showModal,
+          action: this.openModal,
         },
         {
           label: this.$str('remove', 'core'),
@@ -178,8 +187,11 @@ export default {
 
       return this.attrs.subtitle.url;
     },
-  },
 
+    subtitleButtonVisible() {
+      return this.attrs.subtitle === null;
+    },
+  },
   methods: {
     $_toAttachment() {
       if (!this.context.replaceWithAttachment) {
@@ -207,12 +219,24 @@ export default {
       window.open(await this.context.getDownloadUrl(this.filename));
     },
 
-    $_showModal() {
+    openModal() {
       this.showModal = true;
     },
 
     hideModal() {
       this.showModal = false;
+    },
+
+    async cancel() {
+      if (this.subtitleFilename === null) {
+        await this.updateSubtitle('');
+      } else {
+        this.hideModal();
+      }
+    },
+
+    async onSubtitleChange(file) {
+      this.updateSubtitle(file || '');
     },
 
     /**
@@ -234,8 +258,6 @@ export default {
         oldSubtitleFilename = videoAttrs.subtitle.filename;
       }
 
-      videoAttrs.subtitle = null;
-
       if (subtitleFile) {
         changeSubtitle = oldSubtitleFilename !== subtitleFile.filename;
 
@@ -243,6 +265,9 @@ export default {
           filename: subtitleFile.filename,
           url: subtitleFile.url,
         };
+      } else {
+        // set subtitle if subtitleFile is not an object
+        videoAttrs.subtitle = subtitleFile;
       }
 
       this.context.updateVideoWithSubtitle(this.getRange, videoAttrs);
@@ -292,12 +317,20 @@ export default {
   }
 
   &__inner {
+    position: relative;
     max-width: 100%;
 
     .tui-videoBlock {
       // Reset margin
       margin: 0;
       white-space: normal;
+    }
+
+    &-addCaptionButton {
+      position: absolute;
+      right: var(--gap-2);
+      bottom: var(--gap-7);
+      z-index: 1;
     }
   }
 }

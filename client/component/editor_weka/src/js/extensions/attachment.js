@@ -344,14 +344,8 @@ class AttachmentExtension extends BaseExtension {
         filename: filename,
         url: info.url,
         mime_type: mimeType,
+        subtitle: subtitle,
       };
-
-      if (subtitle) {
-        videoAttrs.subtitle = {
-          url: subtitle.url,
-          filename: subtitle.filename,
-        };
-      }
 
       const video = state.schema.node('video', videoAttrs);
 

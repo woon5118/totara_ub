@@ -62,7 +62,7 @@ final class video extends base_file implements block_node, has_extra_linked_file
         $video->mime_type = $attrs['mime_type'];
         $video->subtitle = null;
 
-        if (array_key_exists('subtitle', $attrs)) {
+        if (array_key_exists('subtitle', $attrs) && !empty($attrs['subtitle'])) {
             // Subtitle.
             $subtitle = $attrs['subtitle'];
             if (!is_array($subtitle)) {

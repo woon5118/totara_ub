@@ -1,6 +1,11 @@
 This files describes API changes in /client/component/editor_weka,
 information provided here is intended especially for developers.
 
+=== 13.5 ===
+
+* Added caption button in VideoBlock.vue
+  * Template and CSS changes
+
 === 13.3 ===
 
 * Suggestion.showList() fourth parameter had been deprecated and no longer used, please update all calls.
