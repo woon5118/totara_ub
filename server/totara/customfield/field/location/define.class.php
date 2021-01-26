@@ -394,7 +394,7 @@ class customfield_define_location extends customfield_define_base {
         $options->para = false;
 
         $newdata = new stdClass();
-        $newdata->address = (!empty($data->$address)) ? format_text($data->$address, FORMAT_HTML, $options) : "";
+        $newdata->address = (!empty($data->$address)) ? $data->$address : "";
         $newdata->size = (!empty($data->$size)) ? $data->$size : "";
         $newdata->view = (!empty($data->$view)) ? $data->$view : "";
         $newdata->display = (!empty($data->$display)) ? $data->$display : "";
@@ -432,7 +432,7 @@ class customfield_define_location extends customfield_define_base {
         $options->para = false;
 
         $newdata = new stdClass();
-        $newdata->address = (isset($data->address) && !empty($data->address)) ? format_text($data->address, FORMAT_MOODLE, $options) : "";
+        $newdata->address = (isset($data->address) && !empty($data->address)) ? $data->address : "";
         $newdata->size = (isset($data->size) && !empty($data->size)) ? $data->size : "";
         $newdata->view = (isset($data->view) && !empty($data->view)) ? $data->view : "";
         $newdata->display = (isset($data->display) && !empty($data->display)) ? $data->display : GMAP_DISPLAY_ADDRESS_ONLY;
@@ -532,6 +532,9 @@ class customfield_define_location extends customfield_define_base {
 
         $output = array();
         if ($displaytype === GMAP_DISPLAY_ADDRESS_ONLY || $displaytype === GMAP_DISPLAY_MAP_AND_ADDRESS) {
+            $options = new stdClass();
+            $options->para = false;
+            $fielddata->address = format_text($fielddata->address, FORMAT_MOODLE, $options);
             $output[] = html_writer::tag('span', $fielddata->address);
             if ($displaytype === GMAP_DISPLAY_ADDRESS_ONLY) {
                 if ((string)$fielddata->address === '') {

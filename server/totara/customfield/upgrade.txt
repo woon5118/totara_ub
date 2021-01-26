@@ -5,6 +5,10 @@ information provided here is intended especially for developers.
 
 * customfield_textarea::display_item_data() is now required to use format_text() for display value
 * customfield_text::display_item_data() has been added to use format_string() for display value
+* customfield_define_location::prepare_location_data() is no longer calling format_text() on the address value on input
+* customfield_define_location::prepare_db_location_data_for_form() is no longer calling format_text() on the address value for form display
+* customfield_define_location::render() is now required to use format_text() on the address value for display
+* rb\display\customfield_location::display() is now required to use format_text() on the address value for use in reports
 
 === 13.0 ===
 

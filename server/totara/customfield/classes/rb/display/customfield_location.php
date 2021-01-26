@@ -55,6 +55,9 @@ class customfield_location extends base {
             return get_string('notapplicable', 'facetoface');
         }
 
+        $options = new \stdClass();
+        $options->para = false;
+        $location->address = format_text($location->address, FORMAT_MOODLE, $options);
         $output[] = $location->address;
 
         return implode('', $output);

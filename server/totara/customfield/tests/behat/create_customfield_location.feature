@@ -110,3 +110,33 @@ Feature: Administrators can add a custom location field to complete during room 
     And I click on "Search" "button" in the "Set map location" "fieldset"
     # Google maps without applied key will not work.
     #Then I should not see "Location not found" in the "Set map location" "fieldset"
+
+  Scenario: Language filter should work on location custom field
+
+    # Enabling multi-language filters for headings and content.
+    And I navigate to "Manage filters" node in "Site administration > Plugins > Filters"
+    And I set the field with xpath "//table[@id='filterssetting']//form[@id='activemultilang']//select[@name='newstate']" to "1"
+    And I set the field with xpath "//table[@id='filterssetting']//form[@id='applytomultilang']//select[@name='stringstoo']" to "1"
+
+    # Create new customfield with multilang
+    And I navigate to "Rooms" node in "Site administration > Seminars"
+    And I press "Add a new room"
+    And I set the following fields to these values:
+      | Name              | Room 1          |
+      | Building          | That house      |
+      | Address           | <span lang="de" class="multilang">German address</span><span lang="en" class="multilang">English address</span> |
+      | Capacity          | 5               |
+    And I click on "#id_customfield_locationsize_small" "css_element"
+    And I click on "#id_customfield_locationview_satellite" "css_element"
+    And I click on "#id_customfield_locationdisplay_address" "css_element"
+    And I press "Add a room"
+
+    Then I should see "That house" in the "Room 1" "table_row"
+    And I should see "English address" in the "Room 1" "table_row"
+    And I should not see "German address" in the "Room 1" "table_row"
+    And I should see "5" in the "Room 1" "table_row"
+    When I click on "Room 1" "link"
+    And I should see "English address"
+    And I should not see "German address"
+
+    Then I log out
