@@ -29,8 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 /* Include required award criteria library. */
 require_once($CFG->dirroot . '/badges/criteria/award_criteria.php');
 
-use core\json_editor\helper\document_helper;
-
 /*
  * Number of records per page.
 */
@@ -160,7 +158,9 @@ function badges_notify_badge_award(badge $badge, $userid, $issued, $filepathhash
     $params->badgename = $badge->name;
     $params->username = fullname($userto);
     $params->badgelink = $issuedlink;
-    $message = badge_message_from_template($badge->message, $params);
+    // Use format_text here to convert weka JSON to HTML
+    $ft_options = ['para' => false, 'filter' => false, 'newlines' => false];
+    $message = badge_message_from_template(format_text($badge->message, FORMAT_MOODLE, $ft_options), $params);
     $plaintext = html_to_text($message);
 
     // Notify recipient.
@@ -173,7 +173,7 @@ function badges_notify_badge_award(badge $badge, $userid, $issued, $filepathhash
     $eventdata->notification      = 1;
     $eventdata->subject           = $badge->messagesubject;
     $eventdata->fullmessage       = $plaintext;
-    $eventdata->fullmessageformat = document_helper::is_valid_json_document($badge->message) ? FORMAT_JSON_EDITOR : FORMAT_HTML;
+    $eventdata->fullmessageformat = FORMAT_HTML;
     $eventdata->fullmessagehtml   = $message;
     $eventdata->smallmessage      = '';
 
@@ -210,7 +210,7 @@ function badges_notify_badge_award(badge $badge, $userid, $issued, $filepathhash
         $eventdata->notification      = 1;
         $eventdata->subject           = $creatorsubject;
         $eventdata->fullmessage       = html_to_text($creatormessage);
-        $eventdata->fullmessageformat = document_helper::is_valid_json_document($badge->message) ? FORMAT_JSON_EDITOR : FORMAT_HTML;
+        $eventdata->fullmessageformat = FORMAT_HTML;
         $eventdata->fullmessagehtml   = $creatormessage;
         $eventdata->smallmessage      = '';
 

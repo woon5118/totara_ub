@@ -1,4 +1,4 @@
-@core @core_badges @_file_upload
+@core @core_badges @_file_upload @javascript
 Feature: Award badges
   In order to award badges to users for their achievements
   As an admin
@@ -8,7 +8,6 @@ Feature: Award badges
     Given the "badges" user profile block exists
     And the "coursedetails" user profile block exists
 
-  @javascript
   Scenario: Award profile badge
     Given I log in as "admin"
     And I navigate to "Manage badges" node in "Site administration > Badges"
@@ -41,7 +40,6 @@ Feature: Award badges
     Then I should see "Profile Badge"
     And I should not see "There are no badges available."
 
-  @javascript
   Scenario: Award site badge
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -73,7 +71,6 @@ Feature: Award badges
     And I follow "Profile" in the user menu
     Then I should see "Site Badge"
 
-  @javascript
   Scenario: Award course badge
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -137,7 +134,6 @@ Feature: Award badges
     And I should not see "Manage badges" in the "#region-main" "css_element"
     And I should not see "Add a new badge"
 
-  @javascript
   Scenario: Award badge on activity completion
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -201,7 +197,6 @@ Feature: Award badges
     Then I should see "Course Badge"
     And I should see "Warning: This activity is no longer available."
 
-  @javascript
   Scenario: Award badge on course completion
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -279,8 +274,6 @@ Feature: Award badges
     Then I should see "Course Badge"
     And I should see "Warning: This course is no longer available."
 
-
-  @javascript
   Scenario: All of the selected roles can award badges
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -361,7 +354,6 @@ Feature: Award badges
     Then I should see "Course Badge 2"
     Then I should not see "Course Badge 1"
 
-  @javascript
   Scenario: Revoke badge
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -406,3 +398,46 @@ Feature: Award badges
     When I press "Revoke badge"
     And I follow "Course Badge"
     Then I should see "Recipients (0)"
+
+  @weka @vue
+  Scenario: Check badge notifications
+    Given the following "users" exist:
+      | username | firstname | lastname | email                |
+      | teacher1 | Teacher   | One      | teacher1@example.com |
+      | student  | Student   | One      | student1@example.com |
+    And I log in as "admin"
+    And I follow "Preferences" in the user menu
+    And I follow "Editor preferences"
+    And I set the field "Text editor" to "Weka editor"
+    And I press "Save changes"
+    And I navigate to "Manage badges" node in "Site administration > Badges"
+    And I click on "Add a new badge" "button"
+    And I set the following fields to these values:
+      | Name        | Site Badge             |
+      | Description | Site badge description |
+    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
+    And I press "Create badge"
+    And I set the field "type" to "Manual issue by role"
+    And I set the field "Teacher" to "1"
+    And I press "Save"
+    And I click on "Message" "link" in the "#region-main" "css_element"
+    And I activate the weka editor with css "#uid-1"
+    And I select the text "been awarded" in the weka editor
+    And I replace the selection with "earned" in the weka editor
+    And I press "Save changes"
+    And I press "Enable access"
+    And I press "Continue"
+    And I follow "Recipients (0)"
+    And I press "Award badge"
+    And I set the field "potentialrecipients[]" to "Student One (student1@example.com)"
+    And I press "Award badge"
+    When I follow "Site Badge"
+    Then I should see "Recipients (1)"
+    And I log out
+    And I log in as "student"
+    And I open the notification popover
+    Then I should see "Congratulations!"
+    And I follow "View full notification"
+    And I should see "You have earned the badge"
+    And I should not see "{\"type\":\"doc\""
+    And I should not see "paragraph"
