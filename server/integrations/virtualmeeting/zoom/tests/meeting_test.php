@@ -215,7 +215,9 @@ class virtualmeeting_zoom_providers_meeting_testcase extends advanced_testcase {
         $entity = $this->create_virtual_meeting();
         $this->create_user_auth();
         $provider = new meeting($client);
-        $dto = new meeting_edit_dto($entity, 'test meeting', new DateTime('+1 hour'), new DateTime('+2 hour'));
+        $dto = new meeting_edit_dto($entity, 'test meeting', new DateTime('2021-08-12T10:00:00', new DateTimeZone('Pacific/Auckland')),
+            new DateTime('2021-08-12T12:00:00', new DateTimeZone('Pacific/Auckland')));
+
         $provider->create_meeting($dto);
         foreach ($expected as $name => $expected_value) {
             $value = $dto->get_storage()->get($name, true);
@@ -223,6 +225,32 @@ class virtualmeeting_zoom_providers_meeting_testcase extends advanced_testcase {
         }
         // Update should change nothing in storage
         $dto = new meeting_edit_dto($entity, 'update meeting', new DateTime('+3 hour'), new DateTime('+4 hour'));
+        // the same date and time
+        $dto = new meeting_edit_dto($entity, 'test meeting', new DateTime('2021-08-12T10:00:00', new DateTimeZone('Pacific/Auckland')),
+            new DateTime('2021-08-12T12:00:00', new DateTimeZone('Pacific/Auckland')));
+        $response = [
+            'id' => 'totara314',
+            'topic' => 'test meeting',
+            'start_time' => '2021-08-11T22:00:00Z',
+            'duration' => '120',
+        ];
+        $client->add_response(constants::MEETING_API_ENDPOINT. '/totara314', new response(json_encode($response), 200, []), method::GET);
+        // no update, so we don't need new response here
+        $provider->update_meeting($dto);
+
+        // different duration
+        $dto = new meeting_edit_dto($entity, 'test meeting', new DateTime('2021-08-12T10:00:00', new DateTimeZone('Pacific/Auckland')),
+            new DateTime('2021-08-12T11:00:00', new DateTimeZone('Pacific/Auckland')));
+        $client->add_response(constants::MEETING_API_ENDPOINT. '/totara314', new response(json_encode($response), 200, []), method::GET);
+        // needs update
+        $client->add_response(constants::MEETING_API_ENDPOINT . '/totara314', new response('', 204, []), method::PATCH);
+        $provider->update_meeting($dto);
+
+        // different name, same duration
+        $dto = new meeting_edit_dto($entity, 'new meeting', new DateTime('2021-08-12T10:00:00', new DateTimeZone('Pacific/Auckland')),
+            new DateTime('2021-08-12T12:00:00', new DateTimeZone('Pacific/Auckland')));
+        $client->add_response(constants::MEETING_API_ENDPOINT. '/totara314', new response(json_encode($response), 200, []), method::GET);
+        // needs update
         $client->add_response(constants::MEETING_API_ENDPOINT . '/totara314', new response('', 204, []), method::PATCH);
         $provider->update_meeting($dto);
         foreach ($expected as $name => $expected_value) {

@@ -107,6 +107,23 @@ class meeting implements provider {
      */
     public function update_meeting(meeting_edit_dto $meeting): void {
         $id = $meeting->get_storage()->get('meeting_id');
+        $request = request::get(constants::MEETING_API_ENDPOINT . '/' . rawurlencode($id), $this->get_headers($meeting));
+        $response = $this->client->execute($request);
+        if ($response->get_http_code() === 404) {
+            $this->create_meeting($meeting);
+            return;
+        } else {
+            $response->throw_if_error();
+        }
+        $json = $response->get_body_as_json(false, true);
+
+        $json_start = strtotime($json->start_time);
+        $json_finish = strtotime($json->start_time) + ((int)($json->duration)) * 60;
+
+        if ($json->topic == $meeting->get_name() && $json_start == $meeting->get_timestart()->getTimestamp() && $json_finish == $meeting->get_timefinish()->getTimestamp()) {
+            // same meeting time, do nothing.
+            return;
+        }
         $request = request::patch(constants::MEETING_API_ENDPOINT . '/' . rawurlencode($id), $this->get_properties($meeting), $this->get_headers($meeting));
         $response = $this->client->execute($request);
         $response->throw_if_error();
