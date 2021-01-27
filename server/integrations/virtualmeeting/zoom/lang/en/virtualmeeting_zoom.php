@@ -27,7 +27,7 @@ $string['plugindesc'] = 'Provide Zoom Meeting integration via OAuth2.';
 $string['setting_header_app'] = 'App credentials';
 $string['setting_header_app_desc'] = 'Please <a href="https://help.totaralearning.com/display/DEV/Setting+up+Zoom+Virtualmeeting+Plugin">follow our documentation</a> to set up your app as a Zoom adminstrator.
 
-The <strong>Redirect URL for OAuth</strong> should be set to: <a href="{$a->redirect_url}">{$a->redirect_url}</a>';
+The <strong>Redirect URL for OAuth</strong> should be set to: <pre><code>{$a->redirect_url}</code></pre>';
 $string['setting_client_id'] = 'Client ID';
 $string['setting_client_id_help'] = 'As found on the App Credentials page of your app.';
 $string['setting_client_secret'] = 'Client secret';

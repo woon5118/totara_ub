@@ -26,7 +26,7 @@ $string['plugindesc'] = 'Provide Microsoft Teams integration.';
 $string['setting_header_app'] = 'App credentials';
 $string['setting_header_app_desc'] = 'Please <a href="https://help.totaralearning.com/display/DEV/Setting+up+Microsoft+Teams+Virtualmeeting+plugin">follow our documentation</a> to set up your app on Microsoft Azure.
 
-The <strong>Redirect URI</strong> should be set to: <a href="{$a->redirect_url}">{$a->redirect_url}</a>';
+The <strong>Redirect URI</strong> should be set to: <pre><code>{$a->redirect_url}</code></pre>';
 $string['setting_client_id'] = 'Application (client) ID';
 $string['setting_client_id_help'] = 'Enter the Application (client) ID provided by Microsoft Azure';
 $string['setting_client_secret'] = 'Client secret';
