@@ -27,4 +27,5 @@ $string['achievement_via'] = 'Course completion';
 $string['error_no_courses'] = 'No courses linked to the competency';
 $string['error_no_course_completion'] = 'Course completion not possible in one or more linked courses (completion not tracked, or completion settings not valid)';
 $string['error_not_enough_courses'] = 'Not enough linked courses – link more courses, or reduce the number required';
+$string['info_aggregation_minumum'] = "Reset to 1 – this is the minimum number of linked courses that can be required for completion";
 $string['linked_courses'] = 'Linked courses';

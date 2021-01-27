@@ -216,6 +216,7 @@ function(templates, notification, ajax, ModalList, Loader) {
             }
 
             this.showHideNotEnoughCourses();
+            this.hideAggregationCountInfo();
         },
 
         /**
@@ -223,15 +224,22 @@ function(templates, notification, ajax, ModalList, Loader) {
          * @param {int} reqItems Required item count
          */
         setAggregationCount: function(reqItems) {
-            var countInput = this.widget.querySelector('[data-tw-criterionCourseCompletion-aggregationCount-changed]');
+            var countInput = this.widget.querySelector('[data-tw-criterionCourseCompletion-aggregationCount-changed]'),
+                newValue = parseInt(reqItems) || 0;
 
-            this.criterion.aggregation.reqitems = reqItems;
+            this.criterion.aggregation.reqitems = newValue < 1 ? 1 : newValue;
 
             if (countInput) {
-                countInput.value = reqItems;
+                countInput.value = this.criterion.aggregation.reqitems;
             }
 
             this.showHideNotEnoughCourses();
+            // We want to show the warning if the user selected something invalid and we reset it
+            if (newValue < 1) {
+                this.showAggregationCountInfo();
+            } else {
+                this.hideAggregationCountInfo();
+            }
         },
 
         /**
@@ -430,6 +438,28 @@ function(templates, notification, ajax, ModalList, Loader) {
                 targetNone.classList.remove(this.domClasses.hidden);
                 targetNotEnough.classList.add(this.domClasses.hidden);
             }
+        },
+
+        /**
+         * Show the aggregation count information
+         */
+        showAggregationCountInfo: function() {
+            var target = this.widget.querySelector('[data-tw-criterionCourseCompletion-info="aggregation-count"]');
+            if (!target) {
+                return;
+            }
+            target.classList.remove(this.domClasses.hidden);
+        },
+
+        /**
+         * Hide the aggregation count information
+         */
+        hideAggregationCountInfo: function() {
+            var target = this.widget.querySelector('[data-tw-criterionCourseCompletion-info="aggregation-count"]');
+            if (!target) {
+                return;
+            }
+            target.classList.add(this.domClasses.hidden);
         },
 
         /**

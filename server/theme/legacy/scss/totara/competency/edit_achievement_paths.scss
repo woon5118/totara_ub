@@ -257,8 +257,16 @@
     }
 
     &-item {
+      .tw-editAchievementPaths--hidden {
+        display: none;
+      }
+
       & > * {
         display: inline-block;
+      }
+
+      &-info {
+        color: var(--color-prompt-info);
       }
     }
 
@@ -279,6 +287,11 @@
 
     &-warning {
       color: var(--color-prompt-warning);
+    }
+
+    &-info {
+      color: var(--color-prompt-info);
+      font-size: 0.75em;
     }
   }
 }

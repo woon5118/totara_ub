@@ -54,6 +54,10 @@ function(ajax, notification, Loader) {
             singleuse: false,
             expandable: true
         };
+
+        this.domClasses = {
+            hidden: 'tw-editAchievementPaths--hidden',
+        };
     }
 
     CriterionChildCompetency.prototype = {
@@ -177,6 +181,8 @@ function(ajax, notification, Loader) {
                 // the count input
                 countInput.disabled = testCountInput ? false : true;
             }
+
+            this.hideAggregationCountInfo();
         },
 
         /**
@@ -185,13 +191,43 @@ function(ajax, notification, Loader) {
          * @param {int} reqItems Required item count
          */
         setAggregationCount: function(reqItems) {
-            var countInput = this.widget.querySelector('[data-tw-criterionChildCompetency-aggregationCount-changed]');
+            var countInput = this.widget.querySelector('[data-tw-criterionChildCompetency-aggregationCount-changed]'),
+                newValue = parseInt(reqItems) || 0;
 
-            this.criterion.aggregation.reqitems = reqItems;
+            this.criterion.aggregation.reqitems = newValue < 1 ? 1 : newValue;
 
             if (countInput) {
-                countInput.value = reqItems;
+                countInput.value = this.criterion.aggregation.reqitems;
             }
+
+            // We want to show the information if the user selected something invalid and we reset it
+            if (newValue < 1) {
+                this.showAggregationCountInfo();
+            } else {
+                this.hideAggregationCountInfo();
+            }
+        },
+
+        /**
+         * Show the aggregation count information
+         */
+        showAggregationCountInfo: function() {
+            var target = this.widget.querySelector('[data-tw-criterionChildCompetency-info="aggregation-count"]');
+            if (!target) {
+                return;
+            }
+            target.classList.remove(this.domClasses.hidden);
+        },
+
+        /**
+         * Hide the aggregation count information
+         */
+        hideAggregationCountInfo: function() {
+            var target = this.widget.querySelector('[data-tw-criterionChildCompetency-info="aggregation-count"]');
+            if (!target) {
+                return;
+            }
+            target.classList.add(this.domClasses.hidden);
         },
 
         /**

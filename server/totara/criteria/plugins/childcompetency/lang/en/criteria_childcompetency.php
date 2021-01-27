@@ -29,5 +29,6 @@ $string['competencies'] = 'Competencies';
 $string['error_cant_become_proficient'] = 'Proficiency not possible due to invalid criteria on one or more child competency';
 $string['error_no_children'] = 'No child competencies exist';
 $string['error_not_enough_children'] = 'Not enough child competencies – reduce the number required';
+$string['info_aggregation_minumum'] = "Reset to 1 – this is the minimum number of child competencies that can be required for completion";
 $string['required_only'] = '{$a} required only';
 $string['self_assign_competency'] = 'Self assign competency';

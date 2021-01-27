@@ -406,4 +406,23 @@ Feature: Manage Criteria group achievement paths
     And criterion aggregation should be set to complete "4" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And criterion aggregation should be set to complete "5" in "othercompetency" criterion "1" in criteria group "2" in "Good" scalevalue
 
+    #set to invalid reqItems
+    When I toggle criterion detail of "childcompetency" criterion "1" in criteria group "1" in "Great" scalevalue
+    And I set criterion aggregation to complete "0" in "childcompetency" criterion "1" in criteria group "1" in "Great" scalevalue
+    Then I should see "Reset to 1 – this is the minimum number of child competencies that can be required for completion"
+    And criterion aggregation should be set to complete "1" in "childcompetency" criterion "1" in criteria group "1" in "Great" scalevalue
 
+    When I toggle criterion detail of "coursecompletion" criterion "1" in criteria group "1" in "Great" scalevalue
+    And I set criterion aggregation to complete "0" in "coursecompletion" criterion "1" in criteria group "1" in "Great" scalevalue
+    Then I should see "Reset to 1 – this is the minimum number of courses that can be required for completion"
+    And criterion aggregation should be set to complete "1" in "coursecompletion" criterion "1" in criteria group "1" in "Great" scalevalue
+
+    When I toggle criterion detail of "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
+    And I set criterion aggregation to complete "0" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should see "Reset to 1 – this is the minimum number of linked courses that can be required for completion"
+    And criterion aggregation should be set to complete "1" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
+
+    When I toggle criterion detail of "othercompetency" criterion "1" in criteria group "2" in "Good" scalevalue
+    And I set criterion aggregation to complete "0" in "othercompetency" criterion "1" in criteria group "2" in "Good" scalevalue
+    Then I should see "Reset to 1 – this is the minimum number of competencies that can be required for completion"
+    And criterion aggregation should be set to complete "1" in "othercompetency" criterion "1" in criteria group "2" in "Good" scalevalue

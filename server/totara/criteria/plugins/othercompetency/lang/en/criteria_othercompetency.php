@@ -36,6 +36,7 @@ $string['error_not_enough_competencies'] = 'Not enough competencies added – ad
 $string['hierarchy_list_competency_all'] = 'All competencies';
 $string['hierarchy_list_competency_all_in_framework'] = 'All competencies in framework';
 $string['hierarchy_list_competency_select'] = 'Select competencies';
+$string['info_aggregation_minumum'] = "Reset to 1 – this is the minimum number of competencies that can be required for completion";
 $string['no_competencies'] = 'There are no other competencies available to view';
 $string['other_competencies'] = 'Proficiency in other competencies';
 $string['select_competencies'] = "Select competencies";

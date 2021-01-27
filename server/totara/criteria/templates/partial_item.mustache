@@ -46,12 +46,6 @@
 {{! data-tw-criterionothercompetency-competencies }}
 <li data-tw-{{type}}-item-value="{{value}}">
     <span>{{text}}</span>
-    {{#error}}
-      <span class="tw-editAchievementPaths__criterionForm-warning">
-        {{#flex_icon}}notification-warning{{/flex_icon}}
-        <span>{{error}}</span>
-      </span>
-    {{/error}}
 
     <button type="button" class="tw-editAchievementPaths__group-actionsButton" aria-label="{{#str}}remove_item, totara_criteria{{/str}}" data-tw-{{type}}-item-remove="">
         <span>
@@ -60,4 +54,11 @@
             </span>
         </span>
     </button>
+
+    {{#error}}
+      <span class="tw-editAchievementPaths__criterionForm-warning">
+        {{#flex_icon}}notification-warning{{/flex_icon}}
+        <span>{{error}}</span>
+      </span>
+    {{/error}}
 </li>

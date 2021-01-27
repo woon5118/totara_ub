@@ -31,5 +31,5 @@ $string['error_no_course'] = 'Course no longer exists';
 $string['error_no_course_completion'] = 'Course completion not possible (completion not tracked, or completion settings not valid)';
 $string['error_no_courses'] = 'No courses added';
 $string['error_not_enough_courses'] = 'Not enough courses added – add more courses, or reduce the number required';
+$string['info_aggregation_minumum'] = "Reset to 1 – this is the minimum number of courses that can be required for completion";
 $string['select_courses'] = "Select courses";
-

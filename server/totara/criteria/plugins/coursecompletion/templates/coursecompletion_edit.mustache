@@ -99,7 +99,7 @@ data-tw-loader-target="">
                 value="1"
                 data-tw-criterionCourseCompletion-aggregationMethod-changed="all"/>
 
-                <label for="tw_criterionCourseCompletion_agg_all__{{key}}">
+                <label class="tw-editAchievementPaths__criterionForm-label" for="tw_criterionCourseCompletion_agg_all__{{key}}">
                     <span>{{#str}}complete_all, totara_criteria {{/str}}</span>
                 </label>
                 <span class="tf_loading" style="display: none;">
@@ -114,7 +114,7 @@ data-tw-loader-target="">
                     name="tw_criterionCourseCompletion_agg__{{key}}"
                     value="2"
                     data-tw-criterionCourseCompletion-aggregationMethod-changed="any"/>
-                    <label for="tw_criterionCourseCompletion_agg_any__{{key}}">
+                    <label class="tw-editAchievementPaths__criterionForm-label" for="tw_criterionCourseCompletion_agg_any__{{key}}">
                         <span>{{#str}}complete_any, totara_criteria {{/str}}</span>
                     </label>
                     <span class="tf_loading" style="display: none;">
@@ -125,9 +125,15 @@ data-tw-loader-target="">
                 <div data-tw-criterionCourseCompletion-aggregationCount="">
                     <input type="number"
                     name="tw_criterionCourseCompletion_agg_count__{{key}}"
-                    value="1" min="0"
+                    value="1" min="1"
                     data-tw-criterionCourseCompletion-aggregationCount-changed=""
                     disabled="disabled"/>
+                </div>
+                <div class="tw-editAchievementPaths__criterionForm-info tw-editAchievementPaths--hidden"
+                     data-tw-criterionCourseCompletion-info="aggregation-count"
+                >
+                    {{#flex_icon}}notification-info, info, totara_criteria{{/flex_icon}}
+                    <span>{{#str}}info_aggregation_minumum, criteria_coursecompletion{{/str}}</span>
                 </div>
             </div>
         </div>
