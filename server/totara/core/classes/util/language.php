@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package totara_msteams
+ * @package totara_core
  */
 
-namespace totara_msteams\botfw\util;
+namespace totara_core\util;
 
 /**
  * Convert language code between the Totara format and the IETF BCP-47 format.

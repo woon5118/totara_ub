@@ -29,6 +29,7 @@ use totara_core\http\exception\bad_format_exception;
 use totara_core\http\exception\http_exception;
 use totara_core\http\request;
 use totara_core\http\response;
+use totara_core\util\language;
 use totara_msteams\botfw\account\channel_account;
 use totara_msteams\botfw\account\conversation_account;
 use totara_msteams\botfw\auth\authoriser;
@@ -45,7 +46,6 @@ use totara_msteams\botfw\resolver\resolver;
 use totara_msteams\botfw\router\route;
 use totara_msteams\botfw\router\router;
 use totara_msteams\botfw\storage\storage;
-use totara_msteams\botfw\util\language;
 use totara_msteams\botfw\validator\validator;
 
 /**

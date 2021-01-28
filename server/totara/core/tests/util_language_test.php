@@ -18,12 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package totara_msteams
+ * @package totara_core
  */
 
-use totara_msteams\botfw\util\language;
+use totara_core\util\language;
 
-class totara_msteams_botfw_util_language_testcase extends advanced_testcase {
+/**
+ * @coversDefaultClass totara_core\util\language
+ */
+class totara_core_botfw_util_language_testcase extends advanced_testcase {
     public function setUp(): void {
         $sm = get_string_manager();
         $rc = new ReflectionClass('core_string_manager_standard');
@@ -69,6 +72,7 @@ class totara_msteams_botfw_util_language_testcase extends advanced_testcase {
      * @param string $input
      * @param string|null $expected
      * @dataProvider data_totara_language_code
+     * @covers ::convert_to_totara_format
      */
     public function test_convert_to_totara_format(string $input, ?string $expected) {
         $this->assertSame($expected, language::convert_to_totara_format($input, false));
@@ -90,6 +94,7 @@ class totara_msteams_botfw_util_language_testcase extends advanced_testcase {
      * @param string $input
      * @param string $expected
      * @dataProvider data_ietf_language_code
+     * @covers ::convert_to_ietf_format
      */
     public function test_convert_to_ietf_format(string $input, string $expected) {
         $this->assertSame($expected, language::convert_to_ietf_format($input));

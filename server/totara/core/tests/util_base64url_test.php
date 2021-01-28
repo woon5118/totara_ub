@@ -18,11 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package totara_msteams
+ * @package totara_core
  */
 
 use totara_core\util\base64url;
 
+/**
+ * @coversDefaultClass totara_core\util\base64url
+ */
 class totara_core_util_base64url_testcase extends advanced_testcase {
     public function data_decode_failure() {
         return [
@@ -33,7 +36,9 @@ class totara_core_util_base64url_testcase extends advanced_testcase {
     }
 
     /**
+     * @param string $input
      * @dataProvider data_decode_failure
+     * @covers ::decode
      */
     public function test_decode_failure(string $input) {
         $decode = base64url::decode($input);
@@ -51,7 +56,10 @@ class totara_core_util_base64url_testcase extends advanced_testcase {
     }
 
     /**
+     * @param string $input
+     * @param string $expected
      * @dataProvider data_decode_success
+     * @covers ::decode
      */
     public function test_base64url_decode_success(string $input, string $expected) {
         $decode = base64url::decode($input);
@@ -68,7 +76,10 @@ class totara_core_util_base64url_testcase extends advanced_testcase {
     }
 
     /**
+     * @param string $input
+     * @param string $expected
      * @dataProvider data_encode
+     * @covers ::encode
      */
     public function test_encode(string $input, string $expected) {
         $this->assertEquals($expected, base64url::encode($input));

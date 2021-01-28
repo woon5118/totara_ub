@@ -29,8 +29,8 @@ use lang_string;
 use moodle_url;
 use stdClass;
 use stored_file;
+use totara_core\util\language;
 use totara_msteams\auth_helper;
-use totara_msteams\botfw\util\language;
 use totara_msteams\hook\bot_command_list_hook;
 use totara_msteams\page_helper;
 

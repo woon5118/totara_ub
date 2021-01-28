@@ -116,7 +116,7 @@ class virtualmeeting_msteams_providers_meeting_testcase extends advanced_testcas
         $this->create_user_auth();
         $dto = new meeting_dto($entity);
         $headers = $method->invoke($provider, $dto);
-        $expected = ['Authorization' => 'Bearer k1a0rak0ut0ukat0a'];
+        $expected = ['Authorization' => 'Bearer k1a0rak0ut0ukat0a', 'Accept-Language' => 'en'];
         $this->assertEquals($expected, $headers);
     }
 

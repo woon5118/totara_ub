@@ -23,9 +23,11 @@
 
 namespace virtualmeeting_msteams\providers;
 
+use core\entity\user;
 use DateTime;
 use totara_core\http\client;
 use totara_core\http\request;
+use totara_core\util\language;
 use totara_core\virtualmeeting\exception\meeting_exception;
 use totara_core\virtualmeeting\exception\not_implemented_exception;
 use totara_core\virtualmeeting\dto\meeting_dto;
@@ -58,7 +60,9 @@ class meeting implements provider {
      */
     private function get_headers(meeting_dto $meeting): array {
         $auth = $meeting->get_user()->get_fresh_token(auth::create_authoriser($this->client));
-        return ['Authorization' => 'Bearer ' . $auth];
+        $user = new user($meeting->get_user()->get_userid());
+        $lang = language::convert_to_ietf_format($user->lang);
+        return ['Authorization' => 'Bearer ' . $auth, 'Accept-Language' => $lang];
     }
 
     /**
