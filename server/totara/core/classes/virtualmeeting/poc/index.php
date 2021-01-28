@@ -61,7 +61,7 @@ if ($formdata = data_submitted()) {
 <title>Log in</title>
 <style>
 h1 { text-align: center }
-form { display: flex; flex-direction: column }
+form { display: flex; flex-direction: column; margin: auto; max-width: 400px }
 input,button { line-height: 2; margin-bottom: 1rem; padding: 0 .5rem }
 </style>
 </head>
@@ -70,9 +70,9 @@ input,button { line-height: 2; margin-bottom: 1rem; padding: 0 .5rem }
 <form method="post" autocomplete="off">
 <input type="hidden" name="sesskey" value="<?php echo s(sesskey()); ?>">
 <label for="username">Username</label>
-<input type="text" name="username" placeholder="Username" required>
+<input type="text" id="username" name="username" required>
 <label for="password">Password</label>
-<input type="password" name="password" placeholder="Password" required>
+<input type="password" id="password" name="password" required>
 <button>Log in</button>
 </form>
 </body>

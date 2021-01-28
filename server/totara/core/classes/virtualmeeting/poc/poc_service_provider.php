@@ -36,15 +36,20 @@ use moodle_url;
  * A meeting with name containing 'fail' is permanently banned.
  */
 class poc_service_provider implements provider {
+    /** @var string */
+    private $name;
+
     /** @var boolean */
     private $peruser;
 
     /**
      * Constructor.
      *
+     * @param string $name app or user
      * @param boolean $peruser whether user auth is available or not
      */
-    public function __construct(bool $peruser) {
+    public function __construct(string $name, bool $peruser) {
+        $this->name = $name;
         $this->peruser = $peruser;
     }
 
@@ -150,6 +155,9 @@ class poc_service_provider implements provider {
      * @inheritDoc
      */
     public function get_info(meeting_dto $meeting, string $what): string {
+        if (!get_config('totara_core', "virtualmeeting_poc_{$this->name}_{$what}")) {
+            throw new not_implemented_exception();
+        }
         if ($what === provider::INFO_HOST_URL) {
             return $meeting->get_storage()->get('host_url', true);
         } else if ($what === provider::INFO_INVITATION) {

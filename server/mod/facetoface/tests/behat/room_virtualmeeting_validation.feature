@@ -53,7 +53,7 @@ Feature: Validation in a seminar virtual room meeting
     When I click on "Virtual Room" "link" in the "Christmas" "table_row"
     And I set the field "Add virtual room link" to "Custom virtual room link"
     Then the "Connect" "button_exact" should be disabled
-    And I set the field "Virtual room link" to "/mod/facetoface/tests/fixtures/bph4svcr.php"
+    And I set the field "Virtual room link" to local url "/mod/facetoface/tests/fixtures/bph4svcr.php"
     And I click on "OK" "button_exact" in the "Edit room" "totaradialogue"
     And I press "Save changes"
     Then I should not see "Editing event in"
@@ -183,7 +183,7 @@ Feature: Validation in a seminar virtual room meeting
     And I set the following fields to these values:
       | Name                  | Another virtual site-wide room              |
       | Add virtual room link | Custom virtual room link                    |
-      | Virtual room link     | /mod/facetoface/tests/fixtures/bph4svcr.php |
+    And I set the field "Virtual room link" to local url "/mod/facetoface/tests/fixtures/bph4svcr.php"
     And I press "Save changes"
 
     Given I click on "Edit room" "link" in the "Virtual site-wide room" "table_row"

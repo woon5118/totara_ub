@@ -260,6 +260,9 @@ abstract class content_generator {
         if (!empty($this->eventid)) {
             $cm = (new seminar_event($this->eventid))->get_seminar()->get_coursemodule();
             $context = context_module::instance($cm->id);
+        } else if (!empty($this->sessionid)) {
+            $cm = (new seminar_session($this->sessionid))->get_seminar_event()->get_seminar()->get_coursemodule();
+            $context = context_module::instance($cm->id);
         } else {
             $cm = null;
             $context = $systemcontext;
@@ -346,7 +349,10 @@ abstract class content_generator {
         $session = !empty($this->sessionid) ? new seminar_session($this->sessionid) : null;
         $card = $this->render_card($session, $item, $USER, $renderer);
         if ($card !== null) {
-            $data['card'] = $card->get_template_data();
+            $data['card'] = [
+                'template' => $card->get_template_name(),
+                'context' => $card->get_template_data(),
+            ];
         }
 
         $data['details'] = $this->render_details($item, $USER, $renderer);

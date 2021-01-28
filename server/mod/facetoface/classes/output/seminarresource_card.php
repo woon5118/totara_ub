@@ -23,6 +23,7 @@
 
 namespace mod_facetoface\output;
 
+use core\output\flex_icon;
 use \core\output\template;
 use moodle_url;
 
@@ -31,16 +32,33 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The seminar resource card on the seminar resource detail page.
  */
-final class seminarresource_card extends template {
+class seminarresource_card extends template {
+    /**
+     * Element constructor.
+     *
+     * @param array $data context data for mustache template, this should be the public API of template
+     */
+    public function __construct(array $data) {
+        if (get_class($this) === seminarresource_card::class) {
+            foreach (['simple', 'detailsection', 'preview', 'multibutton'] as $deprecated) {
+                if (isset($data[$deprecated])) {
+                    debugging("seminarresource_card no longer supports '{$deprecated}'. Please use virtualroom_card instead.", DEBUG_DEVELOPER);
+                }
+            }
+        }
+        parent::__construct($data);
+    }
+
     /**
      * Create a template instance to display only the heading text.
      *
      * @param string $heading heading text
      * @param boolean $inactive set true to deactivate the card
      * @return self
+     * @deprecated since Totara 13.5
      */
     public static function create_simple(string $heading, bool $inactive): self {
-        return new static([
+        return new virtualroom_card([
             'heading' => $heading,
             'simple' => true,
             'inactive' => $inactive,
@@ -54,10 +72,12 @@ final class seminarresource_card extends template {
      * @param seminarevent_detail_section $details
      * @param boolean $inactive
      * @return self
+     * @deprecated since Totara 13.5
      */
     public static function create_details(string $heading, seminarevent_detail_section $details, bool $inactive): self {
-        return new static([
+        return new virtualroom_card([
             'heading' => $heading,
+            'simple' => false,
             'detailsection' => $details->get_template_data(),
             'inactive' => $inactive,
         ]);
@@ -76,38 +96,45 @@ final class seminarresource_card extends template {
      * @param string|null $preview
      * @param array|null $host_info;
      * @return self
+     * @deprecated since Totara 13.5
      */
     public static function create(string $heading, string $buttonlabel, $url, bool $accent, ?seminarevent_detail_section $details, bool $inactive, ?string $buttonhint = null, ?string $preview = null, ?array $host_info = null): self {
+        global $OUTPUT;
         if ($url instanceof moodle_url) {
             $url = $url->out(false);
         }
-        $multibutton = false;
-        $joinbutton = [
+        $buttons = [[
             'text' => $buttonlabel,
             'url' => (string)$url,
-            'accent' => $accent,
             'hint' => $buttonhint,
-        ];
+        ]];
+        if ($accent) {
+            $buttons[0]['style'] = 'primary';
+        }
         if (!is_null($host_info) && !empty($host_info)) {
             $hostbutton = [
                 'text' => $host_info['buttonlabel'],
                 'url' => (string)$host_info['url'],
-                'accent' => $host_info['accent'],
                 'hint' => $host_info['buttonhint'],
             ];
-            $multibutton = [
-                'hostbutton' => $hostbutton,
-                'joinbutton' => $joinbutton,
-            ];
+            if (!empty($host_info['accent'])) {
+                $hostbutton['style'] = 'primary';
+            }
+            array_unshift($buttons, $hostbutton);
         }
-        return new static([
+        $data = [
             'heading' => $heading,
-            'detailsection' => $details ? $details->get_template_data() : false,
             'simple' => !$details,
-            'button' => $joinbutton,
+            'has_buttons' => true,
+            'buttons' => $buttons,
             'inactive' => $inactive,
-            'preview' => $preview,
-            'multibutton' => $multibutton,
-        ]);
+        ];
+        if ($details) {
+            $data['detailsection'] = $details->get_template_data();
+        }
+        if ((string)$preview !== '') {
+            $data['preview'] = $preview;
+        }
+        return new virtualroom_card($data);
     }
 }

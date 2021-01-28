@@ -26,6 +26,7 @@ namespace totara_core\virtualmeeting\poc;
 use admin_setting_configcheckbox;
 use admin_setting_heading;
 use admin_settingpage;
+use coding_exception;
 use totara_core\http\client;
 use totara_core\virtualmeeting\plugin\factory\factory;
 use totara_core\virtualmeeting\plugin\provider\provider;
@@ -48,7 +49,25 @@ abstract class poc_factory implements factory {
      * @codeCoverageIgnore
      */
     public static function toggle(string $plugin, bool $state): void {
+        if (strncmp($plugin, 'poc_', 4)) {
+            throw new coding_exception('invalid plugin name');
+        }
         set_config("virtualmeeting_{$plugin}_enabled", $state ? '1' : '0', 'totara_core');
+    }
+
+    /**
+     * Enable/disable whether to return additional info for testing
+     *
+     * @param string $plugin poc_xxx
+     * @param string $info provider::INFO_xxx
+     * @param boolean $state
+     * @codeCoverageIgnore
+     */
+    public static function toggle_info(string $plugin, string $info, bool $state): void {
+        if (strncmp($plugin, 'poc_', 4)) {
+            throw new coding_exception('invalid plugin name');
+        }
+        set_config("virtualmeeting_{$plugin}_{$info}", $state ? '1' : '0', 'totara_core');
     }
 
     /**
@@ -63,7 +82,7 @@ abstract class poc_factory implements factory {
      * @inheritDoc
      */
     public function create_service_provider(client $client): provider {
-        return new poc_service_provider(static::USER_AUTH);
+        return new poc_service_provider(static::NAME, static::USER_AUTH);
     }
 
     /**
@@ -75,6 +94,14 @@ abstract class poc_factory implements factory {
             $name = static::NAME;
             $page->add(new admin_setting_heading("totara_core/virtualmeeting_poc_{$name}_header", 'Plugin settings', ''));
             $page->add(new admin_setting_configcheckbox("totara_core/virtualmeeting_poc_{$name}_enabled", 'Enabled', '', '1'));
+            $infos = [
+                provider::INFO_HOST_URL => 'Hosting',
+                provider::INFO_INVITATION => 'Invitation',
+                provider::INFO_PREVIEW => 'Preview'
+            ];
+            foreach ($infos as $info => $label) {
+                $page->add(new admin_setting_configcheckbox("totara_core/virtualmeeting_poc_{$name}_{$info}", $label, '', '1'));
+            }
         }
         return $page;
     }

@@ -30,6 +30,8 @@
     * headeraction: template data of seminarevent_actionbar
     * heading: heading text
     * card: template data of seminarresource_card
+    * card.template: template name
+    * card.context: template data
     * details: resource details html
     * report: reportbulder data
     * report.header: heading text
@@ -50,7 +52,7 @@
 <h2>{{heading}}</h2>
 
 <section class="mod_facetoface__eventinfo">
-    {{#card}}{{> mod_facetoface/seminarresource_card }}{{/card}}
+    {{#card}}{{#context}}{{> &&template }}{{/context}}{{/card}}
     {{#details}}<div class="mod_facetoface__eventinfo__content">{{{.}}}</div>{{/details}}
 </section>
 

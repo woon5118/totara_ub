@@ -330,6 +330,7 @@ class mod_facetoface_generator extends testing_module_generator {
         // Insert a room.
         $record = (object)$record;
         $record->custom = 1;
+        $record->url = '';
         $room = $this->add_room($record);
 
         // Insert room_virtualmeeting
@@ -401,6 +402,7 @@ class mod_facetoface_generator extends testing_module_generator {
      * @return void
      */
     private function translate_record_for_behat(array &$record, bool $usernametouserid = false) {
+        global $CFG;
         foreach (['usercreated', 'usermodified'] as $fieldname) {
             if (isset($record[$fieldname])) {
                 $user = core_user::get_user_by_username($record[$fieldname], 'id');
@@ -416,6 +418,9 @@ class mod_facetoface_generator extends testing_module_generator {
             $user = core_user::get_user_by_username($record['username'], 'id', null, MUST_EXIST);
             $record['userid'] = $user->id;
             unset($record['username']);
+        }
+        if (isset($record['url']) && $record['url'] === '/mod/facetoface/tests/fixtures/bph4svcr.php') {
+            $record['url'] = $CFG->wwwroot . $record['url'];
         }
         // Add any adjustments here if necessary.
     }

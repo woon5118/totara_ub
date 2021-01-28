@@ -1112,8 +1112,12 @@ select.menuf2f-select {
       background: var(--color-neutral-2);
     }
 
-    &__button {
+    &__buttons {
       text-align: center;
+    }
+
+    &__button {
+        margin: var(--gap-1);
     }
   }
 }

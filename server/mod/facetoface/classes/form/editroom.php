@@ -269,10 +269,7 @@ class editroom extends \moodleform {
             if (empty($data['url'])) {
                 $errors['url'] = get_string('err_required', 'form');
             } else if (!filter_var($data['url'], FILTER_VALIDATE_URL)) {
-                // whitelist '/mod/facetoface/tests/fixtures/bph4svcr.php' under behat
-                if (!defined('BEHAT_SITE_RUNNING') || $data['url'] !== '/mod/facetoface/tests/fixtures/bph4svcr.php') {
-                    $errors['url'] = get_string('error:urlformat', 'mod_facetoface');
-                }
+                $errors['url'] = get_string('error:urlformat', 'mod_facetoface');
             }
         }
 

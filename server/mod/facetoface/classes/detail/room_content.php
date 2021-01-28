@@ -91,9 +91,10 @@ class room_content extends content_generator {
     /**
      * @param seminar_session|null $session
      * @param room $room
+     * @param stdClas $user
      * @return string[]
      */
-    private function get_virtual_room_info(?seminar_session $session, room $room): array {
+    private function get_virtual_room_info(?seminar_session $session, room $room, stdClass $user): array {
         if (!builder::table('facetoface_room_virtualmeeting')->where('roomid', $room->get_id())->exists()) {
             return ['url' => $room->get_url()];
         }
@@ -117,7 +118,7 @@ class room_content extends content_generator {
             'url' => $model->get_join_url(true),
             'plugin' => $model->get_plugin_name(),
         ];
-        if (($host_url = $model->get_host_url(false)) !== '' && room_helper::has_access_at_any_time($session)) {
+        if (($host_url = $model->get_host_url(false)) !== '' && $model->userid == $user->id) {
             $result['host_url'] = $host_url;
         }
         // Invitation is not used by current room card template.
@@ -130,10 +131,17 @@ class room_content extends content_generator {
         return $result;
     }
 
+    /**
+     * @param seminar_session|null $session
+     * @param seminar_attachment_item $item
+     * @param stdClass $user
+     * @param mod_facetoface_renderer $renderer
+     * @return seminarresource_card|null
+     */
     protected function render_card(?seminar_session $session, seminar_attachment_item $item, stdClass $user, mod_facetoface_renderer $renderer): ?seminarresource_card {
         /** @var room $item */
         try {
-            $info = $this->get_virtual_room_info($session, $item);
+            $info = $this->get_virtual_room_info($session, $item, $user);
             if (empty($info['url'])) {
                 // No virtual room info, no virtual room card.
                 return null;
@@ -145,31 +153,32 @@ class room_content extends content_generator {
         }
         $roomurl = $info['url'];
         if (!empty($info['plugin'])) {
-            $header = get_string('virtualroom_heading', 'mod_facetoface') . ': ' . $info['plugin'];
+            $header = get_string('virtualroom_headingx', 'mod_facetoface', $info['plugin']);
         } else {
             $header = get_string('virtualroom_heading', 'mod_facetoface');
         }
+        if ($item->get_custom()) {
+            $capable = has_capability('mod/facetoface:manageadhocrooms', $renderer->getcontext(), $user);
+        } else {
+            $capable = $this->has_edit_capability($item, $renderer->getcontext(), $user);
+        }
+        // Special case for direct access.
         if ($session === null) {
-            // Special case for direct access.
-            if ($item->get_custom()) {
-                $capable = has_capability('mod/facetoface:manageadhocrooms', $renderer->getcontext(), $user);
-            } else {
-                $capable = $this->has_edit_capability($item, $renderer->getcontext(), $user);
-            }
             // A user with a management capability can always see the link.
             if ($capable) {
-                return seminarresource_card::create(get_string('virtualroom_heading', 'mod_facetoface'), get_string('roomgoto', 'mod_facetoface'), new moodle_url($roomurl), false, null, false);
+                return seminarresource_card::create(get_string('virtualroom_heading', 'mod_facetoface'), get_string('roomgoto', 'mod_facetoface'), $roomurl, true, null, false, get_string('roomgotox', 'mod_facetoface', $item->get_name()));
             }
             // Unavailable virtual room card.
             return seminarresource_card::create_simple(get_string('virtualroom_card_unavailable', 'mod_facetoface'), true);
         }
         $time = time();
-        $signup = $signup = signup::create($user->id, $session->get_sessionid());
-        if (!room_helper::show_room_link($session, $signup)) {
+        $signup = signup::create($user->id, $session->get_sessionid());
+        if (!$capable && !room_helper::show_room_link($session, $signup)) {
             return seminarresource_card::create_simple(get_string('virtualroom_card_unavailable', 'mod_facetoface'), true);
         }
-        if (room_helper::has_access_at_any_time($session)) {
+        if ($capable || room_helper::has_access_at_any_time($session, $user->id)) {
             $buttonlabel = get_string('roomgoto', 'mod_facetoface');
+            $buttonhint = get_string('roomgotox', 'mod_facetoface', $item->get_name());
             $hostinfo = null;
             if (isset($info['host_url'])) {
                 $hostinfo = [
@@ -179,20 +188,21 @@ class room_content extends content_generator {
                     'buttonhint' => get_string('roomhostx', 'mod_facetoface', $item->get_name())
                 ];
                 $buttonlabel = get_string('roomhostjoin', 'mod_facetoface');
+                $buttonhint = get_string('roomhostjoinx', 'mod_facetoface', $item->get_name());
             }
             return seminarresource_card::create(
                 $header,
                 $buttonlabel,
-                new moodle_url($roomurl),
-                true,
+                $roomurl,
+                empty($hostinfo),
                 null,
                 false,
-                get_string('roomgotox', 'mod_facetoface', $item->get_name()),
+                $buttonhint,
                 $info['preview'] ?? null,
                 $hostinfo
             );
         }
-        if ($session->is_over($time)) {
+        if ($session->is_over($time) || $session->get_seminar_event()->get_cancelledstatus()) {
             return seminarresource_card::create_simple(get_string('virtualroom_card_over', 'mod_facetoface'), true);
         }
 
@@ -204,9 +214,9 @@ class room_content extends content_generator {
             ->build();
         if (room_helper::has_time_come($event, $session, $time)) {
             return seminarresource_card::create(
-                get_string('virtualroom_heading', 'mod_facetoface'),
+                $header,
                 get_string('roomjoinnow', 'mod_facetoface'),
-                new moodle_url($roomurl),
+                $roomurl,
                 true,
                 $details,
                 false,

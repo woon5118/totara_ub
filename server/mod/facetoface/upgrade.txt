@@ -3,6 +3,12 @@ information provided here is intended especially for developers.
 
 === 13.5 ===
 
+* The button and multibutton fields have been removed from seminarresource_card.mustache; please update the template if modified
+* The card field in seminarresource_information.mustache now requires template and context; please update the template if modified
+* Any contents specific to virtual rooms have been removed from seminarresource_card.mustache; please use virtualroom_card.mustache instead
+* seminarresource_card::create() has been deprecated; please use virtualroom_card::builder() instead
+* seminarresource_card::create_simple() has been deprecated; please use virtualroom_card::builder() instead
+* seminarresource_card::create_details() has been deprecated; please use virtualroom_card::builder() instead
 * room_helper::can_update_virtualmeeting() has been deprecated; please use room_virtualmeeting::can_manage() instead
 
 === 13.3 ===

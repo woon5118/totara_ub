@@ -618,6 +618,9 @@ final class signup_helper {
      * @return boolean
      */
     public static function is_booked(signup $signup, bool $includerequested = true): bool {
+        if (!$signup->exists()) {
+            return false;
+        }
         $state = $signup->get_state();
         if ($includerequested) {
             $statuscodes = attendance_state::get_all_attendance_code_with([
@@ -632,7 +635,7 @@ final class signup_helper {
                 booked::class
             ]);
         }
-        return $signup->exists() && in_array($state::get_code(), $statuscodes);
+        return in_array($state::get_code(), $statuscodes);
     }
 
     /**
