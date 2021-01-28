@@ -1,5 +1,9 @@
 This files describes API changes in /admin/usertours/.
 
+=== 13.5 ===
+
+* Updated tool_usertours/resettour template, changing the link to a button
+
 === 13.0 ===
 
 * Updated tool_usertours/tourstep template

@@ -41,7 +41,7 @@ Feature: Add a new user tour
     When I am on "Dashboard" page
     And I should not see "Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful"
     And I should not see "This area shows you what's happening in your courses"
-    And I follow "Reset user tour on this page"
+    And I click on "Reset user tour on this page" "button"
     And I should see "Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful"
 
   @javascript
