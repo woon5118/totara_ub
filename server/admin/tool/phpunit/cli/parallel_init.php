@@ -26,13 +26,12 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
 }
 
 define('TOOL_PHPUNIT_DIR_ROOT', realpath(__DIR__ . '/../../../../..'));
-define('TOOL_PHPUNIT_DIR_SERVER', realpath(TOOL_PHPUNIT_DIR_ROOT . '/server'));
-define('TOOL_PHPUNIT_DIR_VENDOR', realpath(TOOL_PHPUNIT_DIR_ROOT . '/test/phpunit/vendor'));
+define('TOOL_PHPUNIT_DIR_SERVER', TOOL_PHPUNIT_DIR_ROOT . '/server');
+define('TOOL_PHPUNIT_DIR_VENDOR', TOOL_PHPUNIT_DIR_ROOT . '/test/phpunit/vendor');
 
 require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/clilib.php');
 require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/phpunit/bootstraplib.php');
 require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/testing/lib.php');
-require_once(TOOL_PHPUNIT_DIR_VENDOR . '/autoload.php');
 
 // now get cli options
 list($options, $unrecognized) = cli_get_params(
@@ -80,6 +79,7 @@ if ($processes < 1 or $processes > 99) {
 testing_update_composer_dependencies('phpunit');
 echo "\nInitialising Totara PHPUnit test environment for parallel testing with $processes processes\n";
 
+require_once(TOOL_PHPUNIT_DIR_VENDOR . '/autoload.php');
 chdir(__DIR__);
 
 $output = null;
