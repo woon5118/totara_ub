@@ -701,8 +701,8 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $count++;
         }
         $rs->close();
-        if (!$count) {
-            // No categories found.
+        if ($count - $system_count < 1) {
+            // No (non-system) categories found.
             // This may happen after upgrade of a very old moodle version.
             // In new versions the default category is created on install.
             $defcoursecat = self::create(array('name' => get_string('miscellaneous')));
@@ -2004,7 +2004,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
 
         // If we deleted $CFG->defaultrequestcategory, make it point somewhere else.
         if ($this->id == $CFG->defaultrequestcategory) {
-            set_config('defaultrequestcategory', $DB->get_field('course_categories', 'MIN(id)', array('parent' => 0)));
+            set_config('defaultrequestcategory', $DB->get_field('course_categories', 'MIN(id)', array('parent' => 0, 'issystem' => 0)));
         }
         return array($deletedcourses, $deletedprograms, $deletedcertifs);
     }
@@ -2228,7 +2228,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
 
         // If we deleted $CFG->defaultrequestcategory, make it point somewhere else.
         if ($this->id == $CFG->defaultrequestcategory) {
-            set_config('defaultrequestcategory', $DB->get_field('course_categories', 'MIN(id)', array('parent' => 0)));
+            set_config('defaultrequestcategory', $DB->get_field('course_categories', 'MIN(id)', array('parent' => 0, 'issystem' => 0)));
         }
         return true;
     }
@@ -2982,11 +2982,26 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $children = array_reverse($children);
         }
         $i = 1;
+        $systemsubcat = [];
         foreach ($children as $cat) {
+            // Keep system categories for last.
+            if ($cat->issystem) {
+                $systemsubcat[] = $cat;
+                continue;
+            }
+
             $i++;
             $DB->set_field('course_categories', 'sortorder', $i, array('id' => $cat->id));
             $i += $cat->coursecount;
         }
+
+        // Keep using the same index, just make sure these ones are out of the way at the back.
+        foreach ($systemsubcat as $syscat) {
+            $i++;
+            $DB->set_field('course_categories', 'sortorder', $i, array('id' => $cat->id));
+            $i += $cat->coursecount;
+        }
+
         if ($cleanup) {
             self::resort_categories_cleanup();
         }

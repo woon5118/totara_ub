@@ -774,6 +774,7 @@ function totara_get_categoryid_with_capability($capability) {
     $sql = "SELECT cc.id, cc.sortorder, cc.depth, cc.visible, $fields
                   FROM {course_categories} cc
                   JOIN {context} ctx ON cc.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
+                 WHERE cc.issystem = 0
               ORDER BY depth ASC, sortorder ASC";
     $recordset = $DB->get_recordset_sql($sql, array('contextlevel' => CONTEXT_COURSECAT));
     foreach ($recordset as $record) {

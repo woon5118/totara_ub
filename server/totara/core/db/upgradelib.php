@@ -1404,3 +1404,188 @@ function totara_core_add_hashtag_tag_collection(): int {
     set_config('hashtag_collection_id', $id);
     return $id;
 }
+
+/**
+ * This function should be called if the $CFG->defaultrequestcategory value is not currently valid
+ * it will first try to reset the value to misc, then to another valid category, before recreating misc.
+ *
+ * @return bool
+ */
+function totara_core_refresh_default_category() {
+    global $DB, $CFG;
+
+    if (!empty($CFG->defaultrequestcategory)) {
+        $default = $DB->get_record('course_categories', ['id' => $CFG->defaultrequestcategory]);
+        if (!empty($default) && !$default->issystem) {
+            return false; // Default category looks good, nothing to do here.
+        }
+    }
+
+    // First check if we still have a valid misc category to fall back on.
+    $name = get_string('miscellaneous');
+    $misc = $DB->get_record('course_categories', ['name' => $name]);
+    if (!empty($misc) && !$misc->issystem) {
+        // We have a valid misc category, use that and nevermind the rest.
+        set_config('defaultrequestcategory', $misc->id);
+        return false; // Don't want to resort this category.
+    }
+
+    // Next check if we have another valid category we can use.
+    $sql = "SELECT cc.*
+              FROM {course_categories} cc
+             WHERE cc.issystem = 0
+          ORDER BY cc.depth, cc.sortorder";
+    $cats = $DB->get_records_sql($sql);
+    if (!empty($cats) && $cat = array_shift($cats)) {
+        // We have an existing valid category to use, lets use it.
+        set_config('defaultrequestcategory', $cat->id);
+        return false; // Don't want to resort this category.
+    }
+
+    // Okay neither of those worked, lets re-make misc and use that.
+    $default = new stdClass();
+    $default->name = empty($misc) ? $name : $name . time(); // Highly unlikely there is a system level misc category, but just in case.
+    $default->descriptionformat = FORMAT_MOODLE;
+    $default->description = '';
+    $default->idnumber = '';
+    $default->theme = '';
+    $default->parent = 0; // Top level category.
+    $default->depth = 1; // Top level category.
+    $default->visible = 1;
+    $default->visibleold = 1;
+    $default->sortorder = 0; // We'll fix this later on.
+    $default->timemodified = time();
+    $default->issystem = 0;
+
+    $default->id = $DB->insert_record('course_categories', $default);
+
+    // Update path (only possible after we know the category id).
+    $path = '/' . $default->id;
+    $DB->set_field('course_categories', 'path', $path, array('id' => $default->id));
+
+    // We should mark the context as dirty.
+    context_coursecat::instance($default->id)->mark_dirty();
+
+    set_config('defaultrequestcategory', $default->id);
+    return true;
+}
+
+/**
+ * Note: This was designed to be used in conjunction with totara_core_fix_category_sortorder
+ * Fix any course sortorders that are out of bounds of the new category sortorders
+ *
+ * @return bool
+ */
+function totara_core_fix_course_sortorder() {
+    global $DB;
+
+    // First move any categories that are not sorted yet to the end.
+    if ($unsorted = $DB->get_records('course_categories', ['sortorder' => 0])) {
+        $DB->set_field('course_categories', 'sortorder', MAX_COURSES_IN_CATEGORY * MAX_COURSE_CATEGORIES, ['sortorder' => 0]);
+    }
+
+    // Then get all the top level categories.
+    $topcats = $DB->get_records(
+        'course_categories',
+        ['depth' => 1],
+        'sortorder,
+        id',
+        'id, sortorder, parent, issystem, depth, path'
+    );
+
+    $sortorder = 0;
+    totara_core_fix_category_sortorder($topcats, $sortorder, 0);
+
+
+    // Make sure course sortorder is within the new category bounds.
+    $sql = "SELECT DISTINCT cc.id, cc.sortorder
+              FROM {course_categories} cc
+              JOIN {course} c ON c.category = cc.id
+             WHERE c.sortorder < cc.sortorder OR c.sortorder > cc.sortorder + " . MAX_COURSES_IN_CATEGORY;
+
+    if ($fixcategories = $DB->get_records_sql($sql)) {
+        //fix the course sortorder ranges
+        foreach ($fixcategories as $cat) {
+            $sql = "UPDATE {course}
+                       SET sortorder = " . $DB->sql_modulo('sortorder', MAX_COURSES_IN_CATEGORY) . " + :catsort
+                     WHERE category = :catid";
+            $DB->execute($sql, ['catsort' => $cat->sortorder, 'catid' => $cat->id]);
+        }
+
+        // Reset the caches by event.
+        cache_helper::purge_by_event('changesincourse');
+    }
+    unset($fixcategories);
+
+    return true;
+}
+
+/**
+ * Note: This was designed to be used in conjunction with totara_core_fix_course_sortorder
+ * Move any/all top level system categories to the back of the sortorder so they don't get used as defaults.
+ * And if we do make top level changes, make sure the changes flow down to the sub-categories and courses.
+ *
+ * @param array $categories
+ * @param int   $sortorder
+ * @param int   $parent
+ * @return bool
+ */
+function totara_core_fix_category_sortorder($categories, &$sortorder, $parent, $changesmade = false) {
+    global $DB;
+
+    // First move any system categories to the back.
+    $cats = [];
+    $syscats = [];
+    $syschanged = false;
+    foreach ($categories as $cat) {
+        if ($cat->issystem) {
+            $syschanged = true;
+            $syscats[] = $cat;
+        } else {
+            // If we hit a regular cat after a sys one, we're making a change.
+            if ($syschanged) {
+                $changesmade = true;
+            }
+            $cats[] = $cat;
+        }
+    }
+    $categories = array_merge($cats, $syscats); // System categories at the back.
+    unset($cats);
+    unset($syscats);
+
+    if ($changesmade) {
+        // The top level ordering has changed, so lets follow through.
+        foreach ($categories as $cat) {
+            $sortorder = $sortorder + MAX_COURSES_IN_CATEGORY;
+
+            // Override and update the record if necessary.
+            if ($sortorder != $cat->sortorder) {
+                $cat->sortorder = $sortorder;
+                $DB->update_record('course_categories', $cat, true);
+
+                $context = context_coursecat::instance($cat->id)->reset_paths(false);
+            }
+
+            // Update any sub-categories as well.
+            $subcats = $DB->get_records('course_categories', ['parent' => $cat->id], 'sortorder, id');
+            totara_core_fix_category_sortorder($subcats, $sortorder, $cat->id, $changesmade);
+        }
+
+        // Reset the caches by event.
+        cache_helper::purge_by_event('changesincoursecat');
+
+        // When we're all done, rebuild the context paths.
+        if ($parent === 0) {
+            $start = time();
+            echo str_pad(userdate($start, '%H:%M:%S'), 10) . "Updating context paths, this may take a minute...\n";
+            context_helper::build_all_paths(false, false); // Not forced, not verbose.
+            $duration = time()  - $start;
+            $seconds = $duration % 60;
+            $minutes = (int)floor($duration / 60);
+            echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "... done, duration {$minutes}:{$seconds}\n";
+        }
+    }
+    unset($categories);
+
+    return true;
+}

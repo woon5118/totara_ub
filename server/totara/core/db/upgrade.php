@@ -1472,5 +1472,36 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020100109, 'totara', 'core');
     }
 
+    if ($oldversion < 2020100112) {
+        global $DB;
+
+        // Check the default category, and fix it up if need be.
+        $changed = totara_core_refresh_default_category();
+
+        // Get the category at the top of the sortorder (ignoring unsorted)
+        $topcats = $DB->get_records_select(
+            'course_categories',
+            'depth = 1 AND sortorder != 0',
+            null,
+            'sortorder, id',
+            'issystem',
+            0,
+            1
+        );
+        $topcat = array_pop($topcats); // It's 1 record but in an array anyway.
+
+        /**
+         * We've added a new category and need to fix the ordering,
+         * or we have a system category at the head of the sortorder.
+         * Either way we need to resort the course categories.
+         */
+        if ($changed || !empty($topcat->issystem)) {
+            totara_core_fix_course_sortorder();
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100112, 'totara', 'core');
+    }
+
     return true;
 }

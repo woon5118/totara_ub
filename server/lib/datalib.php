@@ -940,7 +940,7 @@ function fix_course_sortorder() {
         $cacheevents['changesincoursecat'] = true;
     }
 
-    $allcats = $DB->get_records('course_categories', null, 'sortorder, id', 'id, sortorder, parent, depth, path');
+    $allcats = $DB->get_records('course_categories', null, 'sortorder, id', 'id, sortorder, parent, issystem, depth, path');
     $topcats    = array();
     $brokencats = array();
     foreach ($allcats as $cat) {
@@ -1142,6 +1142,26 @@ function _fix_course_cats($children, &$sortorder, $parent, $depth, $path, &$fixc
 
     $depth++;
     $changesmade = false;
+
+    // TOTARA - make sure the system categories are last.
+    $cats = [];
+    $syscats = [];
+    $syschanged = false;
+    foreach ($children as $cat) {
+        if ($cat->issystem) {
+            $syschanged = true;
+            $syscats[] = $cat;
+        } else {
+            // If we hit a regular cat after a sys one, we're making a change.
+            if ($syschanged) {
+                $changesmade = true;
+            }
+            $cats[] = $cat;
+        }
+    }
+    $children = array_merge($cats, $syscats); // System categories at the back.
+    unset($cats);
+    unset($syscats);
 
     foreach ($children as $cat) {
         $sortorder = $sortorder + MAX_COURSES_IN_CATEGORY;
