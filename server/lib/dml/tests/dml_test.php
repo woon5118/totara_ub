@@ -6725,6 +6725,63 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertEquals($data['content'], $result->content);
         $dbman->drop_table($table);
     }
+
+    /**
+     * Test build menu from records function
+     */
+    public function test_build_menu_from_records() {
+        $DB = $this->tdb;
+
+        $buildmenureflection = new ReflectionMethod('moodle_database', 'build_menu_from_records');
+        $buildmenureflection->setAccessible(true);
+
+        // Empty records
+        $records = [];
+        $menu = $buildmenureflection->invokeArgs($DB, [$records]);
+        $this->assertEquals([], $menu);
+
+        // Many field in records
+        $records = [
+            (object) ['id' => '1', 'username' => 'guest', 'firstname' => 'Guest user', 'lastname' => " "],
+            (object) ['id' => '3', 'username' => 'learner1', 'firstname' => 'Learner', 'lastname' => 'One'],
+            (object) ['id' => '4', 'username' => 'learner2', 'firstname' => 'Learner', 'lastname' => 'Two']
+        ];
+        $menu = $buildmenureflection->invokeArgs($DB, [$records]);
+        $expected = [
+            '1' => 'guest',
+            '3' => 'learner1',
+            '4' => 'learner2'
+        ];
+        $this->assertEquals($expected, $menu);
+
+        // Exactly 2 fields in records
+        $records = [
+            (object) ['id' => '1', 'username' => 'guest'],
+            (object) ['id' => '3', 'username' => 'learner1'],
+            (object) ['id' => '4', 'username' => 'learner2']
+        ];
+        $menu = $buildmenureflection->invokeArgs($DB, [$records]);
+        $expected = [
+            '1' => 'guest',
+            '3' => 'learner1',
+            '4' => 'learner2'
+        ];
+        $this->assertEquals($expected, $menu);
+
+        // Only one field in records
+        $records = [
+            (object) ['username' => 'guest'],
+            (object) ['username' => 'learner1'],
+            (object) ['username' => 'learner2']
+        ];
+        $menu = $buildmenureflection->invokeArgs($DB, [$records]);
+        $expected = [
+            'guest' => null,
+            'learner1' => null,
+            'learner2' => null
+        ];
+        $this->assertEquals($expected, $menu);
+    }
 }
 
 /**

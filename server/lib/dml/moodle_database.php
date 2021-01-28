@@ -1763,6 +1763,39 @@ abstract class moodle_database {
     }
 
     /**
+     * Given an array of records, produces a associative array where the key is the first property and the value is the second.
+     * @param stdClass[] $records
+     * @return string[]
+     */
+    protected final function build_menu_from_records(array $records): array {
+        $menu = [];
+        if (!$records || empty($records)) {
+            return $menu;
+        }
+        $first = reset($records);
+        // This will silently and efficiently discard all but the first two properties.
+        $fieldnames = array_keys(get_object_vars($first));
+        switch (count($fieldnames)) {
+            case 0:
+                throw new coding_exception('Records passed to build_menu_from_records() have no properties.');
+            case 1:
+                // This is legit, the caller may not care about the value at this point in time.
+                $prop_key = $fieldnames[0];
+                $prop_value = null;
+                break;
+            case 2:
+            default:
+                $prop_key = $fieldnames[0];
+                $prop_value = $fieldnames[1];
+                break;
+        }
+        foreach ($records as $record) {
+            $menu[$record->{$prop_key}] = isset($record->{$prop_value}) ? $record->{$prop_value} : null;
+        }
+        return $menu;
+    }
+
+    /**
      * Get the first two columns from a number of records as an associative array where all the given conditions met.
      *
      * Arguments are like {@link function get_recordset}.
@@ -1782,16 +1815,11 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_records_menu($table, array $conditions=null, $sort='', $fields='*', $limitfrom=0, $limitnum=0) {
-        $menu = array();
-        if ($records = $this->get_records($table, $conditions, $sort, $fields, $limitfrom, $limitnum)) {
-            foreach ($records as $record) {
-                $record = (array)$record;
-                $key   = array_shift($record);
-                $value = array_shift($record);
-                $menu[$key] = $value;
-            }
+        $records = $this->get_records($table, $conditions, $sort, $fields, $limitfrom, $limitnum);
+        if (!$records) {
+            return [];
         }
-        return $menu;
+        return $this->build_menu_from_records($records);
     }
 
     /**
@@ -1811,16 +1839,11 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_records_select_menu($table, $select, array $params=null, $sort='', $fields='*', $limitfrom=0, $limitnum=0) {
-        $menu = array();
-        if ($records = $this->get_records_select($table, $select, $params, $sort, $fields, $limitfrom, $limitnum)) {
-            foreach ($records as $record) {
-                $record = (array)$record;
-                $key   = array_shift($record);
-                $value = array_shift($record);
-                $menu[$key] = $value;
-            }
+        $records = $this->get_records_select($table, $select, $params, $sort, $fields, $limitfrom, $limitnum);
+        if (!$records) {
+            return [];
         }
-        return $menu;
+        return $this->build_menu_from_records($records);
     }
 
     /**
@@ -1837,16 +1860,11 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_records_sql_menu($sql, array $params=null, $limitfrom=0, $limitnum=0) {
-        $menu = array();
-        if ($records = $this->get_records_sql($sql, $params, $limitfrom, $limitnum)) {
-            foreach ($records as $record) {
-                $record = (array)$record;
-                $key   = array_shift($record);
-                $value = array_shift($record);
-                $menu[$key] = $value;
-            }
+        $records = $this->get_records_sql($sql, $params, $limitfrom, $limitnum);
+        if (!$records) {
+            return [];
         }
-        return $menu;
+        return $this->build_menu_from_records($records);
     }
 
     /**
