@@ -726,7 +726,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $roomurl = $room->get_url();
         if (empty($roomurl)) {
             // This isn't a basic linked room, check if it's a virtual room.
-            $sql = "SELECT vm.id
+            $sql = "SELECT vm.virtualmeetingid
                       FROM {facetoface_room_dates_virtualmeeting} AS vm
                 INNER JOIN {facetoface_room_dates} AS rd
                         ON vm.roomdateid = rd.id
