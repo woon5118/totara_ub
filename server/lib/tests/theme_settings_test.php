@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\hook\tenant_customizable_theme_settings;
+use core\hook\theme_settings_css_categories;
 use core\theme\file\favicon_image;
 use core\theme\file\login_image;
 use core\theme\file\logo_image;
@@ -1137,6 +1138,104 @@ class core_theme_settings_testcase extends advanced_testcase {
             'C' => ['whatever'],
         ];
         $hook->set_customizable_settings($new);
+    }
+
+    public function test_css_categories() {
+        // Replace the customizable categories and image keys
+        hook_manager::phpunit_replace_watchers([
+            [
+                'hookname' => theme_settings_css_categories::class,
+                'callback' => [__CLASS__, 'custom_css_category_watcher']
+            ],
+        ]);
+
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+
+        $expected = [
+            'colours' => '*',
+            'custom' => ['formcustom_field_customcss' => ['transform' => false]],
+            'new_category' => [
+                'css_field_1' => [],
+                'css_field_2' => [],
+                'css_field_3' => ['transform' => false],
+            ],
+        ];
+        $this->assertEqualsCanonicalizing($expected, $theme_settings->get_categories_with_css_settings());
+        $this->assertTrue($theme_settings->is_category_with_css_settings('colours'));
+        $this->assertTrue($theme_settings->is_category_with_css_settings('custom'));
+        $this->assertTrue($theme_settings->is_category_with_css_settings('new_category'));
+        $this->assertFalse($theme_settings->is_category_with_css_settings('other_category'));
+        $this->assertTrue($theme_settings->is_css_property('new_category', 'css_field_1'));
+        $this->assertTrue($theme_settings->is_css_property('new_category', 'css_field_2'));
+        $this->assertTrue($theme_settings->is_css_property('new_category', 'css_field_3'));
+        $this->assertFalse($theme_settings->is_css_property('new_category', 'other_property'));
+        $this->assertTrue($theme_settings->require_css_property_transformation('new_category', 'css_field_1'));
+        $this->assertFalse($theme_settings->require_css_property_transformation('new_category', 'css_field_3'));
+
+        // Update theme settings with some CSS categories.
+        $categories = $this->get_css_categories();
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        $css = $theme_settings->get_css_variables();
+        $this->assertEquals(":root{--css_field_1: #ff0013;--css_field_2: #f50009;}\nbody{background-color:pink;}\n", $css);
+
+        $categories = $this->get_colours(false);
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        $css = $theme_settings->get_css_variables();
+        $this->assertEquals(":root{--css_field_1: #ff0013;--css_field_2: #f50009;--nav-bg-color: #ff0000;}\nbody{background-color:pink;}\n", $css);
+    }
+
+    public static function custom_css_category_watcher(theme_settings_css_categories $hook) {
+        $hook->add_category(
+            'new_category',
+            [
+                'css_field_1' => [],
+                'css_field_2' => [],
+                'css_field_3' => ['transform' => false]
+            ]
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    private function get_css_categories(): array {
+        return [
+            [
+                'name' => 'new_category',
+                'properties' => [
+                    [
+                        'name' => 'css_field_1',
+                        'type' => 'value',
+                        'value' => '#ff0013',
+                    ],
+                    [
+                        'name' => 'css_field_2',
+                        'type' => 'value',
+                        'value' => '#f50009',
+                    ],
+                    [
+                        'name' => 'css_field_3',
+                        'type' => 'value',
+                        'value' => 'body{background-color:pink;}',
+                    ],
+                    [
+                        'name' => 'other_field_1',
+                        'type' => 'value',
+                        'value' => 'foo',
+                    ],
+                    [
+                        'name' => 'other_field_2',
+                        'type' => 'value',
+                        'value' => 'bar',
+                    ],
+                ]
+            ]
+        ];
     }
 
     /**

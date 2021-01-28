@@ -25,16 +25,15 @@ use core\hook\tenant_customizable_theme_settings as tenant_customizable_theme_se
 
 defined('MOODLE_INTERNAL') || die();
 
-class hook_tenant_customizable_theme_settings_test extends advanced_testcase {
+class core_hook_tenant_customizable_theme_settings_testcase extends advanced_testcase {
     public function test_hook() {
-        global $CFG;
 
         $this->setAdminUser();
         $test_settings = [
             'all' => '*',
             'some' => ['one', 'two'],
         ];
-        
+
         $hook = new tenant_customizable_theme_settings_hook($test_settings);
         $this->assertEqualsCanonicalizing($test_settings, $hook->get_customizable_settings());
         $this->assertTrue($hook->is_tenant_customizable_category('all'));

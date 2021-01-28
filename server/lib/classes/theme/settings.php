@@ -24,6 +24,7 @@
 namespace core\theme;
 
 use core\hook\tenant_customizable_theme_settings as tenant_customizable_theme_settings_hook;
+use core\hook\theme_settings_css_categories as theme_settings_css_categories_hook;
 use core\theme\file\helper;
 use core\theme\file\theme_file;
 use core\theme\validation\property\property_validator;
@@ -46,6 +47,9 @@ final class settings {
     /** @var tenant_customizable_theme_settings_hook */
     private $tenant_settings_hook;
 
+    /** @var array */
+    private $css_categories = [];
+
     /**
      * settings constructor.
      *
@@ -56,6 +60,7 @@ final class settings {
         $this->theme_config = $theme_config;
         $this->tenant_id = $tenant_id;
 
+        // Tabs available to tenants.
         $default_tenant_can_customize = [
             'brand' => '*',
             'colours' => '*',
@@ -378,33 +383,35 @@ final class settings {
         $custom_css = '';
         $categories = $this->get_categories($tenant_enabled, false);
         foreach ($categories as $category) {
-            // Each colour property needs to be in the root element
-            // of the document tree.
-            if ($category['name'] === 'colours') {
+            // First check if this category is contains CSS properties.
+            if ($this->is_category_with_css_settings($category['name'])) {
+                // Get all the switches that controls which properties are active.
                 $switches = array_filter($category['properties'], function (array $property) {
                     return $property['type'] === 'boolean';
                 });
-                $css = ':root{';
+                // Loop through all the properties of this category.
                 foreach ($category['properties'] as $property) {
-                    if ($property['type'] !== 'value') {
-                        continue;
-                    }
-                    if ($this->is_on($switches, $property['name'])) {
-                        $css .= "--{$property['name']}: {$property['value']};";
+                    // Check if the property has been registered as a CSS property.
+                    if ($this->is_css_property($category['name'], $property['name'], false)) {
+                        // Some properties need to be transformed into `--name: value;` pairs.
+                        if ($this->require_css_property_transformation($category['name'], $property['name'])) {
+                            if ($property['type'] !== 'value') {
+                                continue;
+                            }
+                            if ($this->is_on($switches, $property['name'])) {
+                                $css .= "--{$property['name']}: {$property['value']};";
+                            }
+                        } else {
+                            $custom_css .= "\n{$property['value']}\n";
+                        }
                     }
                 }
-                $css .= '}';
                 continue;
             }
-
-            // Custom CSS is just output as it is - the user will need
-            // to know how to format it correctly.
-            if ($category['name'] === 'custom') {
-                foreach ($category['properties'] as $property) {
-                    $custom_css .= "\n{$property['value']}\n";
-                }
-            }
         }
+
+        // Each transformed property needs to be in the root element of the document tree.
+        $css = ':root{' . $css . '}';
 
         // Return any category css with custom css added to the end.
         return $css . $custom_css;
@@ -444,7 +451,7 @@ final class settings {
     }
 
     /**
-     * Check if tenant previously enabled
+     * Check if tenant previously enabled.
      *
      * @return bool
      */
@@ -462,9 +469,10 @@ final class settings {
     }
 
     /**
-     * Check whether tenant branding is being re-enabled
+     * Check whether tenant branding is being re-enabled.
      *
      * @param array $categories
+     *
      * @return bool
      */
     public function is_re_enabling_tenant_branding(array $categories): bool {
@@ -489,7 +497,6 @@ final class settings {
             ? filter_var($new_prop['value'], FILTER_VALIDATE_BOOLEAN) ?? false
             : false;
     }
-
 
     /**
      * Confirm if a user has the capability required to manage a theme file.
@@ -530,8 +537,78 @@ final class settings {
     }
 
     /**
+     * Return the list of categories that contains CSS settings.
+     *
+     * @return array
+     */
+    public function get_categories_with_css_settings(): array {
+        if (empty($this->css_categories)) {
+            $default_css_settings_categories = [
+                'colours' => '*',
+                'custom' => [
+                    'formcustom_field_customcss' => ['transform' => false],
+                ],
+            ];
+            $css_categories_hook = new theme_settings_css_categories_hook($default_css_settings_categories);
+            $css_categories_hook->execute();
+            $this->css_categories = $css_categories_hook->get_categories();
+        }
+        return $this->css_categories;
+    }
+
+    /**
+     * @param string $category
+     *
+     * @return bool
+     */
+    public function is_category_with_css_settings(string $category): bool {
+        return in_array($category, array_keys($this->get_categories_with_css_settings()),true);
+    }
+
+    /**
+     * @param string $category
+     * @param string $property
+     * @param bool|null $validate_category
+     *
+     * @return bool
+     */
+    public function is_css_property(string $category, string $property, ?bool $validate_category = true): bool {
+        if ($validate_category && !$this->is_category_with_css_settings($category)) {
+            return false;
+        }
+
+        $categories = $this->get_categories_with_css_settings();
+        $properties = $categories[$category];
+        if (!is_array($properties)) {
+            return $properties === '*';
+        }
+
+        return array_key_exists($property, $properties);
+    }
+
+    /**
+     * @param string $category
+     * @param string $property
+     *
+     * @return bool
+     */
+    public function require_css_property_transformation(string $category, string $property): bool {
+        $categories = $this->get_categories_with_css_settings();
+        $properties = $categories[$category];
+        if (!is_array($properties)) {
+            return $properties === '*';
+        }
+        if (array_key_exists($property, $properties)) {
+            $settings = $properties[$property];
+            return !array_key_exists('transform', $settings) || $settings['transform'];
+        }
+        return true;
+    }
+
+    /**
      * @param int|null $tenant_id
      * @param string|null $theme_name
+     *
      * @return array
      */
     private function get_config_parameters(?int $tenant_id = null, ?string $theme_name = null): array {
@@ -546,6 +623,7 @@ final class settings {
 
     /**
      * @param string $name
+     *
      * @return bool
      */
     private function is_tenant_customizable_category(string $name): bool {
@@ -555,6 +633,7 @@ final class settings {
     /**
      * @param string $category
      * @param string $ui_key
+     *
      * @return bool
      */
     private function is_tenant_customizable_setting(string $category, string $ui_key): bool {

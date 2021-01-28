@@ -44,7 +44,7 @@ use totara_core\hook\base;
  */
 class tenant_customizable_theme_settings extends base {
     /**
-     * array $settings Array of customizable settings.
+     * @var array $settings Array of customizable settings.
      */
     private $settings;
 
