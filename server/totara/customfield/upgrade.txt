@@ -4,6 +4,7 @@ information provided here is intended especially for developers.
 === 13.5 ===
 
 * customfield_textarea::display_item_data() is now required to use format_text() for display value
+* customfield_text::display_item_data() has been added to use format_string() for display value
 
 === 13.0 ===
 

@@ -65,4 +65,13 @@ class customfield_text extends customfield_base {
 
         return $syncitem;
     }
+    static function display_item_data($data, $extradata=array()) {
+
+        // Export return raw value
+        if (!empty($extradata['isexport'])) {
+            return $data;
+        }
+
+        return format_string($data);
+    }
 }
