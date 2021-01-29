@@ -58,6 +58,7 @@ class seminarresource_card extends template {
      * @deprecated since Totara 13.5
      */
     public static function create_simple(string $heading, bool $inactive): self {
+        debugging(__METHOD__ . '() is deprecated. Please use the builder class instead.', DEBUG_DEVELOPER);
         return new virtualroom_card([
             'heading' => $heading,
             'simple' => true,
@@ -75,6 +76,7 @@ class seminarresource_card extends template {
      * @deprecated since Totara 13.5
      */
     public static function create_details(string $heading, seminarevent_detail_section $details, bool $inactive): self {
+        debugging(__METHOD__ . '() is deprecated. Please use the builder class instead.', DEBUG_DEVELOPER);
         return new virtualroom_card([
             'heading' => $heading,
             'simple' => false,
@@ -100,6 +102,7 @@ class seminarresource_card extends template {
      */
     public static function create(string $heading, string $buttonlabel, $url, bool $accent, ?seminarevent_detail_section $details, bool $inactive, ?string $buttonhint = null, ?string $preview = null, ?array $host_info = null): self {
         global $OUTPUT;
+        debugging(__METHOD__ . '() is deprecated. Please use the builder class instead.', DEBUG_DEVELOPER);
         if ($url instanceof moodle_url) {
             $url = $url->out(false);
         }

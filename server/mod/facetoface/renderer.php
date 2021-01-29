@@ -70,6 +70,7 @@ use mod_facetoface\output\seminarevent_detail_session_list;
 use mod_facetoface\output\seminarevent_information;
 use mod_facetoface\output\seminarevent_signup_card;
 use mod_facetoface\output\session_list_table;
+use mod_facetoface\room_dates_virtualmeeting;
 use mod_facetoface\seminar_attachment_item;
 use mod_facetoface\signup\state\attendance_state;
 use mod_facetoface\signup\state\booked;
@@ -716,7 +717,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string containing room details with relevant html tags.
      */
     public function get_session_room_details_html(seminar_session $date, room $room, string $backurl = null, bool $joinnow = false): string {
-        global $CFG, $DB;
+        global $CFG;
 
         $url = new moodle_url('/mod/facetoface/reports/rooms.php', array(
             'roomid' => $room->get_id(),
@@ -726,15 +727,22 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $roomurl = $room->get_url();
         if (empty($roomurl)) {
             // This isn't a basic linked room, check if it's a virtual room.
-            $sql = "SELECT vm.virtualmeetingid
-                      FROM {facetoface_room_dates_virtualmeeting} AS vm
-                INNER JOIN {facetoface_room_dates} AS rd
-                        ON vm.roomdateid = rd.id
-                     WHERE rd.sessionsdateid = :sdid
-                       AND rd.roomid = :rid";
-            $vmid = $DB->get_field_sql($sql, ['sdid' => $date->get_id(), 'rid' => $room->get_id()]);
-            if ($vmid && $model = vm_model::load_by_id($vmid)) {
-                $roomurl = $model->get_join_url(false);
+            $vm = room_dates_virtualmeeting::load_by_session_room($date, $room, true);
+            if ($vm !== null) {
+                $model = $vm->get_virtualmeeting();
+                if ($model !== null) {
+                    try {
+                        $roomurl = $model->get_join_url(true);
+                    } catch (\Throwable $ex) {
+                        if (!defined('BEHAT_SITE_RUNNING')) {
+                            debugging('Cannot get the virtualmeeting URL: ' . $ex->getMessage(), DEBUG_DEVELOPER);
+                        }
+                        // Swallow any exception thrown by a plugin.
+                        // Otherwise a user won't be able to see a course page or a seminar event dashboard page.
+                        $joinnow = false;
+                        $roomurl = '';
+                    }
+                }
             }
         }
 

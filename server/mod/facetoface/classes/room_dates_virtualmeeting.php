@@ -23,7 +23,10 @@
 
 namespace mod_facetoface;
 
+use core\orm\query\builder;
+use core\orm\query\exceptions\record_not_found_exception;
 use mod_facetoface\traits\crud_mapper;
+use totara_core\virtualmeeting\virtual_meeting as virtual_meeting_model;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -116,6 +119,50 @@ class room_dates_virtualmeeting implements seminar_iterator_item {
     }
 
     /**
+     * Get the builder instance by session and room.
+     *
+     * @param seminar_session|integer $sessionorid
+     * @param room|integer $roomorid
+     * @param string $alias
+     * @return builder
+     */
+    public static function get_builder_by_session_room($sessionorid, $roomorid, string $alias = 'frdvm'): builder {
+        if ($sessionorid instanceof seminar_session) {
+            $sessionorid = $sessionorid->get_id();
+        }
+        if ($roomorid instanceof room) {
+            $roomorid = $roomorid->get_id();
+        }
+        return builder::table(self::DBTABLE, $alias)
+            ->join(['facetoface_room_dates', 'frd'], "{$alias}.roomdateid", 'frd.id')
+            ->join([seminar_session::DBTABLE, 'fsd'], 'frd.sessionsdateid', 'fsd.id')
+            ->join([room::DBTABLE, 'fr'], 'frd.roomid', 'fr.id')
+            ->where('fr.id', $roomorid)
+            ->where('fsd.id', $sessionorid);
+    }
+
+    /**
+     * Load the instance by session and room.
+     *
+     * @param seminar_session|integer $sessionorid
+     * @param room|integer $roomorid
+     * @param boolean $nullifnotavailable
+     * @return self|null
+     */
+    public static function load_by_session_room($sessionorid, $roomorid, bool $nullifnotavailable = false): ?self {
+        $builder = self::get_builder_by_session_room($sessionorid, $roomorid, 'vm');
+        $record = $builder->one();
+        if (!$record && $nullifnotavailable) {
+            return null;
+        }
+        $inst = new self();
+        if ($record) {
+            $inst->from_record($record);
+        }
+        return $inst;
+    }
+
+    /**
      * Check whether the virtual meeting instance exists yet or not.
      * If the virtual meeting has been saved into the database the $id field should be non-zero
      * @return bool - true if the virtual meeting has an $id, false if it hasn't
@@ -161,5 +208,22 @@ class room_dates_virtualmeeting implements seminar_iterator_item {
     public function set_virtualmeetingid(int $virtualmeetingid): room_dates_virtualmeeting {
         $this->virtualmeetingid = $virtualmeetingid;
         return $this;
+    }
+
+    /**
+     * Load a virtual meeting model.
+     *
+     * @return virtual_meeting_model|null
+     */
+    public function get_virtualmeeting(): ?virtual_meeting_model {
+        if (!$this->exists() || empty($this->virtualmeetingid)) {
+            return null;
+        }
+        try {
+            return virtual_meeting_model::load_by_id($this->get_virtualmeetingid());
+        } catch (record_not_found_exception $ex) {
+            // swallow exception
+            return null;
+        }
     }
 }

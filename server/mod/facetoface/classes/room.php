@@ -23,6 +23,8 @@
 
 namespace mod_facetoface;
 
+use core\orm\query\builder;
+
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
 defined('MOODLE_INTERNAL') || die();
@@ -336,6 +338,33 @@ final class room implements seminar_iterator_item, seminar_attachment_item {
     }
 
     /**
+     * Check whether the room is a virtual room or not.
+     * @return boolean true if it is a virtual meeting or a custom virtual room
+     */
+    public function is_virtual(): bool {
+        return $this->is_custom_virtual() || $this->is_virtual_meeting();
+    }
+
+    /**
+     * Check whether the room is a custom virtual room or not.
+     * @return boolean true if it is a custom virtual room
+     */
+    public function is_custom_virtual(): bool {
+        return !empty($this->url);
+    }
+
+    /**
+     * Check whether the room is a virtual meeting or not.
+     * @return boolean true if it is a virtual meeting
+     */
+    public function is_virtual_meeting(): bool {
+        if (empty($this->id) || empty($this->custom)) {
+            return false;
+        }
+        return builder::table(room_virtualmeeting::DBTABLE)->where('roomid', $this->id)->exists();
+    }
+
+    /**
      * @return int
      */
     public function get_id(): int {
@@ -622,7 +651,7 @@ final class room implements seminar_iterator_item, seminar_attachment_item {
               JOIN {facetoface_sessions_dates} fsd2 ON (fsd2.id = frd2.sessionsdateid AND fsd2.id <> fsd.id)
               JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid AND fs.cancelledstatus = 0)
              WHERE frd.roomid = :roomid
-               AND ((fsd.timestart >= fsd2.timestart AND fsd.timestart < fsd2.timefinish) OR 
+               AND ((fsd.timestart >= fsd2.timestart AND fsd.timestart < fsd2.timefinish) OR
                     (fsd.timefinish > fsd2.timestart AND fsd.timefinish <= fsd2.timefinish))";
 
         return $DB->record_exists_sql($sql, array('roomid' => $this->get_id()));
