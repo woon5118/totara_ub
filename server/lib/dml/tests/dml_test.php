@@ -299,6 +299,11 @@ class core_dml_testcase extends database_driver_testcase {
         $sql = "SELECT * FROM {user}, {funny_table_name}, {mdl_stupid_table} WHERE {user}.id = {funny_table_name}.userid";
         $expected = "SELECT * FROM {$prefix}user, {$prefix}funny_table_name, {$prefix}mdl_stupid_table WHERE {$prefix}user.id = {$prefix}funny_table_name.userid";
         $this->assertSame($expected, $DB->public_fix_table_names($sql));
+
+        // ttr_prefix
+        $sql = 'SELECT * FROM "ttr_user" WHERE "ttr_user".id = :userid';
+        $expected = "SELECT * FROM {$prefix}user WHERE {$prefix}user.id = :userid";
+        $this->assertSame($expected, $DB->public_fix_table_names($sql));
     }
 
     public function test_fix_sql_params() {

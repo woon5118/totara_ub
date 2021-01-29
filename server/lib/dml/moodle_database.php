@@ -939,8 +939,16 @@ abstract class moodle_database {
      * @return string The sql with tablenames being prefixed with $CFG->prefix
      */
     protected function fix_table_names($sql) {
-        $sql = preg_replace('/"ttr_([a-z][a-z0-9_]*)"/', '{$1}', $sql);
-        $sql = preg_replace('/{([a-z][a-z0-9_]*)}/', $this->prefix.'$1', $sql);
+        $ttr_pattern = '/"ttr_([a-z][a-z0-9_]*)"/';
+        $bracket_pattern = '/{([a-z][a-z0-9_]*)}/';
+        $replacement = $this->prefix.'$1';
+
+        // If ttr_ is not present in the sql then don't run this regex
+        if (strpos($sql, 'ttr_') !== false) {
+            $sql = preg_replace($ttr_pattern, $replacement, $sql);
+        }
+        $sql = preg_replace($bracket_pattern, $replacement, $sql);
+
         return $sql;
     }
 
