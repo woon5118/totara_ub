@@ -163,31 +163,45 @@ function totara_evidence_create_completion_types() {
  * @param string $table
  * @param string $source
  * @param string $old_type
- * @param string[] $old_values
  * @param string $new_type
+ * @param string[] $old_values
  * @param string $new_value
  */
-function totara_evidence_migrate_remap_report_values($table, $source, $old_type, $new_type, $old_values, $new_value) {
+function totara_evidence_migrate_remap_report_values(
+    string $table,
+    string $source,
+    string $old_type,
+    string $new_type,
+    array $old_values,
+    string $new_value
+) {
     global $DB;
 
-    $old_values_param = "'" . implode("', '", $old_values) . "'";
+    if (empty($old_values)) {
+        return;
+    }
+
     $reports = $DB->get_recordset('report_builder', ['source' => $source]);
 
+    [$sql_in, $params_in] = $DB->get_in_or_equal($old_values, SQL_PARAMS_NAMED);
+
     foreach ($reports as $report) {
-        $report_record = $DB->get_record_select(
-            $table,
-            'reportid = :report_id AND type = :old_type AND value IN (' . $old_values_param . ') ORDER BY sortorder',
-            ['report_id' => $report->id, 'old_type' => $old_type],
-            'id',
-            IGNORE_MULTIPLE
-        );
-        if ($report_record) {
-            $DB->update_record($table, [
-                'id' => $report_record->id,
-                'type' => $new_type,
-                'value' => $new_value,
-            ]);
-        }
+        $sql = "
+            UPDATE {{$table}} 
+            SET type = :new_type, value = :new_value
+            WHERE reportid = :report_id AND type = :old_type AND value {$sql_in} 
+        ";
+
+        $params = [
+            'report_id' => $report->id,
+            'old_type' => $old_type,
+            'new_type' => $new_type,
+            'new_value' => $new_value
+        ];
+
+        $params = array_merge($params, $params_in);
+
+        $DB->execute($sql, $params);
     }
 
     $reports->close();
@@ -212,16 +226,17 @@ function totara_evidence_migrate_remap_report_saved_searches($source, $old_type,
         WHERE rb.source = :source
     ", ['source' => $source]);
 
+    $delete_saved_search_ids = [];
     foreach ($saved_searches as $saved) {
         if (empty($saved->search)) {
-            $DB->delete_records('report_builder_saved', ['id' => $saved->id]);
+            $delete_saved_search_ids[] = $saved->id;
             continue;
         }
 
         $search = unserialize($saved->search, ['allowed_classes' => false]);
 
         if (!is_array($search)) {
-            $DB->delete_records('report_builder_saved', ['id' => $saved->id]);
+            $delete_saved_search_ids[] = $saved->id;
             continue;
         }
 
@@ -253,6 +268,10 @@ function totara_evidence_migrate_remap_report_saved_searches($source, $old_type,
                 'search' => serialize($search),
             ]);
         }
+    }
+
+    if (!empty($delete_saved_search_ids)) {
+        $DB->delete_records_list('report_builder_saved', 'id', $delete_saved_search_ids);
     }
 
     $saved_searches->close();
@@ -430,7 +449,7 @@ function totara_evidence_migrate_type_name_field(int $type_id) {
     $shortname = 'oldtypename';
     $new_shortname = $shortname;
     $shortname_count = 1;
-    while ($DB->record_exists('totara_evidence_type_info_field', ['shortname' => &$new_shortname])) {
+    while ($DB->record_exists('totara_evidence_type_info_field', ['shortname' => $new_shortname])) {
         $new_shortname = $shortname . $shortname_count;
         $shortname_count++;
     }
@@ -475,9 +494,10 @@ function totara_evidence_migrate_type_fields(int $new_type_id, moodle_recordset 
         $field_ids[$old_field->id] = $new_field;
         $new_field->id = $DB->insert_record('totara_evidence_type_info_field', $new_field);
 
-        if ($new_field->datatype === 'textarea') {
-            // Copy the textarea files to a temp file area first.
-            // We don't delete the old files in this step as they need to be copied to every evidence type.
+        // If it's a textarea and it has default images / files
+        if ($new_field->datatype === 'textarea' && strpos($new_field->defaultdata, '@@PLUGINFILE@@') !== false) {
+            // Copy the textarea files with the new item id.
+            // Keep the existing one as unfortunately this is a shared component / textare combination
             totara_evidence_migrate_files(
                 'totara_customfield',
                 'old_evidence_textarea',
@@ -522,14 +542,15 @@ function totara_evidence_migrate_get_unique_name_for_record(file_storage $fs, ob
 /**
  * Migrate evidence item text area images whilst preventing duplicates.
  *
- * Previously with old evidence, images that were in the default value for a text area were not prefixed
+ * Previously (t9) with old evidence, images that were in the default value for a text area were not prefixed
  * with "@@PLUGINFILE@@" when they were saved, and instead just saved the full URL to the text area file.
  *
  * @param int $old_field_id The ID of the old text area field
+ * @param $new_field_id
  * @param int $new_data_id The ID of the new text area field data instance
  * @param string $textarea_content The actual content of the textarea
  */
-function totara_evidence_migrate_item_textarea_files($old_field_id, $new_data_id, $textarea_content) {
+function totara_evidence_migrate_item_textarea_files($old_field_id, $new_field_id, $new_data_id, $textarea_content) {
     global $DB;
     $context = context_system::instance()->id;
     $fs = get_file_storage();
@@ -537,6 +558,7 @@ function totara_evidence_migrate_item_textarea_files($old_field_id, $new_data_id
     $component = 'totara_customfield';
     $old_filearea = 'textarea';
     $new_filearea = 'evidence';
+    $has_changed = false;
 
     $file_records = $DB->get_recordset_select(
         'files',
@@ -544,36 +566,51 @@ function totara_evidence_migrate_item_textarea_files($old_field_id, $new_data_id
         [
             'contextid' => $context,
             'component' => $component,
-            'filearea' => 'old_evidence_textarea',
-            'itemid' => $old_field_id,
+            'filearea' => $old_filearea,
+            'itemid' => $new_field_id,
         ]
     );
     foreach ($file_records as $file_record) {
-        $file = $fs->get_file_instance($file_record);
-
-        $file_record->filearea = $new_filearea;
-        $file_record->itemid = $new_data_id;
         $old_filename = $file_record->filename;
-        $file_record->filename = totara_evidence_migrate_get_unique_name_for_record($fs, $file_record);
-        $fs->create_file_from_string($file_record, $file->get_content());
-
-        // Change the file URL to use the new filename.
-        // We need to encode spaces and other entities in the filename as that is how they are saved in the database.
         $old_filename_encoded = rawurlencode($old_filename);
-        $new_filename_encoded = rawurlencode($file_record->filename);
-        $textarea_content = str_replace(
-            "$pluginfile/$context/$component/$old_filearea/$old_field_id/$old_filename_encoded",
-            "$pluginfile/$context/$component/$old_filearea/$old_field_id/$new_filename_encoded",
-            $textarea_content
-        );
-    }
-    $file_records->close();
+        $broken_textarea_url = "$pluginfile/$context/$component/$old_filearea/$old_field_id/$old_filename_encoded";
 
-    // Remove the full URL from the images, making it use @@PLUGINFILE@@ instead
-    $textarea_content = file_rewrite_pluginfile_urls(
-        $textarea_content, $pluginfile, $context, $component, $old_filearea, $old_field_id, ['reverse' => true]
-    );
-    $DB->set_field('totara_evidence_type_info_data', 'data', $textarea_content, ['id' => $new_data_id]);
+        if (strpos($textarea_content, $broken_textarea_url) !== false) {
+            $file = $fs->get_file_instance($file_record);
+
+
+            $new_record_data = [
+                'filearea' => $new_filearea,
+                'itemid' => $new_data_id,
+                'filename' => totara_evidence_migrate_get_unique_name_for_record($fs, $file_record)
+            ];
+
+            $new_file_record = array_merge((array) $file_record, $new_record_data);
+
+            $fs->create_file_from_storedfile($new_file_record, $file);
+
+            // Change the file URL to use the new filename.
+            // We need to encode spaces and other entities in the filename as that is how they are saved in the database.
+            $new_filename_encoded = rawurlencode($new_file_record['filename']);
+
+            $textarea_content = str_replace(
+                "$pluginfile/$context/$component/$old_filearea/$old_field_id/$old_filename_encoded",
+                "$pluginfile/$context/$component/$new_filearea/$new_data_id/$new_filename_encoded",
+                $textarea_content
+            );
+
+            $has_changed = true;
+        }
+    }
+
+    if ($has_changed) {
+        // Remove the full URL from the images, making it use @@PLUGINFILE@@ instead
+        $textarea_content = file_rewrite_pluginfile_urls(
+            $textarea_content, $pluginfile, $context, $component, $new_filearea, $new_data_id, ['reverse' => true]
+        );
+
+        $DB->set_field('totara_evidence_type_info_data', 'data', $textarea_content, ['id' => $new_data_id]);
+    }
 }
 
 /**
@@ -617,15 +654,12 @@ function totara_evidence_migrate_item(object $item, array $fields, int $type_id,
         $data_id = $DB->insert_record('totara_evidence_type_info_data', $new_record);
 
         // Let's check for param records
-        $params = $DB->get_recordset('dp_plan_evidence_info_data_param', ['dataid' => $data_record->id]);
-        foreach ($params as $param) {
-            // Insert these param records...
-            $DB->insert_record('totara_evidence_type_info_data_param', [
-                'dataid' => $data_id,
-                'value' => $param->value,
-            ]);
-        }
-        $params->close();
+        $sql = "
+            INSERT INTO {totara_evidence_type_info_data_param} 
+                (dataid, value)
+            SELECT '{$data_id}', value FROM {dp_plan_evidence_info_data_param} WHERE dataid = :dataid
+        ";
+        $DB->execute($sql, ['dataid' => $data_record->id]);
 
         // Migrate files in text area and file manager fields
         if ($fields[$data_record->fieldid]->datatype === 'textarea') {
@@ -633,31 +667,33 @@ function totara_evidence_migrate_item(object $item, array $fields, int $type_id,
                 'itemid' => $data_id,
                 'filearea' => 'evidence',
             ], true);
-            totara_evidence_migrate_item_textarea_files($data_record->fieldid, $data_id, $data_record->data);
+            totara_evidence_migrate_item_textarea_files($data_record->fieldid, $fields[$data_record->fieldid]->id, $data_id, $data_record->data);
         } else if ($fields[$data_record->fieldid]->datatype === 'file') {
             totara_evidence_migrate_files('totara_customfield', 'old_evidence_filemgr', $data_record->id, [
                 'itemid' => $data_id,
                 'filearea' => 'evidence_filemgr',
             ], true);
 
-            // We also need to remap the data field to the new file ID
+            // We also need to remap the data field to the new migrated data ID
             $DB->set_field('totara_evidence_type_info_data', 'data', $data_id, ['id' => $data_id]);
         }
     }
     $data_records->close();
 
     // Change the evidence relations to use the new evidence
-    $relation_ids = $DB->get_fieldset_select('dp_plan_evidence_relation', 'id', 'evidenceid = ' . $item->id);
-    foreach ($relation_ids as $id) {
-        $DB->set_field('dp_plan_evidence_relation', 'evidenceid', $new_item_id, ['id' => $id]);
-    }
+    $sql = "
+        UPDATE {dp_plan_evidence_relation} 
+        SET evidenceid = :newitemid
+        WHERE evidenceid = :evidenceid
+    ";
+    $DB->execute($sql, ['newitemid' => $new_item_id, 'evidenceid' => $item->id]);
 
     // Remove the old evidence records
-    $old_data_records = $DB->get_recordset('dp_plan_evidence_info_data', ['evidenceid' => $item->id]);
-    foreach ($old_data_records as $data) {
-        $DB->delete_records('dp_plan_evidence_info_data_param', ['dataid' => $data->id]);
-    }
-    $old_data_records->close();
+    $sql = "
+        DELETE FROM {dp_plan_evidence_info_data_param}
+        WHERE dataid IN (SELECT id FROM {dp_plan_evidence_info_data} WHERE evidenceid = :evidenceid)
+    ";
+    $DB->execute($sql, ['evidenceid' => $item->id]);
     $DB->delete_records('dp_plan_evidence_info_data', ['evidenceid' => $item->id]);
     $DB->delete_records('dp_plan_evidence', ['id' => $item->id]);
 
@@ -675,10 +711,12 @@ function totara_evidence_migrate_upload_fields(int $uploaded_type_id) {
     return totara_evidence_migrate_type_fields(
         $uploaded_type_id,
         $DB->get_recordset_sql("
-            SELECT DISTINCT field.* FROM {dp_plan_evidence} item 
-            INNER JOIN {dp_plan_evidence_info_data} data ON item.id = data.evidenceid 
-            INNER JOIN {dp_plan_evidence_info_field} field ON data.fieldid = field.id
-            WHERE item.readonly = 1
+            SELECT * FROM {dp_plan_evidence_info_field} field
+            WHERE EXISTS (
+                SELECT * FROM {dp_plan_evidence} item
+                JOIN {dp_plan_evidence_info_data} data ON item.id = data.evidenceid
+                WHERE data.fieldid = field.id AND item.readonly = 1
+            )
         ")
     );
 }
@@ -757,27 +795,37 @@ function totara_evidence_migrate_completion_history_evidence($current_time, $adm
     }
 
     // Migrate the actual completion evidence, i.e. evidence that is marked as 'readonly'
-    $items = $DB->get_recordset('dp_plan_evidence', ['readonly' => 1]);
-    foreach ($items as $item) {
-        $transaction = $DB->start_delegated_transaction();
-        $new_item_id = totara_evidence_migrate_item(
-            $item, $uploaded_type_field_ids, $uploaded_type_id, $admin_userid, $current_time
-        );
+    $offset = 0;
+    $limit = 10000;
+    $has_items = true;
+    while ($has_items) {
+        $items = $DB->get_recordset('dp_plan_evidence', ['readonly' => 1], 'id', '*', $offset, $limit);
+        $has_items = $items->valid();
+        $offset = $offset + $limit;
 
-        // If the evidence had a type associated with it, then add it to the type name field
-        $legacy_type_name = $DB->get_field('dp_evidence_type', 'name', ['id' => $item->evidencetypeid]);
-        if ($legacy_type_name) {
-            $DB->insert_record('totara_evidence_type_info_data', [
-                'evidenceid' => $new_item_id,
-                'fieldid' => $old_type_field_id,
-                'data' => $legacy_type_name,
-            ]);
+        foreach ($items as $item) {
+            $transaction = $DB->start_delegated_transaction();
+
+            $new_item_id = totara_evidence_migrate_item(
+                $item, $uploaded_type_field_ids, $uploaded_type_id, $admin_userid, $current_time
+            );
+
+            // If the evidence had a type associated with it, then add it to the type name field
+            $sql = "
+                INSERT INTO {totara_evidence_type_info_data}
+                    (evidenceid, fieldid, data) 
+                SELECT '{$new_item_id}', '{$old_type_field_id}', name 
+                FROM {dp_evidence_type}
+                WHERE id = :id
+            ";
+            $DB->execute($sql, ['id' => $item->evidencetypeid]);
+
+            $transaction->allow_commit();
+
+            $progress_bar->increment();
         }
-        $transaction->allow_commit();
-
-        $progress_bar->increment();
+        $items->close();
     }
-    $items->close();
 }
 
 /**
@@ -790,7 +838,9 @@ function totara_evidence_migrate_completion_history_evidence($current_time, $adm
 function totara_evidence_migrate_manually_created_evidence($current_time, $admin_userid, $progress_bar) {
     global $DB;
 
-    foreach (totara_evidence_get_legacy_evidence_types($current_time, $admin_userid) as $old_type) {
+    $types = totara_evidence_get_legacy_evidence_types($current_time, $admin_userid);
+
+    foreach ($types as $old_type) {
         $DB->transaction(static function () use ($DB, $current_time, $admin_userid, $progress_bar, $old_type) {
             // We need to create a type from a given record
             $manual_type_record = [
@@ -819,13 +869,21 @@ function totara_evidence_migrate_manually_created_evidence($current_time, $admin
             }
 
             // Let's migrate all the records of a given type, except 'read-only'
-            $items = $DB->get_recordset('dp_plan_evidence', ['readonly' => 0, 'evidencetypeid' => $old_type->id]);
-            foreach ($items as $item) {
-                totara_evidence_migrate_item($item, $type_field_ids, $new_type_id, $current_time, $admin_userid);
+            $offset = 0;
+            $limit = 10000;
+            $has_items = true;
+            while ($has_items) {
+                $items = $DB->get_recordset('dp_plan_evidence', ['readonly' => 0, 'evidencetypeid' => $old_type->id], 'id', '*', $offset, $limit);
+                $has_items = $items->valid();
+                $offset = $offset + $limit;
 
-                $progress_bar->increment();
+                foreach ($items as $item) {
+                    totara_evidence_migrate_item($item, $type_field_ids, $new_type_id, $current_time, $admin_userid);
+
+                    $progress_bar->increment();
+                }
+                $items->close();
             }
-            $items->close();
 
             if ($old_type->id > 0) {
                 $DB->delete_records('dp_evidence_type', ['id' => $old_type->id]);
@@ -840,34 +898,50 @@ function totara_evidence_migrate_manually_created_evidence($current_time, $admin
  */
 function totara_evidence_migrate_move_files_to_temp_area() {
     global $DB;
+    // Need to override the pathnamehash in order to avoid errors due to duplicates.
+    $hash_concat = $DB->sql_concat("'evidence_file_'", 'id');
 
-    $evidence_data = $DB->get_recordset('dp_plan_evidence_info_data');
-    foreach ($evidence_data as $data) {
-        totara_evidence_migrate_files(
-            'totara_customfield',
-            'evidence',
-            $data->id,
-            ['filearea' => 'old_evidence']
-        );
-        totara_evidence_migrate_files(
-            'totara_customfield',
-            'evidence_filemgr',
-            $data->id,
-            ['filearea' => 'old_evidence_filemgr']
-        );
-    }
-    $evidence_data->close();
+    // Migrate file upload field responses (aka set by the user)
+    $DB->execute("
+        UPDATE {files}
+        SET filearea = 'old_evidence_filemgr', pathnamehash = {$hash_concat}
+        WHERE component = 'totara_customfield' AND filearea = 'evidence_filemgr'
+        AND EXISTS (
+            SELECT data.id, field.datatype
+            FROM {dp_plan_evidence_info_data} data
+            JOIN {dp_plan_evidence_info_field} field ON data.fieldid = field.id
+            WHERE field.datatype = 'file'
+            AND data.id = itemid
+        )
+    ");
 
-    $textareas = $DB->get_recordset('dp_plan_evidence_info_field', ['datatype' => 'textarea']);
-    foreach ($textareas as $textarea) {
-        totara_evidence_migrate_files(
-            'totara_customfield',
-            'textarea',
-            $textarea->id,
-            ['filearea' => 'old_evidence_textarea']
-        );
-    }
-    $textareas->close();
+    // Migrate textarea field responses (aka set by the user)
+    $DB->execute("
+        UPDATE {files}
+        SET filearea = 'old_evidence', pathnamehash = {$hash_concat}
+        WHERE component = 'totara_customfield' AND filearea = 'evidence'
+        AND EXISTS (
+            SELECT data.id, field.datatype
+            FROM {dp_plan_evidence_info_data} data
+            JOIN {dp_plan_evidence_info_field} field ON data.fieldid = field.id
+            WHERE field.datatype = 'textarea'
+            AND data.id = itemid
+        )
+    ");
+
+    // Migrate textarea field default data (aka set by the admin)
+    $DB->execute("
+        UPDATE {files}
+        SET filearea = 'old_evidence_textarea', pathnamehash = {$hash_concat}
+        WHERE component = 'totara_customfield' AND filearea = 'textarea'
+        AND EXISTS (
+            SELECT field.id, field.datatype, field.defaultdata
+            FROM {dp_plan_evidence_info_field} field
+            WHERE field.datatype = 'textarea'
+            AND field.defaultdata LIKE '%@@PLUGINFILE@@%'
+            AND field.id = itemid
+        )
+    ");
 }
 
 /**
@@ -878,10 +952,26 @@ function totara_evidence_migrate_remove_temporary_files() {
     $context = context_system::instance()->id;
     $fs = get_file_storage();
 
-    $fs->delete_area_files($context, 'totara_customfield', 'old_evidence');
-    $fs->delete_area_files($context, 'totara_customfield', 'old_evidence_filemgr');
-    $fs->delete_area_files($context, 'totara_customfield', 'old_evidence_textarea');
-    $fs->delete_area_files($context, 'totara_plan', 'dp_evidence_type');
+    $offset = 0;
+    $limit = 10000;
+    $has_files = true;
+    while ($has_files) {
+        $files = $DB->get_recordset_select(
+            'files',
+            "contextid = {$context} AND (
+                (component = 'totara_customfield' AND filearea IN ('old_evidence', 'old_evidence_filemgr', 'old_evidence_textarea'))
+                OR (component = 'totara_plan' AND filearea = 'dp_evidence_type')
+            )",
+            null, 'id', '*', $offset, $limit
+        );
+        $has_files = $files->valid();
+        $offset += $limit;
+
+        foreach ($files as $file) {
+            $fs->get_file_instance($file)->delete();
+        }
+        $files->close();
+    }
 
     $DB->delete_records('dp_plan_evidence_info_field');
 }

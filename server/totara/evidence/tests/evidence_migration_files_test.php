@@ -169,7 +169,7 @@ class totara_evidence_migration_files_testcase extends totara_evidence_migration
             'fullname' => 'textarea',
             'shortname' => 'textarea',
             'datatype' => 'textarea',
-            'param1' => implode(' ', [
+            'defaultdata' => implode(' ', [
                 "@@PLUGINFILE@@/field_file1.txt",
                 "@@PLUGINFILE@@/field%20file%202.txt",
                 "@@PLUGINFILE@@/field_file1 (1).txt",
@@ -205,11 +205,11 @@ class totara_evidence_migration_files_testcase extends totara_evidence_migration
             'fieldid' => $field->id,
             'data' => implode(' ', [
                 "$textarea_url_base/field_file_1.txt",
-                "$textarea_url_base/field%20file%202.txt",
-                "$textarea_url_base/field_file_1%20(1).txt",
+                "$textarea_url_base/".rawurlencode('field file 2.txt'),
+                "$textarea_url_base/".rawurlencode('field_file_1 (1).txt'),
                 "@@PLUGINFILE@@/field_file_1.txt",
-                "@@PLUGINFILE@@/field%20file%202.txt",
-                "@@PLUGINFILE@@/field_file_1%20(1).txt",
+                "@@PLUGINFILE@@/".rawurlencode('field file 2.txt'),
+                "@@PLUGINFILE@@/".rawurlencode('field_file_1 (1).txt'),
             ]),
         ]);
         $manual_files = [
@@ -271,6 +271,23 @@ class totara_evidence_migration_files_testcase extends totara_evidence_migration
         // Make sure the temporary file areas no longer exist
         $this->assertEmpty($this->fs->get_area_files($this->context->id, 'totara_customfield', 'temp_evidence'));
         $this->assertEmpty($this->fs->get_area_files($this->context->id, 'totara_customfield', 'temp_evidence_textarea'));
+
+        $this->assertStringNotContainsString("$textarea_url_base/field_file_1.txt", $new_field_data->data);
+        $this->assertStringNotContainsString("$textarea_url_base/".rawurlencode('field file 2.txt'), $new_field_data->data);
+        $this->assertStringNotContainsString("$textarea_url_base/".rawurlencode('field_file_1 (1).txt'), $new_field_data->data);
+
+        $expected_file_strings = [
+            '@@PLUGINFILE@@/field_file_1%20%282%29.txt',
+            '@@PLUGINFILE@@/field%20file%202%20%281%29.txt',
+            '@@PLUGINFILE@@/field_file_1%20%281%29%20%281%29.txt',
+            '@@PLUGINFILE@@/field_file_1.txt',
+            '@@PLUGINFILE@@/field%20file%202.txt',
+            '@@PLUGINFILE@@/field_file_1%20%281%29.txt',
+        ];
+
+        foreach ($expected_file_strings as $expected_file_string) {
+            $this->assertStringContainsString($expected_file_string, $new_field_data->data);
+        }
     }
 
     /**
