@@ -348,7 +348,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 FROM {facetoface_signups} su
                 {$global_restriction_join_su}
                 JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-               WHERE ss.superceded = 0 AND ss.statuscode >= " . \mod_facetoface\signup\state\waitlisted::get_code() ." AND su.sessionid = base.id)",
+               WHERE ss.superceded = 0 AND ss.statuscode >= " . \mod_facetoface\signup\state\booked::get_code() ." AND su.sessionid = base.id)",
             array(
                 'dbdatatype' => 'integer',
                 'displayfunc' => 'integer',
@@ -365,7 +365,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 FROM {facetoface_signups} su
                 {$global_restriction_join_su}
                 JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-               WHERE ss.superceded = 0 AND ss.statuscode >= " . \mod_facetoface\signup\state\waitlisted::get_code() ." AND su.sessionid = base.id)",
+               WHERE ss.superceded = 0 AND ss.statuscode >= " . \mod_facetoface\signup\state\booked::get_code() ." AND su.sessionid = base.id)",
             array(
                 'dbdatatype' => 'integer',
                 'displayfunc' => 'f2f_num_attendees_link',

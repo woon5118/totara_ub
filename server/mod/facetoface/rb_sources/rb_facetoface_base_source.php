@@ -412,9 +412,8 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             "(SELECT su.sessionid, count(ss.id) AS number
                 FROM {facetoface_signups} su
                 {$global_restriction_join_su}
-                JOIN {facetoface_signups_status} ss
-                    ON su.id = ss.signupid
-                WHERE ss.superceded=0 AND ss.statuscode >= " . \mod_facetoface\signup\state\waitlisted::get_code() ."
+                JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+                WHERE ss.superceded = 0 AND ss.statuscode >= " . \mod_facetoface\signup\state\booked::get_code() ."
                 GROUP BY su.sessionid)",
             "attendees.sessionid = {$sessiondatejoin}.sessionid",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
