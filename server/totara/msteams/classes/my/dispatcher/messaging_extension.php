@@ -199,7 +199,7 @@ class messaging_extension implements dispatchable {
             }
             if (!empty($object->link)) {
                 $url = page_helper::create_deep_link($object->link->url, $object->name ?? null);
-                $card->tap(builder::action()
+                $card->add_button(builder::action()
                     ->url($object->link->label, $url)
                     ->build());
             }

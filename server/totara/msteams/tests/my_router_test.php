@@ -673,11 +673,11 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
         $this->assertStringContainsString('Culinary art', $json->composeExtension->attachments[0]->content->title);
         $this->assertEquals('Courses', $json->composeExtension->attachments[0]->content->subtitle);
         $this->assertStringContainsString("Let's cook", $json->composeExtension->attachments[0]->content->text);
-        $this->assertCount(0, $json->composeExtension->attachments[0]->content->buttons);
-        $this->assertEquals('openUrl', $json->composeExtension->attachments[0]->content->tap->type);
-        $this->assertEquals(get_string('catalog_go_to_course', 'moodle'), $json->composeExtension->attachments[0]->content->tap->title);
-        $this->assertEquals(get_string('catalog_go_to_course', 'moodle'), $json->composeExtension->attachments[0]->content->tap->text);
-        $this->assertEquals($deeplinkurl, $json->composeExtension->attachments[0]->content->tap->value);
+        $this->assertCount(1, $json->composeExtension->attachments[0]->content->buttons);
+        $this->assertEquals('openUrl', $json->composeExtension->attachments[0]->content->buttons[0]->type);
+        $this->assertEquals(get_string('catalog_go_to_course', 'moodle'), $json->composeExtension->attachments[0]->content->buttons[0]->title);
+        $this->assertEquals(get_string('catalog_go_to_course', 'moodle'), $json->composeExtension->attachments[0]->content->buttons[0]->text);
+        $this->assertEquals($deeplinkurl, $json->composeExtension->attachments[0]->content->buttons[0]->value);
         $this->assertEquals($hasimage, isset($json->composeExtension->attachments[0]->content->images[0]));
 
         $activity = $this->messaging_extension($group, 'blahblah');
