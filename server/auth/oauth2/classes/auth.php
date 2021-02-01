@@ -410,7 +410,7 @@ class auth extends \auth_plugin_base {
      * @return void Either redirects or throws an exception
      */
     public function complete_login(client $client, $redirecturl) {
-        global $CFG, $SESSION, $PAGE;
+        global $CFG, $SESSION, $PAGE, $USER;
 
         $userinfo = $client->get_userinfo();
 
@@ -616,6 +616,12 @@ class auth extends \auth_plugin_base {
 
         // Redirect to home page if PARAM_LOCALURL validation on wantsurl failed.
         $redirecturl = ($redirecturl == '') ? $CFG->wwwroot : $redirecturl;
+
+        if (user_not_fully_set_up($USER, true)) {
+            unset($SESSION->wantsurl);
+            $redirecturl = $CFG->wwwroot . '/user/edit.php?returnurl=' . urlencode($redirecturl);
+        }
+
         redirect($redirecturl);
     }
 

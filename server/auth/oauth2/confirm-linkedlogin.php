@@ -53,6 +53,12 @@ if ($confirmed) {
 
         \core\session\manager::apply_concurrent_login_limit($user->id, session_id());
 
+        if (user_not_fully_set_up($USER, true)) {
+            // Return to homepage after adding missing required profile data during first login.
+            unset($SESSION->wantsurl);
+            redirect($CFG->wwwroot . '/user/edit.php?returnurl=' . urlencode("$CFG->wwwroot/"));
+        }
+
         // Check where to go, $redirect has a higher preference.
         if (empty($redirect) and !empty($SESSION->wantsurl) ) {
             $redirect = $SESSION->wantsurl;
