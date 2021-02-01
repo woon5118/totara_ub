@@ -178,14 +178,14 @@ function totara_plan_upgrade_do_program_assignments() {
                         }
                         break;
                     case MESSAGETYPE_PROGRAM_DUE:
-                        $timedue = $DB->get_field('prog_completion', 'timedue', ['programid' => $programid, 'userid' => $record->userid]);
+                        $timedue = $DB->get_field('prog_completion', 'timedue', ['programid' => $programid, 'userid' => $record->userid, 'coursesetid' => 0]);
                         if ($timedue && $timedue > 0 && (($timedue - $prog_message->triggertime) < $now)) {
                             $todb['timeissued'] = $now;
                             $insertrecords[] = $todb;
                         }
                         break;
                     case MESSAGETYPE_PROGRAM_OVERDUE:
-                        $timedue = $DB->get_field('prog_completion', 'timedue', ['programid' => $programid, 'userid' => $record->userid]);
+                        $timedue = $DB->get_field('prog_completion', 'timedue', ['programid' => $programid, 'userid' => $record->userid, 'coursesetid' => 0]);
                         if ($timedue && $timedue > 0 && (($timedue + $prog_message->triggertime) < $now)) {
                             $todb['timeissued'] = $now;
                             $insertrecords[] = $todb;
