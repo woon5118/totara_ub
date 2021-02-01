@@ -206,3 +206,40 @@ Feature: Check the seminar events and sessions reports display correctly
     Then the following should exist in the "facetoface_events" table:
     | Seminar Name      | Course Name | Event Maximum Bookings | Overbooking allowed | Number of Attendees (linked to attendee page) | Booking Status | Number of Attendees (inc Waiting Approval, Approved and Wait-listed) |
     | Test seminar name | Course 1    | 3                      | Yes                 | 3                                             | Booking full   | 4                                                                    |
+
+  Scenario: Check the Seminar events report displays the booking status correctly when Sign-up opens is used
+    When I am on "Course 1" course homepage
+    And I follow "View all events"
+
+    And I click on the seminar event action "Delete event" in row "#1"
+    And I press "Delete"
+
+    And I follow "Add event"
+    And I set the following fields to these values:
+      | registrationtimestart[enabled]   | 1                    |
+      | registrationtimestart[month]     | July                 |
+      | registrationtimestart[day]       | 1                    |
+      | registrationtimestart[year]      | ## next year ## Y ## |
+      | registrationtimestart[hour]      | 01                   |
+      | registrationtimestart[minute]    | 00                   |
+    And I click on "Edit session" "link"
+    And I set the following fields to these values:
+      | timestart[month]     | July                 |
+      | timestart[day]       | 20                   |
+      | timestart[year]      | ## next year ## Y ## |
+      | timestart[hour]      | 09                   |
+      | timestart[minute]    | 00                   |
+      | timefinish[month]    | July                 |
+      | timefinish[day]      | 20                   |
+      | timefinish[year]     | ## next year ## Y ## |
+      | timefinish[hour]     | 10                   |
+      | timefinish[minute]   | 00                   |
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Save changes"
+
+    # Check reports.
+    When I navigate to "Events report" node in "Site administration > Seminars"
+    Then I should see "Test seminar name" in the "Course 1" "table_row"
+    And I should see "Booking not open" in the "Test seminar name" "table_row"
+    And I should not see "Booking open" in the "Test seminar name" "table_row"

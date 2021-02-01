@@ -68,6 +68,7 @@ $string['status:cancelled'] = 'Event cancelled';
 $string['status:ended'] = 'Event over';
 $string['status:fullybooked'] = 'Booking full';
 $string['status:notavailable'] = 'N/A';
+$string['status:notopen'] = 'Booking not open';
 $string['status:overbooked'] = 'Overbooked';
 $string['status:started'] = 'Event in progress';
 $string['status:underbooked'] = 'Underbooked';

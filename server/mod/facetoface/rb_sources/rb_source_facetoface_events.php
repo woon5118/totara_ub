@@ -550,6 +550,7 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             get_string('bookingstatus', 'rb_source_facetoface_summary'),
             "(CASE WHEN {$now} > eventdateinfo.eventfinish AND cntsignups < {$joinsessions}.capacity THEN 'ended'
                    WHEN {$joinsessions}.registrationtimefinish <> 0 AND {$now} > {$joinsessions}.registrationtimefinish THEN 'ended'
+                   WHEN {$joinsessions}.registrationtimestart <> 0 AND {$now} < {$joinsessions}.registrationtimestart THEN 'notopen'
                    WHEN cancelledstatus <> 0 THEN 'cancelled'
                    WHEN cntsignups < {$joinsessions}.mincapacity THEN 'underbooked'
                    WHEN cntsignups < {$joinsessions}.capacity THEN 'available'
