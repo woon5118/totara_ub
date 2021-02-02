@@ -56,6 +56,9 @@ if ($CFG->catalogtype !== 'totara') {
     die;
 }
 
+// Clear out $SESSION->wantsurl before any further redirection because manual the enrol page doesn't like it.
+unset($SESSION->wantsurl);
+
 $returnurl = new moodle_url('/totara/catalog/index.php');
 // User has clicked the rewind link in the navigation bar.
 if ($rewind) {

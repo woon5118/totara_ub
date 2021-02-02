@@ -178,9 +178,9 @@ final class page_helper {
         global $USER, $PAGE, $SESSION;
         /** @var \moodle_page $PAGE */
 
-        $SESSION->wantsurl = $returnurl->out(false);
-
         if (empty($USER->id)) {
+            $SESSION->wantsurl = $returnurl->out(false);
+
             // Single Sign-On over OAuth2.
             $issuer = auth_helper::get_oauth2_issuer();
             if ($issuer === null) {
