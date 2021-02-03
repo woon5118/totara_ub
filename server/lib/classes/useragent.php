@@ -517,9 +517,11 @@ class core_useragent {
     }
 
     /**
-     * Checks the user agent is Edge (of any version).
+     * Checks the user agent is Edge Legacy.
      *
-     * @return bool true if Edge
+     * Chromium-based Edge is detected as Chrome.
+     *
+     * @return bool true if Edge Legacy
      */
     public static function is_edge() {
         return self::check_edge_version();

@@ -860,7 +860,7 @@ class theme_config {
         $svg = $this->use_svg_icons();
 
         // Totara: Legacy CSS
-        $legacy = core_useragent::is_ie();
+        $legacy = core_useragent::is_ie() || core_useragent::is_edge();
 
         // Totara: Removed chunking support as it's not used by currently supported browsers
 
