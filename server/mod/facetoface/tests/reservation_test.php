@@ -264,7 +264,7 @@ class mod_facetoface_reservation_testcase extends advanced_testcase {
         $this->assertEquals(1, $helper->count_attendees_with_codes($waitliststatcodes, false, true));
         $this->assertEquals(0, $helper->count_attendees_with_codes($waitliststatcodes, false, false));
 
-        sleep(1);
+        $this->waitForSecond();
 
         // Add student1
         $signup1 = signup_helper::signup(signup::create($student1->id, $seminarevent));

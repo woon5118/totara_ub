@@ -529,7 +529,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
         $originalsub1ja = \totara_job\job_assignment::get_with_id($sub1ja->id);
 
         // Sleep for one second so that we know the time has changed.
-        sleep(1);
+        $this->waitForSecond();
 
         // Call update_descendant_manager_paths indirectly.
         $man2ja = \totara_job\job_assignment::get_with_id($man2ja->id);

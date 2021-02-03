@@ -69,7 +69,7 @@ class core_user_userdata_additionalnames_testcase extends advanced_testcase {
         $this->assertTrue(additionalnames::is_purgeable($suspendeduser->status));
 
         // To test if timemodified changed we need to pause for a second.
-        sleep(1);
+        $this->waitForSecond();
 
         // Triggering and capturing the event.
         $sink = $this->redirectEvents();

@@ -112,7 +112,7 @@ class core_user_userdata_otherfields_testcase extends advanced_testcase {
         $this->assertNotEmpty($fs->get_area_files($controluser->contextid, 'user', 'profile'));
 
         // To test if timemodified changed we need to pause for a second.
-        sleep(1);
+        $this->waitForSecond();
 
         // We want to catch events.
         $sink = $this->redirectEvents();

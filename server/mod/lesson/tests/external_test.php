@@ -1132,7 +1132,7 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->assertTimeCurrent($result['data']['students'][0]['attempts'][0]['timeend']);
 
         // Add a new attempt (same user).
-        sleep(1);
+        $this->waitForSecond();
         // Allow first retake.
         $DB->set_field('lesson', 'retake', 1, array('id' => $this->lesson->id));
         // Create a finished attempt with correct answer.
@@ -1203,7 +1203,7 @@ class mod_lesson_external_testcase extends externallib_advanced_testcase {
         $this->create_attempt($this->student, true, true);
 
         $DB->set_field('lesson', 'retake', 1, array('id' => $this->lesson->id));
-        sleep(1);
+        $this->waitForSecond();
         $this->create_attempt($this->student, false, false);
 
         $this->setAdminUser();

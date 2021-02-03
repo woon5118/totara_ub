@@ -248,7 +248,7 @@ class totara_catalog_wildcard_search_testcase extends advanced_testcase {
                         if (10 < $attempted) {
                             return false;
                         }
-                        sleep(1);
+                        $this->waitForSecond();
                         $attempted += 1;
                 }
             }

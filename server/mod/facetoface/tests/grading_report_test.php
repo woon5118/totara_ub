@@ -124,7 +124,7 @@ class grading_report_testcase extends advanced_testcase {
             if ($i++ > 100) {
                 $this->fail('Cannot simulate the time window required for this test.');
             }
-            sleep(1);
+            $this->waitForSecond();
             $frac = time() % 100;
         }
         attendees_list_helper::add($data);

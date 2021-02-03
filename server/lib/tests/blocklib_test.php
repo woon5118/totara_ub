@@ -696,9 +696,7 @@ return;
         $block = reset($blocks);
 
         // Wait until at least the next second.
-        while (time() === $after) {
-            usleep(100000);
-        }
+        $this->waitForSecond();
 
         // Update block settings.
         $this->setAdminUser();
@@ -716,9 +714,7 @@ return;
         $this->assertEquals($blockdata->timecreated, $newblockdata->timecreated);
 
         // Also try repositioning the block.
-        while (time() === $after) {
-            usleep(100000);
-        }
+        $this->waitForSecond();
         $before = time();
         $blockmanager->reposition_block($blockdata->id, $regionname, 10);
         $after = time();

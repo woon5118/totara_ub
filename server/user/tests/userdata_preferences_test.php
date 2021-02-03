@@ -90,7 +90,7 @@ class core_user_userdata_preferences_testcase extends advanced_testcase {
         $sink = $this->redirectEvents();
 
         // To test timemodified we need to wait a second.
-        sleep(1);
+        $this->waitForSecond();
 
         /****************************
          * PURGE activeuser

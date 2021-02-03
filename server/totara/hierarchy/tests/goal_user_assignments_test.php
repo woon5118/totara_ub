@@ -604,7 +604,7 @@ class totara_hierarchy_goal_user_assignments_testcase extends advanced_testcase 
         \totara_job\job_assignment::create_default($data->user2->id, ['organisationid' => $data->org3->id]);
 
         $this->setUser($data->user5);
-        sleep(1); // Ensures that timemodified is updated for the second time.
+        $this->waitForSecond(); // Ensures that timemodified is updated for the second time.
         $timebefore = time();
         $data->goal->update_user_assignments($data->goalid, GOAL_ASSIGNMENT_ORGANISATION, $data->assignment1);
         $timeafter = time();
