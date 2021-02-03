@@ -69,7 +69,7 @@
     }
 }}
 
-<div class="mod_facetoface__eventinfo__sidebars" data-core-autoinitialise="true" data-core-autoinitialise-amd="mod_facetoface/seminarresource_card">
+<div class="mod_facetoface__eventinfo__sidebars">
     <div class="mod_facetoface__eventinfo__sidebar__panel mod_facetoface__resource-card{{#simple}} mod_facetoface__resource-card--simple{{/simple}}{{#inactive}} mod_facetoface__resource-card--inactive{{/inactive}}">
         {{#heading}}<h3>{{.}}</h3>{{/heading}}
         {{#subtitle}}<h4>{{.}}</h4>{{/subtitle}}
@@ -77,31 +77,11 @@
         {{#multibutton}}
             <div class="mod_facetoface__resource-card__button">
                 {{#hostbutton}}<a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>{{text}}</a>{{/hostbutton}}
-                {{#joinbutton}}
-                    <a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>
-                        {{text}}
-                    </a>
-                    <a class="mod_facetoface__resource-card__copy" role="button" href="#">
-                        {{#flex_icon}} mod_facetoface|copy_virtual_room_link {{/flex_icon}}
-                        {{#str}} copyroomlink, mod_facetoface {{/str}}
-                    </a>
-                    <input class="mod_facetoface__resource-card__copy-container" type="text" aria-hidden="true" value="{{url}}" tabIndex="-1" />
-                {{/joinbutton}}
+                {{#joinbutton}}<a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>{{text}}</a>{{/joinbutton}}
             </div>
         {{/multibutton}}
         {{^multibutton}}
-            {{#button}}
-                <div class="mod_facetoface__resource-card__button">
-                    <a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>
-                        {{text}}
-                    </a>
-                    <a class="mod_facetoface__resource-card__copy" role="button" href="#">
-                        {{#flex_icon}} mod_facetoface|copy_virtual_room_link {{/flex_icon}}
-                        {{#str}} copyroomlink, mod_facetoface {{/str}}
-                    </a>
-                    <input class="mod_facetoface__resource-card__copy-container" type="text" aria-hidden="true" value="{{url}}" tabIndex="-1" />
-                </div>
-            {{/button}}
+            {{#button}}<div class="mod_facetoface__resource-card__button"><a role="button" href="{{url}}" class="btn {{#accent}}btn-primary{{/accent}}{{^accent}}btn-default{{/accent}}" target="_blank" rel="noopener noreferrer"{{#hint}} aria-label="{{.}}"{{/hint}}>{{text}}</a></div>{{/button}}
         {{/multibutton}}
         {{#preview}}<div class="mod_facetoface__resource-card__preview">{{{.}}}</div>{{/preview}}
     </div>

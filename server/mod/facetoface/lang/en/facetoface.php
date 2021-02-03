@@ -422,7 +422,6 @@ $string['copynotification'] = 'Copy notification';
 $string['copynotificationcreated'] = 'Copy of the notification is created.';
 $string['copynotificationconfirm'] = 'Confirm you would like to copy the notification <strong>"{$a}"</strong>:';
 $string['copynotificationtitle'] = 'Copy of {$a}';
-$string['copyroomlink'] = 'Copy room link';
 $string['copysession'] = 'Copy event';
 $string['cost'] = 'Cost';
 $string['close'] = 'Close';
