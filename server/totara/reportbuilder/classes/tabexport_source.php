@@ -155,12 +155,12 @@ class tabexport_source extends \totara_core\tabexport_source {
         }
         $rs->close();
 
-        $svgdata = $graph->render($w, $h);
-        if (!$svgdata) {
+        $svgdata = $graph->get_render_data($w, $h);
+        if (!isset($svgdata['svg'])) {
             return null;
         }
 
-        return $svgdata;
+        return $svgdata['svg'];
     }
 
     /**
