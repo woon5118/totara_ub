@@ -1309,6 +1309,54 @@ class core_theme_settings_testcase extends advanced_testcase {
         self::assertEquals(0, helper::get_prelogin_tenantid());
     }
 
+    public function test_email_to_user() {
+        $theme_config = \theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+
+        $user1 = $this->getDataGenerator()->create_user(array('mailformat' => 1, 'maildisplay' => 0));
+        $user2 = $this->getDataGenerator()->create_user(array('mailformat' => 1, 'maildisplay' => 0));
+        $subject = 'subject';
+        $messagetext = 'message text';
+
+        // Confirm that email is using the default colour hard coded in mustache template.
+        $sink = $this->redirectEmails();
+        email_to_user($user1, $user2, $subject, $messagetext);
+        $result = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $result);
+        $body = quoted_printable_decode($result[0]->body);
+        $body = preg_replace("#\r\n#", "\n", $body);
+
+        $this->assertStringContainsString('background-color: #99ac3a;', $body);
+        $this->assertStringNotContainsString('background-color: #850400;', $body);
+
+        $categories = [
+            [
+                'name' => 'colours',
+                'properties' => [
+                    [
+                        'name' => 'color-primary',
+                        'type' => 'value',
+                        'value' => '#850400',
+                    ],
+                ],
+            ]
+        ];
+        $theme_settings->update_categories($categories);
+
+        // Confirm that email is using the theme settings colour.
+        $sink = $this->redirectEmails();
+        email_to_user($user1, $user2, $subject, $messagetext);
+        $result = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $result);
+        $body = quoted_printable_decode($result[0]->body);
+        $body = preg_replace("#\r\n#", "\n", $body);
+
+        $this->assertStringContainsString('background-color: #850400;', $body);
+        $this->assertStringNotContainsString('background-color: #99ac3a;', $body);
+    }
+
     public function test_theme_not_using_tui_theme_settings() {
         $this->setAdminUser();
 

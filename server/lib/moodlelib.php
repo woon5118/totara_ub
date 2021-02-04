@@ -30,6 +30,7 @@
 
 use core\performance_statistics\collector;
 use totara_core\advanced_feature;
+use core\theme\settings as theme_settings;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -6465,6 +6466,12 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
 
     if (!empty($user->mailformat) && $user->mailformat == 1) {
         // Only process html templates if the user preferences allow html email.
+
+        $theme_settings = new theme_settings($PAGE->theme, $user->tenantid ?? 0);
+        $color_primary = $theme_settings->get_property('colours', 'color-primary');
+        if (!empty($color_primary)) {
+            $context['backgroundcolor'] = $color_primary['value'];
+        }
 
         if ($messagehtml) {
             // If html has been given then pass it through the template.
