@@ -151,7 +151,7 @@ class totara_competency_webapi_resolver_query_assignment_testcase extends advanc
      * @return totara_competency_generator
      */
     protected function generator() {
-        return phpunit_util::get_data_generator()->get_plugin_generator('totara_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     /**

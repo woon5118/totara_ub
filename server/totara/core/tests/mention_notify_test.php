@@ -57,8 +57,8 @@ class totara_core_mention_notify_testcase extends advanced_testcase {
             'comment'
         );
 
-        $sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $this->assertCount(1, $messages);
@@ -76,8 +76,8 @@ class totara_core_mention_notify_testcase extends advanced_testcase {
         $handler = content_handler::create();
         $handler->handle_with_params('test', $content, FORMAT_PLAIN, 1,'totara_comment', 'view');
 
-        $sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $this->assertCount(1, $messages);
@@ -100,8 +100,8 @@ class totara_core_mention_notify_testcase extends advanced_testcase {
         $handler = content_handler::create();
         $handler->handle_with_params('test', $content, FORMAT_HTML, 1,'totara_comment', 'view');
 
-        $sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $this->assertCount(1, $messages);
@@ -114,7 +114,7 @@ class totara_core_mention_notify_testcase extends advanced_testcase {
         global $DB;
 
         $this->setAdminUser();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $user = $this->getDataGenerator()->create_user();
         $document = json_encode([
@@ -146,8 +146,8 @@ class totara_core_mention_notify_testcase extends advanced_testcase {
         // Simulate updating.
         $handler->handle_with_params('test', $document, FORMAT_JSON_EDITOR, 1, 'totara_core', 'view');
 
-        $sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $this->assertCount(1, $messages);

@@ -178,8 +178,8 @@ class mod_facetoface_send_thirdparty_testcase extends advanced_testcase {
         $this->setAdminUser();
         $this->set_up_test_environment();
 
-        $sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         // Expecting the $messages to have more than 0 messages, as there were users were signed up into the event

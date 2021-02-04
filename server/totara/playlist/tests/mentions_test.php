@@ -50,7 +50,7 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
         );
 
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         // Set current user again because tasks use cron_setup_user().
         $this->setUser($user);
 
@@ -72,7 +72,7 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
         $summary = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"UPDATED SUMMARY"},{"type":"mention","attrs":{"id":"' . $user2->id . '","display":"Receiver Two"}},{"type":"mention","attrs":{"id":"' . $user3->id . '","display":"Another Three"}}]}]}';
         $playlist->update(null, null, $summary, FORMAT_JSON_EDITOR);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -104,7 +104,7 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
             '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"INITIAL SUMMARY"},{"type":"mention","attrs":{"id":"' . $user2->id . '","display":"Receiver Two"}}]}]}',
             FORMAT_JSON_EDITOR
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Create comment
         $sink = $this->redirectMessages();
@@ -117,7 +117,7 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
             null,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -140,7 +140,7 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -163,7 +163,7 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -186,7 +186,7 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();

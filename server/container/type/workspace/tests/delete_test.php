@@ -150,7 +150,7 @@ class container_workspace_delete_testcase extends advanced_testcase {
         $workspace_generator = $generator->get_plugin_generator('container_workspace');
         $workspace = $workspace_generator->create_workspace();
 
-        $event_sink = phpunit_util::start_event_redirection();
+        $event_sink = $this->redirectEvents();
         self::assertEmpty($event_sink->get_events());
 
         $workspace_id = $workspace->get_id();

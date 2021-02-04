@@ -61,13 +61,13 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
         $content->set_user_id($user_one->id);
 
         // Clear any adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $processor = new mention_processor();
         $processor->process_format_json_editor($content);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -116,13 +116,13 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
         $content->set_user_id($user_one->id);
 
         // Clear any adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $processor = new mention_processor();
         $processor->process_format_json_editor($content);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -168,13 +168,13 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
         );
 
         // Clear any adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $processor = new mention_processor();
         $processor->process_format_json_editor($content);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -205,13 +205,13 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
         );
 
         // Clear adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $processor = new mention_processor();
         $processor->process_format_json_editor($content);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertEmpty($messages);
@@ -231,13 +231,13 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
             'core_area'
         );
 
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $processor = new mention_processor();
         $processor->process_format_text($content);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertEmpty($messages);
@@ -262,13 +262,13 @@ class totara_core_content_mention_processor_testcase extends advanced_testcase {
         );
 
         // Clear out the adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $processor = new mention_processor();
         $processor->process_format_text($content);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);

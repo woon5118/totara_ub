@@ -107,7 +107,7 @@ class mod_facetoface_manager_reject_user_testcase extends advanced_testcase {
         }
 
         // Test suite starts from here
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         $signups = new signup_list(['sessionid' => $seminarevent->get_id()]);
         /** @var signup $signup */
         foreach ($signups as $signup) {

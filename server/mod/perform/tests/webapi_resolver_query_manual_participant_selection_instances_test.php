@@ -42,7 +42,7 @@ class mod_perform_webapi_resolver_query_manual_participant_selection_instances_t
         // Basically just making sure the data we create in manual_participant_selector_test_data::create_data() is returned.
         // We'll have a proper integration test for creating the data elsewhere.
         self::setAdminUser();
-        $data = new manual_participant_selector_test_data();
+        $data = new manual_participant_selector_test_data($this->getDataGenerator());
         $data->create_data();
 
         // Relationships

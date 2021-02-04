@@ -283,7 +283,7 @@ class totara_cohort_lib_testcase extends advanced_testcase {
 
         // user enrolments is now part of an adhoc task.
         $sink->clear();
-        phpunit_util::run_all_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertSame(count($expectedeventsaftersync), $sink->count());
         $eventsaftersync = $sink->get_events();
         foreach ($eventsaftersync as $event) {

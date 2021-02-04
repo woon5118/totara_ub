@@ -120,7 +120,6 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         global $DB;
 
         $emailsink = $this->redirectEmails();
-        $this->assertTrue(\phpunit_util::is_redirecting_phpmailer());
 
         list($users, $course, $seminar1, $s1events, $seminar2, $s2events) = $this->basic_seminar_setup();
 
@@ -194,14 +193,14 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         $this->assertEquals(5, signup_list::signups_by_statuscode_for_event($seminarevent21->get_id(), waitlisted::get_code())->count());
         $this->assertEquals(3, signup_list::signups_by_statuscode_for_event($seminarevent21->get_id(), booked::get_code())->count());
 
-        $this->execute_adhoc_tasks(); // Makes sure the emails have sent.
+        $this->executeAdhocTasks(); // Makes sure the emails have sent.
         $emailsink->clear();
 
         // Execute the waitlist autoclean task.
         $task = new \mod_facetoface\task\waitlist_autoclean_task();
         $task->execute();
 
-        $this->execute_adhoc_tasks(); // Makes sure the emails have sent.
+        $this->executeAdhocTasks(); // Makes sure the emails have sent.
 
         // Check the auto clean messages.
         $emails = $emailsink->get_messages();

@@ -49,6 +49,6 @@ abstract class completionimport_advanced_testcase extends reportcache_advanced_t
         $adhoctask->set_custom_data(['importname' => $importname, 'importtime' => $importstart]);
 
         \core\task\manager::queue_adhoc_task($adhoctask);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
     }
 }

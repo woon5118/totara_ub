@@ -128,7 +128,7 @@ class totara_topic_delete_notify_task_testcase extends advanced_testcase {
         $user_two = $generator->create_user();
 
         // Clear adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         self::setAdminUser();
 
         // Create a topic.
@@ -171,8 +171,8 @@ class totara_topic_delete_notify_task_testcase extends advanced_testcase {
         manager::queue_adhoc_task($task);
 
         // Start the sink and execute the adhoc tasks.
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         self::assertCount(2, $messages);

@@ -57,8 +57,8 @@ class totara_playlist_rate_notify_task_testcase extends advanced_testcase {
         manager::queue_adhoc_task($task);
 
         // Start the sink and execute the adhoc tasks.
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         self::assertCount(1, $messages);

@@ -110,7 +110,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         $this->fac3 = new facilitator_user($f2fgen->add_custom_facilitator([]));
         $this->fac4 = new facilitator_user($f2fgen->add_site_wide_facilitator([]));
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure no notifications are sent at the moment.
         $messages = $this->get_messages();
@@ -170,7 +170,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         facilitator_helper::sync($this->sessiondates[1]->id, $facs);
         $this->sessiondates[0]->facilitatorids = $facs;
         $this->sessiondates[1]->facilitatorids = $facs;
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure no notifications are sent at the moment.
         $messages = $this->get_messages();
@@ -191,7 +191,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
             $sess->from_record($this->sessiondates[$i], false);
             $sess->save();
         }
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure no notifications are sent at the moment.
         $messages = $this->get_messages();
@@ -273,7 +273,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         $this->change_session_date_quietly($dates);
         $this->redirect_messages();
         $this->seminarevent->cancel();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure two notifications are sent, one for each facilitator user.
         $messages = $this->get_messages();
@@ -298,7 +298,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         $this->change_session_date_quietly($dates);
         $this->redirect_messages();
         $this->seminarevent->delete();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure two notifications are sent, one for each facilitator user.
         $messages = $this->get_messages();
@@ -325,7 +325,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         $deleted = current(array_splice($dates, 0, 1));
         $this->redirect_messages();
         seminar_event_helper::merge_sessions($this->seminarevent, $dates);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure two notifications are sent, one for each facilitator user.
         $messages = $this->get_messages();
@@ -351,7 +351,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         $dates = $this->sessiondates;
         $dates[0]->facilitatorids = [$this->fac1->get_id(), $this->fac3->get_id(), $this->fac4->get_id()];
         seminar_event_helper::merge_sessions($this->seminarevent, $dates);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure two notifications are sent, one for each facilitator user.
         $messages = $this->get_messages();
@@ -376,7 +376,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         $dates = $this->sessiondates;
         $dates[0]->facilitatorids = [$this->fac2->get_id(), $this->fac3->get_id(), $this->fac4->get_id()];
         seminar_event_helper::merge_sessions($this->seminarevent, $dates);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure two notifications are sent, one for each facilitator user.
         $messages = $this->get_messages();
@@ -401,7 +401,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         $dates[0]->timestart = strtotime('8 Aug next year 8am');
         $dates[0]->timefinish = strtotime('8 Aug next year 8pm');
         seminar_event_helper::merge_sessions($this->seminarevent, $dates);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Make sure two notifications are sent, one for each facilitator user.
         $messages = $this->get_messages();
@@ -417,7 +417,7 @@ class mod_facetoface_notify_facilitator_testcase extends advanced_testcase {
         $dates[0]->timestart = strtotime('7 Jul last year 7am');
         $dates[0]->timefinish = strtotime('7 Jul last year 7pm');
         seminar_event_helper::merge_sessions($this->seminarevent, $dates);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $this->get_messages();
         $this->assertEmpty($messages);
     }

@@ -130,7 +130,6 @@ class totara_feedback360_responder_testcase extends feedback360_testcase {
 
         // Make sure we are redirecting emails.
         $sink = $this->redirectEmails();
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
 
         feedback360_responder::update_external_assignments(array($email), array(), $userassignment->id, $time);
 

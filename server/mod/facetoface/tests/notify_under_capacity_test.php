@@ -83,7 +83,7 @@ class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
 
         // Clean messages stack.
         $sink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->close();
 
         // Set the session date back an hour, this is enough for facetoface_notify_under_capacity to find this session.
@@ -149,7 +149,7 @@ class mod_facetoface_notify_under_capacity_testcase extends advanced_testcase {
 
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $this->assertCount(2, $messages, "The test suite was expecting only 2 messages sent out in the environment setup");

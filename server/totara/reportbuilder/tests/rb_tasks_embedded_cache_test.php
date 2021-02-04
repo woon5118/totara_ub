@@ -90,7 +90,7 @@ class totara_reportbuilder_rb_tasks_embedded_cache_testcase extends reportcache_
 
         $info = $this->create_task($this->user1, $this->user2);
 
-        phpunit_util::reset_debugging();
+        $this->resetDebugging();
         // Add message of different type (not task).
         tm_alert_send($info);
 

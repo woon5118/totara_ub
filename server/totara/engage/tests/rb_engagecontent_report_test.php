@@ -222,7 +222,7 @@ class totara_engage_rb_engagecontent_report_testcase extends advanced_testcase {
         $playlist3->add_resource(resource_factory::create_instance_from_id($survey3->get_id()));
 
         // Add topics to resourecs.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->setAdminUser();
 
         $topics[] = $topicgen->create_topic('topic1')->get_id();

@@ -77,7 +77,7 @@ class totara_playlist_catalog_multi_tenancy_testcase extends advanced_testcase {
 
         // Fetch catalog for the user two and make sure that this user's two is able to see
         // self own playlists within the catalog.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $retriever = new catalog_retrieval();
         $user_two_result = $retriever->get_page_of_objects(50, 0);
@@ -144,7 +144,7 @@ class totara_playlist_catalog_multi_tenancy_testcase extends advanced_testcase {
 
         // Log in as first user and check that if this user is able to see the
         // playlists or not.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->setUser($user_one);
 
         $retrieval = new catalog_retrieval();

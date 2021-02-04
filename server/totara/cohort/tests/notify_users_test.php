@@ -47,7 +47,7 @@ class totara_cohort_notify_users_testcase extends advanced_testcase {
             ]);
         }
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         totara_cohort_notify_users($cohort->id, $userids, 'membersadded');
 
         $messages = $sink->get_messages();
@@ -77,7 +77,7 @@ class totara_cohort_notify_users_testcase extends advanced_testcase {
             ]);
         }
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         totara_cohort_notify_users($cohort->id, $userids, 'membersremoved');
         $messages = $sink->get_messages();
 

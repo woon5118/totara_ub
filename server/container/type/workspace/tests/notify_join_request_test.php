@@ -66,14 +66,14 @@ class container_workspace_notify_join_request_testcase extends advanced_testcase
         $this->setUser($user_two);
 
         // Clear the adhoc tasks list first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $workspace_id = $workspace->get_id();
         $member_request = member_request::create($workspace_id, $user_two->id);
 
         // Start the sink, then execute the adhoc tasks to check our message to the workspace owner.
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         $this->assertCount(1, $messages);
@@ -114,14 +114,14 @@ class container_workspace_notify_join_request_testcase extends advanced_testcase
         workspace_notification::off($workspace_id, $user_one->id);
 
         // Request to join the workspace as user two. But first we need to clear adhoc tasks first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $this->setUser($user_two);
         member_request::create($workspace_id, $user_two->id);
 
         // Start the sink and execute the adhoc tasks
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         // There should be no messages sending out to the workspace owner as the notification had turned off
         // for the workspace owner.
@@ -159,14 +159,14 @@ class container_workspace_notify_join_request_testcase extends advanced_testcase
         // anyone.
 
         // But first clear the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $this->setUser($user_two);
         member_request::create($workspace_id, $user_two->id);
 
         // Start the sink and execute the adhoc tasks
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         // There should be no messages sending out to the workspace owner as the notification had turned off
         // for the workspace owner.
@@ -192,16 +192,16 @@ class container_workspace_notify_join_request_testcase extends advanced_testcase
         $this->setUser($user_two);
 
         // Clear the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $workspace_id = $workspace->get_id();
         $member_request = member_request::create($workspace_id, $user_two->id);
 
         $member_request->cancel();
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
 
         // Trigger adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         $this->assertEmpty($messages);
@@ -228,7 +228,7 @@ class container_workspace_notify_join_request_testcase extends advanced_testcase
         $workspace = $workspace_generator->create_private_workspace();
 
         // Clear the adhoc tasks list.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Log in as second user and request to join the workspace.
         self::setUser($user_two);
@@ -237,8 +237,8 @@ class container_workspace_notify_join_request_testcase extends advanced_testcase
         member_request::create($workspace_id, $user_two->id);
 
         // Start the sink, then execute the adhoc tasks to check our message to the workspace owner.
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         self::assertCount(1, $messages);

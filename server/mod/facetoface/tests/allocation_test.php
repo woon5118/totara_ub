@@ -62,7 +62,7 @@ class mod_facetoface_allocation_testcase extends advanced_testcase {
         $sink = $this->redirectEmails();
         $seminarevent = new \mod_facetoface\seminar_event($sessionid);
         \mod_facetoface\reservations::allocate_spaces($seminarevent, $user1->id, array($user2->id));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $sink->close();
         $this->assertCount(2, $messages);

@@ -168,7 +168,7 @@ class totara_cohort_record_checker_for_broken_rules_testcase extends advanced_te
      * @return void
      */
     private function perform_test() {
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
 
         ob_start();
         totara_cohort_check_and_update_dynamic_cohort_members(null, new null_progress_trace());

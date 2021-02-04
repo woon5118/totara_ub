@@ -438,7 +438,7 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
 
     private function generate_test_data(): manual_participant_selector_test_data {
         self::setAdminUser();
-        $data = new manual_participant_selector_test_data();
+        $data = new manual_participant_selector_test_data($this->getDataGenerator());
         $data->create_data();
         self::setUser();
         return $data;
@@ -480,11 +480,11 @@ class manual_participant_selector_test_data {
     /** @var mod_perform_generator|component_generator_base */
     private $perform_generator;
 
-    public function __construct() {
+    public function __construct($generator) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/perform/tests/generator/mod_perform_generator.class.php');
 
-        $this->generator = phpunit_util::get_data_generator();
+        $this->generator = $generator;
         $this->perform_generator = $this->generator->get_plugin_generator('mod_perform');
     }
 

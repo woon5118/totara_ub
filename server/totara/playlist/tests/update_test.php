@@ -123,8 +123,8 @@ class totara_playlist_update_testcase extends advanced_testcase {
         $user_two = $generator->create_user();
 
         // Clear adhoc tasks.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $playlist->update(
             null,
@@ -145,7 +145,7 @@ class totara_playlist_update_testcase extends advanced_testcase {
             $user_one->id
         );
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);

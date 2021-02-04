@@ -93,7 +93,7 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
         $user_two_discussion = $workspace_generator->create_discussion($workspace->get_id());
 
         // Make sure that we cleared the adhoc tasks first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Now log in as user one and create a comment on the discussion.
         $this->setUser($user_one);
@@ -107,10 +107,10 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
         );
 
         // Start the sink.
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
 
         // Execute the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // There should be a message sent out to user two - as the comment was created by user one.
         $messages = $message_sink->get_messages();
@@ -161,7 +161,7 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
         workspace_notification::off($workspace_id, $user_two->id);
 
         // Run any adhoc tasks just before we are creating any new ones.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Log in as user one and create the comment to the discussion.
         // Then run the adhoc tasks.
@@ -177,8 +177,8 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
 
         // Run adhoc tasks and check the message - since user two had turned off the notification
         // for this specific workspace - hence we should not expect any message(s) sent to the user two.
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         $this->assertEmpty($messages);
@@ -201,7 +201,7 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
         $discussion = $workspace_generator->create_discussion($workspace->get_id());
 
         // Clean up the adhoc tasks first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Create comment for the discussion.
         /** @var totara_comment_generator $comment_generator */
@@ -212,8 +212,8 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
             discussion::AREA
         );
 
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         $this->assertEmpty($messages);
@@ -245,7 +245,7 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
         $user_two_discussion = $workspace_generator->create_discussion($workspace->get_id());
 
         // Clear adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // As user one, create a comment on the discussion.
         self::setUser($user_one);
@@ -258,10 +258,10 @@ class container_workspace_notify_discussion_new_comment_testcase extends advance
         );
 
         // Start the sink.
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
 
         // Execute the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // There should be a message sent out to user two - as the comment was created by user one.
         $messages = $message_sink->get_messages();

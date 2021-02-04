@@ -65,8 +65,8 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         member::join_workspace($workspace, $user_two->id);
 
         // Clear the adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         // Create comment with mention of user one.
         comment_helper::create_comment(
@@ -95,7 +95,7 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         workspace_notification::off($workspace->get_id(), $user_one->id);
 
         // Execute the adhoc tasks which it should send a message to user one.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -138,8 +138,8 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         member::join_workspace($workspace, $user_two->id);
 
         // Clear the adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         // Set the guest user so that we can check if the message sending out is working or not.
         $guest_user = guest_user();
@@ -172,7 +172,7 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         workspace_notification::off($workspace->get_id(), $user_one->id);
 
         // Execute the adhoc tasks which it should send a message to user one.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -220,8 +220,8 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         member::join_workspace($workspace, $user_two->id);
 
         // Clear the adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         // Create comment with mention of user one.
         comment_helper::create_comment(
@@ -249,7 +249,7 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         workspace_notification::off($workspace->get_id(), $user_one->id);
 
         // Execute the adhoc tasks which it should send a message to user one.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);

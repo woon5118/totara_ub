@@ -67,16 +67,16 @@ final class engage_article_delete_topic_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Make sure that all the adhoc tasks are cleared prior to this.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Start the sink
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
 
         /** @var topic $topic */
         foreach ($topics as $topic) {
             $this->setAdminUser();
             $topic->delete();
-            $this->execute_adhoc_tasks();
+            $this->executeAdhocTasks();
 
             // There should be only one messages send out to the author of the article - which
             // had been using the topics prior to this point.

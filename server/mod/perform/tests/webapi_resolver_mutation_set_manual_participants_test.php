@@ -44,7 +44,7 @@ class mod_perform_webapi_resolver_mutation_set_manual_participants_manual_testca
      */
     public function test_ajax_mutation_successful(): void {
         self::setAdminUser();
-        $data = new manual_participant_selector_test_data();
+        $data = new manual_participant_selector_test_data($this->getDataGenerator());
         $data->create_data();
 
         // Relationships

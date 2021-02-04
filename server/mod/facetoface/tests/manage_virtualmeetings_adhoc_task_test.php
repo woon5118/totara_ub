@@ -367,7 +367,7 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);
         $task->execute();
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $this->assertEquals('Virtual meeting creation failure', $messages[0]->subject);
         $this->assertEquals($this->user1->id, $messages[0]->useridto);

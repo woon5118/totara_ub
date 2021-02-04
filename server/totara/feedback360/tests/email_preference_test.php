@@ -57,7 +57,6 @@ class totara_feedback360_email_preference_testcase extends feedback360_testcase 
         $this->resetAfterTest();
 
         $this->emailsink = $this->redirectEmails();
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
     }
 
 

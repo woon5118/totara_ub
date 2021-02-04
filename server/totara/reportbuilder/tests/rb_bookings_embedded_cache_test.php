@@ -198,7 +198,7 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         $seminarevent = new \mod_facetoface\seminar_event($session->id);
         \mod_facetoface\seminar_event_helper::merge_sessions($seminarevent, [$sessiondate]);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertCount(2, $sink->get_messages());
         $sink->close();
     }

@@ -97,7 +97,7 @@ class totara_catalog_settings_hook_testcase extends advanced_testcase {
         $this->assertTrue($DB->record_exists('task_adhoc', ['classname' => '\totara_catalog\task\refresh_catalog_adhoc']));
         totara_catalog\cache_handler::reset_all_caches();
         ob_start();
-        self::execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         ob_end_clean();
 
         // check the result after adhoc task completed
@@ -153,7 +153,7 @@ class totara_catalog_settings_hook_testcase extends advanced_testcase {
         $this->assertTrue($DB->record_exists('task_adhoc', ['classname' => '\totara_catalog\task\provider_active_task']));
         totara_catalog\cache_handler::reset_all_caches();
         ob_start();
-        self::execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         ob_end_clean();
 
         // check the result after adhoc task completed
@@ -210,7 +210,7 @@ class totara_catalog_settings_hook_testcase extends advanced_testcase {
         $this->assertTrue($DB->record_exists('task_adhoc', ['classname' => '\totara_catalog\task\provider_active_task']));
         totara_catalog\cache_handler::reset_all_caches();
         ob_start();
-        self::execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         ob_end_clean();
 
         // check the result after adhoc task completed

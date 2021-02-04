@@ -95,7 +95,7 @@ class totara_topic_delete_topic_testcase extends advanced_testcase {
         require_once("{$CFG->dirroot}/totara/topic/tests/fixtures/topic_resolver.php");
 
         // Clearing all the adhoc tasks first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->setAdminUser();
 
         /** @var totara_topic_generator $gen */
@@ -120,8 +120,8 @@ class totara_topic_delete_topic_testcase extends advanced_testcase {
 
         $topic->delete();
 
-        $sink = phpunit_util::start_hook_redirection();
-        $this->execute_adhoc_tasks();
+        $sink = $this->redirectHooks();
+        $this->executeAdhocTasks();
 
         // Debugging messages are called, because of the miss-match from list of items.
         $debug_messages = $this->getDebuggingMessages();

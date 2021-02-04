@@ -112,7 +112,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent1)->set_skipusernotification()->set_fromuser($user1));
         signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent1)->set_skipusernotification()->set_fromuser($user1));
         signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent1)->set_skipusernotification()->set_fromuser($user1));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertSame(3, $sink->count());
         $sink->clear();
 
@@ -121,7 +121,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent2)->set_skipusernotification()->set_fromuser($user1));
         signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent2)->set_skipusernotification()->set_fromuser($user1));
         signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent2)->set_skipusernotification()->set_fromuser($user1));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertSame(3, $sink->count());
         $sink->clear();
 
@@ -282,7 +282,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent1)->set_skipusernotification());
         signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent1)->set_skipusernotification());
         signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent1)->set_skipusernotification());
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->clear();
         // Confirm the signups for session 1.
         $this->assertCount(4, $helper1->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
@@ -294,7 +294,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent2)->set_skipusernotification());
         signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent2)->set_skipusernotification());
         signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent2)->set_skipusernotification());
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->clear();
         // Confirm the signups for session 2.
         $this->assertCount(4, $helper2->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));
@@ -306,7 +306,7 @@ class mod_facetoface_cleanup_task_testcase extends advanced_testcase {
         signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent3)->set_skipusernotification());
         signup_helper::signup(\mod_facetoface\signup::create($user3->id, $seminarevent3)->set_skipusernotification());
         signup_helper::signup(\mod_facetoface\signup::create($user4->id, $seminarevent3)->set_skipusernotification());
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->clear();
         // Confirm the signups for session 3.
         $this->assertCount(4, $helper3->get_attendees_with_codes([\mod_facetoface\signup\state\booked::get_code()]));

@@ -780,12 +780,16 @@ abstract class advanced_testcase extends base_testcase {
     /**
      * Execute all adhoc tasks in queue
      */
+    public static function executeAdhocTasks() {
+        phpunit_util::run_all_adhoc_tasks();
+    }
+
+    /**
+     * @deprecated since Totara 13.5
+     */
     public function execute_adhoc_tasks() {
-        $now = time();
-        while ($task = \core\task\manager::get_next_adhoc_task($now)) {
-            $task->execute();
-            \core\task\manager::adhoc_task_complete($task);
-        }
+        // The rule is to use camel case here.
+        self::executeAdhocTasks();
     }
 
     /**
@@ -794,6 +798,28 @@ abstract class advanced_testcase extends base_testcase {
     public static function markTestSkippedIfNotTotaraDistribution() {
         if (!TOTARA_DISTRIBUTION_TEST) {
             static::markTestSkipped('Totara distribution test skipped');
+        }
+    }
+
+    /**
+     * Helper function to call a protected/private method of an object using reflection.
+     *
+     * Example 1. Calling a protected object method:
+     *   $result = $this->call_internal_method($myobject, 'method_name', [$param1, $param2]);
+     *
+     * Example 2. Calling a protected static method:
+     *   $result = $this->call_internal_method('my_plugin\namespace\myclassname', 'method_name', [$param1, $param2]);
+     *
+     * @param object|string $object_or_classname the object on which to call the method, or name of class if calling a static method.
+     * @param string $methodname the name of the protected/private method.
+     * @param array $params the array of function params to pass to the method.
+     * @return mixed the respective return value of the method.
+     */
+    public static function callInternalMethod($object_or_classname, string $methodname, array $params) {
+        if (is_object($object_or_classname)) {
+            return phpunit_util::call_internal_method($object_or_classname, $methodname, $params, get_class($object_or_classname));
+        } else {
+            return phpunit_util::call_internal_method(null, $methodname, $params, (string)$object_or_classname);
         }
     }
 }

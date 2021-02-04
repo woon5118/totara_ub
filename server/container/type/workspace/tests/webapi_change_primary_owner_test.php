@@ -46,7 +46,7 @@ class container_workspace_webapi_change_primary_owner_testcase extends advanced_
         $this->assertEquals($user_one->id, $workspace->get_user_id());
 
         // Clear any adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Change the primary owner by the admin user.
         $this->setAdminUser();
@@ -62,12 +62,12 @@ class container_workspace_webapi_change_primary_owner_testcase extends advanced_
         $workspace->reload();
         $this->assertEquals($user_two->id, $workspace->get_user_id());
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         $sink->clear();
 
         // After changing the owner of the workspace, there should be a message
         // sending to the $user_two - and we should be able to catch that.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         $this->assertCount(1, $messages);

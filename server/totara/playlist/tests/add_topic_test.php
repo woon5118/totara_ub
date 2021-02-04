@@ -33,7 +33,7 @@ final class totara_playlist_add_topic_testcase extends advanced_testcase {
         global $DB;
 
         $this->setAdminUser();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $gen = $this->getDataGenerator();
 

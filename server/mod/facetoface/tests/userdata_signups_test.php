@@ -113,7 +113,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->create_file_customfield($signups[21], 'signup', 'testfile4.txt', 3);
         $f2fgenerator->create_file_customfield($signups[22], 'cancellation', 'testfile5.txt', 4);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Purge data in system context.
         $targetuser = new target_user($student1);
@@ -215,7 +215,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->add_session_status($signups[22]->id, $sessions2[0]->id);
 
         $emailsink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $signupcustomfieldids = [];
@@ -239,7 +239,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         $student1 = $this->handle_user_status($student1, $userstatus);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Purge data in module context.
         $coursemodule = get_coursemodule_from_instance('facetoface', $seminarevent2->get_facetoface());
@@ -337,7 +337,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->add_session_status($signups[23]->id, $sessions3[0]->id);
 
         $emailsink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $signupcustomfieldids = [];
@@ -363,7 +363,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         $student1 = $this->handle_user_status($student1, $userstatus);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Purge data in course context.
         $targetuser = new target_user($student1);
@@ -476,7 +476,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->add_session_status($signups[23]->id, $sessions3[0]->id);
 
         $emailsink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $signupcustomfieldids = [];
@@ -502,7 +502,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         $student1 = $this->handle_user_status($student1, $userstatus);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Purge data in category context.
         $targetuser = new target_user($student1);
@@ -678,7 +678,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->create_signup($student2, $seminarevent3);
 
         $emailsink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $targetuser1 = new target_user($student1);
@@ -757,7 +757,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->create_signup($student2, $seminarevent3);
 
         $emailsink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $targetuser1 = new target_user($student1);
@@ -813,7 +813,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
      * @param array $expectedsessionids
      */
     private function assert_export_data(target_user $targetuser, context $context, array $expectedsessionids) {
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $export = signups::execute_export($targetuser, $context);
         $data = $export->data;

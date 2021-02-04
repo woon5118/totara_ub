@@ -48,8 +48,8 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
         member::added_to_workspace($workspace, $user_two->id, false, $user_one->id);
 
         // Clear adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         // Now create a discussion that mention user two.
         discussion_helper::create_discussion(
@@ -71,7 +71,7 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
             $user_one->id
         );
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -104,8 +104,8 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
         member::added_to_workspace($workspace, $user_two->id, false, $user_one->id);
 
         // Clear adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $guest_user = guest_user();
         $this->setUser($guest_user);
@@ -130,7 +130,7 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
             $user_one->id
         );
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -167,8 +167,8 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
         member::added_to_workspace($workspace, $user_two->id, false, $user_one->id);
 
         // Clear some adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         // Now update the discussion content, with user two being mentioned in the content.
         discussion_helper::update_discussion_content(
@@ -191,7 +191,7 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
         );
 
         // Run adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -229,8 +229,8 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
         $this->setUser($guest_user);
 
         // Clear some adhoc tasks first.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         // Now update the discussion content, with user two being mentioned in the content.
         discussion_helper::update_discussion_content(
@@ -253,7 +253,7 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
         );
 
         // Run adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);

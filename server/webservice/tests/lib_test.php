@@ -268,7 +268,7 @@ class webservice_test extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user(array('username' => 'userabc', 'password' => 'mypassw0rd'));
 
         $this->set_server_username_password($server, 'userabc', 'mypassw0rd');
-        phpunit_util::call_internal_method($server, 'authenticate_user', array(), 'webservice_server');
+        $this->callInternalMethod($server, 'authenticate_user', array());
 
         $this->assertEquals($user->id, $USER->id);
     }
@@ -291,7 +291,7 @@ class webservice_test extends advanced_testcase {
         $this->set_server_username_password($server, 'NOTuserabc', 'mypassw0rd');
 
         try {
-            phpunit_util::call_internal_method($server, 'authenticate_user', array(), 'webservice_server');
+            $this->callInternalMethod($server, 'authenticate_user', array());
         } catch (moodle_exception $e) {
             $message = $e->getMessage();
         }
@@ -318,7 +318,7 @@ class webservice_test extends advanced_testcase {
         $this->set_server_username_password($server, 'userabc', 'NOTmypassw0rd');
 
         try {
-            phpunit_util::call_internal_method($server, 'authenticate_user', array(), 'webservice_server');
+            $this->callInternalMethod($server, 'authenticate_user', array());
         } catch (moodle_exception $e) {
             $message = $e->getMessage();
         }
@@ -350,7 +350,7 @@ class webservice_test extends advanced_testcase {
         // The first 3 times, we get the same debug message from the exception as a normal wrong password.
         for ($i = 1; $i <= 3; $i++) {
             try {
-                phpunit_util::call_internal_method($server, 'authenticate_user', array(), 'webservice_server');
+                $this->callInternalMethod($server, 'authenticate_user', array());
             } catch (moodle_exception $e) {
                 $message = $e->getMessage();
             }
@@ -360,7 +360,7 @@ class webservice_test extends advanced_testcase {
         }
 
         try {
-            phpunit_util::call_internal_method($server, 'authenticate_user', array(), 'webservice_server');
+            $this->callInternalMethod($server, 'authenticate_user', array());
         } catch (moodle_exception $e) {
             $message = $e->getMessage();
         }

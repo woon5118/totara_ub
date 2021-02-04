@@ -97,7 +97,6 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->sink = $this->redirectMessages();
 
         // Make sure the mail is redirecting and the sink is clear.
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
         $this->sink->clear();
 
         $this->programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');

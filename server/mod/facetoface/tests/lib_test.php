@@ -1280,7 +1280,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $event1 = new seminar_event($session1->id);
         $event1->delete();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->close();
 
         // Check data after calling facetoface_delete_session.
@@ -2039,7 +2039,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         signup_helper::signup($signup11);
 
         // Grab the messages that got sent.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // Check the expected number of messages got sent.
@@ -2079,7 +2079,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         // Test for invalid case.
         $sink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $this->assertEquals(
             'No manager email is set',
@@ -2280,7 +2280,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertTrue(signup_helper::can_signup($signup11));
         signup_helper::signup($signup11);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->clear();
 
         $notification = new facetoface_notification();
@@ -2297,7 +2297,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         $notification->send_to_users($sessionid);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // Check the expected number of messages got sent.
@@ -2387,7 +2387,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         signup_helper::signup($signup);
 
         // Check the manager got their email.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $sink->clear();
         $this->assertCount(1, $messages);
@@ -2410,7 +2410,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $notification->send_to_users($sessionid);
 
         // Check the expected number of messages got sent.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         // Notifications disabled - no messages
         $this->assertCount(0, $messages);
@@ -2419,7 +2419,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $notification->send_to_users($sessionid);
 
         // Grab the messages that got sent.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // Check the expected number of messages got sent.
@@ -2475,7 +2475,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         signup_helper::signup($signup21);
 
         // Grab the messages that got sent.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // Check the expected number of messages got sent.
@@ -2589,7 +2589,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         $notification->send_to_users($sessionid);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         // Grab the messages that got sent.
         $messages = $sink->get_messages();
         // Plain text message has been formatted to include new lines at every ~75 characters - removing these as they complicate testing.
@@ -3076,7 +3076,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // Only the teacher should get a message.
@@ -3129,7 +3129,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // There should be no messages received.
@@ -3182,7 +3182,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
 
         // Clean messages stack.
         $sink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->close();
 
         // Set the session date back an hour, this is enough for facetoface_notify_under_capacity to find this session.
@@ -3192,7 +3192,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // There should be one messages received.
@@ -3249,7 +3249,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sink = $this->redirectMessages();
         $notification = new \facetoface_notification((array) $sessiondata, false);
         $notification->send_notification_virtual_meeting_creation_failure(new seminar_event($id));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $this->markTestIncomplete("TODO: TL-28891");
 
@@ -3350,7 +3350,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertInstanceOf(signup\state\booked::class, $signup11->get_state());
         $this->assertInstanceOf(signup\state\waitlisted::class, $signup21->get_state());
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         // User 1 and 2 should have received confirmation messages.
         $this->assertCount(2, $messages);
@@ -3401,7 +3401,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertEquals($user2->id, $booked->id);
 
         // User 2 should have had a message from admin.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $this->assertCount(1, $messages);
         $message = reset($messages);
@@ -3490,7 +3490,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         signup_helper::signup($signup21);
 
         // Check emails.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emails = $sink->get_messages();
         $this->assertCount(4, $emails); // Learners and managers.
         $sink->clear();
@@ -3704,7 +3704,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $notification3->send_scheduled();
 
         // Grab the messages that got sent.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // Put the actual message content into their own array to test against

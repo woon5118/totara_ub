@@ -188,7 +188,7 @@ class engage_article_create_article_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
 
-        $event_sink = phpunit_util::start_event_redirection();
+        $event_sink = $this->redirectEvents();
         $article = article::create(
             [
                 'name' => 'This is the article',
@@ -220,7 +220,7 @@ class engage_article_create_article_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
 
-        $event_sink = phpunit_util::start_event_redirection();
+        $event_sink = $this->redirectEvents();
         article::create(
             [
                 'content' => 'This is something else',

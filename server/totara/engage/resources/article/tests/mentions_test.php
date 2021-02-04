@@ -50,7 +50,7 @@ class engage_article_mentions_testcase extends advanced_testcase {
 
         $article = article::create($data);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         // Set current user again because tasks use cron_setup_user().
         $this->setUser($user);
 
@@ -73,7 +73,7 @@ class engage_article_mentions_testcase extends advanced_testcase {
 
         $article->update($updatedata);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -107,7 +107,7 @@ class engage_article_mentions_testcase extends advanced_testcase {
         ];
 
         $article = article::create($data);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Add comment
         $sink = $this->redirectMessages();
@@ -120,7 +120,7 @@ class engage_article_mentions_testcase extends advanced_testcase {
             null,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -142,7 +142,7 @@ class engage_article_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -164,7 +164,7 @@ class engage_article_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -186,7 +186,7 @@ class engage_article_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();

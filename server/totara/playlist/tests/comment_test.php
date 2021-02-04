@@ -50,8 +50,8 @@ class totara_playlist_comment_testcase extends advanced_testcase {
 
         // Add comment to the playlist that has mention to user two, which it should trigger tasks.
         // But first clear the adhoc tasks list.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         comment_helper::create_comment(
             'totara_playlist',
@@ -75,7 +75,7 @@ class totara_playlist_comment_testcase extends advanced_testcase {
         );
 
         // Execute the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -114,8 +114,8 @@ class totara_playlist_comment_testcase extends advanced_testcase {
 
         // Add comment to the playlist that has mention to user two, which it should trigger tasks.
         // But first clear the adhoc tasks list.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         comment_helper::create_comment(
             'totara_playlist',
@@ -139,7 +139,7 @@ class totara_playlist_comment_testcase extends advanced_testcase {
         );
 
         // Execute the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -187,8 +187,8 @@ class totara_playlist_comment_testcase extends advanced_testcase {
         $user_two = $generator->create_user();
 
         // Clear up adhoc tasks.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         comment_helper::update_content(
             $comment->get_id(),
@@ -209,7 +209,7 @@ class totara_playlist_comment_testcase extends advanced_testcase {
             $user_one->id
         );
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -255,8 +255,8 @@ class totara_playlist_comment_testcase extends advanced_testcase {
         $user_two = $generator->create_user();
 
         // Clear up adhoc tasks.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         // Set the guest user in session so that we can test whether the process is
         // is respecting the argument or not.
@@ -282,7 +282,7 @@ class totara_playlist_comment_testcase extends advanced_testcase {
             $user_one->id
         );
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);

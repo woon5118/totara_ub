@@ -77,7 +77,7 @@ class core_scss_testcase extends advanced_testcase {
      */
     public function test_is_valid_file($path, $valid) {
         $scss = new \core_scss();
-        $pathvalid = phpunit_util::call_internal_method($scss, 'is_valid_file', [$path], \core_scss::class);
+        $pathvalid = $this->callInternalMethod($scss, 'is_valid_file', [$path]);
         $this->assertSame($valid, $pathvalid);
     }
 }

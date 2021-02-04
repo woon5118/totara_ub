@@ -79,7 +79,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         $s->set_timefinish(time() + 7200);
         $s->save();
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         for ($i = 0; $i < 2; $i++) {
             $user = $gen->create_user();
             $gen->enrol_user($user->id, $event->get_seminar()->get_course());
@@ -91,7 +91,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         }
 
         // Clearing emails that sent out to users for confirmation about booking.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->clear();
 
         // Start adding trainer roles to the event
@@ -108,7 +108,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         }
 
         $event->delete();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $this->assertCount(4, $messages);
@@ -139,7 +139,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         $s->set_sessionid($event->get_id());
         $s->save();
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         $gen = $this->getDataGenerator();
         for ($i = 0; $i < 2; $i++) {
             $user = $gen->create_user();
@@ -152,7 +152,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         }
 
         // Start sending out messages to the learners here, so that the last assertion would be more reasonable.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->clear();
 
         $teacher = $DB->get_record('role', ['shortname' => 'teacher']);
@@ -169,7 +169,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         }
 
         $event->delete();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $this->assertEmpty($messages);

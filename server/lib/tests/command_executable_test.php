@@ -148,11 +148,10 @@ class core_command_executable_testcase extends advanced_testcase {
      * @param \core\command\executable $obj_command
      */
     private function match_generated_command($expectedcommand, $obj_command) {
-        $commandstring = phpunit_util::call_internal_method(
+        $commandstring = $this->callInternalMethod(
             $obj_command,
             'get_command',
-            array(),
-            '\core\command\executable'
+            array()
         );
         $this->assertEquals($expectedcommand, $commandstring);
     }
@@ -164,11 +163,10 @@ class core_command_executable_testcase extends advanced_testcase {
      * @param \core\command\executable $obj_command
      */
     private function math_pcntl_file_contents($expectedcontents, $obj_command) {
-        $phpfile = phpunit_util::call_internal_method(
+        $phpfile = $this->callInternalMethod(
             $obj_command,
             'create_pcntl_file',
-            array(),
-            '\core\command\executable'
+            array()
         );
         $phpcontents = file_get_contents($phpfile);
 

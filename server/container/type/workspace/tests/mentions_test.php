@@ -58,7 +58,7 @@ class container_workspace_mentions_testcase extends advanced_testcase {
             $user->id
         );
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -83,7 +83,7 @@ class container_workspace_mentions_testcase extends advanced_testcase {
             $user->id
         );
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -121,7 +121,7 @@ class container_workspace_mentions_testcase extends advanced_testcase {
             FORMAT_PLAIN,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Create comment
         $sink = $this->redirectMessages();
@@ -134,7 +134,7 @@ class container_workspace_mentions_testcase extends advanced_testcase {
             null,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -157,7 +157,7 @@ class container_workspace_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -180,7 +180,7 @@ class container_workspace_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();
@@ -203,7 +203,7 @@ class container_workspace_mentions_testcase extends advanced_testcase {
             FORMAT_JSON_EDITOR,
             $user->id
         );
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $message = current($messages);
         $sink->close();

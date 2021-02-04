@@ -52,7 +52,7 @@ class engage_article_create_article_with_mention_testcase extends advanced_testc
         ]);
 
         // Clear any adhoc tasks first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         article::create(
             [
@@ -63,8 +63,8 @@ class engage_article_create_article_with_mention_testcase extends advanced_testc
             $user_one->id
         );
 
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         // Once adhoc tasks are executed, there should be a message sending out to the user two as
         // the user had been mentioned in the content.
@@ -108,7 +108,7 @@ class engage_article_create_article_with_mention_testcase extends advanced_testc
         ]);
 
         // Clear adhoc tasks first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         article::create(
             [
                 'content' => $content,
@@ -118,10 +118,10 @@ class engage_article_create_article_with_mention_testcase extends advanced_testc
             $user_one->id
         );
 
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
 
         // Trigger adhoc tasks, as there should be a message sending out to the user two.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);

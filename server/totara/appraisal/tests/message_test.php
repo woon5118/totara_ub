@@ -485,7 +485,6 @@ class totara_appraisal_message_testcase extends appraisal_testcase {
 
         // Make sure we are redirecting emails.
         $sink = $this->redirectEmails();
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
 
         // Activate the appraisal.
         $appraisal->activate();
@@ -559,7 +558,6 @@ class totara_appraisal_message_testcase extends appraisal_testcase {
 
         // Make sure we are redirecting emails.
         $sink = $this->redirectEmails();
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
 
         // Run the cron, specifying $maxactivationtime plus one day (just enough for those scheduled for one day after).
         \appraisal::send_scheduled($maxactivationtime + DAYSECS);
@@ -596,7 +594,6 @@ class totara_appraisal_message_testcase extends appraisal_testcase {
 
         // Make sure we are redirecting emails.
         $sink = $this->redirectEmails();
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
 
         // Record the time before we trigger.
         $mincompletetime = time();
@@ -645,7 +642,6 @@ class totara_appraisal_message_testcase extends appraisal_testcase {
 
         // Make sure we are redirecting emails.
         $sink = $this->redirectEmails();
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
 
         // Run scheduled messages code, specifying $maxcompletetime plus three days (enough that all remaining scheduled should be sent).
         \appraisal::send_scheduled($maxactivationtime + DAYSECS * 3);
@@ -671,7 +667,6 @@ class totara_appraisal_message_testcase extends appraisal_testcase {
 
         // Make sure we are redirecting emails.
         $sink = $this->redirectEmails();
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
 
         $closedata = new stdClass();
         $closedata->sendalert = true;
@@ -700,7 +695,6 @@ class totara_appraisal_message_testcase extends appraisal_testcase {
     public function test_activated_appraisal_new_appraisee_notification() {
         advanced_feature::enable('appraisals');
         $sink = $this->redirectEmails();
-        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
 
         $learner1 = $this->getDataGenerator()->create_user(array('username' => 'learner1'));
         [$appraisal] = $this->prepare_appraisal_with_users([], [$learner1]);

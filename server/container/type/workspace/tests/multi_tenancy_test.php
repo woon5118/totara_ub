@@ -60,7 +60,7 @@ class container_workspace_multi_tenancy_testcase extends advanced_testcase {
             $workspace_generator->create_workspace();
         }
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Log in as user two and see that if user two is able to see the workspaces from tenant_one
         // created by user one or not.

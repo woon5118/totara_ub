@@ -112,7 +112,7 @@ class container_workspace_send_accept_request_task_testcase extends advanced_tes
         $request = member_request::create($workspace->get_id(), $user_one->id);
         $request->accept();
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         $task = new send_accept_request_task();
 
         $task->set_userid($admin_id);
@@ -182,7 +182,7 @@ class container_workspace_send_accept_request_task_testcase extends advanced_tes
         $request = member_request::create($workspace->get_id(), $user_one->id);
         $request->accept();
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         $task = new send_accept_request_task();
 
         $task->set_userid(get_admin()->id);

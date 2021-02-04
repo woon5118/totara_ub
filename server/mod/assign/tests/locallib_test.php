@@ -1634,7 +1634,6 @@ class mod_assign_locallib_testcase extends advanced_testcase {
         $this->add_submission($student, $assign);
         $this->submit_for_grading($student, $assign);
         $this->mark_submission($teacher, $assign, $student);
-        phpunit_util::stop_message_redirection();
 
         // Now run cron and see that one message was sent.
         cron_setup_user();

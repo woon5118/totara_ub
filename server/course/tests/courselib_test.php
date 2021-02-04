@@ -3773,7 +3773,7 @@ class core_course_courselib_testcase extends advanced_testcase {
         $sink = $this->redirectEvents();
 
         // Now, run the adhoc task which performs the hard deletion.
-        phpunit_util::run_all_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Fetch and validate the event data.
         $events = $sink->get_events();
@@ -3913,7 +3913,7 @@ class core_course_courselib_testcase extends advanced_testcase {
 
         // Now, run the adhoc task to delete the modules from section 0.
         $sink = $this->redirectEvents(); // To capture the events.
-        phpunit_util::run_all_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Confirm the modules have been deleted.
         list($insql, $assignids) = $DB->get_in_or_equal([$assign0->cmid, $assign1->cmid, $assign2->cmid]);

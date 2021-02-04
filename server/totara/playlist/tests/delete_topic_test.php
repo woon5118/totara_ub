@@ -69,16 +69,16 @@ class totara_playlist_delete_topic_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Clear all the adhoc tasks prior to the actual assertion.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Start the sink.
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
 
         /** @var topic $topic */
         foreach ($topics as $topic) {
             $this->setAdminUser();
             $topic->delete();
-            $this->execute_adhoc_tasks();
+            $this->executeAdhocTasks();
 
             $messages = $message_sink->get_messages();
             $this->assertCount(1, $messages);

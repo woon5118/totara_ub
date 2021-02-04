@@ -131,7 +131,7 @@ class engage_article_catalog_multi_tenancy_testcase extends advanced_testcase {
             $article_generator->share_article($article, [$recipient]);
         }
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Log in as user one and check if the user is able to see the content or not.
         $this->setUser($user_one);

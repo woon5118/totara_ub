@@ -29,7 +29,7 @@ class engage_article_topic_testcase extends advanced_testcase {
     public function test_add_topic_to_article(): void {
         global $DB;
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->setAdminUser();
         $gen = $this->getDataGenerator();
 

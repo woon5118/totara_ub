@@ -118,7 +118,7 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
         \mod_facetoface\signup_helper::cancel_waitlist($seminarevent, array($user4->id));
 
         // Clear any events/messages caused by the signups.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->eventsink->clear();
         $this->emailsink->clear();
 
@@ -171,7 +171,7 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
         }
 
         // Check the registration closure messages.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emails = $this->emailsink->get_messages();
         $this->assertEquals(4, count($emails));
         $subject = get_string('setting:defaultpendingreqclosuresubjectdefault', 'mod_facetoface');

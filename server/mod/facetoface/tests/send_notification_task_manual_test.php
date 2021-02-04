@@ -53,7 +53,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
         $signup = signup::create($seed['users'][0]->id, $seed['seminarevent']);
         signup_helper::signup($signup);
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $sink->clear();
 
@@ -80,7 +80,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
         $DB->update_record('facetoface_notification', $notificationrec);
 
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $sink->clear();
@@ -91,7 +91,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
 
         // Confirm that messages sent only once
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertEmpty($sink->get_messages());
         $sink->close();
     }
@@ -112,7 +112,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
         $signup = signup::create($seed['users'][0]->id, $seed['seminarevent']);
         signup_helper::signup($signup);
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $sink->clear();
 
@@ -144,7 +144,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
         $DB->update_record('facetoface_notification', $notificationrec);
 
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $sink->clear();
@@ -155,7 +155,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
 
         // Confirm that messages sent only once
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertEmpty($sink->get_messages());
         $sink->close();
     }
@@ -173,7 +173,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
         $signup = signup::create($seed['users'][0]->id, $seed['seminarevent']);
         signup_helper::signup($signup);
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $sink->clear();
 
@@ -205,7 +205,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
         $DB->update_record('facetoface_notification', $notificationrec);
 
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $sink->clear();
@@ -216,7 +216,7 @@ class mod_facetoface_send_notification_task_manual_testcase extends mod_facetofa
 
         // Confirm that messages sent only once
         $cron->execute();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertEmpty($sink->get_messages());
         $sink->close();
     }

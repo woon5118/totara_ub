@@ -73,16 +73,16 @@ class engage_survey_delete_topic_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Make sure the adhoc tasks are cleaned.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Get message sinks.
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
 
         /** @var topic $topic */
         foreach ($topics as $topic) {
             $this->setAdminUser();
             $topic->delete();
-            $this->execute_adhoc_tasks();
+            $this->executeAdhocTasks();
 
             $messages = $message_sink->get_messages();
             $this->assertNotEmpty($messages);

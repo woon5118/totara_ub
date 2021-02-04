@@ -85,15 +85,15 @@ class container_workspace_notify_added_to_workspace_testcase extends advanced_te
         $workspace = $workspace_generator->create_workspace();
 
         // Clear the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Create user two and add the user to the workspace.
         $user_two = $generator->create_user();
         $member = member::added_to_workspace($workspace, $user_two->id);
 
         // Start the sinks and execute the adhoc tasks.
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         $this->assertCount(1, $messages);
@@ -136,15 +136,15 @@ class container_workspace_notify_added_to_workspace_testcase extends advanced_te
         $workspace = $workspace_generator->create_workspace();
 
         // Clear the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Create user two and add the user to the workspace.
         $user_two = $generator->create_user(['lang' => $fake_language]);
         member::added_to_workspace($workspace, $user_two->id);
 
         // Start the sinks and execute the adhoc tasks.
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         self::assertCount(1, $messages);
@@ -169,7 +169,7 @@ class container_workspace_notify_added_to_workspace_testcase extends advanced_te
         $workspace = $workspace_generator->create_workspace();
 
         // Clear the adhoc tasks.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Create user two and add the user to the workspace.
         $user_two = $generator->create_user();
@@ -183,8 +183,8 @@ class container_workspace_notify_added_to_workspace_testcase extends advanced_te
         $this->assertTrue(workspace_notification::is_off($workspace_id, $user_two->id));
 
         // Start the sinks and execute the adhoc tasks.
-        $message_sink = phpunit_util::start_message_redirection();
-        $this->execute_adhoc_tasks();
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         $this->assertCount(1, $messages);

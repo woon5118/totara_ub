@@ -78,7 +78,7 @@ class tool_recyclebin_course_bin_tests extends advanced_testcase {
         course_delete_module($this->quiz->cmid);
 
         // Now, run the course module deletion adhoc task.
-        phpunit_util::run_all_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Check the course module is now in the recycle bin.
         $this->assertEquals(1, $DB->count_records('tool_recyclebin_course'));
@@ -122,7 +122,7 @@ class tool_recyclebin_course_bin_tests extends advanced_testcase {
         course_delete_module($this->quiz->cmid);
 
         // Now, run the course module deletion adhoc task.
-        phpunit_util::run_all_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Try purging.
         $recyclebin = new \tool_recyclebin\course_bin($this->course->id);
@@ -147,7 +147,7 @@ class tool_recyclebin_course_bin_tests extends advanced_testcase {
         course_delete_module($this->quiz->cmid);
 
         // Now, run the course module deletion adhoc task.
-        phpunit_util::run_all_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Set deleted date to the distant past.
         $recyclebin = new \tool_recyclebin\course_bin($this->course->id);
@@ -163,7 +163,7 @@ class tool_recyclebin_course_bin_tests extends advanced_testcase {
         course_delete_module($book->cmid);
 
         // Now, run the course module deletion adhoc task.
-        phpunit_util::run_all_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Should have 2 items now.
         $this->assertEquals(2, count($recyclebin->get_items()));

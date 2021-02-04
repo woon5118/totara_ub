@@ -81,7 +81,7 @@ class container_workspace_webapi_delete_workspace_with_discussion_testcase exten
 
         // Clear the user in session, in order to make sure that the task does not depending on the session user.
         $this->setUser(null);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         self::assertFalse($DB->record_exists('course', ['id' => $workspace->get_id()]));
         self::assertFalse($DB->record_exists('workspace_discussion', ['id' => $discussion->get_id()]));
@@ -107,7 +107,7 @@ class container_workspace_webapi_delete_workspace_with_discussion_testcase exten
 
         // Clear the user in session, in order to make sure that the task does not depending on the session user.
         $this->setUser(null);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         self::assertFalse($DB->record_exists('course', ['id' => $workspace->get_id()]));
         self::assertFalse($DB->record_exists('workspace_discussion', ['id' => $discussion->get_id()]));
@@ -134,7 +134,7 @@ class container_workspace_webapi_delete_workspace_with_discussion_testcase exten
         );
 
         $this->setUser(null);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         self::assertFalse($DB->record_exists('course', ['id' => $workspace->get_id()]));
         self::assertFalse($DB->record_exists('workspace_discussion', ['id' => $discussion->get_id()]));

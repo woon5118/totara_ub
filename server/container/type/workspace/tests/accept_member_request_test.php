@@ -45,15 +45,15 @@ class container_workspace_accept_member_request_testcase extends advanced_testca
         $member_request = member_request::create($workspace->get_id(), $user_two->id);
 
         // Clear all the adhoc tasks first before execute one
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         // Log in as first user and accept the member request.
         $this->setUser($user_one);
         $member_request->accept();
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         $sink->clear();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $sink->get_messages();
         $this->assertCount(1, $messages);

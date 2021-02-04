@@ -237,7 +237,7 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         $this->assertInstanceOf(signup_status_updated::class, $events[0]);
         $this->assertInstanceOf(booking_booked::class, $events[1]);
         self::dispatch_events($events);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sinkemail->get_messages();
         $this->assertCount(1, $messages);
 
@@ -251,7 +251,7 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         $this->assertCount(1, $events);
         $this->assertInstanceOf(signup_status_updated::class, $events[0]);
         self::dispatch_events($events);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sinkemail->get_messages();
         $this->assertCount(0, $messages);
 
@@ -264,7 +264,7 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         $this->assertInstanceOf(signup_status_updated::class, $events[0]);
         $this->assertInstanceOf(booking_booked::class, $events[1]);
         self::dispatch_events($events);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sinkemail->get_messages();
         $this->assertCount(0, $messages);
     }

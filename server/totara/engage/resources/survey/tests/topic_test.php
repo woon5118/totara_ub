@@ -30,7 +30,7 @@ class engage_survey_topic_testcase extends advanced_testcase {
     public function test_add_topic_to_survey(): void {
         global $DB;
         $this->setAdminUser();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $gen = $this->getDataGenerator();
 

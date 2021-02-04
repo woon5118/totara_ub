@@ -85,8 +85,8 @@ class totara_playlist_create_testcase extends advanced_testcase {
         $user_two = $generator->create_user();
 
         // Clear out the adhoc tasks.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         playlist::create(
             "Playlist 101",
@@ -109,7 +109,7 @@ class totara_playlist_create_testcase extends advanced_testcase {
         );
 
         // Now run adhoc tasks which it should send an email out to user two.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);
@@ -133,8 +133,8 @@ class totara_playlist_create_testcase extends advanced_testcase {
         $user_two = $generator->create_user();
 
         // Clear out the adhoc tasks.
-        $this->execute_adhoc_tasks();
-        $message_sink = phpunit_util::start_message_redirection();
+        $this->executeAdhocTasks();
+        $message_sink = $this->redirectMessages();
 
         $guest_user = guest_user();
         $this->setUser($guest_user);
@@ -160,7 +160,7 @@ class totara_playlist_create_testcase extends advanced_testcase {
         );
 
         // Now run adhoc tasks which it should send an email out to user two.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         self::assertCount(1, $messages);

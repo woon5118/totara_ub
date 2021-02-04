@@ -177,12 +177,12 @@ class container_workspace_add_member_testcase extends advanced_testcase {
         $workspace = $workspace_generator->create_workspace();
 
         // Make sure that we clear out the adhoc tasks first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
         $member = member::added_to_workspace($workspace, $user_two->id, false);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
         $this->assertEmpty($messages);
@@ -212,16 +212,16 @@ class container_workspace_add_member_testcase extends advanced_testcase {
         $workspace2 = $workspace_generator->create_workspace();
 
         // Make sure that we clear out the adhoc tasks first.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $users_to_add = [$user_two->id, $user_three->id, $user_four->id, $user_five->id];
 
-        $message_sink = phpunit_util::start_message_redirection();
+        $message_sink = $this->redirectMessages();
         $member_ids = member::added_to_workspace_in_bulk($workspace1, $users_to_add, false);
 
         $this->assertEquals(count($users_to_add), count($member_ids));
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $this->assertEmpty($message_sink->get_messages());
 
@@ -234,7 +234,7 @@ class container_workspace_add_member_testcase extends advanced_testcase {
 
         $this->assertEquals(count($users_to_add), count($members));
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $message_sink->get_messages();
         $this->assertCount(count($users_to_add), $messages);

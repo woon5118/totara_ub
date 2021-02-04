@@ -76,10 +76,10 @@ class mod_facetoface_reservation_testcase extends advanced_testcase {
         \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user1->id, $seminarevent));
         \mod_facetoface\signup_helper::signup(\mod_facetoface\signup::create($user2->id, $seminarevent));
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink = $this->redirectMessages();
         \mod_facetoface\reservations::remove_allocations($seminarevent, $seminar, array($user1->id), true, $manager->id);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertSame(1, $sink->count());
         $messages = $sink->get_messages();
         $sink->clear();
@@ -89,7 +89,7 @@ class mod_facetoface_reservation_testcase extends advanced_testcase {
 
         $sink = $this->redirectMessages();
         \mod_facetoface\reservations::remove_allocations($seminarevent, $seminar, array($user2->id), false, $manager->id);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertSame(1, $sink->count());
         $messages = $sink->get_messages();
         $sink->clear();

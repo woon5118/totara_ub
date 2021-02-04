@@ -69,7 +69,7 @@ class container_workspace_notify_new_workspace_owner_task_testcase extends advan
 
         $task = notify_new_workspace_owner_task::from_workspace($workspace->get_id(), $admin_user->id);
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         $sink->clear();
 
         $task->execute();
@@ -141,7 +141,7 @@ class container_workspace_notify_new_workspace_owner_task_testcase extends advan
 
         $task = notify_new_workspace_owner_task::from_workspace($workspace->get_id(), $admin_user->id);
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
         $sink->clear();
 
         $task->execute();

@@ -59,7 +59,7 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
      */
     public function test_count() {
         $this->setAdminUser(); // Necessary for file handling.
-        $datagenerator = phpunit_util::get_data_generator();
+        $datagenerator = $this->getDataGenerator();
         /** @var \mod_facetoface_generator $f2fgenerator */
         $f2fgenerator = $datagenerator->get_plugin_generator('mod_facetoface');
 
@@ -159,7 +159,7 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
     public function test_export() {
         $this->setAdminUser(); // Necessary for file handling.
         /** @var \mod_facetoface_generator $f2fgenerator */
-        $datagenerator = phpunit_util::get_data_generator();
+        $datagenerator = $this->getDataGenerator();
         $f2fgenerator = $datagenerator->get_plugin_generator('mod_facetoface');
 
         $category1 = $datagenerator->create_category();

@@ -73,16 +73,16 @@ class mod_facetoface_cancelled_event_testcase extends advanced_testcase {
             $signup->switch_state(booked::class);
         }
 
-        $sink = phpunit_util::start_message_redirection();
+        $sink = $this->redirectMessages();
 
         // Execute those booking confirmation to the users first, so that we can start cancelling the event, and perform the
         // assertion way easier.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $sink->clear();
 
         // Cancelling event here.
         $e->cancel();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
 
         // Start assertion to locate that whether the room name is included in the cancellation message.

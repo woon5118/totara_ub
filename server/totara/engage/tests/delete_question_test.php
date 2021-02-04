@@ -65,7 +65,7 @@ class totara_engage_delete_question_testcase extends advanced_testcase {
 
         $this->assertTrue($DB->record_exists('engage_answer_choice', ['userid' => $user2->id]));
 
-        $sink = phpunit_util::start_event_redirection();
+        $sink = $this->redirectEvents();
 
         $question->delete();
         $this->assertFalse($DB->record_exists('engage_answer_choice', ['userid' => $user2->id]));
@@ -100,7 +100,7 @@ class totara_engage_delete_question_testcase extends advanced_testcase {
 
         $this->assertTrue($DB->record_exists('engage_answer_choice', ['userid' => $user2->id]));
 
-        $sink = phpunit_util::start_event_redirection();
+        $sink = $this->redirectEvents();
 
         $question->delete();
         $this->assertFalse($DB->record_exists('engage_answer_choice', ['userid' => $user2->id]));

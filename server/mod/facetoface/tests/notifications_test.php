@@ -230,7 +230,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink = $this->redirectMessages();
         $e = new seminar_event($session->id);
         $e->delete();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -319,7 +319,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         signup_helper::signup(\mod_facetoface\signup::create($student2->id, new \mod_facetoface\seminar_event($sessionid)));
 
         $emailsink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         if (!$future) {
@@ -601,7 +601,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         signup_helper::signup(\mod_facetoface\signup::create($student->id, new \mod_facetoface\seminar_event($session->id)));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $preemails = $emailsink->get_messages();
         $emailsink->clear();
         foreach($preemails as $preemail) {
@@ -676,7 +676,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertCount(1, $icals['date_edited_and_cancelled'][1]->status,
             $errors['cancelled_count_dont_match']);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emails = $emailsink->get_messages();
         $emailsink->clear();
 
@@ -691,7 +691,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertTrue($result);
 
         // One email has been sent and it contains all the required data.
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $this->assertCount(1, $messages = $emailsink->get_messages());
         $message = $messages[0];
         $emailsink->close();
@@ -1701,7 +1701,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1725,7 +1725,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $new_signup->set_skipusernotification(false);
         $new_signup->set_skipmanagernotification();
         signup_helper::signup($new_signup);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emails = $emailsink->get_messages();
         $this->assertCount(1, $emails, 'Incorrect number of notification emails generated for signup.');
         $emailsink->clear();
@@ -1736,7 +1736,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $new_signup->set_skipusernotification();
         $new_signup->set_skipmanagernotification(false);
         signup_helper::signup($new_signup);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emails = $emailsink->get_messages();
         $this->assertCount(1, $emails, 'Incorrect number of notification emails generated for signup.');
         $emailsink->clear();
@@ -1748,7 +1748,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $new_signup->set_skipusernotification();
         $new_signup->set_skipmanagernotification();
         signup_helper::signup($new_signup);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emails = $emailsink->get_messages();
         $this->assertCount(0, $emails, 'Incorrect number of notification emails generated for signup.');
 
@@ -1763,7 +1763,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
         $signup->set_skipmanagernotification();
         signup_helper::signup($signup);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1783,7 +1783,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1809,7 +1809,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         }
         $emailsink = $this->redirectMessages();
         signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1822,7 +1822,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emailsink = $this->redirectMessages();
@@ -1832,7 +1832,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1847,7 +1847,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink = $this->redirectMessages();
 
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $emailsink->close();
         $emailsink = $this->redirectMessages();
@@ -1860,7 +1860,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1873,7 +1873,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $params = array(
@@ -1891,7 +1891,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1907,7 +1907,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $params = array(
@@ -1924,7 +1924,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1939,7 +1939,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink = $this->redirectMessages();
 
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $params = array(
@@ -1959,7 +1959,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             \mod_facetoface\notice_sender::signup_cancellation($signup);
         }
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1983,7 +1983,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         list($sessiondate, $student1, $student2, $student3) = $this->session_generate_timezone(99);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         // Test we are getting F2F booking confirmation email.
@@ -2020,7 +2020,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink = $this->redirectMessages();
         $notification = new \facetoface_notification((array)$notify, false);
         $notification->send_scheduled();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
         // Test we are getting F2F booking reminder email.
         $haystack = $emailsink->get_messages();
@@ -2059,7 +2059,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         list($sessiondate, $student1, $student2, $student3) = $this->session_generate_timezone($test->timezone);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         // Test we are getting F2F booking confirmation email.
@@ -2095,7 +2095,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink = $this->redirectMessages();
         $notification = new \facetoface_notification((array)$notify, false);
         $notification->send_scheduled();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
         // Test we are getting F2F booking reminder email.
         $haystack = $emailsink->get_messages();
@@ -2192,7 +2192,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         // Clean messages stack.
         $emailsink = $this->redirectMessages();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         // Now test cancelling the session.
@@ -2203,7 +2203,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertTrue($result1);
         $this->assertTrue($result2);
         $this->assertTrue($result3);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $messages = $emailsink->get_messages();
@@ -2340,7 +2340,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $emailsink = $this->redirectMessages();
         signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $preemails = $emailsink->get_messages();
@@ -2497,7 +2497,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $helper = new \mod_facetoface\notification\notification_helper();
         $helper->notify_under_capacity();
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
 
         $messages = $emailsink->get_messages();
         $emailsink->close();
@@ -2550,7 +2550,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $count = $DB->count_records('facetoface_session_roles', ['roleid' => $role->id, 'userid' => $teacher1->id]);
         $this->assertEquals(1, (int)$count);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $sink->close();
         $this->assertCount(1, $messages);
@@ -2578,7 +2578,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $count = $DB->count_records('facetoface_session_roles', ['roleid' => $role->id, 'userid' => $teacher2->id]);
         $this->assertEquals(1, (int)$count);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $messages = $sink->get_messages();
         $sink->close();
         usort($messages, function($email1, $email2) {
@@ -2607,7 +2607,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $signup->set_discountcode('XMAS');
         signup_helper::signup($signup);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -2628,7 +2628,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
         signup_helper::signup($signup);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -2654,7 +2654,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $signup->set_discountcode('XMAS');
         signup_helper::signup($signup);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -2668,7 +2668,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $signup = \mod_facetoface\signup::create($student2->id, $seminarevent);
         signup_helper::signup($signup);
 
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -2692,7 +2692,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
         $signup->set_discountcode('XMAS');
         signup_helper::signup($signup);
-        $this->execute_adhoc_tasks();
+        $this->executeAdhocTasks();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
