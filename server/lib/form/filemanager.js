@@ -194,7 +194,8 @@ M.form_filemanager.init = function(Y, options) {
             this.check_buttons();
             this.refresh(this.currentpath);
             if (typeof M.core_formchangechecker != 'undefined') {
-                M.core_formchangechecker.set_form_changed();
+                // Fake target so that the ignoredirty check works from Atto
+                M.core_formchangechecker.set_form_changed({target: this.pathbar});
             }
         },
         check_buttons: function() {

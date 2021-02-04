@@ -88,7 +88,7 @@ foreach ($files as $file) {
 
 $mform = new atto_managefiles_manage_form(null,
     array('options' => $options, 'draftitemid' => $itemid, 'files' => $filenames, 'elementid' => $elementid),
-    'post', '', array('id' => 'atto_managefiles_manageform'));
+    'post', '', array('id' => 'atto_managefiles_manageform', 'class' => 'ignoredirty'));
 
 if ($data = $mform->get_data()) {
     if (!empty($data->deletefile)) {
