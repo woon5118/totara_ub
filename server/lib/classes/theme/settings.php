@@ -59,7 +59,11 @@ final class settings {
         $default_tenant_can_customize = [
             'brand' => '*',
             'colours' => '*',
-            'images' => ['sitelogin'],
+            'images' => [
+                'sitelogin',
+                'formimages_field_displaylogin',
+                'formimages_field_loginalttext',
+            ],
             'custom' => ['formcustom_field_customfooter'],
             'tenant' => '*',
         ];

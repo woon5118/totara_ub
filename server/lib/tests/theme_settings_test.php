@@ -1099,7 +1099,11 @@ class core_theme_settings_testcase extends advanced_testcase {
         $expected = [
             'brand' => '*',
             'colours' => '*',
-            'images' => ['sitelogin'],
+            'images' => [
+                'sitelogin',
+                'formimages_field_displaylogin',
+                'formimages_field_loginalttext',
+            ],
             'custom' => ['formcustom_field_customfooter'],
             'tenant' => '*',
         ];
