@@ -1112,23 +1112,18 @@ class behat_totara_tui extends behat_base {
     public function i_set_the_tui_date_selector_to(string $field_name, string $date_value): void {
         $date_selector = $this->find_date_selector_by_name($field_name);
 
-        [$day_to_set, $month_to_set, $year_to_set] = explode(' ', $date_value);
+        $date = new DateTime($date_value);
 
-        $selections = [
-            'day' => $day_to_set,
-            'month' => $month_to_set,
-            'year' => $year_to_set,
-        ];
+        /** @var NodeElement $select_node */
+        $select_node = $date_selector->find('css', '.tui-dateSelector__date-year select');
+        $select_node->selectOption($date->format('Y'));
 
-        foreach ($selections as $key => $selection) {
-            if ($selection === '') {
-                continue;
-            }
+        $select_node = $date_selector->find('css', '.tui-dateSelector__date-month select');
+        $select_node->selectOption($date->format('F'));
 
-            /** @var NodeElement $select_node */
-            $select_node = $date_selector->find('css', ".tui-dateSelector__date-$key select");
-            $select_node->selectOption($selection);
-        }
+        $select_node = $date_selector->find('css', '.tui-dateSelector__date-day select');
+        $select_node->selectOption($date->format('j'));
+
     }
 
     /**
@@ -1139,12 +1134,12 @@ class behat_totara_tui extends behat_base {
     public function the_tui_date_selector_should_be_set_to(string $field_name, string $date_value): void {
         $date_selector = $this->find_date_selector_by_name($field_name);
 
-        [$day_expected, $month_expected, $year_expected] = explode(' ', $date_value);
+        $date = new DateTime($date_value);
 
         $selections = [
-            'day' => $day_expected,
-            'month' => $month_expected,
-            'year' => $year_expected,
+            'day' => $date->format('j'),
+            'month' => $date->format('F'),
+            'year' => $date->format('Y'),
         ];
 
         foreach ($selections as $key => $expected_value) {

@@ -66,8 +66,9 @@ Feature: Interact with the date picker in the participant form
     Then I should see "Req date picker" has the validation error "Required"
     And I should see "Opt date picker" has no validation errors
 
-    When I set the "sectionElements[1][response]" tui date selector to "1  "
-    And I set the "sectionElements[2][response]" tui date selector to "1  "
+    # Validation should be tested on the Vue item (TL-29558)
+    When I set the field "uid-11-event-date-day" to "1"
+    And I set the field "uid-14-event-date-day" to "1"
     And I click on "Save as draft" "button"
     Then I should see "Req date picker" has the validation error "Invalid date. Select day, month and year"
     And I should see "Opt date picker" has the validation error "Invalid date. Select day, month and year"
@@ -76,8 +77,8 @@ Feature: Interact with the date picker in the participant form
     Then I should see "Req date picker" has the validation error "Invalid date. Select day, month and year"
     Then I should see "Opt date picker" has the validation error "Invalid date. Select day, month and year"
 
-    When I set the "sectionElements[1][response]" tui date selector to "1 January "
-    And I set the "sectionElements[2][response]" tui date selector to "1 January "
+    When I set the field "uid-11-event-date-month" to "January"
+    And I set the field "uid-14-event-date-month" to "January"
     And I click on "Save as draft" "button"
     Then I should see "Req date picker" has the validation error "Invalid date. Select day, month and year"
     And I should see "Opt date picker" has the validation error "Invalid date. Select day, month and year"
@@ -86,8 +87,8 @@ Feature: Interact with the date picker in the participant form
     Then I should see "Req date picker" has the validation error "Invalid date. Select day, month and year"
     And I should see "Opt date picker" has the validation error "Invalid date. Select day, month and year"
 
-    When I set the "sectionElements[1][response]" tui date selector to "1 January 2020"
-    And I set the "sectionElements[2][response]" tui date selector to "1 January 2020"
+    When I set the field "uid-11-event-date-year" to "2020"
+    And  I set the field "uid-14-event-date-year" to "2020"
     And I click on "Save as draft" "button"
     Then I should see "Req date picker" has no validation errors
     And I should see "Opt date picker" has no validation errors

@@ -15,9 +15,9 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
-    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector to "-1 day"
     And I set the "scheduleFixed[from]" tui date selector timezone to "UTC"
-    And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
+    And I set the "scheduleFixed[to]" tui date selector to "+1 day"
 
     When I save the activity schedule
     Then I should see "Instances are not created until after an activity is activated, so no users will be affected by the changes" in the tui modal
@@ -29,9 +29,9 @@ Feature: Define track schedules to perform activities
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
-    Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
+    Then the "scheduleFixed[from]" tui date selector should be set to "-1 day"
     And the "scheduleFixed[from]" tui date selector timezone should be set to "UTC"
-    And the "scheduleFixed[to]" tui date selector should be set to "30 December 2030"
+    And the "scheduleFixed[to]" tui date selector should be set to "+1 day"
 
   Scenario: Save and view open ended fixed performance activity schedule
     Given I log in as "admin"
@@ -39,7 +39,7 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Open-ended" "button"
-    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector to "-1 day"
     And I set the "scheduleFixed[from]" tui date selector timezone to "UTC"
 
     When I save the activity schedule
@@ -51,7 +51,7 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
 
-    Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
+    Then the "scheduleFixed[from]" tui date selector should be set to "-1 day"
     And the "scheduleFixed[from]" tui date selector timezone should be set to "UTC"
 
   Scenario: Check remembered toggling between fixed options
@@ -61,7 +61,7 @@ Feature: Define track schedules to perform activities
 
     When I click on "Assignments" "link"
     And I click on "Open-ended" "button"
-    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector to "-1 day"
     And I set the "scheduleFixed[from]" tui date selector timezone to "UTC"
     And I save the activity schedule
     And I click on "Confirm" "button"
@@ -72,7 +72,7 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
 
-    Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
+    Then the "scheduleFixed[from]" tui date selector should be set to "-1 day"
     And the "scheduleFixed[from]" tui date selector timezone should be set to "UTC"
 
   Scenario: Check validation messages of fixed activity schedule
@@ -82,16 +82,16 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
 
-    When I set the "scheduleFixed[from]" tui date selector to "2 January 2020"
+    When I set the "scheduleFixed[from]" tui date selector to "-1 day"
     And I set the "scheduleFixed[from]" tui date selector timezone to "UTC"
-    And I set the "scheduleFixed[to]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[to]" tui date selector to "-2 days"
     And I save the activity schedule
     Then I should see "Range end date cannot be before range start date"
 
      # Make sure the validation for limited range doesn't apply (this used to be a bug).
     When I click on "Limited" "button"
-    And I set the "scheduleFixed[from]" tui date selector to "30 June 2020"
-    And I set the "scheduleFixed[to]" tui date selector to "3 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector to "-10 days"
+    And I set the "scheduleFixed[to]" tui date selector to "-30 days"
     And I click on "Open-ended" "button"
     And I save the activity schedule
     And I click on "Confirm" "button"
@@ -100,8 +100,8 @@ Feature: Define track schedules to perform activities
 
     When I close the tui notification toast
     And I click on "Limited" "button"
-    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
-    And I set the "scheduleFixed[to]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector to "-1 day"
+    And I set the "scheduleFixed[to]" tui date selector to "-1 day"
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -263,8 +263,8 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
-    Then I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
-    And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
+    Then I set the "scheduleFixed[from]" tui date selector to "-1 day"
+    And I set the "scheduleFixed[to]" tui date selector to "+1 day"
 
     When I click on "Relative" "button"
     And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
@@ -279,8 +279,8 @@ Feature: Define track schedules to perform activities
 
     When I click on "Fixed" "button"
 
-    Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
-    And the "scheduleFixed[to]" tui date selector should be set to "30 December 2030"
+    Then the "scheduleFixed[from]" tui date selector should be set to "-1 day"
+    And the "scheduleFixed[to]" tui date selector should be set to "+1 day"
 
     When I click on "Relative" "button"
     Then the following fields match these values:
@@ -321,7 +321,7 @@ Feature: Define track schedules to perform activities
     # Open & Fixed
     When I click on "Open-ended" "button"
     And I click on "Fixed" "button"
-    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector to "-1 day"
     And I set the following fields to these values:
       | dueDateOffset[value] | 0 |
     And I save the activity schedule
@@ -389,13 +389,13 @@ Feature: Define track schedules to perform activities
     # Limited & Fixed
     When I click on "Limited" "button"
     And I click on "Fixed" "button"
-    When I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
-    And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
+    When I set the "scheduleFixed[from]" tui date selector to "-1 day"
+    And I set the "scheduleFixed[to]" tui date selector to "+ 1 day"
     And I click on the "fixed" tui radio in the "dueDateType" tui radio group
-    And I set the "fixedDueDate" tui date selector to "30 December 2030"
+    And I set the "fixedDueDate" tui date selector to "+1 day"
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
-    When I set the "fixedDueDate" tui date selector to "31 December 2030"
+    When I set the "fixedDueDate" tui date selector to "+2 day"
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -403,10 +403,10 @@ Feature: Define track schedules to perform activities
     When I reload the page
     And I click on "Assignments" "link"
 
-    When I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
-    And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
+    When I set the "scheduleFixed[from]" tui date selector to "-1 day"
+    And I set the "scheduleFixed[to]" tui date selector to "+1 day"
       | dueDateType  | fixed |
-    And I set the "fixedDueDate" tui date selector to "31 December 2030"
+    And I set the "fixedDueDate" tui date selector to "+1 day"
     And I click on the "relative" tui radio in the "dueDateType" tui radio group
     And I set the following fields to these values:
       | dueDateOffset[relative][value] | 0 |
