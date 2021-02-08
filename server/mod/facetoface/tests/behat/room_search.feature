@@ -238,3 +238,44 @@ Feature: Search pre-defined rooms in seminar
     Then I should see "Room 10278"
     When I press "Save changes"
     Then I should see "Room 10278" in the ".mod_facetoface__sessionlist" "css_element"
+
+  Scenario: Check special characters(Å - Ä - Ö Swedish)
+    Given the following "global rooms" exist in "mod_facetoface" plugin:
+      | name       |
+      | Örebro     |
+      | ÖreÅbro    |
+      | ÖrebroÄ    |
+      | Южная      |
+      | Желтая     |
+      | Straße     |
+    And the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 2 | C2        | 0        |
+    And I am on "Course 2" course homepage with editing mode on
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name        | Test seminar name        |
+      | Description | Test seminar description |
+    And I follow "View all events"
+    And I follow "Add event"
+
+    And I click on "Select rooms" "link"
+    And I click on "Search" "link" in the "Choose rooms" "totaradialogue"
+
+    When I search for "örebro" in the "Choose rooms" totara dialogue
+    Then I should see "Örebro"
+
+    When I search for "öreå" in the "Choose rooms" totara dialogue
+    Then I should see "ÖreÅbro"
+
+    When I search for "broä" in the "Choose rooms" totara dialogue
+    Then I should see "ÖrebroÄ"
+
+    When I search for "южная" in the "Choose rooms" totara dialogue
+    Then I should see "Южная"
+
+    When I search for "желтая" in the "Choose rooms" totara dialogue
+    Then I should see "Желтая"
+
+    When I search for "STRASSE" in the "Choose rooms" totara dialogue
+    Then I should see "Straße"
+

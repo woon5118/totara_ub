@@ -57,10 +57,15 @@ if (strlen($query)) {
     }
 
     $founditems = [];
+    // Why strtoupper()? From PHP 7.3, it is parsing the special characters more accurate, as sample ß == ss in German,
+    // so searching for "STRASSE" doesn't pick a room named "Straße" up if PHP is lower than 7.2
+    // In this case we use strtoupper() instead of strtolower() as it will not parse as user is expecting.
+    $needle = \core_text::strtoupper($query);
     // Generate some treeview data
     foreach ($this->items as $result) {
 
-        if (stripos($result->fullname, $query) === false) {
+        $haystack = \core_text::strtoupper($result->fullname);
+        if (\core_text::strpos($haystack, $needle) === false) {
              continue;
         }
         // Add datakey attributes to item.
