@@ -239,10 +239,10 @@ class calculator {
 
         if ($s % 2 == 0) {
             // An even number of attempts.
-            $limitoffset = $s / 2 - 1;
+            $limitoffset = (int)($s / 2 - 1);
             $limit = 2;
         } else {
-            $limitoffset = floor($s / 2);
+            $limitoffset = (int)floor($s / 2);
             $limit = 1;
         }
         $sql = "SELECT quiza.id, quiza.sumgrades
