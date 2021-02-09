@@ -91,4 +91,4 @@ Write-Host 'Client secret: ' -NoNewline
 Write-Host $pass.SecretText -ForegroundColor Black -BackgroundColor White
 Write-Host
 Write-Host -ForegroundColor Yellow 'The client secret will expire: ' -NoNewline
-Write-Host -ForegroundColor Yellow $pass.EndDateTime
+Write-Host -ForegroundColor Yellow $pass.EndDateTime.ToLocalTime()
