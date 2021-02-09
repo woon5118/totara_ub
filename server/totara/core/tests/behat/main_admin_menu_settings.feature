@@ -81,7 +81,7 @@ Feature: Totara settings for admin main menu
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Menu settings" "link" in the "#quickaccess-popover-content" "css_element"
     Then I should see "Core platform"
-    And I open the action menu in "//div[@aria-label='Core platform']" "xpath_element"
+    And I open the action menu in "//div[button[@aria-label='Expand Core platform']]" "xpath_element"
     And I choose "Delete group" in the open action menu
     And I am on homepage
     And I click on "[aria-label='Show admin menu window']" "css_element"
@@ -95,9 +95,9 @@ Feature: Totara settings for admin main menu
     And I click on "Add a new group" "button"
     Then I should see "Untitled"
     When I click on "//div/child::h3[contains(., 'Untitled')]/span" "xpath_element"
-    And I click on "Add menu item..." "link" in the "//div[@aria-label=\"Untitled\"]/.." "xpath_element"
-    And I click on "Audiences" "link" in the "//div[@aria-label=\"Untitled\"]/.." "xpath_element"
-    And I click on "Audience global settings" "link" in the "//div[@aria-label=\"Untitled\"]/.." "xpath_element"
+    And I click on "Add menu item..." "link" in the "//div[h3[contains(., 'Untitled')]]/.." "xpath_element"
+    And I click on "Audiences" "link" in the "//div[h3[contains(., 'Untitled')]]/.." "xpath_element"
+    And I click on "Audience global settings" "link" in the "//div[h3[contains(., 'Untitled')]]/.." "xpath_element"
     And I am on homepage
     And I click on "[aria-label='Show admin menu window']" "css_element"
     Then I should see "Audience global settings"
@@ -107,14 +107,14 @@ Feature: Totara settings for admin main menu
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Menu settings" "link" in the "#quickaccess-popover-content" "css_element"
     Then I should see "Core platform"
-    And I open the action menu in "//div[@aria-label='Core platform']" "xpath_element"
+    And I open the action menu in "//div[button[@aria-label='Expand Core platform']]" "xpath_element"
     And I choose "Delete group" in the open action menu
     And I click on "Add a new group" "button"
     And I should see "Untitled"
     And I click on "//div/child::h3[contains(., 'Untitled')]/span" "xpath_element"
-    And I click on "Add menu item..." "link" in the "//div[@aria-label=\"Untitled\"]/.." "xpath_element"
-    And I click on "Audiences" "link" in the "//div[@aria-label=\"Untitled\"]/.." "xpath_element"
-    And I click on "Audience global settings" "link" in the "//div[@aria-label=\"Untitled\"]/.." "xpath_element"
+    And I click on "Add menu item..." "link" in the "//div[h3[contains(., 'Untitled')]]/.." "xpath_element"
+    And I click on "Audiences" "link" in the "//div[h3[contains(., 'Untitled')]]/.." "xpath_element"
+    And I click on "Audience global settings" "link" in the "//div[h3[contains(., 'Untitled')]]/.." "xpath_element"
     And I am on homepage
     And I click on "[aria-label='Show admin menu window']" "css_element"
     Then I should not see "Core platform"
