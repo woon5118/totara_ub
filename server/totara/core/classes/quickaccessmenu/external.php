@@ -456,6 +456,7 @@ final class external extends \external_api {
                 'title'  => new external_value(PARAM_TEXT, 'The display name for the group'),
                 'has_items'  => new external_value(PARAM_BOOL, 'Whether the group has any items'),
                 'item_count' => new external_value(PARAM_INT, 'Number of items in the group'),
+                'expandlabel' => new external_value(PARAM_TEXT, 'The ARIA label for the expand control of this group'),
                 'items' => new external_multiple_structure(new external_single_structure(
                     [
                         'key'   => new external_value(PARAM_ALPHANUMEXT, 'The item key'),
