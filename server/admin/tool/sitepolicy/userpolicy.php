@@ -59,6 +59,7 @@ if (empty($policyversionid)) {
     $unanswered = \tool_sitepolicy\userconsent::get_unansweredpolicies($userid);
     if (count($unanswered) == 0) {
         $SESSION->tool_sitepolicy_consented = true;
+        unset($SESSION->wantsurl);
         redirect($wantsurl);
     }
 
@@ -207,6 +208,7 @@ if ($form->is_cancelled()) {
     // avoid uneccessary db queries
     if ($currentcount == $totalcount) {
         $SESSION->tool_sitepolicy_consented = true;
+        unset($SESSION->wantsurl);
         redirect($wantsurl);
     } else {
         redirect(url_helper::user_sitepolicy_consent($currentcount + 1, $totalcount));
