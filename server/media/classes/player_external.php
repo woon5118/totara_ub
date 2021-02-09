@@ -104,4 +104,40 @@ abstract class core_media_player_external extends core_media_player {
             $matches[$i] = false;
         }
     }
+
+    /**
+     * Generate HTML for embedding a responsive iframe
+     *
+     * @param string $url
+     * @param int $width
+     * @param int $height
+     * @param string $title
+     * @return string
+     */
+    protected function responsive_iframe($url, $width = null, $height = null, $title = null): string {
+        // Responsive aspect - all padding is relative to the element's width, so by
+        // creating an element with no height and making the top padding the reciprocal of
+        // the aspect ratio expressed as a percentage, we end up with an element that has
+        // the desired aspect ratio.
+        //
+        // See also:
+        // * https://css-tricks.com/aspect-ratio-boxes/
+        // * .mediaplugin__iframe_responsive styles in filter_mediaplugin/styles.css.
+        $padding_top = ($height / $width) * 100 . '%';
+
+        $iframe = html_writer::tag('iframe', '', [
+            'width' => $width,
+            'height' => $height,
+            'src' => $url,
+            'frameborder' => '0',
+            'allow' => 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+            'allowfullscreen' => '1',
+            'title' => $title,
+        ]);
+
+        return html_writer::tag('div', $iframe, [
+            'class' => 'mediaplugin__iframe_responsive',
+            'style' => "padding-top: {$padding_top}",
+        ]);
+    }
 }

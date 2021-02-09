@@ -67,7 +67,6 @@ class media_youtube_plugin extends core_media_player_external {
         if (empty($info) or strpos($info, 'http') === 0) {
             $info = get_string('pluginname', 'media_youtube');
         }
-        $info = s($info);
 
         self::pick_video_size($width, $height);
 
@@ -76,10 +75,12 @@ class media_youtube_plugin extends core_media_player_external {
             $site = $this->matches[1];
             $playlist = $this->matches[3];
 
+            $iframe = $this->responsive_iframe("https://$site/embed/videoseries?list=$playlist", $width, $height, $info);
+
             return <<<OET
-<span class="mediaplugin mediaplugin_youtube">
-<iframe width="$width" height="$height" src="https://$site/embed/videoseries?list=$playlist" frameborder="0" allowfullscreen="1"></iframe>
-</span>
+<div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: {$width}px">
+$iframe
+</div>
 OET;
         } else {
 
@@ -87,21 +88,22 @@ OET;
             $params = '';
             $start = self::get_start_time($url);
             if ($start > 0) {
-                $params .= "start=$start&amp;";
+                $params .= "start=$start&";
             }
 
             $listid = $url->param('list');
             // Check for non-empty but valid playlist ID.
             if (!empty($listid) && !preg_match('/[^a-zA-Z0-9\-_]/', $listid)) {
                 // This video is part of a playlist, and we want to embed it as such.
-                $params .= "list=$listid&amp;";
+                $params .= "list=$listid&";
             }
 
+            $iframe = $this->responsive_iframe("https://www.youtube.com/embed/$videoid?{$params}rel=0&wmode=transparent", $width, $height, $info);
+
             return <<<OET
-<span class="mediaplugin mediaplugin_youtube">
-<iframe title="$info" width="$width" height="$height"
-  src="https://www.youtube.com/embed/$videoid?{$params}rel=0&amp;wmode=transparent" frameborder="0" allowfullscreen="1"></iframe>
-</span>
+<div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: {$width}px">
+$iframe
+</div>
 OET;
         }
 

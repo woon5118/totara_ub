@@ -35,19 +35,22 @@ defined('MOODLE_INTERNAL') || die();
 class media_vimeo_plugin extends core_media_player_external {
     protected function embed_external(moodle_url $url, $name, $width, $height, $options) {
         $videoid = $this->matches[1];
-        $info = s($name);
+        $info = trim($name);
+        if (empty($info) or strpos($info, 'http') === 0) {
+            $info = get_string('pluginname', 'media_vimeo');
+        }
 
         // Note: resizing via url is not supported, user can click the fullscreen
         // button instead. iframe embedding is not xhtml strict but it is the only
         // option that seems to work on most devices.
         self::pick_video_size($width, $height);
 
+        $iframe = $this->responsive_iframe("https://player.vimeo.com/video/$videoid", $width, $height, $info);
+
         $output = <<<OET
-<span class="mediaplugin mediaplugin_vimeo">
-<iframe title="$info" src="https://player.vimeo.com/video/$videoid"
-  width="$width" height="$height" frameborder="0"
-  webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-</span>
+<div class="mediaplugin mediaplugin_vimeo mediaplugin--iframe-centered" style="max-width: {$width}px">
+$iframe
+</div>
 OET;
 
         return $output;
