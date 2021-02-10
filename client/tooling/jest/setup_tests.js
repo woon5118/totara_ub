@@ -18,6 +18,8 @@
 
 import { config } from '@vue/test-utils';
 
+import * as i18n from 'tui/i18n';
+
 jest.mock('tui/storage');
 jest.mock('tui/internal/lang_string_store');
 jest.mock('tui/config');
@@ -32,8 +34,14 @@ jest.mock('tui/components/icons/implementation/SvgIconWrap', () => {
   };
 });
 
-config.mocks.$str = (key, comp, a) =>
-  a ? `[[${key}, ${comp}, ${JSON.stringify(a)}]]` : `[[${key}, ${comp}]]`;
+config.mocks.$str = (key, comp, a) => {
+  if (i18n.hasString(key, comp)) {
+    return i18n.getString(key, comp, a);
+  }
+  return a
+    ? `[[${key}, ${comp}, ${JSON.stringify(a)}]]`
+    : `[[${key}, ${comp}]]`;
+};
 
 config.mocks.uid = 'id';
 config.mocks.$id = x => (x ? 'id-' + x : 'id');

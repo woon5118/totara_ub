@@ -17,8 +17,10 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'tui/components/form/DateSelector.vue';
+import DateSelector from 'tui/components/form/DateSelector';
+import * as i18n from 'tui/i18n';
 import { axe, toHaveNoViolations } from 'jest-axe';
+
 expect.extend(toHaveNoViolations);
 let wrapper;
 
@@ -29,37 +31,51 @@ const props = {
   yearsMidrange: 2020,
 };
 
+function createWrapper() {
+  return mount(DateSelector, {
+    propsData: props,
+    methods: {
+      getMonths() {
+        this.optionsMonths = ['a', 'b', 'c'];
+      },
+
+      getTimeZones() {
+        this.optionsTimezones = ['1', '2', '3'];
+      },
+    },
+  });
+}
+
 describe('DateSelector', () => {
-  beforeAll(() => {
-    wrapper = mount(component, {
-      propsData: props,
-      mocks: {
-        $str: function() {
-          return 'tempString';
-        },
-        $id: x => 'id-' + x,
-      },
-      methods: {
-        getMonths() {
-          this.optionsMonths = ['a', 'b', 'c'];
-        },
-
-        getTimeZones() {
-          this.optionsTimezones = ['1', '2', '3'];
-        },
-      },
-    });
+  it('switches order with locale', () => {
+    i18n.__setString('strftimedatefulllong', 'langconfig', '%m/%d/%Y');
+    wrapper = createWrapper();
+    const items = wrapper.findAll('.tui-dateSelector__date > div');
+    expect(items.length).toBe(3);
+    expect(items.at(0).classes()).toContain('tui-dateSelector__date-month');
+    expect(items.at(1).classes()).toContain('tui-dateSelector__date-day');
+    expect(items.at(2).classes()).toContain('tui-dateSelector__date-year');
   });
 
-  it('Props can be set', () => {
-    expect(wrapper.props()).toMatchObject(props);
+  it('defaults to y-m-d if no locale setting', () => {
+    i18n.__setString('strftimedatefulllong', 'langconfig', null);
+    wrapper = createWrapper();
+    const items = wrapper.findAll('.tui-dateSelector__date > div');
+    expect(items.length).toBe(3);
+    expect(items.at(0).classes()).toContain('tui-dateSelector__date-year');
+    expect(items.at(1).classes()).toContain('tui-dateSelector__date-month');
+    expect(items.at(2).classes()).toContain('tui-dateSelector__date-day');
   });
 
-  it('Checks snapshot', () => {
+  it('matches snapshot', async () => {
+    i18n.__setString('strftimedatefulllong', 'langconfig', '%d/%m/%Y');
+    wrapper = createWrapper();
+    await wrapper.vm.$nextTick();
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should not have any accessibility violations', async () => {
+    wrapper = createWrapper();
     const results = await axe(wrapper.element, {
       rules: {
         region: { enabled: false },

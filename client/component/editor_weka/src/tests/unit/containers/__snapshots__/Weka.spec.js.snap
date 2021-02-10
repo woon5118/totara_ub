@@ -15,7 +15,7 @@ exports[`editor_weka/components/Weka.vue toolbar is showing and render correctly
     data-placeholder=""
   >
     <div
-      aria-label=""
+      aria-label="[[pluginname, editor_weka]]"
       class="ProseMirror tui-weka-editor"
       contenteditable="true"
       role="region"

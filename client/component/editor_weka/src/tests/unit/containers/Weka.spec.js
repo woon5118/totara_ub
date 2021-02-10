@@ -45,17 +45,6 @@ jest.mock('tui/tui', function() {
   };
 });
 
-// Mock i18n javascript to make the weka works.
-jest.mock('tui/i18n', function() {
-  return {
-    __esModule: true,
-    loadLangStrings: () => new Promise(resolve => resolve()),
-    langString() {
-      return '';
-    },
-  };
-});
-
 jest.mock('editor_weka/api', () => ({
   __esModule: true,
   getLinkMetadata: () => null,

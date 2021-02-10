@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DateSelector Checks snapshot 1`] = `
+exports[`DateSelector matches snapshot 1`] = `
 <div
   class="tui-dateSelector"
 >
@@ -17,7 +17,7 @@ exports[`DateSelector Checks snapshot 1`] = `
         <!---->
         
 
-  tempString
+  [[day, totara_core]]
   
         <!---->
       </label>
@@ -249,7 +249,6 @@ exports[`DateSelector Checks snapshot 1`] = `
         </select>
       </div>
     </div>
-     
     <div
       class="tui-dateSelector__date-month"
     >
@@ -260,7 +259,7 @@ exports[`DateSelector Checks snapshot 1`] = `
         <!---->
         
 
-  tempString
+  [[month, totara_core]]
   
         <!---->
       </label>
@@ -296,7 +295,6 @@ exports[`DateSelector Checks snapshot 1`] = `
         </select>
       </div>
     </div>
-     
     <div
       class="tui-dateSelector__date-year"
     >
@@ -307,7 +305,7 @@ exports[`DateSelector Checks snapshot 1`] = `
         <!---->
         
 
-  tempString
+  [[year, totara_core]]
   
         <!---->
       </label>

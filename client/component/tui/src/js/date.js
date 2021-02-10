@@ -246,3 +246,44 @@ export function isIsoBefore(date, baseDate) {
 
   return isBefore(parseISO(date), parseISO(baseDate));
 }
+
+/**
+ * Map of strftime specifiers to day, month, or year
+ */
+const strftime = {
+  a: 'd',
+  A: 'd',
+  d: 'd',
+  e: 'd',
+  b: 'm',
+  B: 'm',
+  h: 'm',
+  m: 'm',
+  y: 'y',
+  Y: 'y',
+};
+
+/**
+ * Get date order from strftime-style format string.
+ *
+ * @param {string} format
+ * @returns {('y'|'m'|'d')[]} Array of y, m, and d
+ */
+export function getDateOrderFromStrftime(format) {
+  const regex = /%[a-zA-Z]/g;
+  const result = [];
+  let match;
+  while ((match = regex.exec(format))) {
+    const specifier = match[0][1];
+    const r = strftime[specifier];
+    if (r) {
+      result.push(r);
+    }
+  }
+
+  if (result.length === 3) {
+    return result;
+  }
+
+  return ['y', 'm', 'd'];
+}

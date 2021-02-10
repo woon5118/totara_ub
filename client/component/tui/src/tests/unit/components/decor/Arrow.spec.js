@@ -20,8 +20,6 @@ import { shallowMount, mount } from '@vue/test-utils';
 import Arrow from 'tui/components/decor/Arrow';
 import { isRtl } from 'tui/i18n';
 
-jest.mock('tui/i18n');
-
 describe('Arrow', () => {
   beforeAll(() => {
     isRtl.mockReset().mockReturnValue(false);

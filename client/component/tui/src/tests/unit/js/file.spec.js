@@ -16,67 +16,15 @@
  * @module tui
  */
 import { getReadableSize } from 'tui/file';
+import * as i18n from 'tui/i18n';
 
-jest.mock('tui/i18n', () => {
-  function MockLangString(key, component, param) {
-    if (!(this instanceof MockLangString)) {
-      return new MockLangString(key, component, param);
-    }
+i18n.__setString('sizegb', 'core', 'GB');
+i18n.__setString('sizemb', 'core', 'MB');
+i18n.__setString('sizekb', 'core', 'KB');
+i18n.__setString('sizeb', 'core', 'Byte');
+i18n.__setString('filesize', 'totara_core', '{$a->size} {$a->unit}');
 
-    this.key = key;
-    this.component = component;
-    this.param = param;
-  }
-
-  MockLangString.prototype = {
-    constructor: MockLangString,
-
-    toRequest() {
-      return {
-        component: this.component,
-        key: this.key,
-      };
-    },
-
-    loaded() {
-      return true;
-    },
-
-    toString() {
-      const map = {
-        core: {
-          sizegb: 'GB',
-          sizemb: 'MB',
-          sizekb: 'KB',
-          sizeb: 'Byte',
-        },
-        totara_core: {
-          filesize: '{{size}} {{unit}}',
-        },
-      };
-
-      let str = map[this.component][this.key];
-      if (!this.param) {
-        return str;
-      }
-
-      return str.replace(/\{\{(.*?)\}\}/gi, (full, prop) => {
-        return this.param[prop] != null ? this.param[prop] : full;
-      });
-    },
-  };
-
-  return {
-    langString(key, component, param) {
-      return new MockLangString(key, component, param);
-    },
-    loadLangStrings() {
-      return Promise.resolve('x');
-    },
-  };
-});
-
-describe('getReadAbleSize', () => {
+describe('getReadableSize', () => {
   it('gives GB size', async () => {
     // This is 1 GB
     expect(await getReadableSize(1073741824)).toEqual('1 GB');

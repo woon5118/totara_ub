@@ -17,14 +17,7 @@
  */
 
 import { v, fieldValidator } from 'tui/validation';
-
-jest.mock('tui/i18n', () => {
-  return {
-    langString(str) {
-      return str;
-    },
-  };
-});
+import { langString } from 'tui/i18n';
 
 describe('built-in validators', () => {
   test('required', () => {
@@ -119,7 +112,9 @@ describe('fieldValidator', () => {
   it('creates a validator function for a field', () => {
     const i = fieldValidator(v => [v.required(), v.min(3)]);
     expect(i('7')).toBe(undefined);
-    expect(i('')).toBe('required');
-    expect(i('2')).toBe('validation_invalid_min');
+    expect(i('')).toStrictEqual(langString('required', 'core'));
+    expect(i('2')).toStrictEqual(
+      langString('validation_invalid_min', 'totara_core', { min: 3 })
+    );
   });
 });

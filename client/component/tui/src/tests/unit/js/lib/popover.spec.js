@@ -20,8 +20,6 @@ import { position } from 'tui/lib/popover';
 import { Rect, Size, Point } from 'tui/geometry';
 import { isRtl, langSide } from 'tui/i18n';
 
-jest.mock('tui/i18n');
-
 describe('position', () => {
   beforeEach(() => {
     isRtl.mockReset().mockReturnValue(false);

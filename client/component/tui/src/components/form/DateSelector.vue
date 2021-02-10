@@ -19,50 +19,64 @@
 <template>
   <div class="tui-dateSelector">
     <div class="tui-dateSelector__date">
-      <div class="tui-dateSelector__date-day">
-        <Label
-          :for-id="$id('event-date-day')"
-          :label="$str('day', 'totara_core')"
-          :hidden="true"
-        />
-        <Select
-          :id="$id('event-date-day')"
-          v-model="day"
-          :disabled="disabled"
-          :options="dayRange"
-          @input="update"
-        />
-      </div>
+      <template v-for="field in fieldOrder">
+        <div
+          v-if="field === 'd'"
+          :key="field"
+          class="tui-dateSelector__date-day"
+        >
+          <Label
+            :for-id="$id('event-date-day')"
+            :label="$str('day', 'totara_core')"
+            :hidden="true"
+          />
+          <Select
+            :id="$id('event-date-day')"
+            v-model="day"
+            :disabled="disabled"
+            :options="dayRange"
+            @input="update"
+          />
+        </div>
 
-      <div class="tui-dateSelector__date-month">
-        <Label
-          :for-id="$id('event-date-month')"
-          :label="$str('month', 'totara_core')"
-          :hidden="true"
-        />
-        <Select
-          :id="$id('event-date-month')"
-          v-model="month"
-          :disabled="disabled"
-          :options="optionsMonths"
-          @input="update"
-        />
-      </div>
+        <div
+          v-else-if="field === 'm'"
+          :key="field"
+          class="tui-dateSelector__date-month"
+        >
+          <Label
+            :for-id="$id('event-date-month')"
+            :label="$str('month', 'totara_core')"
+            :hidden="true"
+          />
+          <Select
+            :id="$id('event-date-month')"
+            v-model="month"
+            :disabled="disabled"
+            :options="optionsMonths"
+            @input="update"
+          />
+        </div>
 
-      <div class="tui-dateSelector__date-year">
-        <Label
-          :for-id="$id('event-date-year')"
-          :label="$str('year', 'totara_core')"
-          :hidden="true"
-        />
-        <Select
-          :id="$id('event-date-year')"
-          v-model="year"
-          :disabled="disabled"
-          :options="yearRange"
-          @input="update"
-        />
-      </div>
+        <div
+          v-else-if="field === 'y'"
+          :key="field"
+          class="tui-dateSelector__date-year"
+        >
+          <Label
+            :for-id="$id('event-date-year')"
+            :label="$str('year', 'totara_core')"
+            :hidden="true"
+          />
+          <Select
+            :id="$id('event-date-year')"
+            v-model="year"
+            :disabled="disabled"
+            :options="yearRange"
+            @input="update"
+          />
+        </div>
+      </template>
     </div>
 
     <div v-if="hasTimezone" class="tui-dateSelector__time">
@@ -90,6 +104,7 @@ import Select from 'tui/components/form/Select';
 // Utils
 import {
   getCurrentDateValues,
+  getDateOrderFromStrftime,
   getDaysInMonthSelectArray,
   getIsoFromValues,
   getMonthStringsSelectArray,
@@ -139,6 +154,12 @@ export default {
   },
 
   computed: {
+    fieldOrder() {
+      return getDateOrderFromStrftime(
+        this.$str('strftimedatefulllong', 'langconfig')
+      );
+    },
+
     date() {
       let date = {
         day: this.day,
@@ -152,7 +173,7 @@ export default {
       };
 
       if (this.hasTimezone) {
-        iso = Object.assign(iso, { timezone: this.timezone });
+        iso.timezone = this.timezone;
       }
 
       return iso;
@@ -257,16 +278,17 @@ export default {
      *
      */
     async getTimezones() {
-      const zones = getTimeZoneKeyStrings();
+      const zones = getTimeZoneKeyStrings().slice();
       const serverTimezone = config.timezone.server;
       await loadLangStrings(zones.map(x => x.label));
-      this.optionsTimezones = zones.map(zone => {
-        let label = zone.label.toString();
-        return Object.assign({}, zone, {
-          label:
-            label === serverTimezone ? this.getServerTimezone(label) : label,
-        });
-      });
+      const index = zones.findIndex(x => x.id == serverTimezone);
+      if (index !== -1) {
+        const item = zones[index];
+        item.label = this.getServerTimezone(item.label.toString());
+        zones.splice(index, 1);
+        zones.unshift(item);
+      }
+      this.optionsTimezones = zones;
     },
 
     /**
@@ -369,6 +391,9 @@ export default {
     "server_timezone",
     "time_zone",
     "year"
+  ],
+  "langconfig": [
+    "strftimedatefulllong"
   ]
 }
 </lang-strings>
