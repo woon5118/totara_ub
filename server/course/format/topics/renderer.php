@@ -63,7 +63,7 @@ class format_topics_renderer extends format_section_renderer_base {
      * @return string HTML to output.
      */
     protected function start_section_list() {
-        return html_writer::start_tag('ul', array('class' => 'topics'));
+        return html_writer::start_tag('ul', array('class' => 'topics', 'role' => 'presentation'));
     }
 
     /**
@@ -238,7 +238,6 @@ class format_topics_renderer extends format_section_renderer_base {
         $o .= html_writer::start_tag('li', [
             'id' => 'section-'.$section->section,
             'class' => 'section main clearfix'.$sectionstyle,
-            'role' => 'region',
             'data-open' => $this->section_is_expanded($section) ? 'true' : null,
             'data-course-id' => $course->id,
             'data-section-id' => $section->id,
