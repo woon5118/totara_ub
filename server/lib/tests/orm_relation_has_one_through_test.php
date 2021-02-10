@@ -22,6 +22,7 @@
  * @category test
  */
 
+use core\entity\user;
 use core\orm\collection;
 use core\orm\entity\repository;
 
@@ -267,4 +268,28 @@ class core_orm_relation_has_one_through_test extends orm_entity_relation_testcas
 
         $this->assertEquals($count, sample_sibling_entity::repository()->count());
     }
+
+    public function test_querying_related_table_with_reserved_word_does_not_fail() {
+        $this->create_sample_records();
+
+        /** @var sample_parent_entity $parent */
+        $parent = sample_parent_entity::repository()
+            ->order_by('id')
+            ->first();
+
+        $user = $parent->reserved_word_relation;
+        $this->assertInstanceOf(user::class, $user);
+        $this->assertEquals(1, $user->id);
+
+        /** @var sample_parent_entity $parent */
+        $parent = sample_parent_entity::repository()
+            ->order_by('id')
+            ->with('reserved_word_relation')
+            ->first();
+
+        $user = $parent->reserved_word_relation;
+        $this->assertInstanceOf(user::class, $user);
+        $this->assertEquals(1, $user->id);
+    }
+
 }

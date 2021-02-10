@@ -79,11 +79,14 @@ class has_one_through extends has_many_through {
 
         // Prepare query
         $repository = $this->repo
-            ->add_select($this->repo->get_table() . '.*')
+            ->add_select('*')
             ->add_select(
-                $intermediate_builder->get_table() . '.' .
-                $this->get_intermediate_foreign_key() . ' as ' .
-                $this->get_intermediate_key_name()
+                sprintf(
+                    "\"%s\".%s as %s",
+                    $intermediate_builder->get_table(),
+                    $this->get_intermediate_foreign_key(),
+                    $this->get_intermediate_key_name()
+                )
             )
             ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_related_foreign_key());
 

@@ -22,6 +22,7 @@
  * @category test
  */
 
+use core\entity\user;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
@@ -584,6 +585,8 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
  * @property-read collection $siblings Children sibling items
  * @property-read sample_sibling_entity $a_sibling First sibling item connected using a pivot table
  * @property-read sample_passport_entity $passport Passport entity
+ * @property-read user $reserved_word_relation To test relation with reserved wor
+ * @property-read collection|user[] $reserved_word_relations To test relation with reserved wor
  */
 class sample_parent_entity extends entity {
 
@@ -645,6 +648,38 @@ class sample_parent_entity extends entity {
     public function reversed_children(): has_many {
         return $this->has_many(sample_child_entity::class, 'parent_id')
             ->order_by('id', 'desc');
+    }
+
+    /**
+     * user is a reserved word in some databases
+     *
+     * @return has_one_through
+     */
+    public function reserved_word_relation(): has_one_through {
+        return $this->has_one_through(
+            sample_pivot_entity::class,
+            user::class,
+            'id',
+            'parent_id',
+            'sibling_id',
+            'id'
+        );
+    }
+
+    /**
+     * user is a reserved word in some databases
+     *
+     * @return has_many_through
+     */
+    public function reserved_word_relations(): has_many_through {
+        return $this->has_many_through(
+            sample_pivot_entity::class,
+            user::class,
+            'id',
+            'parent_id',
+            'sibling_id',
+            'id'
+        );
     }
 }
 

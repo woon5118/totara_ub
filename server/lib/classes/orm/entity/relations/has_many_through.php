@@ -116,10 +116,10 @@ class has_many_through extends relation {
 
         // Prepare the query
         $repository = $this->repo
-            ->select($this->repo->get_table() . '.*')
+            ->select('*')
             ->add_select(
                 sprintf(
-                    "%s.%s as %s",
+                    "\"%s\".%s as %s",
                     $intermediate_builder->get_table(),
                     $this->get_intermediate_foreign_key(),
                     $this->get_intermediate_key_name()
