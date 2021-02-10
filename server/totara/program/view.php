@@ -48,6 +48,7 @@ if ($program->certifid) {
     check_certification_enabled();
     $identifier = 'editcertif';
     $component = 'totara_certification';
+    $viewtype = 'certification';
 } else {
     check_program_enabled();
     $identifier = 'editprogramdetails';
@@ -89,7 +90,11 @@ $category_breadcrumbs = prog_get_category_breadcrumbs($program->category, $viewt
 $heading = $program->fullname;
 $pagetitle = get_string('program', 'totara_program') . ': ' . $heading;
 if ($isadmin) {
-    $PAGE->navbar->add(get_string('manageprograms', 'admin'), new moodle_url('/totara/program/manage.php', array('viewtype' => $viewtype)));
+    if ($viewtype === 'certification') {
+        $PAGE->navbar->add(get_string('managecertifications', 'totara_core'), new moodle_url('/totara/program/manage.php', array('viewtype' => $viewtype)));
+    } else {
+        $PAGE->navbar->add(get_string('manageprograms', 'admin'), new moodle_url('/totara/program/manage.php', array('viewtype' => $viewtype)));
+    }
 } else {
     $PAGE->navbar->add(get_string('findprograms', 'totara_program'), new moodle_url('/totara/program/index.php', array('viewtype' => $viewtype)));
 }
