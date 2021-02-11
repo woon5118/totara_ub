@@ -58,10 +58,17 @@ class totara_webapi_schema_builder_test  extends \advanced_testcase {
     public function test_caching_of_schema() {
         set_config('cache_graphql_schema', false);
 
+        /** @var cache_application $cache */
         $cache = \cache::make('totara_webapi', 'schema');
         $parsed_schema = $cache->get('parsed_schema');
 
-        $this->assertEmpty($parsed_schema);
+        // This cache is primed for unit tests to speed them up.
+        $this->assertNotFalse($parsed_schema);
+
+        // Empty it.
+        $cache->purge();
+        $parsed_schema = $cache->get('parsed_schema');
+        $this->assertFalse($parsed_schema);
 
         $this->build_schema();
 

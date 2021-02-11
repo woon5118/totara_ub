@@ -174,14 +174,15 @@ class server {
     /**
      * Build and validate the schema (on developer mode)
      *
+     * @param string|null $type One of graphql::TYPE_*
      * @return Schema
      */
-    protected function prepare_schema(): Schema {
+    protected static function prepare_schema(string $type = null): Schema {
         $schema_file_loader = new schema_file_loader();
         $schema_builder = new schema_builder($schema_file_loader);
         $schema = $schema_builder->build();
 
-        if ($this->type == graphql::TYPE_DEV) {
+        if ($type === graphql::TYPE_DEV) {
             $schema->assertValid();
         }
 
