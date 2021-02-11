@@ -47,6 +47,7 @@ $string['eventupdatedscaleminprofid'] = 'Updated minimum proficient value of Com
 $string['eventupdatedscalevalue'] = 'Updated Competency Scale Value';
 $string['eventupdatedtype'] = 'Updated Competency Type';
 $string['eventvieweditem'] = 'Viewed Competency';
+$string['linktype'] = '{$a} link type';
 $string['pluginname'] = 'Competency Hierarchies';
 $string['settings'] = 'Competency settings';
 $string['userdataitemcompetency_evidence'] = 'Competency status records (legacy)';

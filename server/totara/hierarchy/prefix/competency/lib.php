@@ -722,7 +722,7 @@ class competency extends hierarchy {
                         'linktype', //$name,
                         (isset($competency->linktype) ? $competency->linktype : PLAN_LINKTYPE_MANDATORY), //$selected,
                         false, //$nothing,
-                        array('data-id' => $competency->evidenceid)
+                        array('data-id' => $competency->evidenceid, 'aria-label' => get_string('linktype', 'hierarchy_competency', format_string($competency->fullname)))
                     );
 
                     $cell->text = $select;
