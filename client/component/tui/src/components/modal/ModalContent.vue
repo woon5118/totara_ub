@@ -24,6 +24,7 @@
     <div class="tui-modalContent__header">
       <div
         :id="titleId"
+        ref="modalTitle"
         class="tui-modalContent__header-title"
         :class="{ 'tui-modalContent__header-title--sronly': !titleVisible }"
       >
@@ -85,20 +86,43 @@ export default {
   },
 
   mounted() {
-    if (
-      this.titleVisible &&
-      !this.title &&
-      !(this.$slots.title && this.$slots.title.length > 0)
-    ) {
-      console.error(
-        '[ModalContent] You must pass either a non-empty title prop or define a non-empty title slot.'
-      );
+    // Vue does not support changes in content of slots so add a mutation observer to validate
+    if (this.$refs.modalTitle) {
+      this.observer = new MutationObserver(this.$_isAccessibleTitle);
+      this.observer.observe(this.$refs.modalTitle, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
     }
+    this.$_isAccessibleTitle();
   },
 
   methods: {
     dismiss() {
       this.$emit('dismiss');
+    },
+
+    /**
+     * Confirms whether the modal has an accessible title or not
+     *
+     * @returns {Boolean} Whether the title is accessible or not
+     */
+    $_isAccessibleTitle() {
+      if (this.title && this.title.trim().length > 0) {
+        // Modal has a title prop
+        return true;
+      }
+
+      if (this.$slots.title && this.$slots.title[0].text.trim().length > 0) {
+        // Modal has content in a title slot
+        return true;
+      }
+
+      console.error(
+        '[ModalContent] You must pass either a non-empty title prop or define a non-empty title slot.'
+      );
+      return false;
     },
   },
 };
