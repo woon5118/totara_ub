@@ -24,6 +24,7 @@
       vertical && 'tui-form--vertical',
       'tui-form--inputWidth-' + inputWidth,
     ]"
+    :autocomplete="autocomplete"
     @submit="handleSubmit"
   >
     <slot />
@@ -45,6 +46,11 @@ export default {
     },
 
     nativeSubmit: Boolean,
+
+    autocomplete: {
+      type: String,
+      default: 'off',
+    },
   },
 
   methods: {

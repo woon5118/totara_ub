@@ -2,6 +2,7 @@
 
 exports[`totara_playlist/components/form/PlaylistForm.vue Checks snapshot 1`] = `
 <form-stub
+  autocomplete="off"
   class="tui-playlistForm"
   inputwidth="full"
   vertical="true"

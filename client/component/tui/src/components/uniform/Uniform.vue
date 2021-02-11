@@ -31,6 +31,7 @@
       :vertical="vertical"
       :input-width="inputWidth"
       novalidate
+      :autocomplete="autocomplete"
       @submit="slotProps.handleSubmit"
     >
       <slot v-bind="slotProps" />
@@ -86,6 +87,11 @@ export default {
       type: String,
       validator: x => ['full', 'limited'].includes(x),
       default: 'limited',
+    },
+
+    autocomplete: {
+      type: String,
+      default: 'off',
     },
   },
 

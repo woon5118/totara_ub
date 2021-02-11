@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`engage_article/components/form/EditArticleContentForm.vue Checks snapshot 1`] = `
-<form-stub inputwidth="limited" class="tui-engageEditArticleContentForm">
+<form-stub inputwidth="limited" autocomplete="off" class="tui-engageEditArticleContentForm">
   <loader-stub fullpage="true" loading="true"></loader-stub>
   <!---->
   <weka-stub placeholder="" usageidentifier="[object Object]" variant="engage_article-content" value="[object Object]" isloggedin="true" class="tui-engageEditArticleContentForm__editor"></weka-stub>

@@ -6,6 +6,7 @@ exports[`totara_comment/components/form/CommentForm.vue Checks snapshot 1`] = `
   usageidentifier="[object Object]"
 >
   <form-stub
+    autocomplete="off"
     class="tui-commentForm__form"
     inputwidth="limited"
   >

@@ -2,6 +2,7 @@
 
 exports[`PlaylistTitleForm matches snapshot 1`] = `
 <form
+  autocomplete="off"
   class="tui-form tui-playlistTitleForm tui-form--vertical tui-form--inputWidth-full"
 >
   <div

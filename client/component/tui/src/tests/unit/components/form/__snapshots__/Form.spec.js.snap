@@ -2,6 +2,7 @@
 
 exports[`presentation/form/Form.vue Checks snapshot 1`] = `
 <form
+  autocomplete="off"
   class="tui-form tui-form--horizontal tui-form--inputWidth-limited"
 />
 `;

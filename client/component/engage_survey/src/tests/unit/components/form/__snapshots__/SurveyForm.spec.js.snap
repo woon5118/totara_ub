@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`engage_survey/components/form/SurveyForm.vue Checks snapshot 1`] = `
-<uniform-stub initialvalues="[object Object]" validationmode="auto" vertical="true" inputwidth="full" class="tui-engageSurveyForm">
+<uniform-stub initialvalues="[object Object]" validationmode="auto" vertical="true" inputwidth="full" autocomplete="off" class="tui-engageSurveyForm">
   <div class="tui-engageSurveyForm__title">
     <fieldcontextprovider-stub>
       <formtext-stub placeholder="formtitle, engage_survey" maxlength="75" arialabel="formtitle, engage_survey" name="question" validations="function(v) {

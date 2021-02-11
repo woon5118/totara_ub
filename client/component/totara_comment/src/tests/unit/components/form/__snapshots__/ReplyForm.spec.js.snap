@@ -5,6 +5,7 @@ exports[`totara_comment/components/form/ReplyForm.vue Checks snapshot 1`] = `
   class="tui-commentReplyForm"
 >
   <form-stub
+    autocomplete="off"
     class="tui-commentReplyForm__form"
     inputwidth="limited"
   >
