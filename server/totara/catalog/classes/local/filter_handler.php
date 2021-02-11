@@ -275,4 +275,15 @@ class filter_handler {
 
         return $this->learningtypefilters;
     }
+
+    /**
+     * @internal
+     */
+    public static function phpunit_reset() {
+        if (!PHPUNIT_TEST) {
+            throw new \coding_exception('Cannot reset file handler outside of phpunit tests!');
+        }
+        $instance = static::instance();
+        $instance->reset_cache();
+    }
 }

@@ -358,4 +358,15 @@ class provider_handler {
 
         return $objects;
     }
+
+    /**
+     * @internal
+     */
+    public static function phpunit_reset() {
+        if (!PHPUNIT_TEST) {
+            throw new \coding_exception('Cannot reset providers outside of phpunit tests!');
+        }
+        $instance = static::instance();
+        $instance->reset_cache();
+    }
 }

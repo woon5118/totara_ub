@@ -51,4 +51,8 @@ $watchers = [
         'hookname' => '\core\hook\admin_setting_changed',
         'callback' => '\totara_catalog\watcher\admin_settings_watcher::changed'
     ],
+    [
+        'hookname' => '\core\hook\phpunit_reset',
+        'callback' => '\totara_catalog\watcher\phpunit_reset_watcher::reset_data'
+    ],
 ];

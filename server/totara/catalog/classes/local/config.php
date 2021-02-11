@@ -359,4 +359,15 @@ class config {
     public function is_provider_active(string $objecttype): bool {
         return in_array($objecttype, $this->get_learning_types_in_catalog());
     }
+
+    /**
+     * @internal
+     */
+    public static function phpunit_reset() {
+        if (!PHPUNIT_TEST) {
+            throw new \coding_exception('Cannot reset catalog config outside of phpunit tests!');
+        }
+        $instance = static::instance();
+        $instance->reset_cache();
+    }
 }
