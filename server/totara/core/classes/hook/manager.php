@@ -54,14 +54,14 @@ abstract class manager {
      *    )
      * )
      *
-     * @var array[] cache of all watchers
+     * @var null|array[] cache of all watchers
      */
     protected static $allwatchers = null;
 
     /**
      * PHPUNIT directive
      *
-     * @var bool should we reload watchers after the test?
+     * @var bool|null|array should we reload watchers after the test?
      */
     protected static $reloadaftertest = false;
 
@@ -254,10 +254,11 @@ abstract class manager {
             throw new \coding_exception('Cannot override hook watchers outside of phpunit tests!');
         }
 
-        self::phpunit_reset();
-        self::$allwatchers = array();
-        self::$reloadaftertest = true;
+        if (self::$reloadaftertest === false) {
+            self::$reloadaftertest = self::$allwatchers;
+        }
 
+        self::$allwatchers = array();
         self::add_watchers($watchers, 'phpunit');
         self::order_all_watchers();
 
@@ -293,9 +294,9 @@ abstract class manager {
         if (!PHPUNIT_TEST) {
             throw new \coding_exception('Cannot reset hook manager outside of phpunit tests!');
         }
-        if (self::$reloadaftertest) {
-            self::$allwatchers = null;
+        if (self::$reloadaftertest !== false) {
+            self::$allwatchers = self::$reloadaftertest;
+            self::$reloadaftertest = false;
         }
-        self::$reloadaftertest = false;
     }
 }

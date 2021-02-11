@@ -49,10 +49,10 @@ class manager {
     /** @var bool evert dispatching already in progress - prevents nesting */
     protected static $dispatching = false;
 
-    /** @var array cache of all observers */
+    /** @var null|array cache of all observers */
     protected static $allobservers = null;
 
-    /** @var bool should we reload observers after the test? */
+    /** @var bool|null|array should we reload observers after the test? */
     protected static $reloadaftertest = false;
 
     /**
@@ -385,13 +385,25 @@ class manager {
      * @throws \coding_Exception if used outside of unit tests.
      */
     public static function phpunit_replace_observers(array $observers) {
+        global $DB;
+
         if (!PHPUNIT_TEST) {
             throw new \coding_exception('Cannot override event observers outside of phpunit tests!');
         }
+        if (self::$dispatching) {
+            throw new \coding_exception('Cannot override event observers when events are being dispatched');
+        }
+        if ($DB->is_transaction_started()) {
+            throw new \coding_exception('Cannot override event observers when transaction is started');
+        }
 
-        self::phpunit_reset();
+        self::$buffer = array();
+        self::$extbuffer = array();
+
+        if (self::$reloadaftertest === false) {
+            self::$reloadaftertest = self::$allobservers;
+        }
         self::$allobservers = array();
-        self::$reloadaftertest = true;
 
         self::add_observers($observers, 'phpunit');
         self::order_all_observers();
@@ -412,9 +424,11 @@ class manager {
         self::$buffer = array();
         self::$extbuffer = array();
         self::$dispatching = false;
-        if (self::$reloadaftertest) {
-            self::$allobservers = null;
+        self::$trans_buffers = [];
+        self::$trans_name = null;
+        if (self::$reloadaftertest !== false) {
+            self::$allobservers = self::$reloadaftertest;
+            self::$reloadaftertest = false;
         }
-        self::$reloadaftertest = false;
     }
 }
