@@ -293,7 +293,7 @@ abstract class manager {
         if (!PHPUNIT_TEST) {
             throw new \coding_exception('Cannot reset hook manager outside of phpunit tests!');
         }
-        if (!self::$reloadaftertest) {
+        if (self::$reloadaftertest) {
             self::$allwatchers = null;
         }
         self::$reloadaftertest = false;

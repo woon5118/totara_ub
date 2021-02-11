@@ -412,7 +412,7 @@ class manager {
         self::$buffer = array();
         self::$extbuffer = array();
         self::$dispatching = false;
-        if (!self::$reloadaftertest) {
+        if (self::$reloadaftertest) {
             self::$allobservers = null;
         }
         self::$reloadaftertest = false;
