@@ -49,29 +49,6 @@ class totara_catalog_hook_testcase extends advanced_testcase {
     }
 
     /**
-     * @param callable $callback
-     * @return void
-     */
-    private function add_watcher(callable $callback): void {
-        $refclass = new ReflectionClass(manager::class);
-        $method = $refclass->getMethod('add_watchers');
-        $method->setAccessible(true);
-
-        $method->invokeArgs(
-            null,
-            [
-                [
-                    [
-                        'hookname' => exclude_item::class,
-                        'callback' => $callback,
-                    ]
-                ],
-                __FILE__
-            ]
-        );
-    }
-
-    /**
      * @return void
      */
     public function test_remove_learning_items_in_course_catalog_hook(): void {
@@ -87,7 +64,12 @@ class totara_catalog_hook_testcase extends advanced_testcase {
             }
         };
 
-        $this->add_watcher($callback);
+        // Do not hack hook manager!!!
+        $watchers[] = [
+            'hookname' => exclude_item::class,
+            'callback' => $callback
+        ];
+        \totara_core\hook\manager::phpunit_add_watchers($watchers);
 
         $catalog = new catalog_retrieval();
         $page = $catalog->get_page_of_objects(10, 0);

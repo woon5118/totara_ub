@@ -266,6 +266,31 @@ abstract class manager {
     }
 
     /**
+     * Replace all standard watchers and return the correctly reordered.
+     *
+     * @private
+     *
+     * @param array[] $watchers
+     * @return array[]
+     *
+     * @throws \coding_exception Throws a coding_exception if used outside of unit tests.
+     */
+    public static function phpunit_add_watchers(array $watchers) {
+        if (!PHPUNIT_TEST) {
+            throw new \coding_exception('Cannot override hook watchers outside of phpunit tests!');
+        }
+
+        if (self::$reloadaftertest === false) {
+            self::$reloadaftertest = self::$allwatchers;
+        }
+
+        self::add_watchers($watchers, 'phpunit');
+        self::order_all_watchers();
+
+        return self::$allwatchers;
+    }
+
+    /**
      * Replace all standard watchers.
      *
      * @private
