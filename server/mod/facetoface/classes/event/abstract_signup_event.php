@@ -61,6 +61,8 @@ abstract class abstract_signup_event extends \core\event\base {
             'relateduserid' => $signup->get_userid(),
             'other'  => [
                 'signupid' => $signup->get_id(),
+                'managerid' => $signup->get_managerid(),
+                'jobassignmentid' => $signup->get_jobassignmentid(),
                 'sessionid' => $signup->get_seminar_event()->get_id()
             ]
         ];
