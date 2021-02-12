@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.5 ===
 
+* In notification template for virtual meeting creation failure [session:room:link] was changed to [seminareventdetailslink]
 * The button and multibutton fields have been removed from seminarresource_card.mustache; please update the template if modified
 * The card field in seminarresource_information.mustache now requires template and context; please update the template if modified
 * Any contents specific to virtual rooms have been removed from seminarresource_card.mustache; please use virtualroom_card.mustache instead

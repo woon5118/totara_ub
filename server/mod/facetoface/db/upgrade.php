@@ -1005,5 +1005,39 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020100104, 'facetoface');
     }
 
+    if ($oldversion < 2020100105) {
+        // Change virtual meeting creating failure notification template.
+        $oldplaceholder = '[session:room:link]';
+        $newplaceholder = '[seminareventdetailslink]';
+
+        // Load templates that match reference
+        $templates = $DB->get_records('facetoface_notification_tpl', ['reference' => 'virtualmeetingfailure']);
+        $matchingtemplates = [];
+
+        // For each matching template, see if old placeholder is in use and replace it
+        foreach ($templates as $template) {
+            if (isset($template->body) && strpos($template->body, $oldplaceholder) !== false) {
+                $matchingtemplates[$template->id] = ['old' => $template->body];
+                $template->body = str_replace($oldplaceholder, $newplaceholder, $template->body);
+                $matchingtemplates[$template->id]['new'] = $template->body;
+                $DB->update_record('facetoface_notification_tpl', $template);
+            }
+        }
+
+        // For each of the matching templates, sync up the body on linked activity notifications that haven't been changed
+        foreach ($matchingtemplates as $id => $templatebody) {
+            $notifications = $DB->get_records('facetoface_notification', ['templateid' => $id]);
+            foreach ($notifications as $f2f_notification) {
+                if (isset($f2f_notification->body) && $f2f_notification->body == $templatebody['old']) {
+                    $f2f_notification->body = $templatebody['new'];
+                    $DB->update_record('facetoface_notification', $f2f_notification);
+                }
+            }
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020100105, 'facetoface');
+    }
+
     return true;
 }
