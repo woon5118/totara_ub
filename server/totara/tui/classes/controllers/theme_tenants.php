@@ -30,6 +30,7 @@
 
 namespace totara_tui\controllers;
 
+use coding_exception;
 use totara_mvc\admin_controller;
 use totara_mvc\tui_view;
 use totara_tenant\entity\tenant;
@@ -83,6 +84,13 @@ class theme_tenants extends admin_controller {
 
         // Get theme_config.
         $theme_config = \theme_config::load($this->theme);
+        if (!$theme_config->use_tui_theme_settings) {
+            $line = '$THEME->use_tui_theme_settings = true';
+            throw new coding_exception(
+                'TUI theme settings is not enabled for current theme. '
+                . "Add '{$line}' in current theme's config.php if the theme uses TUI theme settings."
+            );
+        }
 
         // Get tenant information for the tui view.
         $tenants = tenant::repository()->select(['id', 'idnumber', 'name'])->get()->to_array();

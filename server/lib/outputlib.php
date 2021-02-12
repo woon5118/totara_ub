@@ -536,6 +536,14 @@ class theme_config {
     public $minify_css = true;
 
     /**
+     * This indicates that a specific theme will rely on the TUI theme settings
+     * implementation to customize its appearance.
+     *
+     * @var bool
+     */
+    public $use_tui_theme_settings = false;
+
+    /**
      * Load the config.php file for a particular theme, and return an instance
      * of this class. (That is, this is a factory method.)
      *
@@ -615,7 +623,9 @@ class theme_config {
             'rendererfactory', 'csspostprocess', 'editor_sheets', 'rarrow', 'larrow', 'uarrow', 'darrow',
             'hidefromselector', 'doctype', 'yuicssmodules', 'blockrtlmanipulations',
             'lessfile', 'extralesscallback', 'lessvariablescallback', 'blockrendermethod',
-            'scss', 'extrascsscallback', 'prescsscallback', 'csstreepostprocessor', 'addblockposition');
+            'scss', 'extrascsscallback', 'prescsscallback', 'csstreepostprocessor', 'addblockposition',
+            'use_tui_theme_settings'
+        );
         // Totara: Add favicon resolver, image sizes and minify css
         $configurable[] = 'resolvefaviconcallback';
         $configurable[] = 'image_sizes';

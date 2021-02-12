@@ -88,6 +88,11 @@ final class settings {
     public function get_categories(bool $tenant_enabled = true, bool $include_default_file_categories = true): array {
         global $DB;
 
+        // We can skip all of this for a theme that does not support theme settings.
+        if (!$this->theme_config->use_tui_theme_settings) {
+            return [];
+        }
+
         $theme = $this->theme_config->name;
         $categories = $this->get_default_categories($include_default_file_categories);
 
@@ -331,6 +336,11 @@ final class settings {
      * @return theme_file[]
      */
     private function get_file_instances(): array {
+        // We can skip all of this for a theme that does not support theme settings.
+        if (!$this->theme_config->use_tui_theme_settings) {
+            return [];
+        }
+
         // Get classes and instantiate them all.
         if (empty($this->file_instances)) {
             $classes = helper::get_classes();
