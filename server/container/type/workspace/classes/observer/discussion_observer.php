@@ -23,10 +23,12 @@
 namespace container_workspace\observer;
 
 use container_workspace\discussion\discussion;
+use container_workspace\task\notify_create_new_discussion_task;
 use container_workspace\workspace;
 use container_workspace\event\discussion_created;
 use container_workspace\event\discussion_updated;
 use totara_core\content\content_handler;
+use core\task\manager as task_manager;
 
 /**
  * Observer class for discussion events.
@@ -45,6 +47,10 @@ final class discussion_observer {
      */
     public static function on_created(discussion_created $event): void {
         static::handle_discussion($event->objectid, $event->userid);
+
+        // Queue adhoc task to notify the members of workspace.
+        $task = notify_create_new_discussion_task::from_discussion($event->objectid);
+        task_manager::queue_adhoc_task($task);
     }
 
     /**

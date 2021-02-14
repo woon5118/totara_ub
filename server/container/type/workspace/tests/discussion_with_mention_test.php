@@ -73,16 +73,26 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
 
         $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
-
-        self::assertCount(1, $messages);
+        self::assertCount(2, $messages);
         $message = reset($messages);
 
         self::assertIsObject($message);
         self::assertObjectHasAttribute('useridfrom', $message);
         self::assertObjectHasAttribute('useridto', $message);
+        self::assertEquals('mention', $message->eventtype);
 
         self::assertEquals($user_one->id, $message->useridfrom);
         self::assertEquals($user_two->id, $message->useridto);
+
+        $message1 = next($messages);
+
+        self::assertIsObject($message1);
+        self::assertObjectHasAttribute('useridfrom', $message1);
+        self::assertObjectHasAttribute('useridto', $message1);
+        self::assertEquals('create_new_discussion', $message1->eventtype);
+
+        self::assertEquals($user_two->id, $message1->useridto);
+        self::assertEquals(core_user::get_noreply_user()->id, $message1->useridfrom);
     }
 
     /**
@@ -133,17 +143,28 @@ class container_workspace_discussion_with_mention_testcase extends advanced_test
         $this->executeAdhocTasks();
         $messages = $message_sink->get_messages();
 
-        self::assertCount(1, $messages);
+        self::assertCount(2, $messages);
         $message = reset($messages);
 
         self::assertIsObject($message);
         self::assertObjectHasAttribute('useridfrom', $message);
         self::assertObjectHasAttribute('useridto', $message);
-
+        self::assertEquals('mention', $message->eventtype);
         self::assertNotEquals($guest_user->id, $message->useridfrom);
 
         self::assertEquals($user_one->id, $message->useridfrom);
         self::assertEquals($user_two->id, $message->useridto);
+
+        $message1 = next($messages);
+
+        self::assertIsObject($message1);
+        self::assertObjectHasAttribute('useridfrom', $message1);
+        self::assertObjectHasAttribute('useridto', $message1);
+        self::assertEquals('create_new_discussion', $message1->eventtype);
+        self::assertNotEquals($guest_user->id, $message1->useridfrom);
+
+        self::assertEquals($user_two->id, $message1->useridto);
+        self::assertEquals(core_user::get_noreply_user()->id, $message1->useridfrom);
     }
 
     /**

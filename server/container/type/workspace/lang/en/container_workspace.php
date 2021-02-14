@@ -63,6 +63,8 @@ $string['copied_to_clipboard'] = 'Copied to clipboard';
 $string['copy_discussion_link_text'] = 'Copy link';
 $string['collapse_nav'] = 'Collapse navigation selection';
 $string['current_owner'] = "Current owner";
+$string['create_new_discussion_title'] = 'New discussion by {$a->name} in {$a->workspace}';
+$string['create_new_discussion_message'] = '{$a->author} posted in {$a->workspace}: "{$a->discussion}"';
 $string['create_space'] = 'Create a workspace';
 $string['date_posted'] = 'Date posted';
 $string['decline'] = 'Decline';
@@ -113,6 +115,7 @@ $string['hidden_workspace_text'] = 'Hide this workspace from non-members';
 $string['invalid_access'] = 'Invalid access';
 $string['invalid_workspace'] = 'Invalid workspace';
 $string['joined'] = 'Joined';
+$string['join_discussion'] = 'Join the discussion';
 $string['join_me'] = 'Join';
 $string['join_space'] = 'Join workspace {$a}';
 $string['join_workspace'] = 'Join workspace';
@@ -288,6 +291,7 @@ $string['workspace:add_library'] = 'Select content to share with workspaces';
 
 // String for message provider
 $string['messageprovider:bulk_members_via_audience_added'] = "Members added in bulk via audience(s)";
+$string['messageprovider:create_new_discussion'] = 'New discussion in a workspace';
 $string['messageprovider:notification'] = "New items added to workspace library";
 $string['messageprovider:accept_member_request'] = "Member request accepted";
 $string['messageprovider:comment_on_discussion'] = "Comments on discussion posts";
