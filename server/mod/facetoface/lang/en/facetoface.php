@@ -2694,6 +2694,7 @@ $string['waitlisteveryone_help'] = 'Everyone who signs up for this event will be
 $string['waitlistselectoneormoreusers'] = 'Please select one or more users to update';
 $string['wait-list'] = 'Wait-list';
 $string['wait-listed'] = 'Wait-listed';
+$string['warning:meetingmaynotbepreserved'] = 'Editing this session may reset virtual room settings with the external provider. For example, who can present or bypass the lobby. Please check the meeting settings with your provider to ensure they are still correct after editing.';
 $string['xerrorsencounteredduringimport'] = '{$a} problem(s) encountered during import.';
 $string['xhours'] = '{$a} hour(s)';
 $string['xmessagesfailed'] = '{$a} message(s) failed to send';

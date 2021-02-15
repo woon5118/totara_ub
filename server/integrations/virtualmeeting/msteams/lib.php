@@ -22,8 +22,11 @@
  */
 
 use totara_core\http\client;
+use totara_core\virtualmeeting\exception\unsupported_exception;
 use totara_core\virtualmeeting\plugin\factory\auth_factory;
 use totara_core\virtualmeeting\plugin\factory\factory;
+use totara_core\virtualmeeting\plugin\factory\feature_factory;
+use totara_core\virtualmeeting\plugin\feature;
 use totara_core\virtualmeeting\plugin\provider\auth_provider;
 use totara_core\virtualmeeting\plugin\provider\provider;
 use virtualmeeting_msteams\providers\auth;
@@ -32,7 +35,7 @@ use virtualmeeting_msteams\providers\meeting;
 /**
  * Plug-in factory
  */
-class virtualmeeting_msteams_factory implements factory, auth_factory {
+class virtualmeeting_msteams_factory implements factory, auth_factory, feature_factory {
     /**
      * @inheritDoc
      */
@@ -79,5 +82,15 @@ class virtualmeeting_msteams_factory implements factory, auth_factory {
      */
     public function create_auth_service_provider(client $client): auth_provider {
         return new auth($client);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_feature(string $feature): bool {
+        if ($feature === feature::LOSSY_UPDATE) {
+            return true;
+        }
+        return unsupported_exception::feature('msteams');
     }
 }

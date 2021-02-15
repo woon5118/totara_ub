@@ -30,6 +30,7 @@ use totara_core\virtualmeeting\exception\not_implemented_exception;
 use totara_core\virtualmeeting\plugin\provider\provider;
 use core_user;
 use moodle_url;
+use totara_core\virtualmeeting\plugin\feature;
 
 /**
  * PoC meeting service provider
@@ -104,7 +105,9 @@ class poc_service_provider implements provider {
         }
         $username = $this->extract_username($meeting);
         $age = $meeting->get_storage()->get('age') ?? 0;
-        $age++; // new age
+        if (get_config('totara_core', "virtualmeeting_poc_{$this->name}_" . feature::LOSSY_UPDATE)) {
+            $age++; // new age
+        }
         $meeting->get_storage()
             ->delete_all()
             ->set('id', $update ? 'updated' : 'created')

@@ -7,7 +7,10 @@ use coding_exception;
 use core\plugininfo\base;
 use core_plugin_manager;
 use part_of_admin_tree;
+use totara_core\virtualmeeting\exception\not_implemented_exception;
+use totara_core\virtualmeeting\exception\unsupported_exception;
 use totara_core\virtualmeeting\plugin\factory\factory;
+use totara_core\virtualmeeting\plugin\factory\feature_factory;
 
 /**
  * Manages virtual meeting plugins.
@@ -210,6 +213,27 @@ class virtualmeeting extends base {
     public function is_available(): bool {
         $factory = $this->create_factory();
         return $factory->is_available();
+    }
+
+    /**
+     * Return whether the plugin has the particulate characteristic or not.
+     *
+     * @param string $feature one of constants defined in the totara_core\virtualmeeting\plugin\feature class
+     * @return boolean
+     */
+    public function get_feature(string $feature): bool {
+        // In the future, the default value might depend on a feature.
+        // Note that the rhyme is not intentional.
+        $default = false;
+        $factory = $this->create_factory();
+        try {
+            if ($factory instanceof feature_factory) {
+                return $factory->get_feature($feature);
+            }
+        } catch (unsupported_exception $ex) {
+            // Swallow exception.
+        }
+        return $default;
     }
 
     /**

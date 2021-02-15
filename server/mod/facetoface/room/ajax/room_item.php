@@ -26,8 +26,10 @@ define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
+use core\plugininfo\virtualmeeting;
 use mod_facetoface\room;
 use mod_facetoface\room_virtualmeeting;
+use totara_core\virtualmeeting\plugin\feature;
 
 $facetofaceid = required_param('facetofaceid', PARAM_INT);
 $itemseq = required_param('itemids', PARAM_SEQUENCE);
@@ -60,9 +62,18 @@ foreach($itemids as $itemid) {
         'custom' => $room->get_custom(),
         'capacity' => $room->get_capacity(),
         'can_manage' => $virtual_meeting->can_manage(),
-        'virtualmeeting' => $virtual_meeting->exists(),
-        'virtualroom' => $virtual_meeting->exists() || !empty($room->get_url()),
+        'virtualmeeting' => false,
+        'virtualroom' => !empty($room->get_url()),
+        'lossyupdate' => null,
     ];
+    if ($virtual_meeting->exists()) {
+        $res->virtualmeeting = true;
+        $res->virtualroom = true;
+        $plugin = virtualmeeting::get_all_plugins()[$virtual_meeting->get_plugin()] ?? null;
+        if ($plugin !== null) {
+            $res->lossyupdate = $plugin->get_feature(feature::LOSSY_UPDATE);
+        }
+    }
     $rooms[] = $res;
 }
 

@@ -528,6 +528,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
         listItem.setAttribute('data-capacity', resource.capacity);
         listItem.setAttribute('data-can-manage', resource.can_manage);
         listItem.setAttribute('data-is-virtual', resource.virtualmeeting);
+        listItem.setAttribute('data-lossy-update', resource.lossyupdate);
         listItem.classList.add(this.cssClass);
     };
 
@@ -586,7 +587,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
     };
 
     /**
-     * Updates wheter the "Use room capacity" button is disabled or enabled
+     * Updates whether the "Use room capacity" button is disabled or enabled
      */
     Rooms.prototype._updateCapacityState = function() {
         var totalDates = document.querySelector('[name="cntdates"]').value;
@@ -615,6 +616,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
         var row = dateLink.closest('tr');
         var canManage = true;
         var virtualCount = 0;
+        var lossyUpdate = false;
 
         roomnames.forEach(function (name) {
             if (name.getAttribute('data-can-manage') === 'false') {
@@ -624,6 +626,10 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
             if (name.getAttribute('data-is-virtual') === 'true') {
                 virtualCount++;
             }
+
+            if (name.getAttribute('data-lossy-update') === 'true') {
+                lossyUpdate = true;
+            }
         });
 
         NotificationLib.clearNotifications();
@@ -631,6 +637,14 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
             strLib.get_string('error:toomanyvirtualmeetings', 'mod_facetoface').then(function(string) {
                 NotificationLib.addNotification({message: string});
             });
+        }
+
+        if (lossyUpdate) {
+            if (pageConfig.sessionid && Number(pageConfig.clone) != 1) {
+                strLib.get_string('warning:meetingmaynotbepreserved', 'mod_facetoface').then(function(string) {
+                    NotificationLib.addNotification({type: 'warning', message: string});
+                });
+            }
         }
 
         if (!canManage) {

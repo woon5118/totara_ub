@@ -32,6 +32,7 @@ use totara_core\virtualmeeting\poc\poc_factory;
  */
 class virtualmeeting_poc_app_factory extends poc_factory {
     protected const NAME = 'app';
+    protected const DESC = 'app auth based fake meeting provider';
     protected const USER_AUTH = false;
 }
 
@@ -40,6 +41,7 @@ class virtualmeeting_poc_app_factory extends poc_factory {
  */
 class virtualmeeting_poc_user_factory extends poc_factory implements auth_factory {
     protected const NAME = 'user';
+    protected const DESC = 'user auth based fake meeting provider';
     protected const USER_AUTH = true;
 
     /**

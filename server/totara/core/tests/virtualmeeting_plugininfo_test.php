@@ -22,6 +22,7 @@
  */
 
 use core\plugininfo\virtualmeeting as plugininfo;
+use totara_core\virtualmeeting\plugin\feature;
 use totara_core\virtualmeeting\poc\poc_factory;
 
 /**
@@ -186,6 +187,26 @@ class totara_core_virtualmeeting_plugininfo_testcase extends advanced_testcase {
         poc_factory::toggle('poc_user', false);
         $this->assertTrue($plugin_app->is_available());
         $this->assertFalse($plugin_user->is_available());
+    }
+
+    /**
+     * @covers ::get_feature
+     */
+    public function test_get_feature(): void {
+        $plugin_app = plugininfo::load('poc_app');
+        $plugin_user = plugininfo::load('poc_user');
+        $this->assertTrue($plugin_app->get_feature(feature::LOSSY_UPDATE));
+        $this->assertTrue($plugin_user->get_feature(feature::LOSSY_UPDATE));
+        poc_factory::toggle_feature('poc_app', feature::LOSSY_UPDATE, poc_factory::FEATURE_UNKNOWN);
+        $this->assertFalse($plugin_app->get_feature(feature::LOSSY_UPDATE));
+        $this->assertTrue($plugin_user->get_feature(feature::LOSSY_UPDATE));
+        poc_factory::toggle_feature('poc_app', feature::LOSSY_UPDATE, poc_factory::FEATURE_NO);
+        $this->assertFalse($plugin_app->get_feature(feature::LOSSY_UPDATE));
+        $this->assertTrue($plugin_user->get_feature(feature::LOSSY_UPDATE));
+        poc_factory::toggle_feature('poc_app', feature::LOSSY_UPDATE, poc_factory::FEATURE_YES);
+        poc_factory::toggle_feature('poc_user', feature::LOSSY_UPDATE, poc_factory::FEATURE_NO);
+        $this->assertTrue($plugin_app->get_feature(feature::LOSSY_UPDATE));
+        $this->assertFalse($plugin_user->get_feature(feature::LOSSY_UPDATE));
     }
 
     /**

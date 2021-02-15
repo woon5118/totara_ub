@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,33 +21,20 @@
  * @package totara_core
  */
 
-namespace totara_core\virtualmeeting\exception;
+namespace totara_core\virtualmeeting\plugin\factory;
 
-use totara_core\virtualmeeting\exception\base_exception;
-use Throwable;
+use totara_core\virtualmeeting\exception\unsupported_exception;
 
 /**
- * unsupported exception
+ * Feature factory interface for virtualmeeting plugin factories
  */
-class unsupported_exception extends base_exception {
+interface feature_factory {
     /**
-     * Exception: authentication not available for plugin
+     * Does the plugin have a feature or a characteristic?
      *
-     * @param string $plugin
-     * @param Throwable $previous
-     * @return self
+     * @param string $feature one of constants defined in the totara_core\virtualmeeting\plugin\feature class
+     * @return boolean true if the provider has it, false if not
+     * @throws unsupported_exception if the provider doesn't know (or doesn't care) about it
      */
-    public static function auth(string $plugin, Throwable $previous = null): self {
-        return new self('authentication not available for plugin: '.$plugin, 0, $previous);
-    }
-
-    /**
-     * Exception: feature unsupported by plugin
-     *
-     * @param string $plugin
-     * @return self
-     */
-    public static function feature(string $plugin): self {
-        return new self('feature unsupported by plugin: '.$plugin);
-    }
+    public function get_feature(string $feature): bool;
 }
