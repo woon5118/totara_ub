@@ -31,7 +31,7 @@ require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/plagiarismlib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
 
-$usetags = (!empty($CFG->usetags));
+$usetags = core_tag_tag::is_enabled('core', 'course_modules');
 if ($usetags) {
     require_once($CFG->dirroot.'/tag/lib.php');
 }
