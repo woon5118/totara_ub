@@ -32,7 +32,7 @@ use totara_core\path;
 
 defined('MOODLE_INTERNAL') || die();
 
-class totara_tui_local_mediation_file_testcase extends base_testcase {
+class totara_tui_local_mediation_file_testcase extends advanced_testcase {
 
     public function test_operation() {
         $file = new \totara_tui\local\mediation\file(__FILE__);
