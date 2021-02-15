@@ -1,7 +1,34 @@
 <?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+// Error page to be used as a custom 404 set in server configuration.
 
     require('../config.php');
     require_once($CFG->libdir.'/eventslib.php');
+
+    $site = get_site();
+    $PAGE->set_url('/error/');
+    $PAGE->set_context(context_system::instance());
+    $PAGE->set_title($site->fullname .':Error');
+    $PAGE->set_heading($site->fullname .': Error 404');
 
     // Form submitted, do not check referer (original page unknown).
     if ($form = data_submitted()) {
@@ -24,22 +51,16 @@
         $eventdata->smallmessage      = '';
         message_send($eventdata);
 
-        redirect($CFG->wwwroot .'/course/', 'Message sent, thanks', 3);
+        redirect($CFG->wwwroot, 'Message sent, thanks', 3);
         exit;
     }
 
-    $site = get_site();
-    $redirecturl = empty($_SERVER['REDIRECT_URL']) ? '' : $_SERVER['REDIRECT_URL'];
     $httpreferer = get_local_referer(false);
     $requesturi  = empty($_SERVER['REQUEST_URI'])  ? '' : $_SERVER['REQUEST_URI'];
 
     header("HTTP/1.0 404 Not Found");
     header("Status: 404 Not Found");
 
-    $PAGE->set_url('/error/');
-    $PAGE->set_context(context_system::instance());
-    $PAGE->set_title($site->fullname .':Error');
-    $PAGE->set_heading($site->fullname .': Error 404');
     $PAGE->navbar->add('Error 404 - File not Found');
     echo $OUTPUT->header();
     echo $OUTPUT->box(get_string('pagenotexist', 'error'). '<br />'.s($requesturi), 'generalbox boxaligncenter');
