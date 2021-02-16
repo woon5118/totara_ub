@@ -231,7 +231,9 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         global $DB, $PAGE;
 
         $usernamefieldscreator = totara_get_all_user_name_fields_join('creator');
-        $usernamefieldsbooked  = totara_get_all_user_name_fields_join('bookedby');
+        $usernamefieldsbooked  = totara_get_all_user_name_fields_join('bookedby', null, true);
+        $allnamefields         = totara_get_all_user_name_fields_join('bookedby');
+
         $columnoptions = array(
             new rb_column_option(
                 'session',
@@ -377,13 +379,13 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'session',
                 'bookedby',
                 get_string('bookedby', 'rb_source_facetoface_sessions'),
-                $DB->sql_concat_join("' '", $usernamefieldsbooked),
+                "CASE WHEN bookedby.id IS NULL THEN NULL ELSE " . $DB->sql_concat_join("' '", $usernamefieldsbooked) . " END",
                 array(
                     'joins' => 'bookedby',
                     'displayfunc' => 'user_link',
                     'extrafields' => array_merge(
                         ['id' => 'bookedby.id', 'deleted' => 'bookedby.deleted'],
-                        $usernamefieldsbooked
+                        $allnamefields
                     ),
                 )
             ),
