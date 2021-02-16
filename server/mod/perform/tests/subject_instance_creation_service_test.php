@@ -302,6 +302,45 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         );
     }
 
+    /**
+     * @dataProvider period_data_provider
+     * @param int|null $track_assignment_start
+     * @param int|null $track_assignment_end
+     */
+    public function test_instances_are_not_created_for_missing_job_assignments(
+        ?int $track_assignment_start,
+        ?int $track_assignment_end
+    ) {
+        $data = $this->create_data();
+
+        /** @var track_user_assignment $user_assignment */
+        $user_assignment = track_user_assignment::repository()
+            ->order_by('id')
+            ->first();
+
+        $user_assignment->job_assignment_id = -200; // Does not link to any job_assignment.
+        $user_assignment->period_start_date = $track_assignment_start;
+        $user_assignment->period_end_date = $track_assignment_end;
+        $user_assignment->save();
+
+        // There should be three user assignments initially.
+        $user_assignments = track_user_assignment::repository()->get();
+        $this->assertCount(3, $user_assignments);
+        $this->assertEquals(0, subject_instance::repository()->count());
+
+        $this->generate_instances();
+
+        $other_assignments_count = 2;
+        $this->assertEquals($other_assignments_count, count($data->assignments) - 1);
+        $this->assertEquals($other_assignments_count, subject_instance::repository()->count());
+
+        $this->assertFalse(
+            subject_instance::repository()
+                ->where('subject_user_id', $user_assignment->subject_user_id)
+                ->exists()
+        );
+    }
+
     public function test_hook_is_executed_properly() {
         $data = $this->create_data();
 

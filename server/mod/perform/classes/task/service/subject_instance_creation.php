@@ -29,6 +29,7 @@ use core\orm\entity\repository;
 use core\orm\query\builder;
 use core\orm\query\sql\query;
 use mod_perform\dates\date_offset;
+use mod_perform\entity\activity\activity_repository;
 use mod_perform\entity\activity\subject_instance;
 use mod_perform\entity\activity\temp_track_user_assignment_queue;
 use mod_perform\entity\activity\track;
@@ -131,6 +132,7 @@ class subject_instance_creation {
             ->filter_by_active_track_and_activity()
             ->filter_by_time_interval()
             ->filter_by_does_not_need_schedule_sync()
+            ->filter_by_job_assignment_specific_has_existing_job_assignment()
             ->order_by('t.activity_id')
             ->order_by('id')
             ->get_builder();
@@ -165,7 +167,7 @@ class subject_instance_creation {
             ->as('temp_tua')
             ->join([track_user_assignment::TABLE, 'tua'], 'track_user_assignment_id', 'id')
             ->with([
-                'activity' => function (repository $repository) {
+                'activity' => function (activity_repository $repository) {
                     $repository->eager_load_instance_creation_data();
                 }
             ])

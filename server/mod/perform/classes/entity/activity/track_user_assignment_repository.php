@@ -28,6 +28,7 @@ use core\orm\query\builder;
 use core\orm\query\table;
 use mod_perform\models\activity\track_status;
 use mod_perform\state\activity\active;
+use totara_job\entity\job_assignment;
 
 /**
  * Repository for track user assignment entities
@@ -181,6 +182,22 @@ final class track_user_assignment_repository extends repository {
             $this->join([track::TABLE, 'fbat'], 'track_id', 'id');
         }
         $this->where('fbat.schedule_needs_sync', false);
+
+        return $this;
+    }
+
+    /**
+     * Exclude job assignment specific track user assignments where the referenced job assignment row no longer exists.
+     *
+     * @return $this
+     */
+    public function filter_by_job_assignment_specific_has_existing_job_assignment(): self {
+        $this->left_join([job_assignment::TABLE, 'ja'], 'tua.job_assignment_id', 'ja.id');
+
+        $this->where(function (builder $builder) {
+            $builder->where_null('job_assignment_id') // Not job assignment specific.
+                ->or_where_field('job_assignment_id', 'ja.id'); // Job assignment specific, and the job assignment still exists.
+        });
 
         return $this;
     }
