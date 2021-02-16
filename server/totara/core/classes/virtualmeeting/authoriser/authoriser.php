@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author  Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package core_virtualmeeting
+ * @package totara_core
  */
 
 namespace totara_core\virtualmeeting\authoriser;
