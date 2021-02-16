@@ -319,6 +319,12 @@ class core_component_testcase extends advanced_testcase {
             core_component::normalize_component('whoonearth_wouldcomewithsuchastupidnameofcomponent'));
         $this->assertSame(array('whoonearth', 'would_come_withsuchastupidnameofcomponent'),
             core_component::normalize_component('whoonearth_would_come_withsuchastupidnameofcomponent'));
+
+        // Totara prefix and rb_source
+        $this->assertSame(['totara', 'core'], core_component::normalize_component('totara_core'));
+        $this->assertSame(['totara', 'tenant'], core_component::normalize_component('totara_tenant'));
+        $this->assertSame(['rb_source','user'], core_component::normalize_component('rb_source_user'));
+        $this->assertSame(['rb_source', 'facetoface_summary'], core_component::normalize_component('rb_source_facetoface_summary'));
     }
 
     public function test_deprecated_normalize_component() {

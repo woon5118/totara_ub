@@ -49,6 +49,15 @@ class core_component {
     /** @var array list plugin types that support subplugins, do not add more here unless absolutely necessary */
     protected static $supportsubplugins = array('mod', 'editor', 'totara', 'tool', 'local');
 
+    protected static $normalised_component_map = [
+        '' => ['core', null],
+        'core' => ['core', null],
+        'moodle' => ['core', null],
+        'admin' => ['core', 'admin'],
+        'core_admin' => ['core', 'admin'],
+        'moodle_admin' => ['core', 'admin'],
+    ];
+
     /** @var array cache of plugin types */
     protected static $plugintypes = null;
     /** @var array cache of plugin locations */
@@ -1188,32 +1197,31 @@ $cache = '.var_export($cache, true).';
      * @return array two-items list of [(string)type, (string|null)name]
      */
     public static function normalize_component($component) {
-        if ($component === 'moodle' or $component === 'core' or $component === '') {
-            return array('core', null);
-        }
-
-        if (strpos($component, '_') === false) {
-            self::init();
-            if (array_key_exists($component, self::$subsystems)) {
-                $type   = 'core';
-                $plugin = $component;
+        if (!isset(self::$normalised_component_map[$component])) {
+            if (strpos($component, '_') === false) {
+                self::init();
+                if (array_key_exists($component, self::$subsystems)) {
+                    $type   = 'core';
+                    $plugin = $component;
+                } else {
+                    // Everything else without underscore is a module.
+                    $type   = 'mod';
+                    $plugin = $component;
+                }
+            } else if (strpos($component, 'rb_source_') === 0) {
+                $type = 'rb_source';
+                $plugin = substr($component, 10);
             } else {
-                // Everything else without underscore is a module.
-                $type   = 'mod';
-                $plugin = $component;
+                list($type, $plugin) = explode('_', $component, 2);
+                if ($type === 'moodle') {
+                    $type = 'core';
+                }
+                // Any unknown type must be a subplugin.
             }
-        } else if (preg_match('/^rb_source_/', $component)) {
-            $type = 'rb_source';
-            $plugin = str_replace('rb_source_', '', $component);
-        } else {
-            list($type, $plugin) = explode('_', $component, 2);
-            if ($type === 'moodle') {
-                $type = 'core';
-            }
-            // Any unknown type must be a subplugin.
-        }
 
-        return array($type, $plugin);
+            self::$normalised_component_map[$component] = [$type, $plugin];
+        }
+        return self::$normalised_component_map[$component];
     }
 
     /**
