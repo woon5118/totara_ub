@@ -46,8 +46,11 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
     public function test_get_activities_for_normal_user(): void {
 
         $user = $this->getDataGenerator()->create_user();
-        self::setUser($user);
+
+        $this->setAdminUser();
         $this->create_test_data();
+
+        self::setUser($user);
 
         $activities = $this->resolve_graphql_query(self::QUERY, []);
         $this->assertEmpty($activities);
@@ -63,10 +66,11 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
         // The role is granted in the user's own context.
         $user_context = \context_user::instance($user->id);
         role_assign($roleid, $user->id, $user_context);
-        self::setUser($user);
         // Creating full activities as whether you can report on
         // depends on the actual subject users
+        $this->setAdminUser();
         $expected_activities = $this->create_test_data();
+        self::setUser($user);
 
         $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
         $this->assertEqualsCanonicalizing(
@@ -78,13 +82,17 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
         $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
         // Draft activites never should show up
+        $this->setAdminUser();
         $draft_activity = $perform_generator->create_activity_in_container(['activity_status' => draft::get_code()]);
+        self::setUser($user);
 
         $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
         $this->assertNull($actual_activities->find('id', $draft_activity->id));
 
         // As the user has the super capability an activity without responsed will also show up
+        $this->setAdminUser();
         $active_activity = $perform_generator->create_activity_in_container(['activity_status' => active::get_code()]);
+        self::setUser($user);
 
         $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
         $this->assertNotNull($actual_activities->find('id', $active_activity->id));
@@ -132,15 +140,11 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
                 ->set_number_of_activities(3)
         );
 
-        $this->setUser($tenant1_manager);
-
         $activities1 = $perform_generator->create_full_activities(
             mod_perform_activity_generator_configuration::new()
                 ->set_number_of_activities(3)
                 ->set_tenant_id($tenant1->id)
         );
-
-        $this->setUser($tenant2_manager);
 
         $activities2 = $perform_generator->create_full_activities(
             mod_perform_activity_generator_configuration::new()

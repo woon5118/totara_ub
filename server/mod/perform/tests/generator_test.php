@@ -119,6 +119,8 @@ class mod_perform_generator_testcase extends advanced_testcase {
     }
 
     public function test_create_full_activities_with_default_configuration() {
+        $this->setAdminUser();
+
         $generator = $this->generator();
 
         // Try with default configuration
@@ -163,6 +165,8 @@ class mod_perform_generator_testcase extends advanced_testcase {
     }
 
     public function test_create_full_activities_with_anonymous_responeses() {
+        $this->setAdminUser();
+
         $generator = $this->generator();
 
         $configuration = mod_perform_activity_generator_configuration::new()->enable_anonymous_responses();
@@ -184,6 +188,8 @@ class mod_perform_generator_testcase extends advanced_testcase {
     }
 
     public function test_create_full_activities_with_increased_number() {
+        $this->setAdminUser();
+
         $generator = $this->generator();
 
         $configuration = mod_perform_activity_generator_configuration::new()
@@ -235,6 +241,8 @@ class mod_perform_generator_testcase extends advanced_testcase {
     }
 
     public function test_create_full_activities_without_subject_instances() {
+        $this->setAdminUser();
+
         $generator = $this->generator();
 
         $configuration = mod_perform_activity_generator_configuration::new()
@@ -268,6 +276,8 @@ class mod_perform_generator_testcase extends advanced_testcase {
     }
 
     public function test_create_full_activities_without_user_assignments() {
+        $this->setAdminUser();
+
         $generator = $this->generator();
 
         $configuration = mod_perform_activity_generator_configuration::new()
@@ -301,6 +311,8 @@ class mod_perform_generator_testcase extends advanced_testcase {
     }
 
     public function test_create_full_activities_with_additional_roles() {
+        $this->setAdminUser();
+
         $generator = $this->generator();
 
         $configuration = mod_perform_activity_generator_configuration::new()

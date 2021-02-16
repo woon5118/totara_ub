@@ -934,6 +934,8 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
      * @return void
      */
     public function test_none_visibility_conditions_applies(): void {
+        self::setAdminUser();
+
         $activity = $this->create_activity();
         $this->update_activity_visibility_condition($activity, none::VALUE);
 
@@ -975,6 +977,8 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
      * @return void
      */
     public function test_own_response_visibility_condition_applies(): void {
+        self::setAdminUser();
+
         $activity = $this->create_activity();
         $this->update_activity_visibility_condition($activity, own_response::VALUE);
 
@@ -1022,6 +1026,8 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
      * @return void
      */
     public function test_all_responses_visibility_condition_applies(): void {
+        self::setAdminUser();
+
         $activity = $this->create_activity();
         $this->update_activity_visibility_condition($activity, all_responses::VALUE);
 

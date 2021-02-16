@@ -35,6 +35,8 @@ use mod_perform\state\subject_instance\open as subject_instance_availability_ope
 class mod_perform_delete_user_testcase extends advanced_testcase {
 
     public function test_deleting_user_closes_subject_instances() {
+        self::setAdminUser();
+
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
@@ -100,6 +102,8 @@ class mod_perform_delete_user_testcase extends advanced_testcase {
     }
 
     public function test_deleting_user_closes_participant_instances() {
+        self::setAdminUser();
+
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 

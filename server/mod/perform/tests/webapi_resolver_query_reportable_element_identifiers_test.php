@@ -36,8 +36,9 @@ class mod_perform_webapi_resolver_query_reportable_element_identifiers_testcase 
 
     public function test_get_identifiers_for_normal_user(): void {
         $user = $this->getDataGenerator()->create_user();
-        self::setUser($user);
+        self::setAdminUser();
         $this->create_test_data();
+        self::setUser($user);
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage("You do not have permission to view reporting identifiers");
@@ -54,8 +55,9 @@ class mod_perform_webapi_resolver_query_reportable_element_identifiers_testcase 
         // The role is granted in the user's own context.
         $user_context = \context_user::instance($user->id);
         role_assign($roleid, $user->id, $user_context);
-        self::setUser($user);
+        self::setAdminUser();
         $data = $this->create_test_data();
+        self::setUser($user);
 
         $returned_identifiers = $this->resolve_graphql_query(self::QUERY, []);
         $this->assertEqualsCanonicalizing(

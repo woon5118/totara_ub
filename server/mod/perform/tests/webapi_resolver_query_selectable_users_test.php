@@ -256,6 +256,7 @@ class mod_perform_webapi_resolver_query_selectable_users_testcase extends advanc
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $generator->get_plugin_generator('mod_perform');
 
+        $this->setAdminUser();
         $activities = $perform_generator->create_full_activities();
         $subject_instance = $this->get_subject_instance($activities->first());
 

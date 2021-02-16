@@ -37,6 +37,8 @@ class mod_perform_subject_instance_model_testcase extends advanced_testcase {
      * @dataProvider get_instance_count_provider
      */
     public function test_get_instance_count(int $extra_instance_count): void {
+        $this->setAdminUser();
+
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 

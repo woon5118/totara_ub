@@ -80,6 +80,8 @@ class mod_perform_external_participant_token_validator_testcase extends advanced
     }
 
     private function setup_data() {
+        self::setAdminUser();
+
         $generator = $this->generator();
 
         $configuration = mod_perform_activity_generator_configuration::new()

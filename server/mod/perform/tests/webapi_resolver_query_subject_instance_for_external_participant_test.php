@@ -281,6 +281,7 @@ class mod_perform_webapi_resolver_query_subject_instance_for_external_participan
     }
 
     private function setup_data() {
+        $this->setAdminUser();
         $generator = $this->generator();
 
         $configuration = mod_perform_activity_generator_configuration::new()

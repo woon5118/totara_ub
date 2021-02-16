@@ -96,6 +96,8 @@ class upgrade_unwrap_response_data_testcase extends advanced_testcase {
     }
 
     private function save_response_data($response_data, bool $encode = true): element_response {
+        $this->setAdminUser();
+
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
@@ -110,6 +112,8 @@ class upgrade_unwrap_response_data_testcase extends advanced_testcase {
         $element_response->section_element_id = $section_element_id;
         $element_response->response_data = $encode ? json_encode($response_data) : $response_data;
         $element_response->save();
+
+        $this->setUser();
 
         return $element_response;
     }

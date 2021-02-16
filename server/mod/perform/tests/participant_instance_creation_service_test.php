@@ -197,6 +197,8 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     }
 
     public function test_add_participants_multiple_subject_instances() {
+        $this->setAdminUser();
+
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
@@ -736,6 +738,8 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * @return stdClass
      */
     private function generate_test_data_for_adding_participants(array $relationships, int $num_sections = 1): stdClass {
+        $this->setAdminUser();
+
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
