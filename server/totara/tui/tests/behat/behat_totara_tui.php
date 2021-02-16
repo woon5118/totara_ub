@@ -1321,9 +1321,11 @@ class behat_totara_tui extends behat_base {
 
         [, $parent, $dropdown] = $this->find_taglist($parent_locator, $parent_selector);
 
-        // Open the dropdown
-        $parent->find('css', self::TAGLIST_DROPDOWN_BUTTON_LOCATOR)->click();
-        $this->wait_for_pending_js();
+        // Open the (if not already open) dropdown
+        if ($parent->find('css', '.tui-dropdown--open') === null) {
+            $parent->find('css', self::TAGLIST_DROPDOWN_BUTTON_LOCATOR)->click();
+            $this->wait_for_pending_js();
+        }
 
         $specified_options = array_keys($table->getRowsHash());
 
