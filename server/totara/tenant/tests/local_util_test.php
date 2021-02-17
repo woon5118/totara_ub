@@ -193,6 +193,10 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $data->cohortname = 'Skupina pro prvniho tenanta';
         $oldtenant = util::create_tenant((array)$data);
 
+        $coursecat = $DB->get_record('course_categories', ['id' => $oldtenant->categoryid], '*', MUST_EXIST);
+        $this->assertSame('0', $coursecat->visible);
+        $course = $this->getDataGenerator()->create_course(['category' => $oldtenant->categoryid, 'visible' => 1]);
+
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
@@ -242,13 +246,16 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $audience = $DB->get_record('cohort', ['id' => $tenant->cohortid], '*', MUST_EXIST);
         $this->assertSame($data->cohortname, $audience->name);
         $this->assertSame('1', $audience->cohorttype);
-        $this->assertSame('0', $audience->visible);
+        $this->assertSame('1', $audience->visible);
         $this->assertSame('1', $audience->active);
         $this->assertSame('totara_tenant', $audience->component);
         $this->assertSame((string)$coursecatcontext->id, $audience->contextid);
         $this->assertInstanceOf(core\event\cohort_updated::class, $events[1]);
         $this->assertEquals($tenant->cohortid, $events[1]->objectid);
         $this->assertSame('cohort', $events[1]->objecttable);
+
+        $course = $DB->get_record('course', ['id' => $course->id], '*', MUST_EXIST);
+        $this->assertSame('1', $course->visible);
 
         $data = new stdClass();
         $data->id = $oldtenant->id;
@@ -284,6 +291,37 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $this->assertSame('1', $audience->active);
         $this->assertSame('totara_tenant', $audience->component);
         $this->assertSame((string)$coursecatcontext->id, $audience->contextid);
+
+        $course = $DB->get_record('course', ['id' => $course->id], '*', MUST_EXIST);
+        $this->assertSame('0', $course->visible);
+
+        // Make sure the category visibility cannot get out of sync.
+        $updatecategory = \coursecat::get($tenant->categoryid, MUST_EXIST, true);
+        $updatecategory->update(['visible' => 1]);
+        $this->assertSame('0', $updatecategory->visible);
+        $this->assertFalse($updatecategory->can_change_visibility());
+
+        $data = new stdClass();
+        $data->id = $oldtenant->id;
+        $data->suspended = '0';
+        $tenant = util::update_tenant((array)$data);
+
+        $this->assertSame($data->suspended, $tenant->suspended);
+
+        $coursecat = $DB->get_record('course_categories', ['id' => $tenant->categoryid], '*', MUST_EXIST);
+        $this->assertSame('1', $coursecat->visible);
+
+        $audience = $DB->get_record('cohort', ['id' => $tenant->cohortid], '*', MUST_EXIST);
+        $this->assertSame('1', $audience->visible);
+
+        $course = $DB->get_record('course', ['id' => $course->id], '*', MUST_EXIST);
+        $this->assertSame('1', $course->visible);
+
+        // Make sure the category visibility cannot get out of sync.
+        $updatecategory = \coursecat::get($tenant->categoryid, MUST_EXIST, true);
+        $updatecategory->update(['visible' => 0]);
+        $this->assertSame('1', $updatecategory->visible);
+        $this->assertFalse($updatecategory->can_change_visibility());
     }
 
     public function test_delete_tenant_delete() {

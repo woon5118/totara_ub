@@ -166,7 +166,7 @@ final class util {
         $coursecat->idnumber = $data['categoryidnumber'] ?? null; // NOTE: add validation if added to UI
         $coursecat->description = '';
         $coursecat->parent = 0;
-        $coursecat->visible = !$tenant->suspended;
+        $coursecat->visible = ($tenant->suspended ? 0 : 1);
         $coursecat = \coursecat::create($coursecat);
         $ccontext = \context_coursecat::instance($coursecat->id);
         $tenant->categoryid = $coursecat->id;
@@ -178,7 +178,7 @@ final class util {
         $cohort->name = \core_text::substr($cohort->name, 0, 254);
         $cohort->idnumber = $data['cohortidnumber'] ?? null; // NOTE: add validation if added to UI
         $cohort->description = '';
-        $cohort->visible = !$tenant->suspended;
+        $cohort->visible = ($tenant->suspended ? 0 : 1); // Not used yet.
         $cohort->active = 1;
         $cohort->component = 'totara_tenant';
         $cohort->contextid = $ccontext->id;
@@ -272,7 +272,7 @@ final class util {
             $update['name'] = $data['categoryname'];
         }
         if ($tenant->suspended == $category->visible) {
-            $update['visible'] = !$tenant->suspended;
+            $update['visible'] = ($tenant->suspended ? 0 : 1);
         }
         if ($update) {
             $update['id'] = $category->id;
@@ -287,6 +287,9 @@ final class util {
                 throw new \invalid_parameter_exception('invalid audience name');
             }
             $update['name'] = $data['cohortname'];
+        }
+        if ($tenant->suspended == $cohort->visible) {
+            $update['visible'] = ($tenant->suspended ? 0 : 1); // Not used yet.
         }
         // Make sure nobody hijacked the cohort in the meantime.
         if ($cohort->component !== 'totara_tenant') {

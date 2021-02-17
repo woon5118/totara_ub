@@ -331,8 +331,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         global $USER, $DB;
 
         if (!empty($USER->tenantid)) {
+            // Always return top-level tenant category for tenant members.
             $tenant = \core\record\tenant::fetch($USER->tenantid);
-            return self::get($tenant->categoryid);
+            return self::get($tenant->categoryid, MUST_EXIST, true);
         }
 
         if ($visiblechildren = self::get(0)->get_children()) {
@@ -542,6 +543,12 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $newcategory->theme = $data->theme;
         }
 
+        // Totara: do not allow manual hiding of top-level tenant categories, it is controlled by tenant suspended flag.
+        $tenant = $DB->get_record('tenant', ['categoryid' => $this->id]);
+        if ($tenant) {
+            $data->visible = ($tenant->suspended ? 0 : 1);
+        }
+
         $changes = false;
         if (isset($data->visible)) {
             if ($data->visible) {
@@ -553,7 +560,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
 
         if (isset($data->parent) && $data->parent != $this->parent) {
             // TOTARA: do not allow change of parent!
-            if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
+            if ($tenant) {
                 throw new coding_exception('Top level tenant categories cannot be moved');
             }
             if ($changes) {
@@ -2414,6 +2421,14 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         global $DB;
         $changes = false;
 
+        // Totara: prevent manual hiding of top-level tenant categories.
+        $tenant = $DB->get_record('tenant', ['categoryid' => $this->id]);
+        if ($tenant) {
+            if (!$tenant->suspended) {
+                return false;
+            }
+        }
+
         // Note that field 'visibleold' is not cached so we must retrieve it from DB if it is missing.
         if ($this->id && $this->__get('visibleold') != $visibleold) {
             $this->visibleold = $visibleold;
@@ -2485,6 +2500,14 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         if ($this->visible) {
             // Already visible.
             return false;
+        }
+
+        // Totara: prevent manual unhiding of top-level suspended tenant categories.
+        $tenant = $DB->get_record('tenant', ['categoryid' => $this->id]);
+        if ($tenant) {
+            if ($tenant->suspended) {
+                return false;
+            }
         }
 
         $this->visible = 1;
@@ -2931,6 +2954,13 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return bool
      */
     public function can_change_visibility() {
+        global $DB, $CFG;
+        if (!empty($CFG->tenantsenabled)) { // Perf hack - tenants have to be deleted before disabling them.
+            // Prevent manual visibility changes to top level-tenant categories.
+            if ($DB->record_exists('tenant', ['categoryid' => $this->id])) {
+                return false;
+            }
+        }
         return $this->parent_has_manage_capability();
     }
 
