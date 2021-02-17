@@ -103,7 +103,7 @@ class block_totara_recommendations_renderer extends plugin_renderer_base {
         global $PAGE;
 
         $template = ($is_tiled ? 'tile' : 'list') . '_' . $component;
-        $image = $card->get_image($is_tiled);
+        $image = $card->get_image($is_tiled, $PAGE->theme);
         if ($image instanceof moodle_url) {
             $image = $image->out(false, [
                 'theme' => $PAGE->theme->name,

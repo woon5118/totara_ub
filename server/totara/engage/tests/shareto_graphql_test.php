@@ -45,6 +45,7 @@ class totara_engage_shareto_graphql_testcase extends advanced_testcase {
             'component' => 'no_component',
             'search' => 'some1 a',
             'access' => access::get_code(access::RESTRICTED),
+            'theme' => 'ventura',
         ];
 
         $result = graphql::execute_operation($ec, $parameters);

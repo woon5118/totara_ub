@@ -161,6 +161,7 @@ import WorkspaceDescription from 'container_workspace/components/sidepanel/Works
 import WorkspaceContentLayout from 'container_workspace/components/content/WorkspaceContentLayout';
 import WorkspacePrimaryAction from 'container_workspace/components/action/WorkspacePrimaryAction';
 import apolloClient from 'tui/apollo_client';
+import { config } from 'tui/config';
 
 // GraphQL queries
 import getWorkspace from 'container_workspace/graphql/get_workspace';
@@ -220,6 +221,7 @@ export default {
       variables() {
         return {
           id: this.workspaceId,
+          theme: config.theme.name,
         };
       },
     },
@@ -258,6 +260,7 @@ export default {
         query: getWorkspace,
         variables: {
           id: this.workspaceId,
+          theme: config.theme.name,
         },
         data: {
           workspace: workspace,
@@ -285,6 +288,7 @@ export default {
         query: getWorkspace,
         variables: {
           id: this.workspaceId,
+          theme: config.theme.name,
         },
       });
 
@@ -296,6 +300,7 @@ export default {
         query: getWorkspace,
         variables: {
           id: this.workspaceId,
+          theme: config.theme.name,
         },
         data: { workspace },
       });
@@ -321,6 +326,7 @@ export default {
         query: getWorkspace,
         variables: {
           id: this.workspaceId,
+          theme: config.theme.name,
         },
       });
 
@@ -332,6 +338,7 @@ export default {
         query: getWorkspace,
         variables: {
           id: this.workspaceId,
+          theme: config.theme.name,
         },
 
         data: { workspace },

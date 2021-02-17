@@ -157,7 +157,8 @@ class engage_article_webapi_multi_tenancy_share_content_testcase extends advance
             'search' => $this->system_user_one->firstname,
             'itemid' => $article->get_id(),
             'component' => article::get_resource_type(),
-            'access' => $article->get_access_code()
+            'access' => $article->get_access_code(),
+            'theme' => 'ventura',
         ];
 
         $result_one = $this->resolve_graphql_query($query_name, $parameters);
@@ -201,7 +202,8 @@ class engage_article_webapi_multi_tenancy_share_content_testcase extends advance
             'search' => $this->system_user_two->firstname,
             'itemid' => $article->get_id(),
             'component' => article::get_resource_type(),
-            'access' => $article->get_access_code()
+            'access' => $article->get_access_code(),
+            'theme' => 'ventura',
         ];
 
         $result_one = $this->resolve_graphql_query($query_name, $parameters);
@@ -243,7 +245,8 @@ class engage_article_webapi_multi_tenancy_share_content_testcase extends advance
                 'search' => $this->system_user_two->lastname,
                 'itemid' => $article->get_id(),
                 'component' => article::get_resource_type(),
-                'access' => $article->get_access_code()
+                'access' => $article->get_access_code(),
+                'theme' => 'ventura',
             ]
         );
     }
@@ -262,7 +265,8 @@ class engage_article_webapi_multi_tenancy_share_content_testcase extends advance
             'search' => $this->tenant_one_participant->lastname,
             'itemid' => $article->get_id(),
             'component' => article::get_resource_type(),
-            'access' => $article->get_access_code()
+            'access' => $article->get_access_code(),
+            'theme' => 'ventura',
         ];
 
         $result_one = $this->resolve_graphql_query($query_name, $parameters);
@@ -320,7 +324,8 @@ class engage_article_webapi_multi_tenancy_share_content_testcase extends advance
             'search' => $this->tenant_one_user_two->lastname,
             'itemid' => $article->get_id(),
             'component' => article::get_resource_type(),
-            'access' => $article->get_access_code()
+            'access' => $article->get_access_code(),
+            'theme' => 'ventura',
         ];
 
         $result_one = $this->resolve_graphql_query($query_name, $parameters);
@@ -375,7 +380,8 @@ class engage_article_webapi_multi_tenancy_share_content_testcase extends advance
             'search' => $this->tenant_one_user_one->firstname,
             'itemid' => $article->get_id(),
             'component' => article::get_resource_type(),
-            'access' => $article->get_access_code()
+            'access' => $article->get_access_code(),
+            'theme' => 'ventura',
         ];
 
         $result_one = $this->resolve_graphql_query($query_name, $parameters);
@@ -416,7 +422,8 @@ class engage_article_webapi_multi_tenancy_share_content_testcase extends advance
             'search' => $this->tenant_one_user_one->firstname,
             'itemid' => $article->get_id(),
             'component' => article::get_resource_type(),
-            'access' => $article->get_access_code()
+            'access' => $article->get_access_code(),
+            'theme' => 'ventura',
         ];
 
         $result_one = $this->resolve_graphql_query($query_name, $parameters);
@@ -457,7 +464,8 @@ class engage_article_webapi_multi_tenancy_share_content_testcase extends advance
             'search' => $this->tenant_two_user->firstname,
             'itemid' => $article->get_id(),
             'component' => article::get_resource_type(),
-            'access' => $article->get_access_code()
+            'access' => $article->get_access_code(),
+            'theme' => 'ventura',
         ];
 
         $result_one = $this->resolve_graphql_query($query_name, $parameters);

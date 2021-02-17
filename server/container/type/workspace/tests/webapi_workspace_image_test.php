@@ -36,7 +36,9 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
         $this->setUser($user_one);
 
         $result = $this->execute_graphql_operation(
-            'container_workspace_upload_metadata', []
+            'container_workspace_upload_metadata', [
+                'theme' => 'ventura',
+            ]
         );
 
         $this->assertEmpty($result->errors);
@@ -59,7 +61,8 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
 
         $result = $this->execute_graphql_operation(
             'container_workspace_upload_metadata', [
-                'workspace_id' => $workspace->id
+                'workspace_id' => $workspace->id,
+                'theme' => 'ventura',
             ]
         );
 
@@ -106,7 +109,8 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
 
         $result = $this->execute_graphql_operation(
             'container_workspace_upload_metadata', [
-                'workspace_id' => $workspace->id
+                'workspace_id' => $workspace->id,
+                'theme' => 'ventura',
             ]
         );
 

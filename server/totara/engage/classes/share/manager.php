@@ -306,12 +306,10 @@ final class manager {
         }
 
         if ($recipient->area !== user::AREA) {
-            $library = \totara_engage\share\recipient\helper::get_recipient_class($recipient->component, $recipient->area);
-            $library = new $library($recipient->instanceid);
-            $data = $library->get_data();
-            $has_capability = $data['unshare'];
-
-            if (!$has_capability) {
+            /** @var recipient $share_recipient */
+            $share_recipient = \totara_engage\share\recipient\helper::get_recipient_class($recipient->component, $recipient->area);
+            $share_recipient = new $share_recipient($recipient->instanceid);
+            if (!$share_recipient->can_unshare_resources()) {
                 throw new share_exception('error:sharecapability', $instance::get_resource_type());
             }
         }

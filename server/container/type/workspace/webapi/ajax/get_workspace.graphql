@@ -1,4 +1,7 @@
-query container_workspace_get_workspace($id: param_integer!) {
+query container_workspace_get_workspace(
+  $id: param_integer!
+  $theme: param_component!
+) {
   workspace: container_workspace_workspace(id: $id) {
     __typename
     id
@@ -6,7 +9,7 @@ query container_workspace_get_workspace($id: param_integer!) {
     description(format: HTML)
     description_format
     time_description
-    image
+    image(theme: $theme)
     total_members
     total_member_requests
     total_discussions

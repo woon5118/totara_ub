@@ -77,6 +77,7 @@ class ml_recommender_get_recommended_workspaces_testcase extends advanced_testca
         $ec = execution_context::create('ajax', 'ml_recommender_get_recommended_user_workspaces');
         $parameters = [
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -97,6 +98,7 @@ class ml_recommender_get_recommended_workspaces_testcase extends advanced_testca
         $this->setUser($user);
         $parameters = [
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -114,6 +116,7 @@ class ml_recommender_get_recommended_workspaces_testcase extends advanced_testca
         $parameters = [
             'user_id' => $user2->id,
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -219,6 +222,7 @@ class ml_recommender_get_recommended_workspaces_testcase extends advanced_testca
         $ec = execution_context::create('ajax', 'ml_recommender_get_recommended_user_workspaces');
         $parameters = [
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -234,6 +238,7 @@ class ml_recommender_get_recommended_workspaces_testcase extends advanced_testca
         $ec = execution_context::create('ajax', 'ml_recommender_get_recommended_user_workspaces');
         $parameters = [
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);

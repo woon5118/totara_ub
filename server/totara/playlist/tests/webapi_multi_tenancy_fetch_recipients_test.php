@@ -167,7 +167,8 @@ class totara_playlist_webapi_multi_tenancy_fetch_recipients_testcase extends adv
             'itemid' => $playlist->get_id(),
             'component' => playlist::get_resource_type(),
             'access' => $playlist->get_access_code(),
-            'search' => $search_string
+            'search' => $search_string,
+            'theme' => 'ventura',
         ];
     }
 
@@ -452,7 +453,8 @@ class totara_playlist_webapi_multi_tenancy_fetch_recipients_testcase extends adv
                 'itemid' => $playlist->get_id(),
                 'component' => playlist::get_resource_type(),
                 'access' => $playlist->get_access_code(),
-                'search' => $this->tenant_one_user_one->firstname
+                'search' => $this->tenant_one_user_one->firstname,
+                'theme' => 'ventura',
             ]
         );
 

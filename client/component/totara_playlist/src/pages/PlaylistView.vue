@@ -116,6 +116,7 @@ import HeaderBox from 'totara_playlist/components/page/HeaderBox';
 import Layout from 'totara_engage/components/page/LayoutOneColumnWithSidePanel';
 import ResourceNavigationBar from 'totara_engage/components/header/ResourceNavigationBar';
 import apolloClient from 'tui/apollo_client';
+import { config } from 'tui/config';
 
 // GraphQL
 import getPlaylist from 'totara_playlist/graphql/get_playlist';
@@ -167,6 +168,7 @@ export default {
           footnotes_type: 'playlist',
           footnotes_item_id: this.playlistId,
           include_footnotes: true,
+          theme: config.theme.name,
         };
       },
     },

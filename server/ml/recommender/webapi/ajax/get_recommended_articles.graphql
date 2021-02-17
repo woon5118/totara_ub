@@ -3,6 +3,7 @@ query ml_recommender_get_recommended_articles(
   $article_id: param_integer!
   $cursor: param_text
   $source: String
+  $theme: param_component!
 ) {
   cursor: ml_recommender_recommended_articles_cursor(
     article_id: $article_id
@@ -28,7 +29,7 @@ query ml_recommender_get_recommended_articles(
     timecreated
     sharedbycount
     bookmarked
-    extra
+    extra(theme: $theme)
     owned
     user {
       id

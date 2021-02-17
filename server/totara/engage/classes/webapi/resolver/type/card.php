@@ -24,6 +24,7 @@ namespace totara_engage\webapi\resolver\type;
 
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
+use theme_config;
 use totara_engage\access\access;
 use totara_engage\card\card as abstract_card;
 use totara_engage\formatter\card_formatter;
@@ -53,7 +54,8 @@ final class card implements type_resolver {
                 return access::get_code($access);
 
             case 'extra':
-                $extra = $source->get_extra_data();
+                $theme_config = theme_config::load($args['theme']);
+                $extra = $source->get_extra_data($theme_config);
                 $json = json_encode($extra);
 
                 if (JSON_ERROR_NONE !== json_last_error()) {
@@ -88,7 +90,8 @@ final class card implements type_resolver {
                 return $source->get_url($args);
 
             case 'image':
-                $card_image = $source->get_card_image($args['preview_mode'] ?? null);
+                $theme_config = theme_config::load($args['theme']);
+                $card_image = $source->get_card_image($theme_config, $args['preview_mode'] ?? null);
                 return $card_image ? $card_image->out(false) : null;
 
             default:

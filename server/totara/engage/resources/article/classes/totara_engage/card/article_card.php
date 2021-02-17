@@ -25,6 +25,7 @@ namespace engage_article\totara_engage\card;
 use engage_article\theme\file\article_image;
 use engage_article\totara_engage\resource\article;
 use moodle_url;
+use theme_config;
 use totara_comment\loader\comment_loader;
 use totara_engage\card\card;
 use totara_engage\timeview\time_view;
@@ -41,11 +42,12 @@ final class article_card extends card {
     }
 
     /**
+     * @param theme_config $theme_config
      * @return array
      */
-    public function get_extra_data(): array {
+    public function get_extra_data(theme_config $theme_config): array {
         $extra_data = [
-            'image' => $this->get_card_image('engage_article_resource')->out(false),
+            'image' => $this->get_card_image($theme_config, 'engage_article_resource')->out(false),
             'usage' => article::get_resource_usage($this->instanceid),
             'timeview' => null,
             'alt' => ''
@@ -89,18 +91,17 @@ final class article_card extends card {
     }
 
     /**
+     * @param theme_config $theme_config
      * @param string|null $preview_mode
      * @return moodle_url|null
      */
-    public function get_card_image(?string $preview_mode = null): ?moodle_url {
-        global $PAGE;
-
-        $article_image = new article_image();
-        $image = $article_image->get_default_url();
-
+    public function get_card_image(theme_config $theme_config, ?string $preview_mode = null): ?moodle_url {
         $extra = $this->get_json_decoded_extra();
         if (!empty($extra['image'])) {
-            $image = new \moodle_url($extra['image'], ['theme' => $PAGE->theme->name]);
+            $image = new \moodle_url($extra['image'], ['theme' => $theme_config->name]);
+        } else {
+            $article_image = new article_image($theme_config);
+            $image = $article_image->get_current_or_default_url();
         }
 
         if ($preview_mode) {

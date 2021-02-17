@@ -64,7 +64,10 @@ class container_workspace_multi_tenancy_access_testcase extends advanced_testcas
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
 
         $ec = execution_context::create('ajax', 'container_workspace_get_workspace');
-        $result = graphql::execute_operation($ec, ['id' => $workspace->get_id()]);
+        $result = graphql::execute_operation($ec, [
+            'id' => $workspace->get_id(),
+            'theme' => 'ventura',
+        ]);
 
         $this->assertEmpty($result->errors);
         $this->assertNotEmpty($result->data);

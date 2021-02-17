@@ -344,6 +344,7 @@ final class settings {
         // Get classes and instantiate them all.
         if (empty($this->file_instances)) {
             $classes = helper::get_classes();
+            /** @var theme_file $class */
             foreach ($classes as $class) {
                 $instance = new $class($this->theme_config);
                 $instance->set_tenant_id($this->tenant_id);

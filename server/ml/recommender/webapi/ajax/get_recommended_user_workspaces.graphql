@@ -1,5 +1,8 @@
 # Load recommended workspaces for the user
-query ml_recommender_get_recommended_user_workspaces($cursor: param_text) {
+query ml_recommender_get_recommended_user_workspaces(
+  $cursor: param_text
+  $theme: param_component!
+) {
   cursor: ml_recommender_recommended_user_workspaces_cursor(cursor: $cursor) {
     __typename
     total
@@ -13,7 +16,7 @@ query ml_recommender_get_recommended_user_workspaces($cursor: param_text) {
     description(format: HTML)
     description_format
     time_description
-    image
+    image(theme: $theme)
     total_members
     interactor {
       __typename

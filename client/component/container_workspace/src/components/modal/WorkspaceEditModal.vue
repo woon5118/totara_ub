@@ -64,6 +64,7 @@ import ModalContent from 'tui/components/modal/ModalContent';
 import WorkspaceForm from 'container_workspace/components/form/WorkspaceForm';
 import { notify } from 'tui/notifications';
 import { isPublic, isPrivate, isHidden } from 'container_workspace/index';
+import { config } from 'tui/config';
 
 // GraphQL queries
 import getWorkspaceRaw from 'container_workspace/graphql/workspace_raw';
@@ -190,6 +191,7 @@ export default {
             draft_id: draftId,
             private: isPrivate,
             hidden: isHidden,
+            theme: config.theme.name,
           },
         });
 

@@ -57,7 +57,8 @@ class totara_engage_webapi_share_recipient_testcase extends advanced_testcase {
             'totara_engage_share_recipients',
             [
                 'itemid' => $article->get_id(),
-                'component' => $article::get_resource_type()
+                'component' => $article::get_resource_type(),
+                'theme' => 'ventura',
             ]
         );
 
@@ -80,7 +81,8 @@ class totara_engage_webapi_share_recipient_testcase extends advanced_testcase {
             'totara_engage_share_recipients',
             [
                 'itemid' => $article->get_id(),
-                'component' => $article::get_resource_type()
+                'component' => $article::get_resource_type(),
+                'theme' => 'ventura',
             ]
         );
 
@@ -118,7 +120,8 @@ class totara_engage_webapi_share_recipient_testcase extends advanced_testcase {
             'totara_engage_share_recipients',
             [
                 'itemid' => $article->get_id(),
-                'component' => $article::get_resource_type()
+                'component' => $article::get_resource_type(),
+                'theme' => 'ventura',
             ]
         );
 
@@ -142,7 +145,8 @@ class totara_engage_webapi_share_recipient_testcase extends advanced_testcase {
             'totara_engage_share_recipients',
             [
                 'itemid' => $article->get_id(),
-                'component' => $article::get_resource_type()
+                'component' => $article::get_resource_type(),
+                'theme' => 'ventura',
             ]
         );
 

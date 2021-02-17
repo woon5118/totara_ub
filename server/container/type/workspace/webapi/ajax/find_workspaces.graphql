@@ -4,6 +4,7 @@ query container_workspace_find_workspaces(
   $search_term: param_text
   $cursor: param_text
   $access: container_workspace_access
+  $theme: param_component!
 ) {
   cursor: container_workspace_workspace_cursor(
     source: $source
@@ -26,7 +27,7 @@ query container_workspace_find_workspaces(
     __typename
     name(format: PLAIN)
     id
-    image
+    image(theme: $theme)
     url
     description(format: PLAIN)
     total_members

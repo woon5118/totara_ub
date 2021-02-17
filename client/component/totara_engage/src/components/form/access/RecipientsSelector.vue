@@ -90,6 +90,7 @@ import CheckSuccess from 'tui/components/icons/CheckSuccess';
 import Label from 'tui/components/form/Label';
 import TagList from 'tui/components/tag/TagList';
 import { AccessManager } from 'totara_engage/index';
+import { config } from 'tui/config';
 
 // GraphQL
 import shareToRecipients from 'totara_engage/graphql/shareto_recipients';
@@ -149,6 +150,7 @@ export default {
           component: this.component,
           search: this.query,
           access: this.access,
+          theme: config.theme.name,
         };
       },
 

@@ -262,7 +262,8 @@ class engage_survey_share_graphql_testcase extends advanced_testcase {
         $ec = execution_context::create('ajax', 'totara_engage_share_recipients');
         $parameters = [
             'itemid' => $survey->get_id(),
-            'component' => survey::get_resource_type()
+            'component' => survey::get_resource_type(),
+            'theme' => 'ventura',
         ];
 
         $result = graphql::execute_operation($ec, $parameters);

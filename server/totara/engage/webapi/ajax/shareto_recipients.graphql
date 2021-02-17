@@ -3,14 +3,15 @@ query totara_engage_shareto_recipients(
   $component: param_component!
   $search: String
   $access: totara_engage_access!
+  $theme: param_component!
 ) {
   recipients: totara_engage_shareto_recipients(
     itemid: $itemid
     component: $component
     search: $search
     access: $access
+    theme: $theme
   ) {
-    __typename
     component
     area
     instanceid
@@ -18,15 +19,12 @@ query totara_engage_shareto_recipients(
     summary
     minimum_access
     user {
-      __typename
       id
       card_display {
-        __typename
         profile_picture_alt
         profile_picture_url
         profile_url
         display_fields {
-          __typename
           value
           label
           associate_url
@@ -35,7 +33,6 @@ query totara_engage_shareto_recipients(
       }
     }
     other {
-      __typename
       category
       fullname
       imageurl

@@ -23,6 +23,7 @@
 
 namespace core\theme\file;
 
+use coding_exception;
 use core\files\file_area;
 use core\files\file_helper;
 use core\files\type\file_type;
@@ -63,12 +64,9 @@ abstract class theme_file {
      * theme_file constructor.
      *
      * @param theme_config|null $theme_config
-     * @param string|null $theme
      */
-    public function __construct(?theme_config $theme_config = null, ?string $theme = null) {
-        global $PAGE;
-        $this->theme_config = $theme_config
-            ?? theme_config::load($theme ?? $PAGE->theme->name);
+    public function __construct(?theme_config $theme_config = null) {
+        $this->theme_config = $theme_config;
     }
 
     /**
@@ -109,6 +107,13 @@ abstract class theme_file {
         $this->theme_config = $theme_config;
     }
 
+    private function get_theme_config(): theme_config {
+        if (empty($this->theme_config)) {
+            throw new coding_exception("'theme_config' is not set");
+        }
+        return $this->theme_config;
+    }
+
     /**
      * @param int $item_id
      */
@@ -128,7 +133,7 @@ abstract class theme_file {
         global $DB;
 
         $id = $tenant_id ?? $this->tenant_id;
-        $plugin = "theme_" . ($theme ?? $this->theme_config->name);
+        $plugin = "theme_" . ($theme ?? $this->get_theme_config()->name);
         $name = "tenant_{$id}_settings";
 
         // Always make sure that there is a record representing this config.
@@ -156,7 +161,7 @@ abstract class theme_file {
      * @return string
      */
     public function get_name(): string {
-        return "{$this->get_component()}/{$this->get_area()}";
+        return static::get_component() . "/" . static::get_area();
     }
 
     /**
@@ -190,8 +195,8 @@ abstract class theme_file {
 
         // Get files for current component and context.
         $file_helper = new file_helper(
-            $this->get_component(),
-            $this->get_area(),
+            static::get_component(),
+            static::get_area(),
             $context
         );
         $file_helper->set_item_id($item_id);
@@ -203,10 +208,7 @@ abstract class theme_file {
         }
 
         // Return first file found.
-        /** @var stored_file $file */
-        $file = reset($files);
-
-        return $file;
+        return reset($files);
     }
 
     /**
@@ -224,8 +226,7 @@ abstract class theme_file {
             return null;
         }
 
-        $theme_settings = new theme_settings($this->theme_config, $this->tenant_id);
-        $file = $this->get_current_file($this->get_item_id($this->tenant_id, $theme));
+        $theme_settings = new theme_settings($this->get_theme_config(), $this->tenant_id);
 
         // If not using custom tenant branding or no file found check if site setting is set for theme.
         if ($this->tenant_id > 0 && !$theme_settings->is_tenant_branding_enabled()) {
@@ -233,6 +234,8 @@ abstract class theme_file {
                 $this->get_item_id(0, $theme),
                 \context_system::instance()
             );
+        } else {
+            $file = $this->get_current_file($this->get_item_id($this->tenant_id, $theme));
         }
 
         return !empty($file) ? $this->get_url($file) : null;
@@ -276,7 +279,7 @@ abstract class theme_file {
         if ($this->has_default()) {
             $parts = explode('/', static::get_id());
             return $this->type->create_url(
-                $this->theme_config->name,
+                $this->get_theme_config()->name,
                 $parts[0],
                 $parts[1],
                 theme_get_revision(),
@@ -295,8 +298,8 @@ abstract class theme_file {
         global $USER;
 
         $file_helper = new file_helper(
-            $this->get_component(),
-            $this->get_area(),
+            static::get_component(),
+            static::get_area(),
             $this->get_context()
         );
 
@@ -371,7 +374,7 @@ abstract class theme_file {
             $this->get_name(),
             '',
             '',
-            $this->get_area(),
+            static::get_area(),
             $this->get_item_id(),
             [
                 'accepted_types' => $this->get_type()->get_group(),
@@ -437,7 +440,7 @@ abstract class theme_file {
      */
     public function delete(): void {
         if ($current_file = $this->get_current_file()) {
-            unset_config($this->get_area(), $this->get_component());
+            unset_config(static::get_area(), static::get_component());
             $current_file->delete();
         }
     }
@@ -505,12 +508,12 @@ abstract class theme_file {
     /**
      * @return string
      */
-    abstract public function get_component(): string;
+    abstract public static function get_component(): string;
 
     /**
      * @return string
      */
-    abstract public function get_area(): string;
+    abstract public static function get_area(): string;
 
     /**
      * Get a unique key to map to theme categories.

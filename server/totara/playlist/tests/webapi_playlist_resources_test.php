@@ -87,6 +87,7 @@ class totara_playlist_webapi_playlist_resources_testcase extends advanced_testca
                 'page' => 1,
             ],
             'include_footnotes' => false,
+            'theme' => 'ventura',
         ];
         $results = graphql::execute_operation($ec, $parameters);
 

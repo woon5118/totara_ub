@@ -50,6 +50,7 @@ import Contribute from 'totara_engage/components/contribution/Contribute';
 import { AccessManager } from 'totara_engage/index';
 import Share from 'container_workspace/components/contribution/Share';
 import { isPrivate, isHidden } from 'container_workspace/index';
+import { config } from 'tui/config';
 
 // GraphQL
 import getWorkspace from 'container_workspace/graphql/get_workspace';
@@ -81,6 +82,7 @@ export default {
       variables() {
         return {
           id: this.instanceId,
+          theme: config.theme.name,
         };
       },
     },
