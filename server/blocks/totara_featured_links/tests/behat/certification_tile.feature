@@ -85,7 +85,7 @@ Feature: The certification tile should work as expected
 
     And I follow "Turn editing off"
     And I click on ".block-totara-featured-links-link" "css_element"
-    Then "Manage programs" "link" should exist
+    Then "Manage certifications" "link" should exist
     And I should see "TestCertificationName"
     And "Featured Links" "block" should not exist
 
