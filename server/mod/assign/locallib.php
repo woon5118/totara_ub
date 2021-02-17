@@ -156,6 +156,9 @@ class assign {
     /** @var array cached list of participants for this assignment. The cache key will be group, showactive and the context id */
     private $participants = array();
 
+    /** @var array cached list of participants IDs for this assignment. The cache key will be group, showactive and the context id */
+    private $participantsidsonly = array();
+
     /** @var array cached list of user groups when team submissions are enabled. The cache key will be the user. */
     private $usersubmissiongroups = array();
 
@@ -1897,7 +1900,12 @@ class assign {
                            $additionalfilters
                   ORDER BY $orderby";
 
-            $users = $DB->get_records_sql($sql, $params);
+            // Fetch all users and convert it to an array with user IDs as keys.
+            $allusers = $DB->get_huge_recordset_sql($sql, $params);
+            $users = [];
+            foreach ($allusers as $user) {
+                $users[$user->id] = $user;
+            }
 
             $cm = $this->get_course_module();
             $info = new \core_availability\info_module($cm);
@@ -1907,13 +1915,18 @@ class assign {
         }
 
         if ($idsonly) {
-            $idslist = array();
-            foreach ($this->participants[$key] as $id => $user) {
-                $idslist[$id] = new stdClass();
-                $idslist[$id]->id = $id;
+            if (isset($this->participantsidsonly[$key])) {
+                return $this->participantsidsonly[$key];
+            } else {
+                $idslist = array();
+                foreach ($this->participants[$key] as $id => $user) {
+                    $idslist[$id] = new stdClass();
+                    $idslist[$id]->id = $user->id;
+                }
+                return $this->participantsidsonly[$key] = $idslist;
             }
-            return $idslist;
         }
+
         return $this->participants[$key];
     }
 

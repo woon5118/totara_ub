@@ -120,12 +120,6 @@ class assign_grading_table extends table_sql implements renderable {
             $this->rownum = $rowoffset - 1;
         }
 
-        $users = array_keys( $assignment->list_participants($currentgroup, true));
-        if (count($users) == 0) {
-            // Insert a record that will never match to the sql is still valid.
-            $users[] = -1;
-        }
-
         $params = array();
         $params['assignmentid1'] = (int)$this->assignment->get_instance()->id;
         $params['assignmentid2'] = (int)$this->assignment->get_instance()->id;
@@ -243,12 +237,10 @@ class assign_grading_table extends table_sql implements renderable {
             $fields .= ', um.id as recordid ';
         }
 
-        $userparams = array();
-        $userindex = 0;
-
-        list($userwhere, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
-        $where = 'u.id ' . $userwhere;
-        $params = array_merge($params, $userparams);
+        list($enrolleduserssql, $enrolledusersparams) = get_enrolled_sql($this->assignment->get_context(), 'mod/assign:submit', $currentgroup,
+            $this->assignment->show_only_active_users());
+        $where = "u.id IN ($enrolleduserssql)";
+        $params = array_merge($params, $enrolledusersparams);
 
         // The filters do not make sense when there are no submissions, so do not apply them.
         if ($this->assignment->is_any_submission_plugin_enabled()) {
@@ -478,14 +470,7 @@ class assign_grading_table extends table_sql implements renderable {
             $headers[] = get_string('finalgrade', 'grades');
         }
 
-        // Load the grading info for all users.
-        $this->gradinginfo = grade_get_grades($this->assignment->get_course()->id,
-                                              'mod',
-                                              'assign',
-                                              $this->assignment->get_instance()->id,
-                                              $users);
-
-        if (!empty($CFG->enableoutcomes) && !empty($this->gradinginfo->outcomes)) {
+        if (!empty($CFG->enableoutcomes)) {
             $columns[] = 'outcomes';
             $headers[] = get_string('outcomes', 'grades');
         }
@@ -819,8 +804,19 @@ class assign_grading_table extends table_sql implements renderable {
      * @return string
      */
     public function col_outcomes(stdClass $row) {
+        // Calculate outcomes based on the rawdata.
+        $grades = grade_get_grades($this->assignment->get_course()->id,
+            'mod',
+            'assign',
+            $this->assignment->get_instance()->id,
+            array_keys($this->rawdata));
+
+        if (!isset($grades->outcomes)) {
+            return '';
+        }
+
         $outcomes = '';
-        foreach ($this->gradinginfo->outcomes as $index => $outcome) {
+        foreach ($grades->outcomes as $index => $outcome) {
             $options = make_grades_menu(-$outcome->scaleid);
 
             $options[0] = get_string('nooutcome', 'grades');
@@ -912,8 +908,17 @@ class assign_grading_table extends table_sql implements renderable {
      * @return mixed stdClass or false
      */
     private function get_gradebook_data_for_user($userid) {
-        if (isset($this->gradinginfo->items[0]) && $this->gradinginfo->items[0]->grades[$userid]) {
-            return $this->gradinginfo->items[0]->grades[$userid];
+        if (isset($this->rawdata[$userid])) {
+            // Search the grade for the user.
+            $grade = grade_get_grades($this->assignment->get_course()->id,
+                'mod',
+                'assign',
+                $this->assignment->get_instance()->id,
+                [$this->rawdata[$userid]->id]);
+
+            if (isset($grade->items[0]) && $grade->items[0]->grades[$userid]) {
+                return $grade->items[0]->grades[$userid];
+            }
         }
         return false;
     }
