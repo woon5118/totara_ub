@@ -53,5 +53,10 @@ function xmldb_container_workspace_upgrade($old_version) {
         upgrade_plugin_savepoint(true, 2020100105, 'container', 'workspace');
     }
 
+    if ($old_version < 2020100110) {
+        container_workspace_update_hidden_workspace_with_audience_visibility();
+        upgrade_plugin_savepoint(true, 2020100110, 'container', 'workspace');
+    }
+
     return true;
 }

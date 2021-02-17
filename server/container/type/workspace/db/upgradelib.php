@@ -70,3 +70,24 @@ function container_workspace_add_missing_roles() {
         }
     }
 }
+
+/**
+ * @return void
+ */
+function container_workspace_update_hidden_workspace_with_audience_visibility(): void {
+    global $DB, $CFG;
+
+    if (!defined('COHORT_VISIBLE_ENROLLED')) {
+        require_once("{$CFG->dirroot}/totara/core/totara.php");
+    }
+
+    $DB->execute(
+        'UPDATE "ttr_course" SET audiencevisible = :new_audience_visible 
+         WHERE containertype = :workspace AND visible = 0 AND audiencevisible = :audience_visible',
+        [
+            'workspace' => 'container_workspace',
+            'audience_visible' => COHORT_VISIBLE_ALL,
+            'new_audience_visible' => COHORT_VISIBLE_ENROLLED
+        ]
+    );
+}

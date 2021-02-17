@@ -71,6 +71,7 @@ final class workspace_helper {
                                             ?int $summary_format = null,
                                             ?int $draft_id = null, bool $is_private = false,
                                             bool $is_hidden = false): workspace {
+        global $CFG;
         if (empty($name)) {
             throw new \coding_exception("Cannot create a workspace with empty name");
         }
@@ -122,6 +123,12 @@ final class workspace_helper {
 
         if ($is_private && $is_hidden) {
             $record->visible = 0;
+
+            if (!defined('COHORT_VISIBLE_ENROLLED')) {
+                require_once("{$CFG->dirroot}/totara/core/totara.php");
+            }
+
+            $record->audiencevisible = COHORT_VISIBLE_ENROLLED;
         }
 
         if (null !== $summary) {

@@ -27,6 +27,7 @@ use container_workspace\query\workspace\source;
 use container_workspace\query\workspace\access;
 use container_workspace\loader\workspace\loader;
 use container_workspace\workspace;
+use container_workspace\testing\generator as workspace_generator;
 
 class container_workspace_workspace_loader_testcase extends advanced_testcase {
     /**
@@ -136,6 +137,54 @@ class container_workspace_workspace_loader_testcase extends advanced_testcase {
                     $workspace->get_id(),
                     array_merge($private_ids, [$hidden_workspace->get_id()])
                 )
+            );
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function test_fetch_hidden_workspaces_with_audience_visibility(): void {
+        set_config('audiencevisibility', true);
+        $generator = self::getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        /** @var workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $this->setUser($user_one);
+
+        // Create three workspaces, one public, one private and one hidden.
+        $public_workspace = $workspace_generator->create_workspace('public_workspace');
+        $private_workspace = $workspace_generator->create_private_workspace('private_workspace');
+        $hidden_workspace = $workspace_generator->create_hidden_workspace('hidden_workspace');
+
+        // Add the user two to the public workspace.
+        $workspace_generator->add_member($public_workspace, $user_two->id, $user_one->id);
+
+        // Log in as user two and start fetching the workspaces which it should not return the hidden workspace.
+        $this->setUser($user_two);
+
+        $query = new query(source::ALL, $user_two->id);
+        $result = loader::get_workspaces($query);
+
+        // There should only be two records, which is one public workspace and one private workspace.
+        // The hidden workspace should not be included into the result.
+        self::assertEquals(2, $result->get_total());
+        $workspaces = $result->get_items();
+
+        self::assertEquals(2, $workspaces->count());
+
+        /** @var workspace $fetched_workspace */
+        foreach ($workspaces as $fetched_workspace) {
+            self::assertNotEquals($hidden_workspace->get_id(), $fetched_workspace->get_id());
+            self::assertContainsEquals(
+                $fetched_workspace->get_id(),
+                [
+                    $public_workspace->get_id(),
+                    $private_workspace->get_id()
+                ]
             );
         }
     }
