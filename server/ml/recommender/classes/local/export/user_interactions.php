@@ -37,14 +37,6 @@ class user_interactions extends export {
     }
 
     public function export(writer $writer): bool {
-        $recordset = $this->get_export_recordset();
-
-        $microlearning_time_view = time_view::LESS_THAN_FIVE;
-
-        if (!$recordset->valid()) {
-            return false;
-        }
-
         // Column headings for csv file.
         $writer->add_headings([
             'user_id',
@@ -52,6 +44,14 @@ class user_interactions extends export {
             'rating',
             'timestamp',
         ]);
+        
+        $recordset = $this->get_export_recordset();
+
+        $microlearning_time_view = time_view::LESS_THAN_FIVE;
+
+        if (!$recordset->valid()) {
+            return false;
+        }
 
         foreach ($recordset as $interaction) {
             // Get the mapped item and user ids.

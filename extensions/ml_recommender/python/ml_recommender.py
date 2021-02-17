@@ -53,17 +53,18 @@ def run_modelling_process():
 
     # -------------------------------------------------------
     # Set path for the natural language processing libraries
-    nl_libs = os.path.join(os.path.dirname(__file__), 'totara')
+    nl_libs = os.path.join(os.path.dirname(__file__), "totara")
     # Get list of the tenants
     data_reader = DataReader(data_home=data_home)
     tenants = data_reader.read_tenants().tenants.tolist()
     if len(tenants) == 0:
         tenants = [0]
     # ------------------------------------------------------
-    # Check if the ML process has already started via the process control file 'ml_started',
-    # exit the process if this had already started or crashed after starting. Create the
-    # process control file 'ml_started' if this does not exist already.
-    started_file_path = os.path.join(data_home, 'ml_started')
+    # Check if the ML process has already started via the process control file
+    # 'ml_started', exit the process if this had already started or crashed after
+    # starting. Create the process control file 'ml_started' if this does not exist
+    # already.
+    started_file_path = os.path.join(data_home, "ml_started")
     if os.path.exists(started_file_path):
         print(
             "Processing already started. If it was crashed before and need restart, "
@@ -71,14 +72,14 @@ def run_modelling_process():
         )
         exit()
 
-    with open(file=started_file_path, mode='w') as writer:
-        writer.write(f'{time.time(): 0.0f}')
+    with open(file=started_file_path, mode="w") as writer:
+        writer.write(f"{time.time(): 0.0f}")
     # -------------------------------------------------------
     # Loop through the list of tenants
     for tenant in tenants:
-        print(f'Loading and processing/transforming data of tenant {tenant}')
-        i2i_file_path = os.path.join(data_home, f'i2i_{tenant}.csv')
-        i2u_file_path = os.path.join(data_home, f'i2u_{tenant}.csv')
+        print(f"Loading and processing/transforming data of tenant {tenant}")
+        i2i_file_path = os.path.join(data_home, f"i2i_{tenant}.csv")
+        i2u_file_path = os.path.join(data_home, f"i2u_{tenant}.csv")
         # Process the tenant's data from data_home directory and read into the memory
         d_loader = DataLoader(nl_libs=nl_libs)
         t1 = time.time()
@@ -87,120 +88,118 @@ def run_modelling_process():
         users_data = data_reader.read_users_file(tenant=tenant)
         # Remove interactions by the users and items that are not in the current tenant
         interactions_cleaner = RemoveExternalInteractions(
-            users_df=users_data,
-            items_df=items_data,
-            interactions_df=interactions_df
+            users_df=users_data, items_df=items_data, interactions_df=interactions_df
         )
         interactions_df = interactions_cleaner.clean_interactions()
-        processed_data = d_loader.load_data(
-            interactions_df=interactions_df,
-            items_data=items_data,
-            users_data=users_data,
-            query=query
-        )
-        m, s = divmod((time.time() - t1), 60)
-        print(
-            f'The data loading and processing/transformation of tenant {tenant} took'
-            f' {m: .0f} minutes and {s: .2f} seconds.\n'
-        )
-        min_data = cfg.get_property('min_data')
-        shape = processed_data['interactions'].shape
-        if shape[0] < min_data['min_users'] or shape[1] < min_data['min_items']:
+        shape = (users_data.shape[0], items_data.shape[0])
+        min_data = cfg.get_property("min_data")
+
+        if shape[0] < min_data["min_users"] or shape[1] < min_data["min_items"]:
             print(
-                "The number of users or items is too small to run the recommendation engine."
-                f" Skipping tenant {tenant}."
+                "The number of users or items is too small to run the recommendation"
+                f" engine. Skipping tenant {tenant}."
             )
 
-            with open(file=i2i_file_path, mode='w') as f:
+            with open(file=i2i_file_path, mode="w") as f:
                 f.write("target_iid,similar_iid,ranking")
 
-            with open(file=i2u_file_path, mode='w') as f:
+            with open(file=i2u_file_path, mode="w") as f:
                 f.write("uid,iid,ranking")
 
         else:
-            if query in ['hybrid', 'partial']:
-                item_alpha = cfg.get_property('item_alpha')
+            processed_data = d_loader.load_data(
+                interactions_df=interactions_df,
+                items_data=items_data,
+                users_data=users_data,
+                query=query,
+            )
+            m, s = divmod((time.time() - t1), 60)
+            print(
+                f"The data loading and processing/transformation of tenant {tenant}"
+                f" took {m: .0f} minutes and {s: .2f} seconds.\n"
+            )
+            if query in ["hybrid", "partial"]:
+                item_alpha = cfg.get_property("item_alpha")
             else:
                 item_alpha = 0.0
             # --------------------------------------------------
-            # We will optimize the 'epochs' and the latent dimension of the user-item interaction
-            # matrix called the 'no_components'
+            # We will optimize the 'epochs' and the latent dimension of the user-item
+            # interaction matrix called the 'no_components'
             opt_obj = OptimizeHyperparams(
-                interactions=processed_data['interactions'],
-                item_features=processed_data['item_features'],
-                weights=processed_data['weights'],
+                interactions=processed_data["interactions"],
+                item_features=processed_data["item_features"],
+                weights=processed_data["weights"],
                 num_threads=num_threads,
-                item_alpha=item_alpha
+                item_alpha=item_alpha,
             )
             t2 = time.time()
             epochs, comps, scores = opt_obj.run_optimization(lr=1000)
 
             m, s = divmod((time.time() - t2), 60)
             print(
-                f'The hyper-parameters optimization of the model for tenant {tenant} took\n'
-                f'{m: .0f} minutes and {s: .2f} seconds to converge.\n'
+                f"The hyper-parameters optimization of the model for tenant {tenant}"
+                f" took {m: .0f} minutes and {s: .2f} seconds to converge.\n"
             )
             print(
-                f'The best hyper-parameters found for tenant {tenant}:\n   epochs: {epochs[-1]}\n'
-                f'   n_components: {comps[-1]}\n   The best score: {scores[-1]: .3f}\n'
+                f"The best hyper-parameters found for tenant {tenant}:\n"
+                f"   epochs: {epochs[-1]}\n"
+                f"   n_components: {comps[-1]}\n"
+                f"   The best score: {scores[-1]: .3f}\n"
             )
             # --------------------------------------------------
-            # Train the final model with the optimum number of 'epochs' and the 'no_components'
-            print(f'Training final model for tenant {tenant}.\n')
+            # Train the final model with the optimum number of 'epochs' and the
+            # 'no_components'
+            print(f"Training final model for tenant {tenant}.\n")
             model_obj = BuildModel(
-                interactions=processed_data['interactions'],
-                weights=processed_data['weights'],
-                item_features=processed_data['item_features'],
+                interactions=processed_data["interactions"],
+                weights=processed_data["weights"],
+                item_features=processed_data["item_features"],
                 num_threads=num_threads,
                 optimized_hyperparams={
-                    'epochs': epochs[-1],
-                    'no_components': comps[-1]
+                    "epochs": epochs[-1],
+                    "no_components": comps[-1],
                 },
-                item_alpha=item_alpha
+                item_alpha=item_alpha,
             )
             final_model = model_obj.build_model()
             # --------------------------------------------------
             # Items to item (I2I) recommendations.
-            print(f'Making I2I recommendations for tenant {tenant}')
-            item_representations = final_model.get_item_representations(features=processed_data['item_features'])[1]
+            print(f"Making I2I recommendations for tenant {tenant}")
+            item_representations = final_model.get_item_representations(
+                features=processed_data["item_features"]
+            )[1]
             similar_items = SimilarItems(
-                item_mapping=processed_data['mapping'][2],
+                item_mapping=processed_data["mapping"][2],
                 item_representations=item_representations,
-                num_items=item_result_count
+                num_items=item_result_count,
             ).all_items()
             similar_items.to_csv(
-                path_or_buf=i2i_file_path,
-                sep=',',
-                float_format='%.12f',
-                index=False
+                path_or_buf=i2i_file_path, sep=",", float_format="%.12f", index=False
             )
 
-            print(f'Making I2U recommendations for tenant {tenant}')
+            print(f"Making I2U recommendations for tenant {tenant}")
             # -----------------------------------------------------
             # Items to user (I2U) recommendations.
             might_like_items = UserToItems(
-                u_mapping=processed_data['mapping'][0],
-                i_mapping=processed_data['mapping'][2],
-                item_type_map=processed_data['item_type_map'],
-                item_features=processed_data['item_features'],
-                positive_inter_map=processed_data['positive_inter_map'],
+                u_mapping=processed_data["mapping"][0],
+                i_mapping=processed_data["mapping"][2],
+                item_type_map=processed_data["item_type_map"],
+                item_features=processed_data["item_features"],
+                positive_inter_map=processed_data["positive_inter_map"],
                 model=final_model,
                 num_items=user_result_count,
-                num_threads=num_threads
+                num_threads=num_threads,
             ).all_items()
 
             might_like_items.to_csv(
-                path_or_buf=i2u_file_path,
-                sep=',',
-                float_format='%.12f',
-                index=False
+                path_or_buf=i2u_file_path, sep=",", float_format="%.12f", index=False
             )
     # --------------------------------------------------------
     # Write the process control file 'ml_completed'
-    with open(file=os.path.join(data_home, 'ml_completed'), mode='w') as writer:
-        writer.write(f'{time.time(): 0.0f}')
+    with open(file=os.path.join(data_home, "ml_completed"), mode="w") as writer:
+        writer.write(f"{time.time(): 0.0f}")
     print("Done\n\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_modelling_process()

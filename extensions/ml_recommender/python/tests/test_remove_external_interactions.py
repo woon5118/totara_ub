@@ -18,13 +18,16 @@ Please contact [licensing@totaralearning.com] for more information.
 
 import unittest
 from tests.generate_data import GenerateData
+
 from subroutines.remove_external_interactions import RemoveExternalInteractions
 
 
 class TestRemoveExternalInteractions(unittest.TestCase):
     """
-    This class is the test object to test units of the class `RemoveExternalInteractions`
+    This class is the test object to test units of the class
+    `RemoveExternalInteractions`
     """
+
     def setUp(self):
         """
         Hook method for setting up the fixture before exercising it
@@ -37,18 +40,23 @@ class TestRemoveExternalInteractions(unittest.TestCase):
         self.rem_ext_int = RemoveExternalInteractions(
             users_df=self.users_df,
             items_df=self.items_df,
-            interactions_df=interactions_df
+            interactions_df=interactions_df,
         )
 
     def test_clean_interactions(self):
         """
-        This method tests if the users and items from the `interactions_df` have been removed that were not
-        found in the datasets `users_df` and `items_df`, respectively
+        This method tests if the users and items from the `interactions_df` have been
+        removed that were not found in the datasets `users_df` and `items_df`,
+        respectively
         """
         computed_cleaned_interactions = self.rem_ext_int.clean_interactions()
         self.assertTrue(
-            set(computed_cleaned_interactions.user_id.tolist()).issubset(set(self.users_df.index.tolist()))
+            set(computed_cleaned_interactions.user_id.tolist()).issubset(
+                set(self.users_df.index.tolist())
+            )
         )
         self.assertTrue(
-            set(computed_cleaned_interactions.item_id.tolist()).issubset(set(self.items_df.index.tolist()))
+            set(computed_cleaned_interactions.item_id.tolist()).issubset(
+                set(self.items_df.index.tolist())
+            )
         )

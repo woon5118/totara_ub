@@ -204,4 +204,58 @@ class ml_recommender_export_user_interaction_testcase extends advanced_testcase 
             $actual_content
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_export_tenant_with_no_interactions(): void {
+        $generator = self::getDataGenerator();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $article_generator = $this->get_article_generator();
+
+        $tenant = $tenant_generator->create_tenant();
+        $user_one = $generator->create_user(['tenantid' => $tenant->id]);
+        $user_two = $generator->create_user(['tenantid' => $tenant->id]);
+
+        // Log in as user_one and create article.
+        $this->setUser($user_one);
+        $article = $article_generator->create_public_article(['timeview' => time_view::MORE_THAN_TEN]);
+
+        // Log in as user_two and create article.
+        $this->setUser($user_two);
+        $article = $article_generator->create_public_article(['timeview' => time_view::MORE_THAN_TEN]);
+
+        $recommender_generator = $this->get_recommender_generator();
+
+        // Unset the user in session so that we can run the test properly.
+        $this->setUser(null);
+        $csv_file = "{$this->data_path}/file.csv";
+
+        $writer = new writer($csv_file);
+        $export = new user_interactions();
+        $export->set_tenant($tenant);
+
+        $result = $export->export($writer);
+        $writer->close();
+
+        //Verify that the user_interactions file is exported.
+        self::assertTrue(file_exists($csv_file));
+
+        // Verify that the file is not empty.
+        $actual_content = file_get_contents($csv_file);
+        self::assertNotEmpty($actual_content);
+
+        // Check for the presence of headers.
+        self::assertStringContainsString(
+            "user_id,item_id,rating,timestamp",
+            $actual_content
+        );
+
+        // There should be 1 rows from the csv content containing only headers.
+        self::assertEquals(1, substr_count($actual_content, "\n"));
+    }
 }
