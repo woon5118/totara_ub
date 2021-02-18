@@ -306,6 +306,8 @@ function tm_alert_send($eventdata) {
     }
     $eventdata->notification = 1;
 
+    $string_manager = get_string_manager();
+
     if (empty($eventdata->contexturl)) {
         $eventdata->contexturl     = '';
         $eventdata->contexturlname = '';
@@ -314,9 +316,11 @@ function tm_alert_send($eventdata) {
         if ($eventdata->contexturl instanceof moodle_url) {
             $contexturl = $eventdata->contexturl->out();
         }
+
+        $lang = (is_object($eventdata->userto) && !empty($eventdata->userto->lang)) ? $eventdata->userto->lang : null;
         $context_link_html = html_writer::empty_tag('br')
             . html_writer::empty_tag('br')
-            . get_string('viewdetailshere', 'totara_message', $contexturl);
+            . $string_manager->get_string('viewdetailshere', 'totara_message', $contexturl, $lang);
 
         // Don't append the link if it's already appended.
         // This can easily happen if this method is called with the same $eventdata object repeatedly.
@@ -335,8 +339,6 @@ function tm_alert_send($eventdata) {
     // We can't handle attachments when logged on
     $alertemailpref = get_user_preferences('message_provider_totara_message_alert_loggedoff', null, $eventdata->userto->id);
     if ($result && strpos($alertemailpref, 'email') !== false && $eventdata->sendemail == TOTARA_MSG_EMAIL_MANUAL) {
-
-        $string_manager = get_string_manager();
 
         // Send alert email
         if (empty($eventdata->subject)) {
@@ -435,7 +437,10 @@ function tm_task_send($eventdata) {
         $eventdata->contexturlname = '';
     }
     if (!empty($eventdata->contexturl)) {
-        $eventdata->fullmessagehtml .= html_writer::empty_tag('br').html_writer::empty_tag('br').get_string('viewdetailshere', 'totara_message', $eventdata->contexturl);
+        $lang = (is_object($eventdata->userto) && !empty($eventdata->userto->lang)) ? $eventdata->userto->lang : null;
+        $eventdata->fullmessagehtml .= html_writer::empty_tag('br')
+            .html_writer::empty_tag('br')
+            .get_string_manager()->get_string('viewdetailshere', 'totara_message', $eventdata->contexturl, $lang);
     }
 
     $result = tm_message_send($eventdata);
