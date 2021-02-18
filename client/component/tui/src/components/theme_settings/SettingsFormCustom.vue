@@ -147,12 +147,10 @@ export default {
         formcustom_field_customcss: {
           value: '',
           type: 'text',
-          editable: this.customCssEditable,
         },
         formcustom_field_customfooter: {
           value: '',
           type: 'text',
-          editable: this.customFooterEditable,
         },
       },
       initialValuesSet: false,
@@ -270,7 +268,7 @@ export default {
       };
 
       Object.keys(currentValues).forEach(field => {
-        if (!field.editable) return;
+        if (!this.canEditSetting(field)) return;
         data.fields.push({
           name: field,
           type: currentValues[field].type,
