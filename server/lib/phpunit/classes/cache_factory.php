@@ -102,6 +102,9 @@ class phpunit_cache_factory extends cache_factory {
             get_config($plugin->plugin);
         }
 
+        // Prime the hook watchers:
+        \totara_core\hook\manager::phpunit_get_watchers();
+
         // Prime the event observers.
         \core\event\manager::get_all_observers();
 

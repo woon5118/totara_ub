@@ -58,12 +58,6 @@ abstract class manager {
      */
     protected static $allwatchers = null;
 
-    /**
-     * PHPUNIT directive
-     *
-     * @var bool|null|array should we reload watchers after the test?
-     */
-    protected static $reloadaftertest = false;
 
     /**
      * Execute all hook watchers.
@@ -136,7 +130,7 @@ abstract class manager {
             return;
         }
 
-        if (!PHPUNIT_TEST and !during_initial_install()) {
+        if (!during_initial_install()) {
             $cache = \cache::make('totara_core', 'hookwatchers');
             $cached = $cache->get('all');
             $dirroot = $cache->get('dirroot');
@@ -172,7 +166,7 @@ abstract class manager {
 
         self::order_all_watchers();
 
-        if (!PHPUNIT_TEST and !during_initial_install()) {
+        if (!during_initial_install()) {
             $cache->set('all', self::$allwatchers);
             $cache->set('dirroot', $CFG->dirroot);
         }
@@ -249,10 +243,6 @@ abstract class manager {
             throw new \coding_exception('Cannot override hook watchers outside of phpunit tests!');
         }
 
-        if (self::$reloadaftertest === false) {
-            self::$reloadaftertest = self::$allwatchers;
-        }
-
         self::$allwatchers = array();
         self::add_watchers($watchers, 'phpunit');
         self::order_all_watchers();
@@ -273,10 +263,6 @@ abstract class manager {
     public static function phpunit_add_watchers(array $watchers) {
         if (!PHPUNIT_TEST) {
             throw new \coding_exception('Cannot override hook watchers outside of phpunit tests!');
-        }
-
-        if (self::$reloadaftertest === false) {
-            self::$reloadaftertest = self::$allwatchers;
         }
 
         self::add_watchers($watchers, 'phpunit');
@@ -314,9 +300,6 @@ abstract class manager {
         if (!PHPUNIT_TEST) {
             throw new \coding_exception('Cannot reset hook manager outside of phpunit tests!');
         }
-        if (self::$reloadaftertest !== false) {
-            self::$allwatchers = self::$reloadaftertest;
-            self::$reloadaftertest = false;
-        }
+        self::$allwatchers = null;
     }
 }
