@@ -102,6 +102,9 @@ class phpunit_cache_factory extends cache_factory {
             get_config($plugin->plugin);
         }
 
+        // Prime the event observers.
+        \core\event\manager::get_all_observers();
+
         // Cache the GraphQL schema - this will be hit numerous times and can't be changed during a run.
         $method = new ReflectionMethod(\totara_webapi\server::class, 'prepare_schema');
         $method->setAccessible(true);

@@ -52,9 +52,6 @@ class manager {
     /** @var null|array cache of all observers */
     protected static $allobservers = null;
 
-    /** @var bool|null|array should we reload observers after the test? */
-    protected static $reloadaftertest = false;
-
     /**
      * Trigger new event.
      *
@@ -257,7 +254,7 @@ class manager {
             return;
         }
 
-        if (!PHPUNIT_TEST and !during_initial_install()) {
+        if (!during_initial_install()) {
             $cache = \cache::make('core', 'observers');
             $cached = $cache->get('all');
             $dirroot = $cache->get('dirroot');
@@ -294,7 +291,7 @@ class manager {
 
         self::order_all_observers();
 
-        if (!PHPUNIT_TEST and !during_initial_install()) {
+        if (!during_initial_install()) {
             $cache->set('all', self::$allobservers);
             $cache->set('dirroot', $CFG->dirroot);
         }
@@ -399,10 +396,6 @@ class manager {
 
         self::$buffer = array();
         self::$extbuffer = array();
-
-        if (self::$reloadaftertest === false) {
-            self::$reloadaftertest = self::$allobservers;
-        }
         self::$allobservers = array();
 
         self::add_observers($observers, 'phpunit');
@@ -426,9 +419,6 @@ class manager {
         self::$dispatching = false;
         self::$trans_buffers = [];
         self::$trans_name = null;
-        if (self::$reloadaftertest !== false) {
-            self::$allobservers = self::$reloadaftertest;
-            self::$reloadaftertest = false;
-        }
+        self::$allobservers = null;
     }
 }
