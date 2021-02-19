@@ -1,0 +1,128 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD's customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   tui*/
+
+/* This contains the common variable set for form elements,*/
+/* allowing form elements to be consistently styled.*/
+
+/* loosely based on a modular scale of (2 * (1.5 ^ n))*/
+$tui-char-length-scale: 2, 3, 4, 5, 10, 15, 20, 25, 30, 50, 75, 100;
+
+/* Selectors for form inputs (and similar elements) that should have sizes applied to them.*/
+/* If modifying this list in a theme, do it via append() rather than replacing*/
+/* the entire list.*/
+$tui-form-layout-sized-inputs: (
+  'input[type].tui-formInput',
+  '.tui-formField',
+  '.tui-formTextarea',
+  '.tui-inputColor',
+  '.tui-range',
+  '.tui-select'
+);
+
+/* Selectors for inputs that are *replaced elements*.*/
+/* The behavior of width: auto differs for replaced elements, so these are set*/
+/* to width: 100% to get the "grow to container" behavior.*/
+/* https://developer.mozilla.org/en-US/docs/Web/CSS/Replaced_element*/
+/* However, this causes an issue in certain contexts - namely if the container*/
+/* has a margin. This list exists to enable workarounds using flex at the site*/
+/* of use.*/
+/* If modifying this list in a theme, do it via append() rather than replacing*/
+/* the entire list.*/
+$tui-input-replaced-selectors: (
+  'input[type].tui-formInput',
+  '.tui-formTextarea',
+  '.tui-range',
+  '.tui-select'
+);
+
+/* Don't apply the default input size if the element is within one of these*/
+/* selectors.*/
+/* (if it's not within a form, it won't be applied either)*/
+$tui-input-no-default-size-parent-selectors: (
+  /* minor convenience: split input sets should not have the width set, to save*/
+    /* developers from having to pass char-length="full" all the time*/
+    '.tui-inputSet--split'
+);
+
+/* Calculate character-based sizing for inputs.*/
+@function tui-char-length($num) {
+  @return calc(#{$num} * var(--form-input-font-size));
+}
+
+/* Generate sizing class for size*/
+@mixin tui-char-length-class($name, $width) {
+  &--charLength-#{$name} {
+    max-width: #{$width};
+  }
+}
+
+/* Default input sizing*/
+@mixin tui-char-length-class-form-default() {
+  /* Set a custom size for inputs in a limited form*/
+  .tui-form--inputWidth-limited &:not(.tui-input--customSize) {
+    max-width: var(--form-input-limited-width);
+  }
+  @each $sel in $tui-input-no-default-size-parent-selectors {
+    .tui-form--inputWidth-limited #{$sel} &:not(.tui-input--customSize) {
+      max-width: none;
+    }
+  }
+}
+
+/* Generate sizing classes for predefined sizes*/
+@mixin tui-char-length-classes() {
+  @each $size in $tui-char-length-scale {
+    @include tui-char-length-class($size, tui-char-length($size));
+  }
+  @include tui-char-length-class-form-default();
+}
+
+:root {
+  /* Height of single line form elements (including padding & border)*/
+  --form-input-height: 3rem;
+  /* Height of large single line form elements (including padding & border)*/
+  --form-input-height-large: 4rem;
+  /* Inner font size of form elements*/
+  --form-input-font-size: var(--font-size-15);
+  /* Inner font size of form elements*/
+  --form-input-font-size-sm: var(--font-size-13);
+  /* Border size of input elements*/
+  --form-input-border-size: 1px;
+  /* Vertical padding of single line form elements,*/
+  /* the calculation splits the remaining available space to meet the target height.*/
+  /* Must be on a single line otherwise it breaks (for some reason!) so must be ignored by prettier.*/
+  /* prettier-ignore */
+  --form-input-v-padding: calc((var(--form-input-height) - var(--form-input-font-size) - (var(--form-input-border-size) * 2)) / 2);
+  --form-input-invalid-shadow-size: 1px;
+
+  /* Width for "limited" width setting*/
+  --form-input-limited-width: tui-char-length(20);
+
+  /* Simple Notepad style lines, for printing unanswered form inputs.*/
+  --form-notepad-line-height: 3rem;
+  --form-notepad-line-border: solid 1px;
+
+  /* Spacing between elements in an InputSet*/
+  --input-set-spacing: var(--gap-2);
+
+  --char-length-scale: $tui-char-length-scale;
+
+  /* Offset for radio label*/
+  --radio-label-offset: calc(var(--form-radio-size) * 1.35);
+}
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvY29tcG9uZW50L3R1aS9zcmMvZ2xvYmFsX3N0eWxlcy92YXJpYWJsZXMvdHVpX2Zvcm1zLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsImZpbGUiOiJjbGllbnQvY29tcG9uZW50L3R1aS9idWlsZC9nbG9iYWxfc3R5bGVzL3ZhcmlhYmxlcy90dWlfZm9ybXMuZGV2ZWxvcG1lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi8qIFRoaXMgZmlsZSBpcyBwYXJ0IG9mIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMuKi9cbi8qKi9cbi8qIENvcHlyaWdodCAoQykgMjAyMCBvbndhcmRzIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMgTFREKi9cbi8qKi9cbi8qIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMgaXMgcHJvdmlkZWQgb25seSB0byBUb3RhcmEqL1xuLyogTGVhcm5pbmcgU29sdXRpb25zIExURCdzIGN1c3RvbWVycyBhbmQgcGFydG5lcnMsIHB1cnN1YW50IHRvKi9cbi8qIHRoZSB0ZXJtcyBhbmQgY29uZGl0aW9ucyBvZiBhIHNlcGFyYXRlIGFncmVlbWVudCB3aXRoIFRvdGFyYSovXG4vKiBMZWFybmluZyBTb2x1dGlvbnMgTFREIG9yIGl0cyBhZmZpbGlhdGUuKi9cbi8qKi9cbi8qIElmIHlvdSBkbyBub3QgaGF2ZSBhbiBhZ3JlZW1lbnQgd2l0aCBUb3RhcmEgTGVhcm5pbmcgU29sdXRpb25zKi9cbi8qIExURCwgeW91IG1heSBub3QgYWNjZXNzLCB1c2UsIG1vZGlmeSwgb3IgZGlzdHJpYnV0ZSB0aGlzIHNvZnR3YXJlLiovXG4vKiBQbGVhc2UgY29udGFjdCBbbGljZW5zaW5nQHRvdGFyYWxlYXJuaW5nLmNvbV0gZm9yIG1vcmUgaW5mb3JtYXRpb24uKi9cbi8qKi9cbi8qIEBhdXRob3IgICAgS2V2aW4gSG90dGluZ2VyIDxrZXZpbi5ob3R0aW5nZXJAdG90YXJhbGVhcm5pbmcuY29tPiovXG4vKiBAbW9kdWxlIHR1aWNrYWdlICAgdHVpKi9cblxuLyogVGhpcyBjb250YWlucyB0aGUgY29tbW9uIHZhcmlhYmxlIHNldCBmb3IgZm9ybSBlbGVtZW50cywqL1xuLyogYWxsb3dpbmcgZm9ybSBlbGVtZW50cyB0byBiZSBjb25zaXN0ZW50bHkgc3R5bGVkLiovXG5cbi8qIGxvb3NlbHkgYmFzZWQgb24gYSBtb2R1bGFyIHNjYWxlIG9mICgyICogKDEuNSBeIG4pKSovXG4kdHVpLWNoYXItbGVuZ3RoLXNjYWxlOiAyLCAzLCA0LCA1LCAxMCwgMTUsIDIwLCAyNSwgMzAsIDUwLCA3NSwgMTAwO1xuXG4vKiBTZWxlY3RvcnMgZm9yIGZvcm0gaW5wdXRzIChhbmQgc2ltaWxhciBlbGVtZW50cykgdGhhdCBzaG91bGQgaGF2ZSBzaXplcyBhcHBsaWVkIHRvIHRoZW0uKi9cbi8qIElmIG1vZGlmeWluZyB0aGlzIGxpc3QgaW4gYSB0aGVtZSwgZG8gaXQgdmlhIGFwcGVuZCgpIHJhdGhlciB0aGFuIHJlcGxhY2luZyovXG4vKiB0aGUgZW50aXJlIGxpc3QuKi9cbiR0dWktZm9ybS1sYXlvdXQtc2l6ZWQtaW5wdXRzOiAoXG4gICdpbnB1dFt0eXBlXS50dWktZm9ybUlucHV0JyxcbiAgJy50dWktZm9ybUZpZWxkJyxcbiAgJy50dWktZm9ybVRleHRhcmVhJyxcbiAgJy50dWktaW5wdXRDb2xvcicsXG4gICcudHVpLXJhbmdlJyxcbiAgJy50dWktc2VsZWN0J1xuKTtcblxuLyogU2VsZWN0b3JzIGZvciBpbnB1dHMgdGhhdCBhcmUgKnJlcGxhY2VkIGVsZW1lbnRzKi4qL1xuLyogVGhlIGJlaGF2aW9yIG9mIHdpZHRoOiBhdXRvIGRpZmZlcnMgZm9yIHJlcGxhY2VkIGVsZW1lbnRzLCBzbyB0aGVzZSBhcmUgc2V0Ki9cbi8qIHRvIHdpZHRoOiAxMDAlIHRvIGdldCB0aGUgXCJncm93IHRvIGNvbnRhaW5lclwiIGJlaGF2aW9yLiovXG4vKiBodHRwczovL2RldmVsb3Blci5tb3ppbGxhLm9yZy9lbi1VUy9kb2NzL1dlYi9DU1MvUmVwbGFjZWRfZWxlbWVudCovXG4vKiBIb3dldmVyLCB0aGlzIGNhdXNlcyBhbiBpc3N1ZSBpbiBjZXJ0YWluIGNvbnRleHRzIC0gbmFtZWx5IGlmIHRoZSBjb250YWluZXIqL1xuLyogaGFzIGEgbWFyZ2luLiBUaGlzIGxpc3QgZXhpc3RzIHRvIGVuYWJsZSB3b3JrYXJvdW5kcyB1c2luZyBmbGV4IGF0IHRoZSBzaXRlKi9cbi8qIG9mIHVzZS4qL1xuLyogSWYgbW9kaWZ5aW5nIHRoaXMgbGlzdCBpbiBhIHRoZW1lLCBkbyBpdCB2aWEgYXBwZW5kKCkgcmF0aGVyIHRoYW4gcmVwbGFjaW5nKi9cbi8qIHRoZSBlbnRpcmUgbGlzdC4qL1xuJHR1aS1pbnB1dC1yZXBsYWNlZC1zZWxlY3RvcnM6IChcbiAgJ2lucHV0W3R5cGVdLnR1aS1mb3JtSW5wdXQnLFxuICAnLnR1aS1mb3JtVGV4dGFyZWEnLFxuICAnLnR1aS1yYW5nZScsXG4gICcudHVpLXNlbGVjdCdcbik7XG5cbi8qIERvbid0IGFwcGx5IHRoZSBkZWZhdWx0IGlucHV0IHNpemUgaWYgdGhlIGVsZW1lbnQgaXMgd2l0aGluIG9uZSBvZiB0aGVzZSovXG4vKiBzZWxlY3RvcnMuKi9cbi8qIChpZiBpdCdzIG5vdCB3aXRoaW4gYSBmb3JtLCBpdCB3b24ndCBiZSBhcHBsaWVkIGVpdGhlcikqL1xuJHR1aS1pbnB1dC1uby1kZWZhdWx0LXNpemUtcGFyZW50LXNlbGVjdG9yczogKFxuICAvKiBtaW5vciBjb252ZW5pZW5jZTogc3BsaXQgaW5wdXQgc2V0cyBzaG91bGQgbm90IGhhdmUgdGhlIHdpZHRoIHNldCwgdG8gc2F2ZSovXG4gICAgLyogZGV2ZWxvcGVycyBmcm9tIGhhdmluZyB0byBwYXNzIGNoYXItbGVuZ3RoPVwiZnVsbFwiIGFsbCB0aGUgdGltZSovXG4gICAgJy50dWktaW5wdXRTZXQtLXNwbGl0J1xuKTtcblxuLyogQ2FsY3VsYXRlIGNoYXJhY3Rlci1iYXNlZCBzaXppbmcgZm9yIGlucHV0cy4qL1xuQGZ1bmN0aW9uIHR1aS1jaGFyLWxlbmd0aCgkbnVtKSB7XG4gIEByZXR1cm4gY2FsYygjeyRudW19ICogdmFyKC0tZm9ybS1pbnB1dC1mb250LXNpemUpKTtcbn1cblxuLyogR2VuZXJhdGUgc2l6aW5nIGNsYXNzIGZvciBzaXplKi9cbkBtaXhpbiB0dWktY2hhci1sZW5ndGgtY2xhc3MoJG5hbWUsICR3aWR0aCkge1xuICAmLS1jaGFyTGVuZ3RoLSN7JG5hbWV9IHtcbiAgICBtYXgtd2lkdGg6ICN7JHdpZHRofTtcbiAgfVxufVxuXG4vKiBEZWZhdWx0IGlucHV0IHNpemluZyovXG5AbWl4aW4gdHVpLWNoYXItbGVuZ3RoLWNsYXNzLWZvcm0tZGVmYXVsdCgpIHtcbiAgLyogU2V0IGEgY3VzdG9tIHNpemUgZm9yIGlucHV0cyBpbiBhIGxpbWl0ZWQgZm9ybSovXG4gIC50dWktZm9ybS0taW5wdXRXaWR0aC1saW1pdGVkICY6bm90KC50dWktaW5wdXQtLWN1c3RvbVNpemUpIHtcbiAgICBtYXgtd2lkdGg6IHZhcigtLWZvcm0taW5wdXQtbGltaXRlZC13aWR0aCk7XG4gIH1cbiAgQGVhY2ggJHNlbCBpbiAkdHVpLWlucHV0LW5vLWRlZmF1bHQtc2l6ZS1wYXJlbnQtc2VsZWN0b3JzIHtcbiAgICAudHVpLWZvcm0tLWlucHV0V2lkdGgtbGltaXRlZCAjeyRzZWx9ICY6bm90KC50dWktaW5wdXQtLWN1c3RvbVNpemUpIHtcbiAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICB9XG4gIH1cbn1cblxuLyogR2VuZXJhdGUgc2l6aW5nIGNsYXNzZXMgZm9yIHByZWRlZmluZWQgc2l6ZXMqL1xuQG1peGluIHR1aS1jaGFyLWxlbmd0aC1jbGFzc2VzKCkge1xuICBAZWFjaCAkc2l6ZSBpbiAkdHVpLWNoYXItbGVuZ3RoLXNjYWxlIHtcbiAgICBAaW5jbHVkZSB0dWktY2hhci1sZW5ndGgtY2xhc3MoJHNpemUsIHR1aS1jaGFyLWxlbmd0aCgkc2l6ZSkpO1xuICB9XG4gIEBpbmNsdWRlIHR1aS1jaGFyLWxlbmd0aC1jbGFzcy1mb3JtLWRlZmF1bHQoKTtcbn1cblxuOnJvb3Qge1xuICAvKiBIZWlnaHQgb2Ygc2luZ2xlIGxpbmUgZm9ybSBlbGVtZW50cyAoaW5jbHVkaW5nIHBhZGRpbmcgJiBib3JkZXIpKi9cbiAgLS1mb3JtLWlucHV0LWhlaWdodDogM3JlbTtcbiAgLyogSGVpZ2h0IG9mIGxhcmdlIHNpbmdsZSBsaW5lIGZvcm0gZWxlbWVudHMgKGluY2x1ZGluZyBwYWRkaW5nICYgYm9yZGVyKSovXG4gIC0tZm9ybS1pbnB1dC1oZWlnaHQtbGFyZ2U6IDRyZW07XG4gIC8qIElubmVyIGZvbnQgc2l6ZSBvZiBmb3JtIGVsZW1lbnRzKi9cbiAgLS1mb3JtLWlucHV0LWZvbnQtc2l6ZTogdmFyKC0tZm9udC1zaXplLTE1KTtcbiAgLyogSW5uZXIgZm9udCBzaXplIG9mIGZvcm0gZWxlbWVudHMqL1xuICAtLWZvcm0taW5wdXQtZm9udC1zaXplLXNtOiB2YXIoLS1mb250LXNpemUtMTMpO1xuICAvKiBCb3JkZXIgc2l6ZSBvZiBpbnB1dCBlbGVtZW50cyovXG4gIC0tZm9ybS1pbnB1dC1ib3JkZXItc2l6ZTogMXB4O1xuICAvKiBWZXJ0aWNhbCBwYWRkaW5nIG9mIHNpbmdsZSBsaW5lIGZvcm0gZWxlbWVudHMsKi9cbiAgLyogdGhlIGNhbGN1bGF0aW9uIHNwbGl0cyB0aGUgcmVtYWluaW5nIGF2YWlsYWJsZSBzcGFjZSB0byBtZWV0IHRoZSB0YXJnZXQgaGVpZ2h0LiovXG4gIC8qIE11c3QgYmUgb24gYSBzaW5nbGUgbGluZSBvdGhlcndpc2UgaXQgYnJlYWtzIChmb3Igc29tZSByZWFzb24hKSBzbyBtdXN0IGJlIGlnbm9yZWQgYnkgcHJldHRpZXIuKi9cbiAgLyogcHJldHRpZXItaWdub3JlICovXG4gIC0tZm9ybS1pbnB1dC12LXBhZGRpbmc6IGNhbGMoKHZhcigtLWZvcm0taW5wdXQtaGVpZ2h0KSAtIHZhcigtLWZvcm0taW5wdXQtZm9udC1zaXplKSAtICh2YXIoLS1mb3JtLWlucHV0LWJvcmRlci1zaXplKSAqIDIpKSAvIDIpO1xuICAtLWZvcm0taW5wdXQtaW52YWxpZC1zaGFkb3ctc2l6ZTogMXB4O1xuXG4gIC8qIFdpZHRoIGZvciBcImxpbWl0ZWRcIiB3aWR0aCBzZXR0aW5nKi9cbiAgLS1mb3JtLWlucHV0LWxpbWl0ZWQtd2lkdGg6IHR1aS1jaGFyLWxlbmd0aCgyMCk7XG5cbiAgLyogU2ltcGxlIE5vdGVwYWQgc3R5bGUgbGluZXMsIGZvciBwcmludGluZyB1bmFuc3dlcmVkIGZvcm0gaW5wdXRzLiovXG4gIC0tZm9ybS1ub3RlcGFkLWxpbmUtaGVpZ2h0OiAzcmVtO1xuICAtLWZvcm0tbm90ZXBhZC1saW5lLWJvcmRlcjogc29saWQgMXB4O1xuXG4gIC8qIFNwYWNpbmcgYmV0d2VlbiBlbGVtZW50cyBpbiBhbiBJbnB1dFNldCovXG4gIC0taW5wdXQtc2V0LXNwYWNpbmc6IHZhcigtLWdhcC0yKTtcblxuICAtLWNoYXItbGVuZ3RoLXNjYWxlOiAkdHVpLWNoYXItbGVuZ3RoLXNjYWxlO1xuXG4gIC8qIE9mZnNldCBmb3IgcmFkaW8gbGFiZWwqL1xuICAtLXJhZGlvLWxhYmVsLW9mZnNldDogY2FsYyh2YXIoLS1mb3JtLXJhZGlvLXNpemUpICogMS4zNSk7XG59XG4iXSwic291cmNlUm9vdCI6IiJ9

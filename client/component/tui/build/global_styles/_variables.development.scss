@@ -1,0 +1,36 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD's customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   tui*/
+
+/* Import all common theme variables*/
+@import 'tui/variables/tui_sizes';
+@import 'tui/variables/tui_spacing';
+@import 'tui/variables/tui_borders';
+@import 'tui/variables/tui_buttons';
+@import 'tui/variables/tui_colors';
+@import 'tui/variables/tui_shadows';
+@import 'tui/variables/tui_side_panel_nav';
+@import 'tui/variables/tui_layout';
+@import 'tui/variables/tui_breakpoints';
+@import 'tui/variables/tui_animations';
+@import 'tui/variables/tui_mixins';
+@import 'tui/variables/tui_modals';
+@import 'tui/variables/tui_forms';
+@import 'tui/variables/tui_tags';
+@import 'tui/variables/tui_typography';
+@import 'tui/variables/tui_zindex';
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvY29tcG9uZW50L3R1aS9zcmMvZ2xvYmFsX3N0eWxlcy9fdmFyaWFibGVzLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBIiwiZmlsZSI6ImNsaWVudC9jb21wb25lbnQvdHVpL2J1aWxkL2dsb2JhbF9zdHlsZXMvX3ZhcmlhYmxlcy5kZXZlbG9wbWVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLyogVGhpcyBmaWxlIGlzIHBhcnQgb2YgVG90YXJhIEVudGVycHJpc2UgRXh0ZW5zaW9ucy4qL1xuLyoqL1xuLyogQ29weXJpZ2h0IChDKSAyMDIwIG9ud2FyZHMgVG90YXJhIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQqL1xuLyoqL1xuLyogVG90YXJhIEVudGVycHJpc2UgRXh0ZW5zaW9ucyBpcyBwcm92aWRlZCBvbmx5IHRvIFRvdGFyYSovXG4vKiBMZWFybmluZyBTb2x1dGlvbnMgTFREJ3MgY3VzdG9tZXJzIGFuZCBwYXJ0bmVycywgcHVyc3VhbnQgdG8qL1xuLyogdGhlIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIGEgc2VwYXJhdGUgYWdyZWVtZW50IHdpdGggVG90YXJhKi9cbi8qIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQgb3IgaXRzIGFmZmlsaWF0ZS4qL1xuLyoqL1xuLyogSWYgeW91IGRvIG5vdCBoYXZlIGFuIGFncmVlbWVudCB3aXRoIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMqL1xuLyogTFRELCB5b3UgbWF5IG5vdCBhY2Nlc3MsIHVzZSwgbW9kaWZ5LCBvciBkaXN0cmlidXRlIHRoaXMgc29mdHdhcmUuKi9cbi8qIFBsZWFzZSBjb250YWN0IFtsaWNlbnNpbmdAdG90YXJhbGVhcm5pbmcuY29tXSBmb3IgbW9yZSBpbmZvcm1hdGlvbi4qL1xuLyoqL1xuLyogQGF1dGhvciAgICBLZXZpbiBIb3R0aW5nZXIgPGtldmluLmhvdHRpbmdlckB0b3RhcmFsZWFybmluZy5jb20+Ki9cbi8qIEBtb2R1bGUgdHVpY2thZ2UgICB0dWkqL1xuXG4vKiBJbXBvcnQgYWxsIGNvbW1vbiB0aGVtZSB2YXJpYWJsZXMqL1xuQGltcG9ydCAndHVpL3ZhcmlhYmxlcy90dWlfc2l6ZXMnO1xuQGltcG9ydCAndHVpL3ZhcmlhYmxlcy90dWlfc3BhY2luZyc7XG5AaW1wb3J0ICd0dWkvdmFyaWFibGVzL3R1aV9ib3JkZXJzJztcbkBpbXBvcnQgJ3R1aS92YXJpYWJsZXMvdHVpX2J1dHRvbnMnO1xuQGltcG9ydCAndHVpL3ZhcmlhYmxlcy90dWlfY29sb3JzJztcbkBpbXBvcnQgJ3R1aS92YXJpYWJsZXMvdHVpX3NoYWRvd3MnO1xuQGltcG9ydCAndHVpL3ZhcmlhYmxlcy90dWlfc2lkZV9wYW5lbF9uYXYnO1xuQGltcG9ydCAndHVpL3ZhcmlhYmxlcy90dWlfbGF5b3V0JztcbkBpbXBvcnQgJ3R1aS92YXJpYWJsZXMvdHVpX2JyZWFrcG9pbnRzJztcbkBpbXBvcnQgJ3R1aS92YXJpYWJsZXMvdHVpX2FuaW1hdGlvbnMnO1xuQGltcG9ydCAndHVpL3ZhcmlhYmxlcy90dWlfbWl4aW5zJztcbkBpbXBvcnQgJ3R1aS92YXJpYWJsZXMvdHVpX21vZGFscyc7XG5AaW1wb3J0ICd0dWkvdmFyaWFibGVzL3R1aV9mb3Jtcyc7XG5AaW1wb3J0ICd0dWkvdmFyaWFibGVzL3R1aV90YWdzJztcbkBpbXBvcnQgJ3R1aS92YXJpYWJsZXMvdHVpX3R5cG9ncmFwaHknO1xuQGltcG9ydCAndHVpL3ZhcmlhYmxlcy90dWlfemluZGV4JztcbiJdLCJzb3VyY2VSb290IjoiIn0=
