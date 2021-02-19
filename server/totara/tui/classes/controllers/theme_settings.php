@@ -30,14 +30,12 @@
 
 namespace totara_tui\controllers;
 
-use coding_exception;
 use context;
 use moodle_url;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
 use totara_tenant\entity\tenant;
 use core\theme\settings as core_theme_settings;
-use totara_tui\local\theme_config;
 
 
 class theme_settings extends controller {
@@ -74,16 +72,6 @@ class theme_settings extends controller {
         // Get the theme name from parameter.
         $this->theme = $this->get_required_param('theme_name', PARAM_COMPONENT);
         $this->tenant_id = $this->get_optional_param('tenant_id', null, PARAM_INT);
-
-        // Load theme config and confirm that this theme supports TUI theme settings.
-        $theme_config = theme_config::load($this->theme);
-        if (!$theme_config->use_tui_theme_settings) {
-            $line = '$THEME->use_tui_theme_settings = true';
-            throw new coding_exception(
-                'TUI theme settings is not enabled for current theme. '
-                . "Add '{$line}' in current theme's config.php if the theme uses TUI theme settings."
-            );
-        }
 
         require_login(null, false);
         $url = new moodle_url('/totara/tui/theme_settings.php', ['theme_name' => $this->theme]);

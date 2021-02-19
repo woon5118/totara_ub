@@ -1357,28 +1357,6 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertStringNotContainsString('background-color: #99ac3a;', $body);
     }
 
-    public function test_theme_not_using_tui_theme_settings() {
-        $this->setAdminUser();
-
-        // Ventura should have categories and files.
-        $theme_config = \theme_config::load('ventura');
-        $theme_settings = new settings($theme_config, 0);
-
-        $categories = $theme_settings->get_categories();
-        $this->assertCount(2, $categories);
-        $files = $theme_settings->get_files();
-        $this->assertCount(9, $files);
-
-        // Basis should not have any categories or files.
-        $theme_config = \theme_config::load('basis');
-        $theme_settings = new settings($theme_config, 0);
-
-        $categories = $theme_settings->get_categories();
-        $this->assertCount(0, $categories);
-        $files = $theme_settings->get_files();
-        $this->assertCount(0, $files);
-    }
-
     private function skip_if_build_not_present() {
         if (!file_exists(bundle::get_vendors_file())) {
             $this->markTestSkipped('Tui build files must exist for this test to complete.');
