@@ -247,7 +247,6 @@ Feature: Search pre-defined rooms in seminar
       | ÖrebroÄ    |
       | Южная      |
       | Желтая     |
-      | Straße     |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 2 | C2        | 0        |
@@ -275,7 +274,3 @@ Feature: Search pre-defined rooms in seminar
 
     When I search for "желтая" in the "Choose rooms" totara dialogue
     Then I should see "Желтая"
-
-    When I search for "STRASSE" in the "Choose rooms" totara dialogue
-    Then I should see "Straße"
-
