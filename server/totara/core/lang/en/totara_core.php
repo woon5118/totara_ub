@@ -808,7 +808,7 @@ $string['totaracopyright'] = '<p>Copyright &copy; 2010 onwards, Totara Learning 
 $string['totaracopyrightacknowledge'] = '<p>{$a} utilises the following copyrighted material:</p>';
 $string['totaracore'] = 'Totara core';
 $string['totarafeatures'] = 'Totara features';
-$string['totaralearn'] = 'Totara Learn';
+$string['totaralearn'] = 'Totara Talent Experience Platform';
 $string['totaralearnlink'] = '<a href="{$a->url}">{$a->totaralearn}</a>';
 $string['totaralogin'] = 'Totara Login';
 $string['totaralogo'] = 'Totara Logo';
