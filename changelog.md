@@ -1,3 +1,207 @@
+Release 13.5 (24th February 2021):
+==================================
+
+
+Security issues:
+
+    TL-29223       Added sanitisation and filtering to customfield textarea output
+
+                   As part of an investigation into filtering of other custom field types, we
+                   discovered that textarea custom field values were not being correctly
+                   sanitised for output, and filtering (for example Multi-Language filtering)
+                   was not being applied.
+
+                   User-submitted textarea values were sanitised on input, so it would be
+                   difficult for users to exploit this bug for cross-site scripting without
+                   access to the database.
+
+                   Textarea custom field values are now being sanitised and filtered on
+                   output.
+
+New features:
+
+    TL-29235       Modified the recommender engine to use user profile data
+
+Performance improvements:
+
+    TL-29347       Improved performance of get_records_menu function
+
+                   The get_records_menu function was calling array_shift a huge number of
+                   times. All the _menu dml functions have be re-written to be more efficient.
+
+    TL-29351       Added static cache to improve performance of the normalize_component function
+    TL-29353       Improved performance of fix_table_names in Database Layer functions
+
+                   This patch makes an improvement to a core function in the database layer to
+                   reduce the number of expensive function calls.
+
+Improvements:
+
+    TL-11308       Added an aria-label attribute when setting link type to a course for a legacy competency
+    TL-26729       Fixed Tui Modals so they now check for accessible models on every title change
+    TL-28814       Moved Torara course completion import to an adhoc task
+
+                   As part of this change a new 'Processed' column has been added to the
+                   'Completion import: Certification status' and 'Completion import: Course
+                   status' embedded reports. On upgrade, this will need to be manually added
+                   or the report restored to default settings for it to show.
+
+    TL-28971       Added Course completion status column to the Record of Learning: Courses report source
+    TL-28978       Improved accessibility of admin menu settings page
+    TL-29019       Added client-side validation when adding virtual rooms to a seminar session
+    TL-29202       Added a discovery call to Zoom virtual meeting plugin so that it only attempts a meeting update if the date and/or duration have actually changed
+    TL-29205       Improved location of 'expand all' and 'collapse all' links when using expanding course topics
+    TL-29354       Changed is_numeric() to is_number() in normalise_limit_from_num() database layer function
+
+                   A debugdeveloper notice will be generated if whole numbers are not used.
+
+    TL-29377       Included an upload transcript button on audio file block
+
+                   "Upload transcript" button appears on the weka audio file block when
+                   uploaded only for the first time.
+
+    TL-29422       Created a new notification when a new discussion is posted in the workspace
+
+                   Workspace members will now receive a notifications when a new discussion is
+                   posted in the workspace
+
+    TL-29430       Converted reset tour link to a button to improve accessibility
+    TL-29561       Improved alignment of topics with long names and collapsible topics
+    TL-29563       Removed incorrect direct use of phpunit_util from tests
+
+Bug fixes:
+
+    TL-27159       Added the ability for the mobile plugin to remove rejected push notification tokens
+
+                   Previously if AirNotifier rejected a push notification's token because
+                   Google Firebase Cloud Messaging reported it as being invalid, the error was
+                   ignored.
+
+                   Now it is logged, and the invalid token is removed from any devices using
+                   it.
+
+    TL-28418       Fixed unread message count badge on Totara Mobile iOS app when using push notifications
+    TL-28472       Fixed theme settings not applying on Edge Legacy
+    TL-28765       Fixed memory limit exceeded when loading performance activities with a large number of section elements
+    TL-28942       Improved accessibility of course topics format
+    TL-28962       Fixed competency criteria aggregation allowing 0 required items
+    TL-28997       Fixed filtering of location custom field values
+
+                   Previously, location custom field values were filtered on input. When the
+                   Multi-Language filter was enabled, this resulted in a Multi-Language value
+                   being saved in the user's current language only, while values in other
+                   languages were lost.
+
+                   This has been fixed, and new Multi-Language values in location custom
+                   fields will work as expected for users viewing the value in other
+                   languages.
+
+    TL-29052       Fixed email mustache template to use colours from theme settings
+    TL-29153       Fixed theme settings capability issue during site upgrade
+
+                   During site upgrade, using the web interface and upgrading from versions
+                   earlier than 13.0, debug messages are thrown in the error logs and the HTTP
+                   request for styles might fail because of a capability check for a
+                   capability that might not be installed yet.
+
+    TL-29221       Indicated user's preferred language when making Microsoft Graph API calls
+
+                   This patch forwards the user's language when creating MS Teams virtual
+                   meeting rooms, so that the resulting room info, which is generated by the
+                   Graph API, is in the room creator's language.
+
+    TL-29323       Fixed theme settings to use theme assigned to user instead of theme defined in config
+    TL-29368       Stopped an 'Unsaved changes' message when saving a form after uploading files via an atto editor
+    TL-29384       Hook added to extend list of categories with CSS variables in theme settings
+
+                   Clients can now use the hook \core\hook\theme_settings_css_categories to
+                   extend the list of categories in theme settings that contains CSS variable
+                   settings
+
+    TL-29391       Fixed the ability to use a default category
+
+                   Since we added new hidden system categories in Totara 13.0 it has been
+                   possible to enter a broken state by deleting the default "Miscellaneous"
+                   category, in some cases this would lead to the system categories being used
+                   as defaults. This caused several issues, the most notable of which is the
+                   create course/program/certification forms would be broken. We've rectified
+                   the issue by setting the default category to a non-system category,
+                   recreating "Miscellaneous" if necessary. And making sure that system
+                   categories are not used by default.
+
+    TL-29392       Fixed an issue with Microsoft Teams where the 'tap area' of a card was preventing contents being inserted via the messaging extension
+
+                   The tap area has been replaced by a button matching the catalogue details,
+                   'View' or 'Go to'
+
+    TL-29393       Added missing admin_externalpage_setup() to scheduledtasks.php
+    TL-29406       Fixed badge notifications created with Weka editor displaying as JSON code
+    TL-29409       Added missing language strings for recent versions of Totara Mobile app
+
+                   Several new language strings were added to the Totara Mobile app since the
+                   release of Totara 13, but not added to Totara and AMOS to be translated.
+                   These have now been added and will be available in the translation and
+                   language string customisation systems.
+
+    TL-29415       Fixed virtual meeting information display on seminar room details page
+
+                   Several fixes have been made to the virtual meeting information card:
+                    * Made card visible to managers approving booking requests
+                    * Prevented showing the card to learners when they should not see virtual
+                      meeting information
+                    * Hid the 'Host meeting' button from non-owners as only the meeting owner
+                      can access the host URL
+                    * Fixed some accessibility issues
+
+    TL-29417       Fixed inconsistent filtering of custom field text values
+
+                   As part of an investigation into filtering of other custom field types, we
+                   discovered that filtering (for example multilang filtering) was being
+                   applied to text custom field values when displayed in report builder, but
+                   not in other areas.
+
+                   Text custom field values are now consistently formatted for display.
+
+    TL-29429       Fixed memory issues and improved performance of evidence migration
+    TL-29431       Fixed 'Number of Attendees' report builder column for seminar event report
+    TL-29433       Fixed 'Can not find data record in database' error when seminar virtualmeeting room was used
+    TL-29434       Fixed 'Booking status' report builder column for seminar event report
+    TL-29436       Fixed theme_config loading issues in theme settings
+    TL-29443       Fixed a redirection problem of the Find learning tab on Microsoft Teams
+    TL-29444       Fixed rendering of graphs when exporting reports to PDF
+    TL-29445       Fixed redirection to home page after adding missing required profile data when user logs in via OAuth 2
+    TL-29446       Added custom CSS and log in image to tenant-customisable theme config
+    TL-29464       Fixed upgrade step issue when creating Learning Plan assignment types for Programs introduced via TL-24703
+    TL-29465       Fixed a typo for seminar manager approval help string
+    TL-29560       Fixed caseless searching of seminar room, asset, and facilitator dialogs when non-ascii characters are used
+    TL-29562       Ensured the learner is returned to the course when using guest enrolment
+    TL-29576       Fixed the display of questions in a quiz activity for the Basis theme
+    TL-29583       Fixed missing aria-label when adding new groups on admin menu settings page
+    TL-29609       Fixed breadcrumbs on the certification details page
+    TL-29610       Fixed missing escaping of table names in ORM has_many_through and has_one_through relations
+    TL-29618       Fixed incorrect event observers and hook watchers reset in PHPUnit tests
+    TL-29619       Updated link to event page in seminar notification for virtual meeting creation failure
+
+                   This patch contains an upgrade step which replaces the
+                   '[session:room:link]' placeholder in the global 'Virtual meeting creation
+                   failure' notification template with '[seminareventdetailslink]', and also
+                   updates the placeholder in any seminar activity notifications linked to
+                   that template. If you have customised the 'Virtual meeting creation
+                   failure' notification in any seminar activities, we recommend replacing the
+                   placeholder by hand.
+
+    TL-29625       Added inline documentation to explain the purpose of, and ensured that $PAGE->context is set for, the server error page.
+    TL-29635       Ensured that the correct method to detect whether tags are enabled is used in modedit.php
+
+API changes:
+
+    TL-29345       Updated PHPUnit to prime and store the GraphQL schema cache between tests
+
+Contributions:
+
+    * Russell England - Kineo USA - TL-29635
+
+
 Release 13.4 (26th January 2021):
 =================================
 
