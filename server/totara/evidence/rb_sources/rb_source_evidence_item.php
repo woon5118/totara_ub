@@ -181,6 +181,7 @@ class rb_source_evidence_item extends rb_base_source {
                 get_string('name', 'rb_source_evidence_item'),
                 'base.name',
                 [
+                    'joins' => 'type',
                     'displayfunc' => 'evidence_item_name',
                     'extrafields' => [
                         'item_id' => 'base.id',
