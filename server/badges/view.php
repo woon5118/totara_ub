@@ -89,6 +89,9 @@ $PAGE->set_title($title);
 $output = $PAGE->get_renderer('core', 'badges');
 
 echo $output->header();
+if ($course && $course->startdate > time()) {
+    echo $OUTPUT->notification(get_string('error:notifycoursedate', 'badges'), 'info');
+}
 echo $OUTPUT->heading($title);
 
 $totalcount = count(badges_get_badges($type, $courseid, '', '', 0, 0, $USER->id));
@@ -96,10 +99,6 @@ $records = badges_get_badges($type, $courseid, $sortby, $sorthow, $page, BADGE_P
 
 if ($totalcount) {
     echo html_writer::tag('p', get_string('badgestoearn', 'badges', $totalcount));
-
-    if ($course && $course->startdate > time()) {
-        echo $OUTPUT->box(get_string('error:notifycoursedate', 'badges'), 'generalbox notifyproblem');
-    }
 
     $badges             = new \core_badges\output\badge_collection($records);
     $badges->sort       = $sortby;

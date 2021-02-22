@@ -161,6 +161,9 @@ if ($deactivate && has_capability('moodle/badges:configuredetails', $PAGE->conte
 }
 
 echo $OUTPUT->header();
+if ($course && $course->startdate > time()) {
+    echo $OUTPUT->notification(get_string('error:notifycoursedate', 'badges'), 'info');
+}
 if ($type == BADGE_TYPE_SITE) {
     echo $OUTPUT->heading_with_help($PAGE->heading, 'sitebadges', 'badges');
 } else {
@@ -172,10 +175,6 @@ $records = badges_get_badges($type, $courseid, $sortby, $sorthow, $page, BADGE_P
 
 if ($totalcount) {
     echo html_writer::tag('p', get_string('badgestoearn', 'badges', $totalcount));
-
-    if ($course && $course->startdate > time()) {
-        echo $OUTPUT->box(get_string('error:notifycoursedate', 'badges'), 'generalbox notifyproblem');
-    }
 
     if ($err !== '') {
         echo $OUTPUT->notification($err, 'notifyproblem');
