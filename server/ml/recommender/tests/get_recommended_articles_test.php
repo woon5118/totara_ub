@@ -237,12 +237,13 @@ class ml_recommender_get_recommended_articles_testcase extends advanced_testcase
         $article = current($result->data['articles']);
         $this->assertSame('Tenant 1 Recommended', $article['name']);
 
-        // User 4 should be see nothing
+        // User 4 should see nothing
         $this->setUser($user4);
         $ec = execution_context::create('ajax', 'ml_recommender_get_recommended_articles');
         $parameters = [
             'article_id' => $base_article->get_id(),
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->errors);
