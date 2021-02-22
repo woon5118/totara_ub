@@ -22,56 +22,53 @@ from pathlib import Path
 
 class ArgParser:
     """
-    This is a conceptual representation of setting up the commandline arguments required
-    to run the recommender engine
+    This is a conceptual representation of setting up the commandline arguments required to run the
+    recommender engine
     """
-
     def __init__(self):
         """
         The constructor method
         """
-        self.parser = argparse.ArgumentParser(
-            description="Totara Engage recommendations"
-        )
+        self.parser = argparse.ArgumentParser(description="Totara Engage recommendations")
 
     def set_args(self):
         """
-        This method sets up the required commandline arguments with the correct type and
-        defaults, etc.
-        :return: An object of the `argparse.ArgumentParser` class with defined
-            command-line named arguments
+        This method sets up the required commandline arguments with the correct type and defaults, etc.
+        :return: An object of the `argparse.ArgumentParser` class with defined command-line named arguments
         :rtype: An object of the `argparse.ArgumentParser` class
         """
         the_parser = self.parser
         the_parser.add_argument(
-            "--query",
-            help="""
-                The type of query to run (mf = matrix factorisation, partial = matrix
-                factorisation & item metadata, hybrid = matrix factorisation &
-                content-filtering
-                """,
+            '--query',
+            help='''
+                The type of query to run (mf = matrix factorisation, partial = matrix factorisation &
+                item metadata, hybrid = matrix factorisation & content-filtering
+                ''',
             required=True,
-            choices=["mf", "partial", "hybrid"],
+            choices=['mf', 'partial', 'hybrid']
         )
         the_parser.add_argument(
-            "--result_count_user",
-            help="Number of items-to-user recommendations to return",
+            '--result_count_user',
+            help='Number of items-to-user recommendations to return',
             required=True,
-            type=int,
+            type=int
         )
         the_parser.add_argument(
-            "--result_count_item",
-            help="Number of items-to-item recommendations to return",
+            '--result_count_item',
+            help='Number of items-to-item recommendations to return',
             required=True,
-            type=int,
+            type=int
         )
         the_parser.add_argument(
-            "--threads",
-            help="Number of parallel threads to use (should be <= physical cores)",
+            '--threads',
+            help='Number of parallel threads to use (should be <= physical cores)',
             required=True,
-            type=int,
+            type=int
         )
         the_parser.add_argument(
-            "--data_path", help="Path to data directory", required=True, type=Path
+            '--data_path',
+            help='Path to data directory',
+            required=True,
+            type=Path
         )
         return the_parser

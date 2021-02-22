@@ -41,16 +41,16 @@ class user_data extends export {
      * @return bool
      */
     public function export(writer $writer): bool {
+        $recordset = $this->get_export_recordset();
+        if (!$recordset->valid()) {
+            return false;
+        }
+
         // Column headings for csv file.
         $writer->add_headings([
             'user_id',
             'lang',
         ]);
-
-        $recordset = $this->get_export_recordset();
-        if (!$recordset->valid()) {
-            return false;
-        }
 
         foreach ($recordset as $user) {
             // Create CSV record.

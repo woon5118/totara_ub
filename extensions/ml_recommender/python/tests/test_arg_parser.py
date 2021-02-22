@@ -18,7 +18,6 @@ Please contact [licensing@totaralearning.com] for more information.
 
 import unittest
 from pathlib import Path
-
 from subroutines.arg_parser import ArgParser
 
 
@@ -26,7 +25,6 @@ class TestArgParser(unittest.TestCase):
     """
     The test object to tests units of the `ArgParser` class
     """
-
     def setUp(self):
         """
         Hook method for setting up the test fixture before exercising it
@@ -38,118 +36,74 @@ class TestArgParser(unittest.TestCase):
         """
         This method tests if the command line argument `--query` is configured properly
         """
-        valid_query = ["mf", "partial", "hybrid"]
+        valid_query = ['mf', 'partial', 'hybrid']
         for q in valid_query:
             args = self.parser.parse_args(
                 [
-                    "--query",
-                    q,
-                    "--result_count_user",
-                    "10",
-                    "--result_count_item",
-                    "10",
-                    "--threads",
-                    "2",
-                    "--data_path",
-                    "/data",
+                    '--query', q, '--result_count_user', '10',
+                    '--result_count_item', '10', '--threads', '2',
+                    '--data_path', '/data'
                 ]
             )
             self.assertEqual(args.query, q)
-        invalid_query = ["10", "other"]
+        invalid_query = ['10', 'other']
         for q in invalid_query:
             with self.assertRaises(SystemExit):
                 self.parser.parse_args(
                     [
-                        "--query",
-                        q,
-                        "--result_count_user",
-                        "10",
-                        "--result_count_item",
-                        "10",
-                        "--threads",
-                        "2",
-                        "--data_path",
-                        "/data",
+                        '--query', q, '--result_count_user', '10',
+                        '--result_count_item', '10', '--threads', '2',
+                        '--data_path', '/data'
                     ]
                 )
 
     def test_user_counter(self):
         """
-        This method tests if the command line argument `--result_count_user` is
-        configured properly
+        This method tests if the command line argument `--result_count_user` is configured properly
         """
-        valid_user_counter = ["10", "100"]
+        valid_user_counter = ['10', '100']
         for user in valid_user_counter:
             args = self.parser.parse_args(
                 [
-                    "--query",
-                    "mf",
-                    "--result_count_user",
-                    user,
-                    "--result_count_item",
-                    "10",
-                    "--threads",
-                    "2",
-                    "--data_path",
-                    "/data",
+                    '--query', 'mf', '--result_count_user', user,
+                    '--result_count_item', '10', '--threads', '2',
+                    '--data_path', '/data'
                 ]
             )
             self.assertEqual(args.result_count_user, int(user))
-        invalid_user_counter = ["ten", "hundred"]
+        invalid_user_counter = ['ten', 'hundred']
         for user in invalid_user_counter:
             with self.assertRaises(SystemExit):
                 self.parser.parse_args(
                     [
-                        "--query",
-                        "mf",
-                        "--result_count_user",
-                        user,
-                        "--result_count_item",
-                        "10",
-                        "--threads",
-                        "2",
-                        "--data_path",
-                        "/data",
+                        '--query', 'mf', '--result_count_user', user,
+                        '--result_count_item', '10', '--threads', '2',
+                        '--data_path', '/data'
                     ]
                 )
 
     def test_item_counter(self):
         """
-        This method tests if the command line argument `--result_count_item` is
-        configured properly
+        This method tests if the command line argument `--result_count_item` is configured properly
         """
-        valid_item_counter = ["10", "100"]
+        valid_item_counter = ['10', '100']
         for item in valid_item_counter:
             args = self.parser.parse_args(
                 [
-                    "--query",
-                    "mf",
-                    "--result_count_user",
-                    "10",
-                    "--result_count_item",
-                    item,
-                    "--threads",
-                    "2",
-                    "--data_path",
-                    "/data",
+                    '--query', 'mf', '--result_count_user', '10',
+                    '--result_count_item', item, '--threads', '2',
+                    '--data_path', '/data'
                 ]
             )
             self.assertEqual(args.result_count_item, int(item))
-        invalid_item_counter = ["ten", "hundred"]
+        invalid_item_counter = ['ten', 'hundred']
         for item in invalid_item_counter:
             with self.assertRaises(SystemExit):
                 self.parser.parse_args(
                     [
-                        "--query",
-                        "mf",
-                        "--result_count_user",
-                        "10",
-                        "--result_count_item",
-                        item,
-                        "--threads",
-                        "2",
-                        "--data_path",
-                        "/data",
+                        '--query', 'mf', '--result_count_user', '10',
+                        '--result_count_item', item, '--threads', '2',
+                        '--data_path', '/data'
                     ]
                 )
 
@@ -157,60 +111,38 @@ class TestArgParser(unittest.TestCase):
         """
         This method tests if the command line argument `--thread` is configured properly
         """
-        valid_thread_counter = ["2", "10"]
+        valid_thread_counter = ['2', '10']
         for thread in valid_thread_counter:
             args = self.parser.parse_args(
                 [
-                    "--query",
-                    "mf",
-                    "--result_count_user",
-                    "10",
-                    "--result_count_item",
-                    "10",
-                    "--threads",
-                    thread,
-                    "--data_path",
-                    "/data",
+                    '--query', 'mf', '--result_count_user', '10',
+                    '--result_count_item', '10', '--threads', thread,
+                    '--data_path', '/data'
                 ]
             )
             self.assertEqual(args.threads, int(thread))
-        invalid_thread_counter = ["two", "ten"]
+        invalid_thread_counter = ['two', 'ten']
         for thread in invalid_thread_counter:
             with self.assertRaises(SystemExit):
                 self.parser.parse_args(
                     [
-                        "--query",
-                        "mf",
-                        "--result_count_user",
-                        "10",
-                        "--result_count_item",
-                        "10",
-                        "--threads",
-                        thread,
-                        "--data_path",
-                        "/data",
+                        '--query', 'mf', '--result_count_user', '10',
+                        '--result_count_item', '10', '--threads', thread,
+                        '--data_path', '/data'
                     ]
                 )
 
     def test_path_str(self):
         """
-        This method tests if the command line argument `--data_path` is configured
-        properly
+        This method tests if the command line argument `--data_path` is configured properly
         """
-        valid_path = ["/data", "/data/data"]
+        valid_path = ['/data', '/data/data']
         for path in valid_path:
             args = self.parser.parse_args(
                 [
-                    "--query",
-                    "mf",
-                    "--result_count_user",
-                    "10",
-                    "--result_count_item",
-                    "10",
-                    "--threads",
-                    "2",
-                    "--data_path",
-                    path,
+                    '--query', 'mf', '--result_count_user', '10',
+                    '--result_count_item', '10', '--threads', '2',
+                    '--data_path', path
                 ]
             )
             self.assertEqual(args.data_path, Path(path))

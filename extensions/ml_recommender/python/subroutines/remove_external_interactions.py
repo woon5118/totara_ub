@@ -19,11 +19,9 @@ Please contact [licensing@totaralearning.com] for more information.
 
 class RemoveExternalInteractions:
     """
-    This is a conceptual representation of the process to remove interactions of the
-    users and the items from a tenant that are not found in that tenant's users data and
-    items data, respectively
+    This is a conceptual representation of the process to remove interactions of the users and the items from a tenant
+    that are not found in that tenant's users data and items data, respectively
     """
-
     def __init__(self, users_df=None, items_df=None, interactions_df=None):
         """
         Class constructor method
@@ -31,8 +29,7 @@ class RemoveExternalInteractions:
         :type users_df: An instance of pandas DataFrame
         :param items_df: The items data exported from the Totara instance
         :type items_df: An instance of pandas DataFrame
-        :param interactions_df: The interactions data as exported from the Totara
-            instance
+        :param interactions_df: The interactions data as exported from the Totara instance
         :type interactions_df: An instance of pandas DataFrame
         """
         self.users_df = users_df
@@ -41,17 +38,14 @@ class RemoveExternalInteractions:
 
     def clean_interactions(self):
         """
-        This method filters the provided interactions data for the users that are found
-        in the provided users dataset and also for the items that are found in the
-        provided dataset
+        This method filters the provided interactions data for the users that are found in the provided users dataset
+            and also for the items that are found in the provided dataset
         :return: Cleaned interactions dataset
         :rtype: An instance of pandas DataFrame
         """
         users_list = self.users_df.index.tolist()
         items_list = self.items_df.index.tolist()
-        clean_users = self.interactions_df[
-            self.interactions_df.user_id.isin(users_list)
-        ]
+        clean_users = self.interactions_df[self.interactions_df.user_id.isin(users_list)]
         clean_users_items = clean_users[clean_users.item_id.isin(items_list)]
         clean_users_items.reset_index(drop=True, inplace=True)
         return clean_users_items

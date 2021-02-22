@@ -16,10 +16,9 @@ Please contact [licensing@totaralearning.com] for more information.
 @package ml_recommender
 """
 
-import numpy as np
 import unittest
+import numpy as np
 from unittest.mock import patch
-
 from subroutines.optimize_hyperparams import OptimizeHyperparams
 
 
@@ -27,7 +26,6 @@ class TestOptimizeHyperparams(unittest.TestCase):
     """
     This class is the test object to test units of the class `OptimizeHyperparams`
     """
-
     def setUp(self):
         """
         Hook method for setting up the fixture before exercising it
@@ -42,23 +40,19 @@ class TestOptimizeHyperparams(unittest.TestCase):
             item_features=item_features,
             weights=weights,
             num_threads=num_threads,
-            item_alpha=item_alpha,
+            item_alpha=item_alpha
         )
 
-    @patch(
-        "subroutines.optimize_hyperparams.OptimizeHyperparams"
-        "._OptimizeHyperparams__compute_performance"
-    )
+    @patch('subroutines.optimize_hyperparams.OptimizeHyperparams._OptimizeHyperparams__compute_performance')
     def test_compute_gradient(self, mock_compute_performance):
         """
-        This method tests if the `__compute_gradient` method of the
-        `OptimizeHyperparams` class calls the `__compute_performance` method twice, and
-        if it returns the correct gradients with the mocked performance values
+        This method tests if the `__compute_gradient` method of the `OptimizeHyperparams` class calls the
+        `__compute_performance` method twice, and if it returns the correct gradients with the mocked performance values
         """
         f = 9.0
         train_data = None
         test_data = None
-        train_weights = (None,)
+        train_weights = None,
         epochs = 5
         comps = 5
         mock_compute_performance.return_value = 10.0
@@ -68,20 +62,19 @@ class TestOptimizeHyperparams(unittest.TestCase):
             test_data=test_data,
             train_weights=train_weights,
             epochs=epochs,
-            comps=comps,
+            comps=comps
         )
         self.assertEqual(mock_compute_performance.call_count, 2)
-        self.assertEqual(grads[0], (mock_compute_performance.return_value - f) / 1)
-        self.assertEqual(grads[1], (mock_compute_performance.return_value - f) / 1)
+        self.assertEqual(grads[0], (mock_compute_performance.return_value - f)/1)
+        self.assertEqual(grads[1], (mock_compute_performance.return_value - f)/1)
 
-    @patch("subroutines.optimize_hyperparams.auc_score")
-    @patch("subroutines.optimize_hyperparams.LightFM.fit")
+    @patch('subroutines.optimize_hyperparams.auc_score')
+    @patch('subroutines.optimize_hyperparams.LightFM.fit')
     def test_compute_performance(self, mock_lightfm_fit, mock_auc_score):
         """
-        This method tests if the `__compute_performance` method of the
-        `OptimizeHyperparams` class calls the `fit` method of `LightFM` class once with
-        the correct arguments, and if the `auc_score` function has been called once and
-        if the returned value is correct with mocked auc_score.
+        This method tests if the `__compute_performance` method of the `OptimizeHyperparams` class calls the `fit`
+        method of `LightFM` class once with the correct arguments, and if the `auc_score` function has been called once
+        and if the returned value is correct with mocked auc_score.
         """
         train_data = 10
         test_data = 5
@@ -95,7 +88,7 @@ class TestOptimizeHyperparams(unittest.TestCase):
             test_data=test_data,
             train_weights=train_weights,
             epochs=epochs,
-            comps=comps,
+            comps=comps
         )
         mock_lightfm_fit.assert_called_once_with(
             interactions=train_data,
@@ -103,26 +96,20 @@ class TestOptimizeHyperparams(unittest.TestCase):
             user_features=None,
             item_features=self.optimizer.item_features,
             epochs=epochs,
-            num_threads=self.optimizer.num_threads,
+            num_threads=self.optimizer.num_threads
         )
         mock_auc_score.assert_called_once()
         self.assertEqual(performance, scores_array.mean())
 
-    @patch("subroutines.optimize_hyperparams.np.random.randint")
-    @patch(
-        "subroutines.optimize_hyperparams.OptimizeHyperparams"
-        "._OptimizeHyperparams__compute_performance"
-    )
-    @patch("subroutines.optimize_hyperparams.random_train_test_split")
-    def test_run_optimization(
-        self, mock_train_test_split, mock_compute_performance, mock_randint
-    ):
+    @patch('subroutines.optimize_hyperparams.np.random.randint')
+    @patch('subroutines.optimize_hyperparams.OptimizeHyperparams._OptimizeHyperparams__compute_performance')
+    @patch('subroutines.optimize_hyperparams.random_train_test_split')
+    def test_run_optimization(self, mock_train_test_split, mock_compute_performance, mock_randint):
         """
-        This method tests if the returned `test_score`, `comps` and `epochs` from the
-        `run_optimization` method of the `OptimizeHyperparams` class are as expected.
-        The `train_test_split` has been called correct number of times, and
-        `__compute_performance` has been called, and also the `np.random.randint` has
-        been called to generate the random `epochs` and `comps`.
+        This method tests if the returned `test_score`, `comps` and `epochs` from the `run_optimization` method of the
+        `OptimizeHyperparams` class are as expected. The `train_test_split` has been called correct number of times,
+        and `__compute_performance` has been called, and also the `np.random.randint` has been called to generate
+        the random `epochs` and `comps`.
         """
         test_score = 0.5
         lr = 10

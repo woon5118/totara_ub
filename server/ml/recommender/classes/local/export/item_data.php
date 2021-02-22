@@ -58,6 +58,12 @@ class item_data extends export {
      */
     public function export(writer $writer): bool {
         global $DB;
+        // Set recordset cursor.
+
+        $recordset = $this->get_export_recordset();
+        if (!$recordset->valid()) {
+            return false;
+        }
 
         // Components.
         $component_names = $this->one_hot_components(static::get_supported_components());
@@ -79,12 +85,6 @@ class item_data extends export {
 
         $headings[] = 'document';
         $writer->add_data($headings);
-        // Set recordset cursor.
-
-        $recordset = $this->get_export_recordset();
-        if (!$recordset->valid()) {
-            return false;
-        }
 
         foreach ($recordset as $item) {
             $cells = [$item->uniqueid];

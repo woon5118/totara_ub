@@ -18,20 +18,20 @@ Please contact [licensing@totaralearning.com] for more information.
 
 
 conf = {
-    # Minimum number of users and items in interactions set for whom to run the
-    # recommendation engine in a tenant
-    "min_data": {"min_users": 10, "min_items": 10},
+    # Minimum number of users and items in interactions set for whom to run the recommendation engine in a tenant
+    'min_data': {
+        'min_users': 10,
+        'min_items': 10
+    },
     # The L2 penalty on item features when item features are being used in the model
-    "item_alpha": 1e-6,
+    'item_alpha': 1e-6
 }
 
 
 class Config:
     """
-    This is a conceptual representation of accessing the configuration elements from the
-    conf object
+    This is a conceptual representation of accessing the configuration elements from the conf object
     """
-
     def __init__(self):
         """
         The constructor method
@@ -40,9 +40,8 @@ class Config:
 
     def get_property(self, property_name):
         """
-        This method accesses and returns the called item of the `conf` dictionary. The
-            method returns `None` when the provided key does not match with any key of
-            the `conf` dictionary
+        This method accesses and returns the called item of the `conf` dictionary. The method returns `None` when the
+            provided key does not match with any key of the `conf` dictionary
         :param property_name: A key from the keys of the `conf` dictionary
         :type property_name: str
         :return: An item from the `conf` dictionary whose key was used as input
