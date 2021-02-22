@@ -336,4 +336,41 @@ class ml_recommender_export_item_data_testcase extends advanced_testcase {
         // Check for the workspace to not appear in the content.
         self::assertStringNotContainsString("engage_article{$admin_article->get_id()}", $actual_content);
     }
+
+        /**
+     * @return void
+     */
+    public function test_export_tenant_with_no_items(): void {
+        $generator = self::getDataGenerator();
+
+        /** @var \totara_tenant\testing\generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenant = $tenant_generator->create_tenant();
+        $user_one = $generator->create_user(['tenantid' => $tenant->id]);
+
+        $csv_file = "{$this->data_path}/file.csv";
+        $writer = new writer($csv_file);
+
+        $export = new item_data();
+        $export->set_tenant($tenant);
+        $export->export($writer);
+
+        $writer->close();
+
+        self::assertTrue(file_exists($csv_file));
+
+        $actual_content = file_get_contents($csv_file);
+
+        // Verify if the content is not empty
+        self::assertNotEmpty($actual_content);
+
+        // There should be 1 rows from the csv content containing only headers.
+        self::assertEquals(1, substr_count($actual_content, "\n"));
+
+        // Verify if the mandatory headers are there
+        self::assertStringContainsString("item_id", $actual_content);
+        self::assertStringContainsString("document", $actual_content);
+    }
 }

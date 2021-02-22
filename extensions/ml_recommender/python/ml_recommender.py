@@ -92,19 +92,9 @@ def run_modelling_process():
             interactions_df=interactions_df
         )
         interactions_df = interactions_cleaner.clean_interactions()
-        processed_data = d_loader.load_data(
-            interactions_df=interactions_df,
-            items_data=items_data,
-            users_data=users_data,
-            query=query
-        )
-        m, s = divmod((time.time() - t1), 60)
-        print(
-            f'The data loading and processing/transformation of tenant {tenant} took'
-            f' {m: .0f} minutes and {s: .2f} seconds.\n'
-        )
+        shape = (users_data.shape[0], items_data.shape[0])
         min_data = cfg.get_property('min_data')
-        shape = processed_data['interactions'].shape
+
         if shape[0] < min_data['min_users'] or shape[1] < min_data['min_items']:
             print(
                 "The number of users or items is too small to run the recommendation engine."
@@ -118,6 +108,17 @@ def run_modelling_process():
                 f.write("uid,iid,ranking")
 
         else:
+            processed_data = d_loader.load_data(
+                interactions_df=interactions_df,
+                items_data=items_data,
+                users_data=users_data,
+                query=query
+            )
+            m, s = divmod((time.time() - t1), 60)
+            print(
+                f'The data loading and processing/transformation of tenant {tenant} took'
+                f' {m: .0f} minutes and {s: .2f} seconds.\n'
+            )
             if query in ['hybrid', 'partial']:
                 item_alpha = cfg.get_property('item_alpha')
             else:
