@@ -4769,8 +4769,15 @@ class settings_navigation extends navigation_node {
 
         $useraccount = $usersetting->add(get_string('useraccount'), null, self::TYPE_CONTAINER, null, 'useraccount');
 
+        $isloggedin = isloggedin();
+        $isguestuser = isguestuser($user);
+        $loggedin_notguest = $isloggedin && !$isguestuser;
+        $edit_own_profile = $loggedin_notguest && $currentuser && has_capability('moodle/user:editownprofile', $usercontext);
+        $edit_other_profile = $loggedin_notguest && has_capability('moodle/user:editprofile', $usercontext);
+        $edit_profile = $edit_own_profile || $edit_other_profile;
+
         // Add the profile edit link.
-        if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
+        if ($loggedin_notguest && !is_mnet_remote_user($user)) {
             if (($currentuser || is_siteadmin($USER) || !is_siteadmin($user)) &&
                     has_capability('moodle/user:update', $systemcontext)) {
                 $url = new moodle_url('/user/editadvanced.php', array('id'=>$user->id, 'course'=>$course->id));
@@ -4797,49 +4804,38 @@ class settings_navigation extends navigation_node {
             $useraccount->add(get_string("changepassword"), $passwordchangeurl, self::TYPE_SETTING, null, 'changepassword');
         }
 
-        if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
-            if ($currentuser && has_capability('moodle/user:editownprofile', $usercontext) ||
-                    has_capability('moodle/user:editprofile', $usercontext)) {
-                $url = new moodle_url('/user/language.php', array('id' => $user->id, 'course' => $course->id));
-                $useraccount->add(get_string('preferredlanguage'), $url, self::TYPE_SETTING, null, 'preferredlanguage');
-            }
+        if ($loggedin_notguest && $edit_profile && !is_mnet_remote_user($user)) {
+            $url = new moodle_url('/user/language.php', array('id' => $user->id, 'course' => $course->id));
+            $useraccount->add(get_string('preferredlanguage'), $url, self::TYPE_SETTING, null, 'preferredlanguage');
         }
-        $pluginmanager = core_plugin_manager::instance();
-        $enabled = $pluginmanager->get_enabled_plugins('mod');
-        if (isset($enabled['forum']) && isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
-            if ($currentuser && has_capability('moodle/user:editownprofile', $usercontext) ||
-                    has_capability('moodle/user:editprofile', $usercontext)) {
+
+        if ($loggedin_notguest && $edit_profile) {
+            $pluginmanager = core_plugin_manager::instance();
+            $enabled = $pluginmanager->get_enabled_plugins('mod');
+            if (isset($enabled['forum'])) {
                 $url = new moodle_url('/user/forum.php', array('id' => $user->id, 'course' => $course->id));
                 $useraccount->add(get_string('forumpreferences'), $url, self::TYPE_SETTING);
             }
         }
+
         $editors = editors_get_enabled();
         if (count($editors) > 1) {
-            if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
-                if ($currentuser && has_capability('moodle/user:editownprofile', $usercontext) ||
-                        has_capability('moodle/user:editprofile', $usercontext)) {
-                    $url = new moodle_url('/user/editor.php', array('id' => $user->id, 'course' => $course->id));
-                    $useraccount->add(get_string('editorpreferences'), $url, self::TYPE_SETTING);
-                }
+            if ($loggedin_notguest && $edit_profile && !is_mnet_remote_user($user)) {
+                $url = new moodle_url('/user/editor.php', array('id' => $user->id, 'course' => $course->id));
+                $useraccount->add(get_string('editorpreferences'), $url, self::TYPE_SETTING);
             }
         }
 
         // Add "Course preferences" link.
-        if (isloggedin() && !isguestuser($user)) {
-            if ($currentuser && has_capability('moodle/user:editownprofile', $usercontext) ||
-                has_capability('moodle/user:editprofile', $usercontext)) {
-                $url = new moodle_url('/user/course.php', array('id' => $user->id, 'course' => $course->id));
-                $useraccount->add(get_string('coursepreferences'), $url, self::TYPE_SETTING, null, 'coursepreferences');
-            }
+        if ($loggedin_notguest && $edit_profile) {
+            $url = new moodle_url('/user/course.php', array('id' => $user->id, 'course' => $course->id));
+            $useraccount->add(get_string('coursepreferences'), $url, self::TYPE_SETTING, null, 'coursepreferences');
         }
 
         // Add "Calendar preferences" link.
-        if (isloggedin() && !isguestuser($user)) {
-            if ($currentuser && has_capability('moodle/user:editownprofile', $usercontext) ||
-                    has_capability('moodle/user:editprofile', $usercontext)) {
-                $url = new moodle_url('/user/calendar.php', array('id' => $user->id));
-                $useraccount->add(get_string('calendarpreferences', 'calendar'), $url, self::TYPE_SETTING, null, 'preferredcalendar');
-            }
+        if ($loggedin_notguest && $edit_profile) {
+            $url = new moodle_url('/user/calendar.php', array('id' => $user->id));
+            $useraccount->add(get_string('calendarpreferences', 'calendar'), $url, self::TYPE_SETTING, null, 'preferredcalendar');
         }
 
         // View the roles settings.
@@ -4914,7 +4910,7 @@ class settings_navigation extends navigation_node {
         }
 
         // Messaging.
-        if (($currentuser && has_capability('moodle/user:editownmessageprofile', $usercontext)) || (!isguestuser($user) &&
+        if (($currentuser && has_capability('moodle/user:editownmessageprofile', $usercontext)) || ($loggedin_notguest &&
                 has_capability('moodle/user:editmessageprofile', $usercontext) && !is_primary_admin($user->id))) {
             $messagingurl = new moodle_url('/message/edit.php', array('id' => $user->id));
             $notificationsurl = new moodle_url('/message/notificationpreferences.php', array('userid' => $user->id));
@@ -4923,9 +4919,9 @@ class settings_navigation extends navigation_node {
         }
 
         // Totara: Admin navigation preferences.
-        if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
+        if ($loggedin_notguest && $currentuser && has_capability('totara/core:editownquickaccessmenu', context_user::instance($USER->id)) && !is_mnet_remote_user($user)) {
             $adminmenu = totara_core\quickaccessmenu\factory::instance($USER->id)->get_possible_items();
-            if ($currentuser && !empty($adminmenu) && has_capability('totara/core:editownquickaccessmenu', context_user::instance($USER->id))) {
+            if (!empty($adminmenu)) {
                 $url = new moodle_url('/user/quickaccessmenu.php', array('id' => $user->id));
                 $useraccount->add(get_string('quickaccessmenu:settingsheading', 'totara_core'), $url, self::TYPE_SETTING, null, 'quickaccessmenu');
             }
