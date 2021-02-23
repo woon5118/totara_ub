@@ -34,7 +34,7 @@
       @click="togglePressed"
       @blur="$emit('blur', $event)"
     >
-      <span :class="{ 'sr-only': ariaLabel }">{{ text }}</span>
+      {{ text }}
     </button>
 
     <div class="tui-toggleSwitch__icon">

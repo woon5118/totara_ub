@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with an empty slot 1`] = `
+exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with an empty slot and some text 1`] = `
 <div
   class="tui-toggleSwitch"
 >
@@ -9,11 +9,61 @@ exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with a
     id="toggle"
     type="button"
   >
-    <span
-      class=""
-    >
-      toggle button text
-    </span>
+    
+    toggle button text
+  
+  </button>
+   
+  <div
+    class="tui-toggleSwitch__icon"
+  />
+   
+  <span
+    aria-hidden="true"
+    class="tui-toggleSwitch__ui"
+  />
+</div>
+`;
+
+exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with an empty slot, an aria-label, and no text 1`] = `
+<div
+  class="tui-toggleSwitch"
+>
+  <button
+    aria-label="Aria label text"
+    class="tui-toggleSwitch__btn"
+    id="toggle"
+    type="button"
+  >
+    
+    
+  
+  </button>
+   
+  <div
+    class="tui-toggleSwitch__icon"
+  />
+   
+  <span
+    aria-hidden="true"
+    class="tui-toggleSwitch__ui"
+  />
+</div>
+`;
+
+exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with an empty slot, an aria-label, and some text 1`] = `
+<div
+  class="tui-toggleSwitch"
+>
+  <button
+    aria-label="Aria label text"
+    class="tui-toggleSwitch__btn"
+    id="toggle"
+    type="button"
+  >
+    
+    toggle button text
+  
   </button>
    
   <div
@@ -36,11 +86,9 @@ exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with s
     id="toggle"
     type="button"
   >
-    <span
-      class=""
-    >
-      toggle button text
-    </span>
+    
+    toggle button text
+  
   </button>
    
   <div
@@ -68,11 +116,9 @@ exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with s
     id="toggle"
     type="button"
   >
-    <span
-      class="sr-only"
-    >
-      toggle button text
-    </span>
+    
+    toggle button text
+  
   </button>
    
   <div

@@ -28,7 +28,6 @@
           v-model="value"
           :disabled="isSaving"
           :aria-label="label"
-          :text="label"
           :toggle-first="true"
           @input="openModal"
         />

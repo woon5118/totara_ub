@@ -96,7 +96,28 @@ describe('ToggleButton.vue', () => {
       expect(wrapper.element).toMatchSnapshot();
     });
 
-    it('Renders correctly with an empty slot', () => {
+    it('Renders correctly with an empty slot and some text', () => {
+      wrapper = shallowMount(component, {
+        propsData,
+        $mocks: { pressed: false },
+      });
+
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('Renders correctly with an empty slot, an aria-label, and some text', () => {
+      propsData = { ...propsData, ariaLabel: 'Aria label text' };
+      wrapper = shallowMount(component, {
+        propsData,
+        $mocks: { pressed: false },
+      });
+
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('Renders correctly with an empty slot, an aria-label, and no text', () => {
+      propsData = { ...propsData, ariaLabel: 'Aria label text' };
+      delete propsData.text;
       wrapper = shallowMount(component, {
         propsData,
         $mocks: { pressed: false },
