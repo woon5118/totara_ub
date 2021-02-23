@@ -46,7 +46,7 @@ class core_form {
      */
     public static function extend_editor_formats(editor_formats_available $hook): void {
         // Only do this if weka editor is enabled.
-        if (!in_array('weka', array_keys(editors_get_enabled()))) {
+        if (!in_array('weka', editors_get_enabled_names())) {
             return;
         }
 

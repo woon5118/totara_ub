@@ -97,23 +97,33 @@ function editors_get_preferred_format() {
  * @return array of name=>texteditor
  */
 function editors_get_enabled() {
-    global $CFG;
-
-    if (empty($CFG->texteditors)) {
-        $CFG->texteditors = 'atto,weka,textarea';
-    }
     $active = array();
-    foreach(explode(',', $CFG->texteditors) as $e) {
+    foreach(editors_get_enabled_names() as $e) {
         if ($editor = get_texteditor($e)) {
             $active[$e] = $editor;
         }
     }
-
-    if (empty($active)) {
-        return array('textarea'=>get_texteditor('textarea')); // must exist and can edit anything
-    }
-
     return $active;
+}
+
+/**
+ * Returns an array of enabled editor names.
+ *
+ * This function does not confirm that the editor code is correct.
+ *
+ * @return string[] A list of editor names.
+ */
+function editors_get_enabled_names(): array {
+    global $CFG;
+    if (empty($CFG->texteditors) || trim($CFG->texteditors) === '') {
+        $CFG->texteditors = 'atto,weka,textarea';
+    }
+    $editors = explode(',', $CFG->texteditors);
+    if (count($editors) === 0) {
+        // It should be impossible to reach this situation.
+        $editors[] = 'textarea';
+    }
+    return $editors;
 }
 
 /**

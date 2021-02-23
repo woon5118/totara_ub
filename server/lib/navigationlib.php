@@ -4818,12 +4818,9 @@ class settings_navigation extends navigation_node {
             }
         }
 
-        $editors = editors_get_enabled();
-        if (count($editors) > 1) {
-            if ($loggedin_notguest && $edit_profile && !is_mnet_remote_user($user)) {
-                $url = new moodle_url('/user/editor.php', array('id' => $user->id, 'course' => $course->id));
-                $useraccount->add(get_string('editorpreferences'), $url, self::TYPE_SETTING);
-            }
+        if ($loggedin_notguest && $edit_profile && !is_mnet_remote_user($user) && count(editors_get_enabled_names()) > 1) {
+            $url = new moodle_url('/user/editor.php', array('id' => $user->id, 'course' => $course->id));
+            $useraccount->add(get_string('editorpreferences'), $url, self::TYPE_SETTING);
         }
 
         // Add "Course preferences" link.

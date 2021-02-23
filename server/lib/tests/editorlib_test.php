@@ -57,6 +57,26 @@ class core_editorslib_testcase extends advanced_testcase {
         }
     }
 
+    public function test_editors_get_enabled_names() {
+        global $CFG;
+
+        $enabled = editors_get_enabled_names();
+        $this->assertEquals(['atto','weka','textarea'], $enabled);
+
+        unset($CFG->texteditors);
+        $enabled = editors_get_enabled_names();
+        $this->assertEquals(['atto','weka','textarea'], $enabled);
+
+        $CFG->texteditors = '  ';
+        $enabled = editors_get_enabled_names();
+        $this->assertEquals(['atto','weka','textarea'], $enabled);
+
+        $CFG->texteditors = 'weka,textarea';
+        $enabled = editors_get_enabled_names();
+        $this->assertEquals(['weka','textarea'], $enabled);
+    }
+
+
     /**
      * @return void
      */

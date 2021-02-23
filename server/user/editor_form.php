@@ -44,7 +44,7 @@ class user_edit_editor_form extends moodleform {
 
         $mform = $this->_form;
 
-        $editors = editors_get_enabled();
+        $editors = editors_get_enabled_names();
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -52,7 +52,7 @@ class user_edit_editor_form extends moodleform {
         if (count($editors) > 1) {
             $choices = array('' => get_string('defaulteditor'));
             $firsteditor = '';
-            foreach (array_keys($editors) as $editor) {
+            foreach ($editors as $editor) {
                 if (!$firsteditor) {
                     $firsteditor = $editor;
                 }
