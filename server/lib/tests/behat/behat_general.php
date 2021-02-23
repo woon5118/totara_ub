@@ -484,31 +484,6 @@ class behat_general extends behat_base {
     }
 
     /**
-     * Totara: Hack around problems caused by clicking on element that is out of screen.
-     *
-     * @param Behat\Mink\Element\NodeElement $node
-     */
-    protected function click_node($node) {
-        try {
-            $node->click();
-        } catch (Exception $e) {
-            $message = $e->getMessage();
-            if (strpos($message, 'element click intercepted') === 0 and strpos($message, 'Other element would receive the click') !== false) {
-                /** @var Moodle\BehatExtension\Driver\MoodleSelenium2Driver $driver */
-                $driver = $this->getSession()->getDriver();
-                if (get_class($driver) === 'Moodle\BehatExtension\Driver\MoodleSelenium2Driver') {
-                    sleep(1); // Just in case there is some animation, this should not happen often.
-                    $script = 'e = document.evaluate(' . json_encode($node->getXpath(), JSON_UNESCAPED_SLASHES) . ', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;e.scrollIntoView({behavior: "auto", block: "end", inline: "nearest"});';
-                    $driver->executeScript($script);
-                    $node->click();
-                    return;
-                }
-            }
-            throw $e;
-        }
-    }
-
-    /**
      * Clicks the specified element and confirms the expected dialogue.
      *
      * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" confirming the dialogue$/

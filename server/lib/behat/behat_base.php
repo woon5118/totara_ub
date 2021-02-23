@@ -951,6 +951,30 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     }
 
     /**
+     * Totara: Hack around problems caused by clicking on element that is out of screen.
+     *
+     * @param Behat\Mink\Element\NodeElement $node
+     */
+    protected function click_node($node) {
+        try {
+            $node->click();
+        } catch (Exception $e) {
+            $message = $e->getMessage();
+            if (preg_match('/^element click intercepted.*Other element would receive the click/', $message) || preg_match('/^element not interactable.*element has zero size/', $message)) {
+                $driver = $this->getSession()->getDriver();
+                if ($driver instanceof \Moodle\BehatExtension\Driver\MoodleSelenium2Driver) {
+                    sleep(1); // Just in case there is some animation, this should not happen often.
+                    $script = 'document.evaluate(' . json_encode($node->getXpath(), JSON_UNESCAPED_SLASHES) . ', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.scrollIntoView({behavior: "auto", block: "end", inline: "nearest"});';
+                    $driver->executeScript($script);
+                    $node->click();
+                    return;
+                }
+            }
+            throw $e;
+        }
+    }
+
+    /**
      * Find a specific element where the attribute also matches a specific value.
      *
      * @param $element

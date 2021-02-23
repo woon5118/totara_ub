@@ -34,7 +34,7 @@ Feature: The activity results block doesn't displays student scores for unconfig
     And I set the following fields to these values:
       | Name | Test page name |
       | Description | Test page description |
-      | page | This is a page |
+      | id_page | This is a page |
     And I press "Save and display"
     When I add the "Activity results" block
     And I configure the "Activity results" block

@@ -97,6 +97,7 @@ Feature: Totara form wizard group tests for default settings
   Scenario: Test cancel button on a stage with required field on wizard group in Totara forms
     # Required fields can potentially be a problem for leaving the form, so go to a stage that has them and click cancel.
     When I click on "Next: Learning activity" "button"
+    And I wait until the page is ready
     And I click on "Cancel" "button"
     Then I should see "The form has been cancelled"
 

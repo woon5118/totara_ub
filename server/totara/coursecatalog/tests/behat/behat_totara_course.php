@@ -61,7 +61,7 @@ class behat_totara_course extends behat_base {
      */
     protected function get_course_category_listing_node_by_idnumber($idnumber) {
         $id = $this->get_category_id($idnumber);
-        $selector = sprintf('.category[data-categoryid="%d"] > div[class="info"]', $id);
+        $selector = sprintf('.category[data-categoryid="%d"] .info .categoryname', $id);
         return $this->find('css', $selector);
     }
 

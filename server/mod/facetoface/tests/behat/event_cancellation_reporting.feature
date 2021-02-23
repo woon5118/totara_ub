@@ -102,16 +102,16 @@ Feature: Seminar event cancellation reporting
 
     When I follow "View This Report"
     Then I should see "Course 1" in the "Learner One" "table_row"
-    And I should see date "10 day Pacific/Auckland" formatted "%d %B %Y"
+    And I should see date "+10 days 10am Pacific/Auckland" formatted "%d %B %Y"
     And I should see "User Cancelled" in the "Learner One" "table_row"
     And I should see "Test Seminar" in the "Learner One" "table_row"
 
     And I should see "Course 1" in the "Learner Two" "table_row"
-    And I should see date "10 day Pacific/Auckland" formatted "%d %B %Y"
+    And I should see date "+10 days 10am Pacific/Auckland" formatted "%d %B %Y"
     And I should see "Event Cancelled" in the "Learner Two" "table_row"
     And I should see "Test Seminar" in the "Learner Two" "table_row"
 
     And I should see "Course 1" in the "Learner Three" "table_row"
-    And I should see date "10 day Pacific/Auckland" formatted "%d %B %Y"
+    And I should see date "+10 days 10am Pacific/Auckland" formatted "%d %B %Y"
     And I should see "Event Cancelled" in the "Learner Three" "table_row"
     And I should see "Test Seminar" in the "Learner Three" "table_row"
