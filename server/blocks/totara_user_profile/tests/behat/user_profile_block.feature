@@ -35,9 +35,9 @@ Feature: Add User Profile blocks in a Default profile page
       | Display User Profile category| Reports |
     When I press "Save changes"
     Then I should see "Reports"
-    When I click on "Reset profile for all users" "button"
-    And I log out
+    And "Reset profile for all users" "button" should not exist
 
+    When I log out
     And I log in as "learner1"
     And I follow "Profile" in the user menu
     Then I should see "Reports"

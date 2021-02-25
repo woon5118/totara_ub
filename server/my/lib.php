@@ -218,6 +218,34 @@ function my_reset_page_for_all_users($private = MY_PAGE_PRIVATE, $pagetype = 'my
     $event->trigger();
 }
 
+/**
+ * Count the instance of pages that have been customised from the default.
+ *
+ * @param int $private Either MY_PAGE_PRIVATE or MY_PAGE_PUBLIC.
+ * @param string $pagetype Either my-index or user-profile.
+ * @return int
+ */
+function my_count_all_custom_pages($private = MY_PAGE_PRIVATE, $pagetype = 'my-index') {
+    global $DB;
+
+    // Count all instances of a customised page.
+    $sql = "SELECT DISTINCT(p.id)
+        FROM {my_pages} p
+        JOIN {context} ctx ON ctx.instanceid = p.userid AND ctx.contextlevel = :usercontextlevel
+        JOIN {block_instances} bi ON bi.parentcontextid = ctx.id AND
+            bi.pagetypepattern = :pagetypepattern AND
+            (bi.subpagepattern IS NULL OR bi.subpagepattern = " . $DB->sql_concat("''", 'p.id') . ")
+        WHERE p.private = :private";
+    $params = [
+        'private' => $private,
+        'usercontextlevel' => CONTEXT_USER,
+        'pagetypepattern' => $pagetype
+    ];
+    $pageids = $DB->get_fieldset_sql($sql, $params);
+
+    return count($pageids);
+}
+
 class my_syspage_block_manager extends block_manager {
     // HACK WARNING!
     // TODO: figure out a better way to do this

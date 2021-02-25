@@ -58,9 +58,13 @@ if (!$currentpage = my_get_page(null, MY_PAGE_PUBLIC)) {
 }
 $PAGE->set_subpage($currentpage->id);
 
-$url = new moodle_url($PAGE->url, array('resetall' => 1));
-$button = $OUTPUT->single_button($url, get_string('reseteveryonesprofile', 'my'));
-$PAGE->set_button($button . $PAGE->button);
+// Only show the reset all button if there are existing customisations to reset.
+$customprofilecount = my_count_all_custom_pages(MY_PAGE_PUBLIC, 'user-profile');
+if ($customprofilecount > 0) {
+    $url = new moodle_url($PAGE->url, array('resetall' => 1));
+    $button = $OUTPUT->single_button($url, get_string('reseteveryonesprofile', 'my'));
+    $PAGE->set_button($button . $PAGE->button);
+}
 
 echo $OUTPUT->header();
 
