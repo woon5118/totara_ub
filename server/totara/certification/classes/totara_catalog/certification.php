@@ -161,16 +161,14 @@ class certification extends provider {
     }
 
     public function get_create_buttons(): array {
-        global $CFG;
 
-        $systemcontext = \context_system::instance();
-
+        $categoryid = totara_get_categoryid_with_capability('totara/certification:createcertification');
         $buttons = [];
 
-        if (has_capability('totara/certification:createcertification', $systemcontext)) {
+        if ($categoryid !== false) {
             $button = new \stdClass();
             $button->label = get_string('certification', 'totara_certification');
-            $button->url = (new \moodle_url("/totara/certification/add.php", ['category' => $CFG->defaultrequestcategory]))->out();
+            $button->url = (new \moodle_url("/totara/certification/add.php", ['category' => $categoryid]))->out();
             $buttons[] = $button;
         }
 

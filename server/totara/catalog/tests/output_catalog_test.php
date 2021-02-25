@@ -332,6 +332,35 @@ class totara_catalog_output_catalog_testcase extends output_test_base {
         $this->assertContains('Course', $labels);
         $this->assertContains('Certification', $labels);
         $this->assertContains('Program', $labels);
+
+        // Check if user has certain capabilities on category context can see buttons
+        $user = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $categoryid = totara_get_categoryid_with_capability('totara/certification:createcertification');
+
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('totara/certification:createcertification', CAP_ALLOW, $roleid, $categoryid);
+
+        $categoryid = totara_get_categoryid_with_capability('totara/program:createprogram');
+        assign_capability('totara/program:createprogram', CAP_ALLOW, $roleid, $categoryid);
+        role_assign($roleid, $user->id, $categoryid);
+
+        $this->setUser($user);
+        $manage_buttons = $rm->invoke($catalog);
+        $this->assertTrue($manage_buttons->has_create_dropdown);
+        $this->assertGreaterThanOrEqual(2, count($manage_buttons->create_buttons));
+
+        $labels = [];
+        foreach ($manage_buttons->create_buttons as $button) {
+            $labels[] = $button->label;
+        }
+        $this->assertContains('Certification', $labels);
+        $this->assertContains('Program', $labels);
+
+        // User does not have any special capabilities so he cannot see the buttons
+        $this->setUser($user2);
+        $manage_buttons = $rm->invoke($catalog);
+        $this->assertFalse($manage_buttons->has_buttons);
     }
 
     /**

@@ -169,16 +169,14 @@ class program extends provider {
     }
 
     public function get_create_buttons(): array {
-        global $CFG;
 
-        $systemcontext = \context_system::instance();
-
+        $categoryid = totara_get_categoryid_with_capability('totara/program:createprogram');
         $buttons = [];
 
-        if (has_capability('totara/program:createprogram', $systemcontext)) {
+        if ($categoryid !== false) {
             $button = new \stdClass();
             $button->label = get_string('program', 'totara_program');
-            $button->url = (new \moodle_url("/totara/program/add.php", ['category' => $CFG->defaultrequestcategory]))->out();
+            $button->url = (new \moodle_url("/totara/program/add.php", ['category' => $categoryid]))->out();
             $buttons[] = $button;
         }
 
