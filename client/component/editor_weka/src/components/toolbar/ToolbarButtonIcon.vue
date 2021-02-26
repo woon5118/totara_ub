@@ -71,9 +71,11 @@ export default {
 
 <style lang="scss">
 .tui-wekaToolbarButtonIcon {
+  // stylelint-disable-next-line tui/at-extend-only-placeholders
   @extend .tui-wekaToolbarButton;
 
   &--selected {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-wekaToolbarButton--selected;
   }
 }

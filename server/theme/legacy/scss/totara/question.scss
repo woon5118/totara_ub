@@ -306,7 +306,9 @@ body.path-question-type .mform fieldset.hidden {
 
 .que .outcome,
 .que .comment {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .alert;
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .alert-warning;
 }
 
@@ -325,6 +327,7 @@ body.path-question-type .mform fieldset.hidden {
 }
 
 .que .comment {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .alert-success;
 }
 
@@ -355,7 +358,7 @@ body.path-question-type .mform fieldset.hidden {
 }
 
 .que .correctness {
-  @extend .label;
+  @include bs-label();
   &.correct {
     background-color: $label-success-bg;
   }

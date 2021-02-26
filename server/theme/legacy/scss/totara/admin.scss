@@ -53,19 +53,23 @@
 .statuswarning,
 .statusserious,
 .statuscritical {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .label;
 }
 
 .statusok {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .label-success;
 }
 
 .statuswarning {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .label-warning;
 }
 
 .statusserious,
 .statuscritical {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .label-danger;
 }
 
@@ -201,6 +205,7 @@ img.iconsmall {
 #page-admin-index .maturitywarning,
 #page-admin-index .testsitewarning,
 #page-admin-index .maturityinfo {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .alert;
   width: 60%;
   min-width: 220px;
@@ -210,11 +215,13 @@ img.iconsmall {
 #page-admin-index .maturitywarning,
 #page-admin-index .testsitewarning,
 #page-admin-index .adminwarning.maturityinfo.maturity50 {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .alert-danger;
 }
 
 #page-admin-index .adminwarning.availableupdatesinfo,
 #page-admin-index .releasenoteslink {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .alert-info;
 }
 
@@ -256,7 +263,7 @@ img.iconsmall {
 .path-admin .roleassigntable {
   width: 100%;
   input[type='text'] {
-    @extend .form-control;
+    @include bs-form-control();
     margin-bottom: 0.3em;
   }
 }
@@ -699,7 +706,9 @@ img.iconsmall {
 // Hacks for badly marked up admin warnings.
 // MDL-44323
 #page-admin-roles-assign div.box.generalbox {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .alert;
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .alert-danger;
 }
 

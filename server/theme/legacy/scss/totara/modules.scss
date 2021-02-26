@@ -86,7 +86,7 @@ select {
 }
 
 .forumpost {
-  @extend .panel;
+  @include bs-panel-root();
   @include bs-panel-default();
   padding: 6px;
   .header {
@@ -128,13 +128,13 @@ select {
   .singleselect {
     width: 100%;
     select.singleselect {
-      @extend .form-control;
+      @include bs-form-control();
     }
   }
   &.movediscussion {
     margin-top: 5px;
     select.urlselect {
-      @extend .form-control;
+      @include bs-form-control();
       width: auto;
       float: left;
     }

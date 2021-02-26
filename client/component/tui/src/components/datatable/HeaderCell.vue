@@ -54,6 +54,7 @@ export default {
 
 @media (min-width: $tui-screen-xs) {
   .tui-dataTableHeaderCell {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-dataTableCell;
     display: flex;
     color: var(--datatable-cell-header-text-color);

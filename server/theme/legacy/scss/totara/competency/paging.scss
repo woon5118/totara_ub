@@ -26,7 +26,7 @@
   text-align: center;
 
   &__btn {
-    @extend .btn;
+    @include bs-btn();
     @include bs-btn-default();
     padding-left: var(--gap-8);
     padding-right: var(--gap-8);

@@ -108,6 +108,7 @@
 }
 
 .enrolpanel.roleassign.visible {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .popover;
   width: $popover-max-width;
   display: block;
@@ -122,6 +123,7 @@
   }
 
   .header {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .popover-title;
     .close {
       color: var(--link-color);
@@ -142,6 +144,7 @@
     }
   }
   .content {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .popover-content;
     margin-top: 5px;
     background-color: var(--color-neutral-2);

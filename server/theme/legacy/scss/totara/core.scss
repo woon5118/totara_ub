@@ -561,7 +561,7 @@ div.hide {
 .accesshide,
 a.skip-block,
 a.skip {
-  @extend .sr-only; // screen-reader-only
+  @include bs-sr-only();
 }
 
 // Display skip to content link when focused for keyboard navigators.
@@ -1673,6 +1673,7 @@ body.jsenabled .formlisting {
   position: relative;
 
   .menu {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .dropdown-menu;
     display: block;
     text-align: left;
@@ -1891,7 +1892,7 @@ h6 [data-flex-icon='help'] {
 }
 
 .link-as-button {
-  @extend .btn;
+  @include bs-btn();
   @include bs-btn-default();
 }
 

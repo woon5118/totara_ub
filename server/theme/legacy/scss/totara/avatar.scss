@@ -22,5 +22,6 @@
 // @package   theme_legacy
 
 .avatar img {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .img-circle;
 }

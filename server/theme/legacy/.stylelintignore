@@ -1,6 +1,5 @@
-less/totara/totara_jquery/
-less/bootstrap3/
-scss/
+scss/totara/totara_jquery/
+scss/bootstrap3/
 style/settings-noprocess.css
 style/totara.css
 style/totara-rtl.css

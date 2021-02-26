@@ -26,7 +26,7 @@
 // @package   theme_legacy
 
 table.collection {
-  @extend .table;
+  @include bs-table-root();
   @include bs-table-bordered();
   @include bs-table-striped();
 }

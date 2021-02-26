@@ -71,10 +71,8 @@
   }
 
   &__btnGroup {
-    @include bs-btn-group();
-
     .tw-editAchievementPaths__btn {
-      @extend .btn;
+      @include bs-btn();
       @include bs-btn-default();
       color: var(--btn-toggle-text-color);
       background: var(--btn-toggle-bg-color);
@@ -103,6 +101,9 @@
         }
       }
     }
+
+    // must be after button style to work properly
+    @include bs-btn-group();
   }
 
   &__activeDropZone {

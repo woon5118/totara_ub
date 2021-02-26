@@ -45,7 +45,7 @@
         @include form-label-display();
       }
       .fstaticlabel {
-        @extend label;
+        @include bs-label();
         @include form-label-display();
       }
     }
@@ -162,7 +162,7 @@
     input[type='text'],
     input[type='password'],
     input[type='number'] {
-      @extend .form-control;
+      @include bs-form-control();
     }
     select[size],
     select[multiple] {
@@ -187,7 +187,7 @@ form input[type='password'],
 form input[type='number'],
 form.atto_form input[type='url'],
 select.singleselect {
-  @extend .form-control;
+  @include bs-form-control();
   width: auto;
   max-width: 300px;
   display: inline;
@@ -199,7 +199,7 @@ select.singleselect {
 // appearance of the element. This addresses the problem. The long term solution
 // is to correct the mark-up. TL-10346 raised to address this.
 select {
-  @extend .form-control;
+  @include bs-form-control();
 }
 
 .path-admin .buttons,
@@ -226,7 +226,7 @@ select {
 }
 
 #adminsettings h3 {
-  @extend legend;
+  @include bs-legend();
 }
 
 .form-setting .form-checkbox input {
@@ -686,7 +686,7 @@ div#dateselector-calendar-panel {
 
     .legend {
       // LESS -> SCSS conversion change
-      @extend label;
+      @include bs-label();
       @include form-label-display();
       // Default padding plus a border
       padding-top: ($padding-base-vertical + 1);

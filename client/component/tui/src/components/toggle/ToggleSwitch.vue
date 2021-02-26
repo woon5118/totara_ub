@@ -108,7 +108,9 @@ export default {
   align-items: center;
 
   &__btn {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn;
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--transparent;
     color: var(--form-toggle-color);
 

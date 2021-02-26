@@ -425,10 +425,12 @@ input.titleeditor {
 }
 
 .dndupload-progress-outer {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .progress;
 }
 
 .dndupload-progress-inner {
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .progress-bar;
 }
 
@@ -483,6 +485,7 @@ input.titleeditor {
 .coursebox {
   position: relative;
   img.courseimage {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .img-rounded;
     float: left;
     height: auto;

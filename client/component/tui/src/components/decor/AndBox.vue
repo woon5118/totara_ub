@@ -34,9 +34,11 @@
 
 <style lang="scss">
 .tui-andBox {
+  // stylelint-disable-next-line tui/at-extend-only-placeholders
   @extend .tui-orBox;
 
   &__text {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-orBox__text;
   }
 }

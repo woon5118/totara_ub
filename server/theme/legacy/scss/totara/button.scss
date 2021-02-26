@@ -40,8 +40,12 @@
   text-align: center;
 }
 
-.btn-lineup {
+@mixin btn-lineup {
   margin: 0 0 3px 5px;
+}
+
+.btn-lineup {
+  @include btn-lineup();
 }
 
 input[name='searchwikicontent'] + input[type='submit'],
@@ -50,7 +54,7 @@ input[type='text'] + input[type='button'],
 input[type='password'] + input[type='submit'],
 input[type='text'] + button,
 input[type='text'] + input[type='submit'] {
-  @extend .btn-lineup;
+  @include btn-lineup();
 }
 
 p.arrow_button {
@@ -60,7 +64,7 @@ p.arrow_button {
     margin: 3em auto 5em;
   }
   input {
-    @extend .btn-block;
+    @include bs-btn-block();
   }
 }
 
@@ -72,7 +76,7 @@ p.arrow_button {
 
 #addcontrols input,
 #removecontrols input {
-  @extend .btn-block;
+  @include bs-btn-block();
 }
 
 button,
@@ -80,9 +84,9 @@ input.form-submit,
 input[type='button'],
 input[type='submit'],
 input[type='reset'] {
-  @extend .btn;
+  @include bs-btn();
   @include bs-btn-default();
-  @extend .btn-lineup;
+  @include btn-lineup();
 
   &.btn-link {
     box-shadow: none;
@@ -100,13 +104,13 @@ td.submit input {
 // override .btn-primary
 #notice .singlebutton + .singlebutton input,
 .submit.buttons input[name='cancel'] {
-  @extend .btn;
+  @include bs-btn();
   @include bs-btn-default();
 }
 
 #notice .singlebutton + .singlebutton input,
 .submit.buttons input[name='cancel'] {
-  @extend .btn-lineup;
+  @include btn-lineup();
 }
 
 button.yui3-button.closebutton,
@@ -120,13 +124,13 @@ button.yui3-button.closebutton:hover {
 }
 
 input.fp-btn-choose {
-  @extend .btn-sm;
+  @include bs-btn-sm();
   margin-left: 0;
   margin-top: 4px;
 }
 
 .user-enroller-panel .uep-search-results .user .options .enrol {
-  @extend .btn-xs;
+  @include bs-btn-xs();
 }
 
 // End of original bootstrap theme code.

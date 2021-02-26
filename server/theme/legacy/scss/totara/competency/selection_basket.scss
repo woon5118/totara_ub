@@ -78,7 +78,7 @@
   }
 
   &__btn {
-    @extend .btn;
+    @include bs-btn();
     @include bs-btn-default();
     font-size: 1.3rem;
     padding: var(--gap-1) var(--gap-2);

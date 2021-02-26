@@ -161,7 +161,7 @@
 
       input[type='text'],
       input[type='password'] {
-        @extend .form-control;
+        @include bs-form-control();
         width: 100%;
         max-width: none;
         border-radius: 0;

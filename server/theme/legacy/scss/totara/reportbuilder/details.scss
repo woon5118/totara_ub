@@ -64,6 +64,7 @@
     }
 
     &-default {
+      // stylelint-disable-next-line totara/at-extend-only-placeholders
       @extend .unlist;
 
       ul {

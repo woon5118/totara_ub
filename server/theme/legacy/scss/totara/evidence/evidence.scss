@@ -61,7 +61,7 @@
         margin-top: var(--gap-2);
 
         &_link {
-          @extend .btn;
+          @include bs-btn();
           @include bs-btn-default();
         }
       }
@@ -103,7 +103,7 @@
       margin-top: var(--gap-2);
 
       &_buttons > &_button {
-        @extend .btn;
+        @include bs-btn();
         @include bs-btn-default();
 
         &_primary {

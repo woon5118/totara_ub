@@ -77,7 +77,6 @@ export default {
 <style lang="scss">
 .tui-criteriaOnActiveAchievement {
   &__title {
-    @extend .tui-criteriaOnActiveAchievement__title;
     max-width: 100%;
   }
 }

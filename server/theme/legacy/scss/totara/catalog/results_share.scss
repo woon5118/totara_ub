@@ -98,7 +98,7 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
 
     &_btn {
       border: 1px solid;
-      @extend .btn;
+      @include bs-btn();
       @include bs-btn-primary();
       display: inline-block;
       font-weight: bold;

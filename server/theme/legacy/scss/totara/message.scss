@@ -67,7 +67,7 @@
     /* stylelint-enable */
 
     input[type='text'] {
-      @extend .form-control;
+      @include bs-form-control();
       display: inline-block;
     }
   }
@@ -95,7 +95,7 @@
         select {
           @include make-md-column(7);
           float: left;
-          @extend .form-control;
+          @include bs-form-control();
           width: auto;
         }
       }
@@ -145,6 +145,7 @@
         text-align: left;
       }
       .link {
+        // stylelint-disable-next-line totara/at-extend-only-placeholders
         @extend .pull-right;
       }
       .pix {
@@ -157,7 +158,7 @@
     @include make-md-column(8);
 
     textarea {
-      @extend .form-control;
+      @include bs-form-control();
       height: 200px;
     }
 
@@ -168,7 +169,7 @@
     }
 
     textarea {
-      @extend .form-control;
+      @include bs-form-control();
       height: 200px;
     }
 
@@ -208,7 +209,7 @@
       .singlemessage {
         margin: 10px 15px;
 
-        @extend.panel;
+        @include bs-panel-root();
         @include bs-panel-default();
         .otheruser {
           @include bs-panel-default-heading();
@@ -349,6 +350,7 @@
         }
         .fitemtitle,
         .form-label {
+          // stylelint-disable-next-line totara/at-extend-only-placeholders
           @extend h3;
           float: none;
           text-align: left;
@@ -367,6 +369,7 @@
 #newmessageoverlay {
   //fix for yui absolute positioning
   width: $popover-max-width;
+  // stylelint-disable-next-line totara/at-extend-only-placeholders
   @extend .popover;
   position: fixed;
   top: inherit;
@@ -378,9 +381,11 @@
   }
   display: block;
   #newmessagetext {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .popover-title;
   }
   #usermessage {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .popover-content;
     border: 1px dotted var(--color-border);
     border-radius: $border-radius-base;

@@ -178,6 +178,7 @@ export default {
 
 <style lang="scss">
 .tui-iconBtn {
+  // stylelint-disable-next-line tui/at-extend-only-placeholders
   @extend .tui-formBtn;
 
   display: inline-block;
@@ -223,14 +224,17 @@ export default {
   }
 
   &--alert {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--alert;
   }
 
   &--prim {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--prim;
   }
 
   &--small {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--small;
     padding: 0 var(--gap-1);
     font-size: var(--font-size-13);
@@ -279,10 +283,12 @@ export default {
   }
 
   &--transparent {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--transparent;
   }
 
   &--transparent-noPadding {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--transparent;
     &.tui-iconBtn,
     &.tui-iconBtn--small,
@@ -292,6 +298,7 @@ export default {
   }
 
   &--stealth {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--stealth;
   }
 

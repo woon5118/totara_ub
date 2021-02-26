@@ -25,9 +25,18 @@
 // @author    Rob Tyler <rob.tyler@totaralearning.com>
 // @package   theme_legacy
 
+@mixin block-root() {
+  @include bs-panel-root();
+  @include bs-panel-default();
+
+  position: relative;
+  border-radius: 0;
+  border-color: $block-border-color;
+  box-shadow: none;
+}
+
 .block {
-  @extend .panel;
-  @extend .panel-default;
+  @include block-root();
   &.invisible {
     border-color: var(--color-border);
     .header {
@@ -82,7 +91,7 @@
     margin: -1em 0 1em;
   }
   .singleselect select {
-    @extend .form-control;
+    @include bs-form-control();
   }
   &.chromeless {
     border: none;
@@ -186,7 +195,7 @@
 .searchform {
   input[type='text'] {
     @include bs-form-group();
-    @extend .form-control;
+    @include bs-form-control();
   }
   fieldset {
     width: 100%;
@@ -322,11 +331,6 @@
 }
 
 .block {
-  position: relative;
-  border-radius: 0;
-  border-color: $block-border-color;
-  box-shadow: none;
-
   .block-header {
     background-color: transparent;
     color: $block-actions-text-color;

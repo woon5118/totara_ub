@@ -17,10 +17,10 @@
  */
 
 const stylelint = require('stylelint');
+const ruleName = 'tui/at-extend-only-placeholders';
 
-const ruleName = 'tui/ascii-only';
 const messages = stylelint.utils.ruleMessages(ruleName, {
-  rejected: 'Non-ascii character',
+  rejected: '@extend may only be used with %placeholders',
 });
 
 const plugin = stylelint.createPlugin(ruleName, on => {
@@ -29,22 +29,16 @@ const plugin = stylelint.createPlugin(ruleName, on => {
       return;
     }
 
-    const reportFromIndex = index => {
-      stylelint.utils.report({
-        message: messages.rejected,
-        node: root,
-        index,
-        result,
-        ruleName,
-      });
-    };
-
-    const css = root.source.input.css;
-    // eslint-disable-next-line no-control-regex
-    const match = /[^\x00-\x7F]/.exec(css);
-    if (match) {
-      reportFromIndex(match.index);
-    }
+    root.walkAtRules('extend', rule => {
+      if (rule.params.trim()[0] !== '%') {
+        stylelint.utils.report({
+          ruleName,
+          result,
+          node: rule,
+          message: messages.rejected,
+        });
+      }
+    });
   };
 });
 

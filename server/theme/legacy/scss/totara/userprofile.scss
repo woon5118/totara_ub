@@ -40,10 +40,11 @@
     display: inline-block;
     width: 100%;
     padding: 0 15px;
-    @extend .panel;
+    @include bs-panel-root();
     @include bs-panel-default();
   }
   .header-button-group {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .pull-right;
     .btn {
       @include bs-btn-default();
@@ -54,6 +55,7 @@
     text-decoration: none;
   }
   dl.list {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .dl-horizontal;
   }
   dd,

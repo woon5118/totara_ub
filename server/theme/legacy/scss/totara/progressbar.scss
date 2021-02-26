@@ -27,6 +27,7 @@
   @include box-shadow(inset 0 1px 3px 0);
 
   .bar {
+    // stylelint-disable-next-line totara/at-extend-only-placeholders
     @extend .progress-bar;
 
     text-align: right;

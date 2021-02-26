@@ -70,18 +70,22 @@ export default {
 
 <style lang="scss">
 .tui-actionLink {
+  // stylelint-disable-next-line tui/at-extend-only-placeholders
   @extend .tui-formBtn;
   display: inline-block;
 
   &--prim {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--prim;
   }
 
   &--small {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--small;
   }
 
   &--srOnly {
+    // stylelint-disable-next-line tui/at-extend-only-placeholders
     @extend .tui-formBtn--srOnly;
   }
 

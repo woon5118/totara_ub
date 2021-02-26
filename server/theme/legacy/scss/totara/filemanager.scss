@@ -1291,7 +1291,7 @@ a.ygtvspacer:focus {
 .fp-formset .controls {
   input[type='text'],
   select {
-    @extend .form-control;
+    @include bs-form-control();
   }
 }
 

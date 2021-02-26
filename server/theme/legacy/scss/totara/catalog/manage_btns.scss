@@ -27,7 +27,7 @@
 
   &__btn {
     border: 1px solid;
-    @extend .btn;
+    @include bs-btn();
     @include bs-btn-default();
     cursor: pointer;
     display: inline-block;

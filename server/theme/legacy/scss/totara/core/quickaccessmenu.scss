@@ -86,7 +86,7 @@
       }
 
       &-button {
-        @extend .btn-sm;
+        @include bs-btn-sm();
         border-radius: 0;
         height: 3rem;
       }
@@ -210,7 +210,7 @@
     &-text {
       // Customise menu link
       a {
-        @extend .btn;
+        @include bs-btn();
         @include bs-btn-primary();
         margin-top: var(--gap-1);
       }
