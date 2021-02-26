@@ -1045,5 +1045,9 @@ Developer settings
 // Set the password used when generating users through the generator tool
 // $CFG->tool_generator_users_password = 'passw0rd!';
 //
+// Disable GraphQL schema caching on PHPUnit instantiation
+// When instantiating PHPUnit Totara builds and caches a complete GraphQL schema file for all components and plugins. During
+// development when running individual unit tests you may want to disable this caching in order to insstantiate the testing suite faste.
+// define('PHPUNIT_NO_CACHE_GRAPHQL_SCHEMA', true);
 
 // All done!
