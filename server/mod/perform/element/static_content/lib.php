@@ -53,8 +53,15 @@ function performelement_static_content_pluginfile($course, $cm, $context, $filea
 
     // Handle external participant.
     $token = external_participant_token_validator::find_token_in_session();
-    if ($token && !(new external_participant_token_validator($token))->is_valid_for_context($context->id)) {
-        send_file_not_found();
+    if ($token) {
+        $validator = new external_participant_token_validator($token);
+        if (!$validator->is_valid()) {
+            send_file_not_found();
+        }
+        $token_context = $validator->get_participant_instance()->get_context();
+        if ($token_context->id !== $context->id) {
+            send_file_not_found();
+        }
     } else {
         require_login();
 
