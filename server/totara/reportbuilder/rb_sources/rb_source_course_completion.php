@@ -601,7 +601,7 @@ class rb_source_course_completion extends rb_base_source {
             new rb_filter_option(
                 'course_completion',
                 'passgrade',
-                'Required Grade',
+                get_string('reqgrade', 'rb_source_course_completion'),
                 'number'
             ),
             new rb_filter_option(

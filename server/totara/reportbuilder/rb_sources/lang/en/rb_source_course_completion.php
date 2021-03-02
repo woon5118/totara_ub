@@ -47,6 +47,7 @@ $string['completionposname'] = 'Completion Position Name';
 $string['grade'] = 'Grade';
 $string['passgrade'] = 'Pass Grade';
 $string['requiredgrade'] = 'Grade and required grade';
+$string['reqgrade'] = 'Required Grade';
 $string['rplnote'] = 'RPL note';
 $string['timetocompletesinceenrol'] = 'Time to complete (since enrol date)';
 $string['timetocompletesincestart'] = 'Time to complete (since start date)';

@@ -583,7 +583,7 @@ class rb_source_dp_course extends rb_base_source {
         $filteroptions[] = new rb_filter_option(
                 'course_completion',
                 'passgrade',
-                'Required Grade',
+                get_string('reqgrade', 'rb_source_course_completion'),
                 'number'
         );
         $filteroptions[] = new rb_filter_option(
