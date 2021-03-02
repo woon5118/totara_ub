@@ -207,9 +207,12 @@ export default class Suggestion {
       this._editor.viewExtrasLiveEl.offsetParent
     );
     const refCoords = this._view.coordsAtPos(this._range.from);
-    const refRect = Rect.fromPositions(
-      Object.assign({}, refCoords, { right: refCoords.right + 1 })
-    ).sub(parentCoords.getPosition());
+    const refRect = Rect.fromPositions({
+      left: refCoords.left,
+      top: refCoords.top,
+      right: refCoords.right + 1,
+      bottom: refCoords.bottom,
+    }).sub(parentCoords.getPosition());
     const viewport = new Rect(0, 0, html.clientWidth, html.clientHeight).sub(
       parentCoords.getPosition()
     );
