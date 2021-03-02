@@ -66,6 +66,8 @@ class rb_source_assign extends rb_base_source {
      * @return array
      */
     protected function define_joinlist() {
+        global $DB;
+        $moduleid = $DB->get_field('modules', 'id', ['name' => 'assign']);
 
         $joinlist = array(
             // Join assignment.
@@ -125,7 +127,17 @@ class rb_source_assign extends rb_base_source {
                 'assign_comments.assignment = assign.id AND assign_comments.grade = assign_grades.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 array('assign', 'assign_grades')
-            )
+            ),
+
+            // Join course modules for assignment name and link.
+            new rb_join(
+                'course_modules',
+                'LEFT',
+                '{course_modules}',
+                "(course_modules.module = {$moduleid} AND course_modules.instance = assign.id)",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'assign'
+            ),
         );
 
         // join users, courses and categories
@@ -156,6 +168,24 @@ class rb_source_assign extends rb_base_source {
                     'dbdatatype' => 'char',
                     'outputformat' => 'text',
                     'displayfunc' => 'format_string'
+                )
+            ),
+
+            // Assignment name linked to the assignment activity.
+            new rb_column_option(
+                'assignment',
+                'namelink',
+                get_string('assignmentnamelink', 'rb_source_assign'),
+                'assign.name',
+                array(
+                    'joins' => ['assign', 'course_modules'],
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text',
+                    'defaultheading' => get_string('assignmentname', 'rb_source_assign'),
+                    'displayfunc' => 'assign_name_link',
+                    'extrafields' => array(
+                        'id' => 'course_modules.id'
+                    )
                 )
             ),
 

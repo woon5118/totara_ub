@@ -9,6 +9,7 @@ $string['sourcesummary'] = 'Assignment activity submission information by user.'
 $string['assignmentdescription'] = 'Assignment description';
 $string['assignmentintro'] = 'Assignment intro';
 $string['assignmentname'] = 'Assignment name';
+$string['assignmentnamelink'] = 'Assignment name (linked to activity)';
 $string['assignmenttype'] = 'Assignment type';
 $string['feedbackcomment'] = 'Feedback comment';
 $string['submissiongrade'] = 'Submission grade';
