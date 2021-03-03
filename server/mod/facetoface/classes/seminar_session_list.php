@@ -314,7 +314,10 @@ final class seminar_session_list implements \Iterator, \Countable {
         for ($i = 0; $i < count($olddates); $i++) {
             if ($olddates[$i]->timestart != $newdates[$i]->timestart ||
                 $olddates[$i]->timefinish != $newdates[$i]->timefinish ||
-                $olddates[$i]->sessiontimezone != $newdates[$i]->sessiontimezone) {
+                $olddates[$i]->sessiontimezone != $newdates[$i]->sessiontimezone ||
+                // NOTE: roomids and facilitatorids must be sorted in the same order.
+                (isset($olddates[$i]->roomids) && isset($newdates[$i]->roomids) && $olddates[$i]->roomids != $newdates[$i]->roomids) ||
+                (isset($olddates[$i]->facilitatorids) && isset($newdates[$i]->facilitatorids) && $olddates[$i]->facilitatorids != $newdates[$i]->facilitatorids)) {
                 $dateschanged = true;
                 break;
             }

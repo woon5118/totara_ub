@@ -998,6 +998,8 @@ class event extends \moodleform {
                 $date->roomids  = !empty($fromform->roomids[$i]) ? explode(',', $fromform->roomids[$i]) : array();
                 $date->assetids = !empty($fromform->assetids[$i]) ? explode(',', $fromform->assetids[$i]) : array();
                 $date->facilitatorids = !empty($fromform->facilitatorids[$i]) ? explode(',', $fromform->facilitatorids[$i]) : array();
+                sort($date->roomids, SORT_NUMERIC);
+                sort($date->facilitatorids, SORT_NUMERIC);
                 $sessiondates[] = $date;
             }
         }
@@ -1011,6 +1013,10 @@ class event extends \moodleform {
             $todb->id  = $session->id;
             $sessionid = $session->id;
             $olddates  = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
+            foreach ($olddates as &$olddate) {
+                $olddate->roomids = array_keys($DB->get_records('facetoface_room_dates', ['sessionsdateid' => $olddate->id], 'roomid', 'roomid'));
+                $olddate->facilitatorids = array_keys($DB->get_records('facetoface_facilitator_dates', ['sessionsdateid' => $olddate->id], 'facilitatorid', 'facilitatorid'));
+            }
         } else {
             // Create or Duplicate the session.
             $sessionid = 0;
