@@ -34,28 +34,38 @@
   --form-error-bg-color: var(--color-prompt-alert-bg);
 
   // Standard btn background, border & text
+  --btn-accent-color: var(--color-state);
+  --btn-accent-color-active: var(--color-state-active);
+  --btn-accent-color-focus: var(--color-state-focus);
+  --btn-accent-color-disabled: var(--color-state-disabled);
   --btn-bg-color: var(--color-neutral-1);
   --btn-bg-color-active: var(--color-neutral-1);
   --btn-bg-color-disabled: var(--color-neutral-3);
   --btn-bg-color-focus: var(--color-neutral-3);
-  --btn-border-color: var(--color-state);
-  --btn-border-color-active: var(--color-state-active);
-  --btn-border-color-disabled: var(--color-state-disabled);
-  --btn-border-color-focus: var(--color-state-focus);
-  --btn-text-color: var(--color-state);
-  --btn-text-color-active: var(--color-state-active);
-  --btn-text-color-disabled: var(--color-state-disabled);
-  --btn-text-color-focus: var(--color-state-focus);
+  --btn-border-color: var(--btn-accent-color);
+  --btn-border-color-active: var(--btn-accent-color-active);
+  --btn-border-color-disabled: var(--btn-accent-color-disabled);
+  --btn-border-color-focus: var(--btn-accent-color-focus);
+  --btn-loader-color-disabled: var(--color-neutral-7);
+  --btn-text-color: var(--btn-accent-color);
+  --btn-text-color-active: var(--btn-accent-color-active);
+  --btn-text-color-disabled: var(--btn-accent-color-disabled);
+  --btn-text-color-focus: var(--btn-accent-color-focus);
 
   // Primary btn background, text & border
-  --btn-prim-bg-color: var(--color-state);
-  --btn-prim-bg-color-active: var(--color-state-active);
-  --btn-prim-bg-color-disabled: var(--color-state-disabled);
-  --btn-prim-bg-color-focus: var(--color-state-focus);
-  --btn-prim-border-color: var(--color-state);
-  --btn-prim-border-color-active: var(--color-state-active);
-  --btn-prim-border-color-disabled: var(--color-state-disabled);
-  --btn-prim-border-color-focus: var(--color-state-focus);
+  --btn-prim-accent-color: var(--color-state);
+  --btn-prim-accent-color-active: var(--color-state-active);
+  --btn-prim-accent-color-focus: var(--color-state-focus);
+  --btn-prim-accent-color-disabled: var(--color-state-disabled);
+  --btn-prim-bg-color: var(--btn-prim-accent-color);
+  --btn-prim-bg-color-active: var(--btn-prim-accent-color-active);
+  --btn-prim-bg-color-disabled: var(--btn-prim-accent-color-disabled);
+  --btn-prim-bg-color-focus: var(--btn-prim-accent-color-focus);
+  --btn-prim-border-color: var(--btn-prim-accent-color);
+  --btn-prim-border-color-active: var(--btn-prim-accent-color-active);
+  --btn-prim-border-color-disabled: var(--btn-prim-accent-color-disabled);
+  --btn-prim-border-color-focus: var(--btn-prim-accent-color-focus);
+  --btn-prim-loader-color-disabled: var(--color-neutral-7);
   --btn-prim-text-color: var(--color-neutral-1);
   --btn-prim-text-color-active: var(--color-neutral-1);
   --btn-prim-text-color-disabled: var(--color-neutral-3);

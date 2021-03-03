@@ -1,5 +1,8 @@
 This file describes API changes for 'theme_legacy'.
 
+=== 13.6 ===
+* Added intermediate "accent" variables for button colours to support styling through theme settings.
+
 === 13.2 ===
 * Dropped !important background pseudo reset style on print media query from bootstrap _print.scss
 
