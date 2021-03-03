@@ -21,6 +21,7 @@
     <Textarea
       :value="value && value.content"
       class="tui-editorTextarea__textarea"
+      char-length="full"
       rows="8"
       @input="handleInput"
     />
