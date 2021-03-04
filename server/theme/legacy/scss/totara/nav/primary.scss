@@ -33,6 +33,7 @@
 
   &--list {
     position: fixed;
+    top: 0;
     left: -100%;
     max-width: 100%;
     height: 100vh;
@@ -44,15 +45,13 @@
     // Tab colours on mobile
     &_item_link {
       color: var(--nav-tab-text-color);
-      background: transparent;
-      border: var(--border-width-thin) solid var(--nav-tab-border-color);
+      background: var(--nav-tab-bg-color);
 
       &:focus,
       &:hover {
         color: var(--nav-tab-text-color-focus);
         text-decoration: none;
         background: var(--nav-tab-bg-color-focus);
-        border-color: var(--nav-tab-border-color-focus);
       }
     }
 
@@ -66,6 +65,10 @@
       text-align: left;
       vertical-align: top;
       background: var(--nav-tab-bg-color);
+      &:focus,
+      &:hover {
+        color: var(--nav-tab-text-color-focus);
+      }
     }
 
     // List display on mobile
@@ -79,7 +82,7 @@
       z-index: 3;
       width: 80%;
       overflow-y: scroll;
-      background: var(--nav-tab-bg-color);
+      background: var(--nav-bg-color);
       box-shadow: var(--shadow-2);
       transition: 0.5s;
     }
@@ -162,7 +165,7 @@
     &--list_item {
       display: inline-block;
       vertical-align: top;
-      background: transparent;
+      background: var(--nav-tab-bg-color);
 
       &_label {
         position: relative;
@@ -191,7 +194,7 @@
         &:focus,
         &:hover {
           color: var(--nav-tab-text-color-focus);
-          background: inherit;
+          background: var(--nav-tab-bg-color-focus);
 
           .totaraNav_prim--list_item_label {
             &::after {
