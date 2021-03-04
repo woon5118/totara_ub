@@ -41,7 +41,9 @@ class core_renderer extends \core_renderer {
      * The URL to the Microsoft Teams SDK.
      */
     const MSTEAMS_SDK_URL = 'https://statics.teams.cdn.office.net/sdk/v1.8.0/js/MicrosoftTeams.min.js';
+    const PARENT_THEME = 'ventura';
 
+    private const PARENT_CSS_CACHE_KEY = 'theme_custom_css';
     private const THEME_CSS_CACHE_KEY = 'css_theme_custom';
     private const MSSTUB_JS_CACHE_KEY = 'js_theme_msteams_stub';
     private const HELPER_JS_CACHE_KEY = 'js_theme_teams';
@@ -52,6 +54,7 @@ class core_renderer extends \core_renderer {
      */
     public function standard_head_html() {
         $out = parent::standard_head_html();
+        $out .= static::load_parent_categories_css($this->page);
         // Inject JavaScript code into the <head> element.
         $payload = self::include_iframe_js();
         return $out.$payload;
@@ -96,6 +99,16 @@ class core_renderer extends \core_renderer {
     public static function include_theme_css(): string {
         // Always serve the LTR version. The layout of the minimal HTML should be language neutral.
         return loader::load_css_internal(self::THEME_CSS_CACHE_KEY, '/theme/msteams/style/custom.css');
+    }
+
+    /**
+     * Return string containing customised CSS code from parent theme.
+     *
+     * @param $page
+     * @return string
+     */
+    private static function load_parent_categories_css($page): string {
+        return loader::load_parent_css(self::PARENT_CSS_CACHE_KEY, $page);
     }
 
     /**

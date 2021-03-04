@@ -28,6 +28,7 @@ $THEME->doctype = 'html5';
 $THEME->name = 'msteams';
 $THEME->sheets = ['custom'];
 $THEME->editor_sheets = [];
+// NOTE: please update theme\msteams\core_renderer::PARENT_THEME if you change the parent theme to something other than ventura.
 $THEME->parents = ['ventura', 'legacy', 'base'];
 $THEME->enable_dock = true;
 $THEME->enable_hide = true;

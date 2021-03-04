@@ -27,6 +27,7 @@ use cache;
 use core_minify;
 use html_writer;
 use moodle_page;
+use theme_msteams\output\core_renderer;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -106,6 +107,36 @@ final class loader {
         }
         if ($raw) {
             return $css;
+        }
+        return html_writer::tag('style', $css);
+    }
+
+    /**
+     * Load a custom css from parent theme and return its minified version
+     *
+     * @param string $key cache key
+     * @param moodle_page $page
+     * @return string
+     */
+    public static function load_parent_css(string $key, moodle_page $page): string {
+
+        $cache = cache::make('theme_msteams', 'postprocessedcode');
+        $data = $cache->get($key);
+        if ($data === false || $data['rev'] == -1 || $data['rev'] != theme_get_revision()) {
+            $theme = \theme_config::load(core_renderer::PARENT_THEME);
+            $css = '';
+            // CSS part from \theme_config::get_css_content()
+            if (!during_initial_install()) {
+                $theme_settings = new \core\theme\settings($theme, (int)$page->context->tenantid);
+                $css = $theme_settings->get_css_variables();
+            }
+            $css = $theme->post_process($css);
+            if ($theme->minify_css) {
+                $css = core_minify::css($css);
+            }
+            $cache->set($key, ['rev' => theme_get_revision(), 'css' => $css]);
+        } else {
+            $css = $data['css']; // use cache
         }
         return html_writer::tag('style', $css);
     }

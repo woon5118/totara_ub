@@ -120,3 +120,19 @@ Feature: Browse the current learning tab
     Given I log in as "user6"
     When I am on Microsoft Teams "mylearning" page
     Then I should see "Course 1" in the ".block_current_learning-tile" "css_element"
+
+  Scenario: msteams504: Admin can customise CSS for all users
+    Given I log in as "admin"
+    And I navigate to "Ventura" node in "Site administration > Appearance > Themes"
+    When I click on "Colours" "link"
+    And I set the field "Primary brand colour" to "#FF000B"
+    And I set the field "Accent colour" to "#00FFE6"
+    And I click on "Save Colours Settings" "button"
+    And I reload the page
+    Then element ":root" should have a css property "--color-state" with a value of "#FF000B"
+    And element ":root" should have a css property "--color-primary" with a value of "#00FFE6"
+    And I log out
+    Given I log in as "user1"
+    When I am on Microsoft Teams "catalog" page
+    Then element ":root" should have a css property "--color-state" with a value of "#FF000B"
+    And element ":root" should have a css property "--color-primary" with a value of "#00FFE6"
