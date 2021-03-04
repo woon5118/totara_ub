@@ -42,7 +42,8 @@ final class helper {
      */
     public static function validate_theme_name(string $themename) {
         global $CFG;
-        if (!preg_match('#^[a-zA-Z_]+$#', $themename)) {
+
+        if (!self::validate_theme_component_name($themename)) {
             // Definitely not valid.
             return false;
         }
@@ -83,4 +84,24 @@ final class helper {
         return $args;
     }
 
+    /**
+     * Confirms the theme name matches the standard component naming structure.
+     * Does not do any further checks (such as to see if the theme exists or not).
+     *
+     * @param string $theme_name
+     * @return bool
+     */
+    private static function validate_theme_component_name(string $theme_name): bool {
+        $component_name = 'theme_' . $theme_name;
+
+        // Validate against the clean_param(PARAM_COMPONENT) filter without explicitly loading it
+        if (!preg_match('/^[a-z]+(_[a-z][a-z0-9_]*)?[a-z0-9]+$/', $component_name)) {
+            return false;
+        }
+        if (strpos($component_name, '__') !== false) {
+            return false;
+        }
+
+        return true;
+    }
 }
