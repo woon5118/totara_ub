@@ -126,7 +126,7 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
             public $activeuser, $controluser;
             /** @var \stdClass */
             public $category1, $category2;
-            /** @var int */
+            /** @var \stdClass */
             public $program1, $program2, $program3;
             /** @var \stdClass */
             public $cert1, $cert2, $cert3;
@@ -195,7 +195,29 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         $this->create_extension($fixtures->controluser, $fixtures->program2->id);
         $this->create_extension($fixtures->controluser, $fixtures->program3->id);
 
+        // Unassign each user from one program. The completion data should still be there.
+        $this->unassign($fixtures->activeuser->id, $fixtures->program1->id);
+        $this->unassign($fixtures->controluser->id, $fixtures->program2->id);
+
         return $fixtures;
+    }
+
+    /**
+     * Validates that the fixtures for the other tests are being constructed correctly, and that all data
+     * exists as expected.
+     */
+    public function test_fixtures(): void {
+        $fixtures = $this->create_fixtures();
+
+        $this->assert_entries_except_assign_exist($fixtures->activeuser, $fixtures->program1->id, true);
+        $this->assert_entries_exist($fixtures->activeuser, $fixtures->program2->id, true);
+        $this->assert_entries_exist($fixtures->activeuser, $fixtures->program3->id, true);
+
+        $this->assert_entries_exist($fixtures->activeuser, $fixtures->controlprogramid, false);
+
+        $this->assert_entries_exist($fixtures->controluser, $fixtures->program1->id, true);
+        $this->assert_entries_except_assign_exist($fixtures->controluser, $fixtures->program2->id, true);
+        $this->assert_entries_exist($fixtures->controluser, $fixtures->program3->id, true);
     }
 
     /**
@@ -219,12 +241,12 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         $this->assert_entries_not_exist($fixtures->activeuser, $fixtures->program1->id);
         $this->assert_entries_not_exist($fixtures->activeuser, $fixtures->program2->id);
         $this->assert_entries_not_exist($fixtures->activeuser, $fixtures->program3->id);
-        // Certification entries should still exist.
+        // Program entries should still exist.
         $this->assert_entries_exist($fixtures->activeuser, $fixtures->controlprogramid, false);
 
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program1->id);
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program2->id);
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program3->id);
+        $this->assert_entries_exist($fixtures->controluser, $fixtures->program1->id, true);
+        $this->assert_entries_except_assign_exist($fixtures->controluser, $fixtures->program2->id, true);
+        $this->assert_entries_exist($fixtures->controluser, $fixtures->program3->id, true);
     }
 
     /**
@@ -242,14 +264,14 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         $this->assert_entries_not_exist($fixtures->activeuser, $fixtures->program1->id);
         $this->assert_entries_not_exist($fixtures->activeuser, $fixtures->program2->id);
         // Program 3 should be untouched.
-        $this->assert_entries_exist($fixtures->activeuser, $fixtures->program3->id);
+        $this->assert_entries_exist($fixtures->activeuser, $fixtures->program3->id, true);
         // Certification entries should still exist.
         $this->assert_entries_exist($fixtures->activeuser, $fixtures->controlprogramid, false);
 
         // All data of controluser should be untouched.
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program1->id);
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program2->id);
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program3->id);
+        $this->assert_entries_exist($fixtures->controluser, $fixtures->program1->id, true);
+        $this->assert_entries_except_assign_exist($fixtures->controluser, $fixtures->program2->id, true);
+        $this->assert_entries_exist($fixtures->controluser, $fixtures->program3->id, true);
     }
 
     /**
@@ -266,15 +288,15 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         // Program 2 should be gone.
         $this->assert_entries_not_exist($fixtures->activeuser, $fixtures->program2->id);
         // Program 1 and 3 should be untouched.
-        $this->assert_entries_exist($fixtures->activeuser, $fixtures->program1->id);
-        $this->assert_entries_exist($fixtures->activeuser, $fixtures->program3->id);
+        $this->assert_entries_except_assign_exist($fixtures->activeuser, $fixtures->program1->id, true);
+        $this->assert_entries_exist($fixtures->activeuser, $fixtures->program3->id, true);
         // Certification entries should still exist.
         $this->assert_entries_exist($fixtures->activeuser, $fixtures->controlprogramid, false);
 
         // All data of controluser should be untouched.
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program1->id);
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program2->id);
-        $this->assert_entries_exist($fixtures->controluser, $fixtures->program3->id);
+        $this->assert_entries_exist($fixtures->controluser, $fixtures->program1->id, true);
+        $this->assert_entries_except_assign_exist($fixtures->controluser, $fixtures->program2->id, true);
+        $this->assert_entries_exist($fixtures->controluser, $fixtures->program3->id, true);
     }
 
     /**
@@ -290,7 +312,7 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         $this->assertArrayHasKey('completion', $result->data);
         $this->assertArrayHasKey('history', $result->data);
 
-        $this->assertCount(3, $result->data['assignment']);
+        $this->assertCount(2, $result->data['assignment']); // One was unassigned.
         $this->assertCount(1, $result->data['future_assignment']);
         $this->assertCount(3, $result->data['completion']);
         $this->assertCount(3, $result->data['history']);
@@ -339,7 +361,6 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         $completionids = array_column($completion, 'id');
         $historyids = array_column($history, 'id');
         $this->assertCount(3, array_diff($completionids, $historyids));
-
     }
 
     /**
@@ -355,7 +376,7 @@ class totara_certification_userdata_assignment_completion_test extends totara_pr
         $this->assertArrayHasKey('completion', $result->data);
         $this->assertArrayHasKey('history', $result->data);
 
-        $this->assertCount(2, $result->data['assignment']);
+        $this->assertCount(1, $result->data['assignment']); // One was unassigned.
         $this->assertCount(1, $result->data['future_assignment']);
         $this->assertCount(2, $result->data['completion']);
         $this->assertCount(2, $result->data['history']);

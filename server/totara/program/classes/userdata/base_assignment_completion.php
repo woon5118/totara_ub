@@ -81,29 +81,6 @@ abstract class base_assignment_completion extends item {
     }
 
     /**
-     * @param target_user $user
-     * @param context $context
-     * @return array
-     */
-    protected static function get_assigned_programids(target_user $user, context $context): array {
-        global $DB;
-
-        $contextsql = self::get_context_sql($context, 'p');
-        $certificationsql = self::get_certification_sql('p');
-
-        // Get all program ids for the users assignments.
-        $sql = "
-            SELECT p.id
-              FROM {prog_user_assignment} pa
-              JOIN {prog} p ON pa.programid = p.id $certificationsql $contextsql
-             WHERE pa.userid = :userid
-        ";
-        $params = ['userid' => $user->id];
-
-        return $DB->get_fieldset_sql($sql, $params);
-    }
-
-    /**
      * @param context $context
      * @return string
      */
@@ -121,7 +98,7 @@ abstract class base_assignment_completion extends item {
      * @param string $tablealias
      * @return string
      */
-    private static function get_certification_sql(string $tablealias): string {
+    protected static function get_certification_sql(string $tablealias): string {
         if (static::$iscertification) {
             $certificationsql = "AND $tablealias.certifid IS NOT NULL";
         } else {
@@ -132,18 +109,23 @@ abstract class base_assignment_completion extends item {
 
     /**
      * @param target_user $user
-     * @param array $programids
+     * @param context $context
      */
-    protected static function unassign_from_programs(target_user $user, array $programids) {
+    protected static function unassign_from_programs(target_user $user, context $context) {
         global $DB, $CFG;
 
         require_once($CFG->dirroot . '/totara/program/program_assignments.class.php');
 
-        list($sqlprogramids, $params) = $DB->get_in_or_equal($programids, SQL_PARAMS_NAMED);
+        $contextsql = self::get_context_sql($context, 'p');
+        $certificationsql = self::get_certification_sql('p');
 
-        $select = "programid $sqlprogramids AND userid = :userid";
+        $program_ids_sql = "(SELECT p.id FROM {prog} p WHERE 1=1 {$certificationsql} {$contextsql})";
 
-        $params['userid'] = $user->id;
+        $select = "userid = :userid AND programid IN {$program_ids_sql}";
+
+        $params = [
+            'userid' => $user->id,
+        ];
 
         // Delete all the program exceptions for the user.
         $DB->delete_records_select('prog_exception', $select, $params);
@@ -158,29 +140,55 @@ abstract class base_assignment_completion extends item {
         $DB->delete_records_select('prog_user_assignment', $select, $params);
 
         // Delete all the individual assignments for the user.
-        $select = "programid $sqlprogramids AND assignmenttype = ".ASSIGNTYPE_INDIVIDUAL." AND assignmenttypeid = :userid";
+        $select = "programid IN {$program_ids_sql} AND assignmenttype = " . ASSIGNTYPE_INDIVIDUAL .
+            " AND assignmenttypeid = :userid";
         $DB->delete_records_select('prog_assignment', $select, $params);
 
         // Delete all the program message logs for the user.
-        $select = "userid = :userid AND messageid IN (SELECT id FROM {prog_message} WHERE programid $sqlprogramids)";
+        $select = "userid = :userid AND messageid IN (SELECT id FROM {prog_message} WHERE programid IN {$program_ids_sql})";
         $DB->delete_records_select('prog_messagelog', $select, $params);
+    }
+
+    /**
+     * @param target_user $user
+     * @param context $context
+     */
+    protected static function purge_program_completion(target_user $user, context $context) {
+        global $DB;
+
+        $contextsql = self::get_context_sql($context, 'p');
+        $certificationsql = self::get_certification_sql('p');
+
+        $program_ids_sql = "(SELECT p.id FROM {prog} p WHERE 1=1 {$certificationsql} {$contextsql})";
+
+        $select = "userid = :userid AND programid IN {$program_ids_sql}";
+
+        $params = [
+            'userid' => $user->id,
+        ];
+
+        $DB->delete_records_select('prog_completion', $select, $params);
+        $DB->delete_records_select('prog_completion_history', $select, $params);
+        $DB->delete_records_select('prog_completion_log', $select, $params);
     }
 
     /**
      * @param target_user $user
      * @param array $programids
      */
-    protected static function purge_program_completion(target_user $user, array $programids) {
+    protected static function purge_other_records(target_user $user, array $programids) {
         global $DB;
 
-        list($sqlinorequal, $params) = $DB->get_in_or_equal($programids, SQL_PARAMS_NAMED);
+
+        list($sqlprogramids, $params) = $DB->get_in_or_equal($programids, SQL_PARAMS_NAMED);
+        $params['userid'] = $user->id;
+
+        $select = "programid $sqlprogramids AND userid = :userid";
+        $DB->delete_records_select('prog_extension', $select, $params);
 
         // All certification completion resides in prog_completion linked to the certification table.
-        $select = "userid = :userid AND programid $sqlinorequal";
-        $params['userid'] = $user->id;
-        $DB->delete_records_select('prog_completion', $select, $params);
-        $DB->delete_records_select('prog_completion_history', $select, $params);
-        $DB->delete_records_select('prog_completion_log', $select, $params);
+        $select = "userid = :userid AND messageid IN (SELECT id FROM {prog_message} WHERE programid $sqlprogramids)";
+        $DB->delete_records_select('prog_messagelog', $select, $params);
     }
 
     /**

@@ -45,21 +45,8 @@ class assignment_completion extends base_assignment_completion {
      * @return int result self::RESULT_STATUS_SUCCESS, self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function purge(target_user $user, context $context) {
-        global $DB;
-
-        $programids = self::get_assigned_programids($user, $context);
-
-        if (!empty($programids)) {
-            $transaction = $DB->start_delegated_transaction();
-
-            self::unassign_from_programs($user, $programids);
-
-            // Even after unassigning the learner there might be entries left
-            // for the completion, we need to make sure all of them are gone.
-            self::purge_program_completion($user, $programids);
-
-            $transaction->allow_commit();
-        }
+        self::unassign_from_programs($user, $context);
+        self::purge_program_completion($user, $context);
 
         return self::RESULT_STATUS_SUCCESS;
     }

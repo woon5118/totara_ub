@@ -168,6 +168,24 @@ abstract class totara_program_base_userdata_assignment_completion_base_test exte
     /**
      * @param target_user $user
      * @param int $programid
+     * @param bool $iscertification
+     */
+    protected function assert_entries_except_assign_exist(target_user $user, int $programid, bool $iscertification = false) {
+        $this->assertEquals(0, $this->count_prog_entries('prog_user_assignment', $user, $programid));
+        $this->assertGreaterThan(0, $this->count_prog_entries('prog_completion', $user, $programid));
+        $this->assertGreaterThan(0, $this->count_prog_entries('prog_completion_log', $user, $programid));
+        if ($iscertification) {
+            $this->assertGreaterThan(0, $this->count_certif_entries('certif_completion_history', $user, $programid));
+        } else {
+            $this->assertGreaterThan(0, $this->count_prog_entries('prog_completion_history', $user, $programid));
+        }
+        $this->assertGreaterThan(0, $this->count_prog_entries('prog_messagelog', $user, $programid));
+        $this->assertGreaterThan(0, $this->count_prog_entries('prog_extension', $user, $programid));
+    }
+
+    /**
+     * @param target_user $user
+     * @param int $programid
      */
     protected function assert_entries_not_exist(target_user $user, int $programid) {
         $this->assertEquals(0, $this->count_prog_entries('prog_user_assignment', $user, $programid));
@@ -210,6 +228,29 @@ abstract class totara_program_base_userdata_assignment_completion_base_test exte
             return $DB->count_records($table, ['userid' => $user->id, 'certifid' => $certification->id]);
         }
         return 0;
+    }
+
+    protected function unassign(int $userid, int $programid): void {
+        global $DB;
+
+        $params = [
+            'programid' => $programid,
+            'userid' => $userid,
+        ];
+
+        // Delete any future assignments for the user.
+        $DB->delete_records('prog_future_user_assignment', $params);
+
+        // Delete all the program user assignments for the user.
+        $DB->delete_records('prog_user_assignment', $params);
+
+        // Delete all the individual assignments for the user.
+        $params = [
+            'programid' => $programid,
+            'assignmenttype' => ASSIGNTYPE_INDIVIDUAL,
+            'assignmenttypeid' => $userid,
+        ];
+        $DB->delete_records('prog_assignment', $params);
     }
 
 }

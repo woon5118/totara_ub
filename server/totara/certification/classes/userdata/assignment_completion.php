@@ -53,58 +53,33 @@ class assignment_completion extends base_assignment_completion {
      * @return int result self::RESULT_STATUS_SUCCESS, self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function purge(target_user $user, context $context) {
-        global $DB;
-
-        $programids = self::get_assigned_programids($user, $context);
-
-        $transaction = $DB->start_delegated_transaction();
-
-        if (!empty($programids)) {
-            self::unassign_from_programs($user, $programids);
-
-            // Even after unassigning the learner there might be entries left
-            // for the completion, we need to make sure all of them are gone.
-            self::purge_certification_completion($user, $programids);
-            self::purge_program_completion($user, $programids);
-        } else {
-            // there are no records in {prog_user_assignment} by the time manual purge occurs.
-            self::purge_any_certification_completion($user);
-        }
-
-        $transaction->allow_commit();
+        self::unassign_from_programs($user, $context);
+        self::purge_program_completion($user, $context);
+        self::purge_certification_completion($user, $context);
 
         return self::RESULT_STATUS_SUCCESS;
     }
 
     /**
      * @param target_user $user
-     * @param array $programids
+     * @param context $context
      */
-    private static function purge_certification_completion(target_user $user, array $programids) {
+    private static function purge_certification_completion(target_user $user, context $context) {
         global $DB;
 
-        list($sqlinorequal, $params) = $DB->get_in_or_equal($programids, SQL_PARAMS_NAMED);
+        $contextsql = self::get_context_sql($context, 'p');
+        $certificationsql = self::get_certification_sql('p');
 
-        // Delete certification completions.
-        $select = "userid = :userid AND certifid IN (
-            SELECT certifid
-              FROM {prog}
-             WHERE id $sqlinorequal
-        )";
-        $params['userid'] = $user->id;
+        $certif_ids_sql = "(SELECT p.certifid FROM {prog} p WHERE 1=1 {$certificationsql} {$contextsql})";
+
+        $select = "userid = :userid AND certifid IN {$certif_ids_sql}";
+
+        $params = [
+            'userid' => $user->id,
+        ];
+
         $DB->delete_records_select('certif_completion', $select, $params);
         $DB->delete_records_select('certif_completion_history', $select, $params);
-    }
-
-    /**
-     * @param target_user $user
-     */
-    private static function purge_any_certification_completion(target_user $user) {
-        global $DB;
-
-        $condition = [ 'userid' => $user->id ];
-        $DB->delete_records('certif_completion', $condition);
-        $DB->delete_records('certif_completion_history', $condition);
     }
 
     /**
