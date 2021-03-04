@@ -26,6 +26,7 @@ namespace mod_perform\task\service;
 use core\orm\collection;
 use core\orm\lazy_collection;
 use core\orm\query\builder;
+use Iterator;
 use mod_perform\dates\constants;
 use mod_perform\dates\resolvers\anniversary_of;
 use mod_perform\dates\resolvers\date_resolver;
@@ -100,13 +101,13 @@ class track_schedule_sync {
     }
 
     /**
-     * @param date_resolver $date_resolver
-     * @param \Iterator|track_user_assignment[] $track_user_assignments
+     * @param date_resolver $original_date_resolver
+     * @param Iterator|track_user_assignment[] $track_user_assignments
      * @param bool $use_anniversary
      */
     public static function sync_user_assignment_schedules(
-        date_resolver $date_resolver,
-        \Iterator $track_user_assignments,
+        date_resolver $original_date_resolver,
+        Iterator $track_user_assignments,
         bool $use_anniversary
     ): void {
         foreach ($track_user_assignments as $assignment) {
@@ -115,7 +116,9 @@ class track_schedule_sync {
                 // the dates can be bulk fetched. However the anniversary_of decorator is created
                 // once for each assignment, because we must set a different cut of date for
                 // each one. Because it uses the original dates, the bulk fetch is still used.
-                $date_resolver = new anniversary_of($date_resolver, $assignment->created_at);
+                $date_resolver = new anniversary_of($original_date_resolver, $assignment->created_at);
+            } else {
+                $date_resolver = $original_date_resolver;
             }
 
             if ($date_resolver->get_resolver_base() === constants::DATE_RESOLVER_JOB_BASED) {

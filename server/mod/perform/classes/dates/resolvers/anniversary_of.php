@@ -22,6 +22,7 @@
  */
 namespace mod_perform\dates\resolvers;
 
+use coding_exception;
 use mod_perform\dates\anniversary_date_calculator;
 
 /**
@@ -58,6 +59,10 @@ class anniversary_of implements date_resolver {
         date_resolver $original,
         int $anniversary_cutoff_date
     ) {
+        if ($original instanceof self) {
+            throw new coding_exception('anniversary_of can not accept an original date resolver of the type anniversary_of');
+        }
+
         $this->original = $original;
         $this->anniversary_cutoff_date = $anniversary_cutoff_date;
         $this->anniversary_date_calculator = new anniversary_date_calculator();

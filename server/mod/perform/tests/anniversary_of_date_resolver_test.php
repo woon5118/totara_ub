@@ -31,6 +31,15 @@ use mod_perform\dates\resolvers\fixed_range_resolver;
  */
 class mod_perform_anniversary_of_date_resolver_testcase extends advanced_testcase {
 
+    public function test_cant_accept_its_self_as_the_original_resolver(): void {
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('anniversary_of can not accept an original date resolver of the type anniversary_of');
+
+        $first_anniversary_of = new anniversary_of(new fixed_range_resolver(time(), time()), time());
+
+        new anniversary_of($first_anniversary_of, time());
+    }
+
     /**
      * @param string $start_date
      * @param string $end_date

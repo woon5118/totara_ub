@@ -93,7 +93,7 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
         $generator = $this->generator();
         $config = mod_perform_activity_generator_configuration::new()
             ->disable_user_assignments()
-            ->set_number_of_users_per_user_group_type(1);
+            ->set_number_of_users_per_user_group_type(3);
 
         /** @var activity_model $activity */
         $activity = $generator->create_full_activities($config)->first();
@@ -112,30 +112,31 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
 
         $create_date = (new DateTime('2000-02-03T00:00:00', new DateTimeZone('UTC')))->getTimestamp();
 
-        // Set the users created date.
-        $user = user::repository()->order_by('id', 'desc')->first();
-        $user->timecreated = $create_date;
-        $user->save();
+        /** @var user $user */
+        user::repository()->update(['timecreated' => $create_date]);
 
         // Expand creates the track_user_assignments with schedule restriction.
         expand_task::create()->expand_all();
         /** @var track_user_assignment $user_assignment */
-        $user_assignment = track_user_assignment::repository()->one();
-        $this->assert_anniversary_date($user_assignment->period_start_date, 3, 2);
+        $user_assignments = track_user_assignment::repository()->get();
 
-        // End dates are adjusted to "end of day".
-        $this->assert_anniversary_date($user_assignment->period_end_date, 5, 2);
+        foreach ($user_assignments as $user_assignment) {
+            $this->assert_anniversary_date($user_assignment->period_start_date, 3, 2);
 
-        $track->set_schedule_open_dynamic(
-            new date_offset(0, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
-            $dynamic_source,
-            true
-        )->update();
+            // End dates are adjusted to "end of day".
+            $this->assert_anniversary_date($user_assignment->period_end_date, 5, 2);
 
-        (new track_schedule_sync())->sync_all_flagged();
-        $user_assignment->refresh();
-        $this->assert_anniversary_date($user_assignment->period_start_date, 3, 2);
-        $this->assertEquals(null, $user_assignment->period_end_date);
+            $track->set_schedule_open_dynamic(
+                new date_offset(0, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+                $dynamic_source,
+                true
+            )->update();
+
+            (new track_schedule_sync())->sync_all_flagged();
+            $user_assignment->refresh();
+            $this->assert_anniversary_date($user_assignment->period_start_date, 3, 2);
+            $this->assertEquals(null, $user_assignment->period_end_date);
+        }
     }
 
     public function test_draft_activity_is_not_synced(): void {
