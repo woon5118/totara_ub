@@ -100,10 +100,10 @@ export default {
 .tui-checkbox {
   position: relative;
   display: flex;
-  height: calc(var(--form-checkbox-size) + 2px);
+  min-height: calc(var(--form-checkbox-size) + 2px);
 
   &--large {
-    height: calc(var(--form-checkbox-size-large) + 2px);
+    min-height: calc(var(--form-checkbox-size-large) + 2px);
   }
 
   &__input {
