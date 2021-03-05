@@ -6466,6 +6466,42 @@ function reportbuilder_send_scheduled_report($sched) {
         }
     }
 
+    // Do not send or save the report if it doesn't contains any data.
+    list($sql, $params) = $report->build_query(true);
+    try {
+        $reportdb = $report->get_report_db();
+        $count = $reportdb->count_records_sql($sql, $params);
+    } catch (dml_read_exception $e) {
+        $message = ($report->is_cached()) ? 'error:problemobtainingcachedreportdata' : 'error:problemobtainingreportdata';
+        mtrace('Error sending scheduled report: ' . get_string($message, 'totara_reportbuilder', $e->getMessage()));
+    }
+
+    if ($count === 0) {
+        // Send instant message to tell the system users that it was not sent because it didn't contain data.
+        $scheduleemail = new \email_setting_schedule($sched->id);
+        $systemusers   = $scheduleemail->get_all_system_users_to_email();
+
+        $reportname = format_string($reportrecord->fullname);
+        $subject = get_string('emptyscheduledreportsubject', 'totara_reportbuilder', $reportname);
+        $fullmessage = get_string('emptyscheduledreportfullmenssage', 'totara_reportbuilder', $reportname);
+        foreach ($systemusers as $userto) {
+            $message = new \core\message\message();
+            $message->courseid = SITEID;
+            $message->component = "totara_reportbuilder";
+            $message->name = "empty_scheduled_report";
+            $message->userfrom = core_user::get_noreply_user();
+            $message->userto = $userto;
+            $message->subject = $subject;
+            $message->smallmessage = '';
+            $message->fullmessage = $fullmessage;
+            $message->fullmessageformat = FORMAT_PLAIN;
+            $message->notification = 1;
+            message_send($message);
+        }
+        mtrace("Scheduled Report {$sched->id} does not contain any data");
+        return false;
+    }
+
     if ($missing = $report->get_missing_filtering()) {
         mtrace("Error: Scheduled report {$sched->id} is missing required filtering input for filters: " . implode(', ', $missing));
         return false;
