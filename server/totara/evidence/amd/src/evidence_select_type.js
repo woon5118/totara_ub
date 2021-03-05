@@ -111,6 +111,7 @@ function($, templates, ajax, str, autocomplete, url) {
                     window.location.href = url.relativeUrl('/totara/evidence/create.php', params);
                 } else if (e.target.closest('[data-type-cancel]')) {
                     document.querySelector('[data-type-infobox]').classList.add('tw-evidence__hidden');
+                    location.reload();
                 }
             });
         });

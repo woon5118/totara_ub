@@ -54,13 +54,13 @@ Feature: Evidence item creation and editing
     Then I should see "Evidence_Type_B" in the "h3.tw-evidence__select_type_info_metadata_name" "css_element"
     And I should see "Two" in the "div.tw-evidence__select_type_info_metadata_description" "css_element"
     When I click on "Cancel" "link"
-    Then I should not see "Evidence_Type_B" in the "h3.tw-evidence__select_type_info_metadata_name" "css_element"
-    And I should not see "Two" in the "div.tw-evidence__select_type_info_metadata_description" "css_element"
+    And I wait until the page is ready
+    Then "h3.tw-evidence__select_type_info_metadata_name" "css_element" should not exist
     And I should not see "Cancel"
     When I expand the evidence type selector
-    And I select type "Evidence_Type_A" from the evidence type selector
-    Then I should see "Evidence_Type_A" in the "h3.tw-evidence__select_type_info_metadata_name" "css_element"
-    And I should see "One" in the "div.tw-evidence__select_type_info_metadata_description" "css_element"
+    And I select type "Evidence_Type_B" from the evidence type selector
+    Then I should see "Evidence_Type_B" in the "h3.tw-evidence__select_type_info_metadata_name" "css_element"
+    And I should see "Two" in the "div.tw-evidence__select_type_info_metadata_description" "css_element"
 
   @javascript
   Scenario: Create an evidence item then edit it
