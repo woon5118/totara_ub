@@ -158,7 +158,6 @@ $PAGE->set_other_editing_capability('moodle/course:manageactivities');
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('participants'));
 
-echo '<div class="userlist">';
 
 if ($isseparategroups and (!$currentgroup) ) {
     // The user is not in the group so show message and exit.
@@ -167,6 +166,7 @@ if ($isseparategroups and (!$currentgroup) ) {
     exit;
 }
 
+echo '<div class="userlist">';
 
 // Should use this variable so that we don't break stuff every time a variable is added or changed.
 $baseurl = new moodle_url('/user/index.php', array(
