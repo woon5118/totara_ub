@@ -33,5 +33,9 @@ $observers = array(
     array(
         'eventname' => '\auth_approved\event\request_approved',
         'callback'  => 'tool_sitepolicy\observer\request_approved_observer::update_user_consent',
-    )
+    ),
+    array(
+        'eventname' => '\core\event\user_confirmed',
+        'callback'  => 'tool_sitepolicy\observer\user_confirmed_observer::update_user_consent',
+    ),
 );

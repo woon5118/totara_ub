@@ -120,6 +120,11 @@ class auth_plugin_email extends auth_plugin_base {
             set_user_preference('auth_email_wantsurl', $SESSION->wantsurl, $user);
         }
 
+        // Save user sitepolicy consent ids so we can use it during confirmation
+        if (!empty($SESSION->userconsentids)) {
+            set_user_preference('auth_email_userconsentids', json_encode($SESSION->userconsentids), $user);
+        }
+
         // Trigger event.
         \core\event\user_created::create_from_userid($user->id)->trigger();
 
