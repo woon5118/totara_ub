@@ -131,6 +131,10 @@ switch ($action) {
 
         if (empty($roleid)) {
             $roleid = null;
+        } else {
+            if (!array_key_exists($roleid, $manager->get_assignable_roles())) {
+                throw new enrol_ajax_exception('invalidrole');
+            }
         }
 
         if (empty($startdate)) {
