@@ -32,6 +32,7 @@ global $CFG;
  *
  * @copyright  2019 Shamim Rezaie
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group core_auth
  */
 class auth_oauth2_auth_testcase extends advanced_testcase {
 
@@ -72,5 +73,25 @@ class auth_oauth2_auth_testcase extends advanced_testcase {
         $USER->auth = 'oauth';
         $result = $method->invoke($oauth, [], $USER);
         $this->assertIsArray($result);
+    }
+
+    public function test_user_confirm_secret_is_required() {
+        global $DB;
+
+        $auth_plugin = get_auth_plugin('oauth2');
+        $user = $this->getDataGenerator()->create_user(['auth' => $auth_plugin->authtype, 'secret' => 'abc']);
+        $DB->set_field('user', 'confirmed', false, ['id' => $user->id]);
+
+        // Fail with wrong secret.
+        self::assertEquals(AUTH_CONFIRM_ERROR, $auth_plugin->user_confirm($user->username, 'xyz'));
+
+        // Fail with 'true' (previous security vulnerability - see TL-29941).
+        self::assertEquals(AUTH_CONFIRM_ERROR, $auth_plugin->user_confirm($user->username, true));
+
+        // Pass with correct secret.
+        self::assertEquals(AUTH_CONFIRM_OK, $auth_plugin->user_confirm($user->username, 'abc'));
+
+        // Pass with correct secret but already confirmed.
+        self::assertEquals(AUTH_CONFIRM_ALREADY, $auth_plugin->user_confirm($user->username, 'abc'));
     }
 }

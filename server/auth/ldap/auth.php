@@ -599,16 +599,18 @@ class auth_plugin_ldap extends auth_plugin_base {
             if ($user->auth != $this->authtype) {
                 return AUTH_CONFIRM_ERROR;
 
-            } else if ($user->secret == $confirmsecret && $user->confirmed) {
+            } else if ($user->secret === $confirmsecret && $user->confirmed) {
                 return AUTH_CONFIRM_ALREADY;
 
-            } else if ($user->secret == $confirmsecret) {   // They have provided the secret key to get in
+            } else if ($user->secret === $confirmsecret) {   // They have provided the secret key to get in
                 if (!$this->user_activate($username)) {
                     return AUTH_CONFIRM_FAIL;
                 }
                 $user->confirmed = 1;
                 user_update_user($user, false);
                 return AUTH_CONFIRM_OK;
+            } else {
+                return AUTH_CONFIRM_ERROR;
             }
         } else {
             return AUTH_CONFIRM_ERROR;
