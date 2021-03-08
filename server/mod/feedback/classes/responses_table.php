@@ -202,7 +202,7 @@ class mod_feedback_responses_table extends table_sql {
                 return $value;
             }
         }
-        return $row->$column;
+        return parent::other_cols($column, $row);
     }
 
     /**
