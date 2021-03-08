@@ -527,13 +527,38 @@ if (" . ($expected ? '!' : '') . "domNode) {
                 continue;
             }
 
-            $image_src = str_replace($CFG->wwwroot . '/pluginfile.php/', '', $image_src);
-            $image_src = str_replace($CFG->wwwroot . '/draftfile.php/', '', $image_src);
-            [$context_id, $component, $filearea, $itemid, $filename] = explode('/', $image_src);
+            $image_path = $image_src;
+            $image_path = str_replace($CFG->wwwroot . '/pluginfile.php/', '', $image_path);
+            $image_path = str_replace($CFG->wwwroot . '/draftfile.php/', '', $image_path);
+            [$context_id, $component, $filearea, $itemid, $filename] = explode('/', $image_path);
             $real_file = get_file_storage()->get_file($context_id, $component, $filearea, $itemid, '/', $filename);
 
             if (!$real_file) {
-                throw new coding_exception("The image with URL {$image_src} doesn't seem to exist.");
+                throw new coding_exception("The image with URL {$image_path} doesn't seem to exist.");
+            }
+
+            // Now that we know the image does exist, check that it can actually be viewed/downloaded via the browser.
+            $uncached_image_src = new moodle_url($image_src);
+            $uncached_image_src->param('cache_timestamp', microtime());
+            $uncached_image_src = $uncached_image_src->raw_out(false);
+            $this->getSession()->executeScript("
+                M.util.js_pending('behatWekaImageFetch');
+                window.behatWekaImageFetch = null;
+                fetch('{$uncached_image_src}').then(function(response) {
+                    window.behatWekaImageFetch = response.status;
+                }).finally(function() {
+                    M.util.js_complete('behatWekaImageFetch');
+                });
+            ");
+            $this->wait_for_pending_js();
+            $http_result = $this->getSession()->evaluateScript("return window.behatWekaImageFetch;");
+            $this->getSession()->executeScript("delete window.behatWekaImageFetch;");
+            if ($http_result !== 200) {
+                $error = "Unable to load image with URL {$image_path}.";
+                if ($http_result !== null) {
+                    $error .= " Received HTTP error with code: {$http_result}";
+                }
+                throw new ExpectationException($error, $this->getSession());
             }
 
             return $image;
