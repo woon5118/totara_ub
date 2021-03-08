@@ -179,10 +179,20 @@ class gallery_tile extends base implements meta_tile {
     public function render_content_wrapper(\renderer_base $renderer, array $settings) {
         $data = $this->get_content_wrapper_template_data($renderer, $settings);
 
+        $subtiles_arr = $this->subtiles;
+
+        // Random order.
+        if (isset($this->data->order) && $this->data->order === self::ORDER_RANDOM) {
+            shuffle($subtiles_arr);
+            for ($i = 0; !empty($subtiles_arr[$i]); $i++) {
+                $subtiles_arr[$i]->sortorder = $i;
+            }
+        }
+
         $subtilesettings = $settings;
         $subtilesettings['editing'] = false;
         $subtiles = '';
-        foreach ($this->subtiles as $subtile) {
+        foreach ($subtiles_arr as $subtile) {
             if ($subtile->is_visible()) {
                 $subtiles .= $subtile->render_content_wrapper($renderer, $subtilesettings);
             }
