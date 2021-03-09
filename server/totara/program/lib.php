@@ -2283,7 +2283,7 @@ function prog_display_summary_widget($program, $userid = null) {
 
     $out = '';
     $out .= html_writer::start_tag('div', array('class' => 'cell'));
-    $out .= html_writer::link($url, $program->fullname);
+    $out .= html_writer::link($url, format_string($program->fullname));
     $out .= html_writer::end_tag('div');
     $out .= html_writer::start_tag('div', array('class' => 'dp-summary-widget-description'));
     $out .= $summary . html_writer::end_tag('div');
