@@ -7,6 +7,8 @@ information provided here is intended especially for developers.
   This validation can be optionally disabled should it cause backwards compatibility problems. To do so add
   the following in your config.php file:
       $CFG->auth_shibboleth_disable_server_attribute_validation = true;
+* The 'Data modification API' (convert_data) setting can no longer be configured to use files located within the
+  current site data directory ($CFG->dataroot), as it exposes the site to security risks.
 
 === 12.0 ===
 
