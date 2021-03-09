@@ -379,6 +379,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
     public function test_data_saved() {
         global $DB;
         $this->resetAfterTest(true);
+        $this->setAdminUser();
 
         // Create.
         $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
@@ -1077,6 +1078,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
 
     public function test_enrolment_data() {
         $this->resetAfterTest(true);
+        $this->setAdminUser();
 
         $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
         $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
