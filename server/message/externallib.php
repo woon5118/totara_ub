@@ -131,6 +131,11 @@ class core_message_external extends external_api {
                 $success = false;
                 $errormessage = get_string('userisblockingyou', 'message');
             }
+            // Check message length.
+            if ($success && \core_text::strlen($message['text']) > \core_message\api::MESSAGE_MAX_LENGTH) {
+                $success = false;
+                $errormessage = get_string('errormessagetoolong', 'message');
+            }
 
             // Check if the user is a contact
             //TODO MDL-31118 performance improvement - edit the function so we can pass an array instead userid
@@ -1013,6 +1018,7 @@ class core_message_external extends external_api {
                     self::get_messagearea_message_structure()
                 ),
                 'isblocked' => new external_value(PARAM_BOOL, 'Is this user blocked by the current user?', VALUE_DEFAULT, false),
+                'messagemaxlength' => new external_value(PARAM_INT, 'The max length of message box'),
             )
         );
     }

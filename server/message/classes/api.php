@@ -38,6 +38,11 @@ require_once($CFG->dirroot . '/lib/messagelib.php');
 class api {
 
     /**
+     * The max message length.
+    */
+    const MESSAGE_MAX_LENGTH = 4096;
+
+    /**
      * Handles searching for messages in the message area.
      *
      * @param int $userid The user id doing the searching

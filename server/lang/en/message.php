@@ -45,6 +45,7 @@ $string['emailtagline'] = 'This is a copy of a message sent to you at "{$a->site
 $string['enabled'] = 'Enabled';
 $string['enablex'] = 'Enable {$a}';
 $string['errorcallingprocessor'] = 'Error calling defined output';
+$string['errormessagetoolong'] = 'The message is longer than the maximum allowed.';
 $string['errortranslatingdefault'] = 'Error translating default setting provided by plugin, using system defaults instead.';
 $string['eventmessagecontactadded'] = 'Message contact added';
 $string['eventmessagecontactblocked'] = 'Message contact blocked';

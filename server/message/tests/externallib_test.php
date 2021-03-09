@@ -134,6 +134,35 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
     }
 
     /**
+     * Test send_instant_messages with a message text longer than permitted.
+     */
+    public function test_send_instant_messages_long_text() {
+
+        $user1 = self::getDataGenerator()->create_user();
+        $user2 = self::getDataGenerator()->create_user();
+
+        $this->setUser($user1);
+
+        // Create test message data.
+        $message1 = [
+            'touserid' => $user2->id,
+            'text' => str_repeat("Spam", \core_message\api::MESSAGE_MAX_LENGTH + 100),
+            'clientmsgid' => 4
+        ];
+        $messages = [$message1];
+
+        // Add the user1 as a contact.
+        message_add_contact($user2->id, 0, $user1->id);
+
+        $sentmessages = core_message_external::send_instant_messages($messages);
+        $sentmessages = external_api::clean_returnvalue(core_message_external::send_instant_messages_returns(), $sentmessages);
+        $this->assertEquals(
+            get_string('errormessagetoolong', 'message'),
+            array_pop($sentmessages)['errormessage']
+        );
+    }
+
+    /**
      * Test create_contacts.
      */
     public function test_create_contacts() {

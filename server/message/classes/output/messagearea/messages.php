@@ -102,7 +102,7 @@ class messages implements templatable, renderable {
         }
 
         $data->isblocked = api::is_user_blocked($this->currentuserid, $this->otheruserid);
-
+        $data->messagemaxlength = \core_message\api::MESSAGE_MAX_LENGTH;
         return $data;
     }
 }
