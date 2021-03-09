@@ -289,7 +289,10 @@ class core_enrol_external extends external_api {
      * @return array of courses
      */
     public static function get_users_courses($userid) {
-        global $USER, $DB;
+        global $USER, $DB, $CFG;
+        require_once($CFG->dirroot . '/user/lib.php');
+
+        $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
         // Do basic automatic PARAM checks on incoming data, using params description
         // If any problems are found then exceptions are thrown with helpful error messages
@@ -308,8 +311,8 @@ class core_enrol_external extends external_api {
                 continue;
             }
 
-            if ($userid != $USER->id and !has_capability('moodle/course:viewparticipants', $context)) {
-                // we need capability to view participants
+            // If viewing details of another user, then we must be able to view participants as well as profile of that user.
+            if ($userid != $USER->id && (!has_capability('moodle/course:viewparticipants', $context) || !user_can_view_profile($user, $course))) {
                 continue;
             }
 

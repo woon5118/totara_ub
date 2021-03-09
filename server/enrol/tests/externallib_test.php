@@ -691,4 +691,88 @@ class core_enrol_externallib_testcase extends externallib_advanced_testcase {
         $this->assertEquals($data->student1->id, $expecteduser['id']);
     }
 
+    /**
+     * Test that get_users_courses respects the capability to view participants when viewing courses of other user
+     */
+    public function test_get_users_courses_can_view_participants(): void {
+        global $DB;
+
+        $generator = self::getDataGenerator();
+        $course = $generator->create_course();
+        $context = context_course::instance($course->id);
+
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+        $generator->enrol_user($user1->id, $course->id);
+        $generator->enrol_user($user2->id, $course->id);
+
+        self::setUser($user1);
+
+        $courses = core_enrol_external::clean_returnvalue(
+            core_enrol_external::get_users_courses_returns(),
+            core_enrol_external::get_users_courses($user2->id)
+        );
+
+        self::assertCount(1, $courses);
+        self::assertEquals($course->id, reset($courses)['id']);
+
+        // Prohibit the capability for viewing course participants.
+        $studentrole = $DB->get_field('role', 'id', ['shortname' => 'student']);
+        assign_capability('moodle/course:viewparticipants', CAP_PROHIBIT, $studentrole, $context->id);
+
+        $courses = core_enrol_external::clean_returnvalue(
+            core_enrol_external::get_users_courses_returns(),
+            core_enrol_external::get_users_courses($user2->id)
+        );
+        self::assertEmpty($courses);
+    }
+
+    public function separate_groups_data_provider(): array {
+        return [ [true], [false] ];
+    }
+
+    /**
+     * Test that get_users_courses respects the capability to view a users profile when viewing courses of other user
+     *
+     * @dataProvider separate_groups_data_provider
+     * @param bool $separate_groups
+     */
+    public function test_get_users_courses_can_view_profile(bool $separate_groups): void {
+        $generator = self::getDataGenerator();
+
+        $course = $generator->create_course([
+            'groupmode' => VISIBLEGROUPS,
+        ]);
+
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+        $generator->enrol_user($user1->id, $course->id);
+        $generator->enrol_user($user2->id, $course->id);
+
+        // Create separate groups for each of our students.
+        $group1 = $generator->create_group(['courseid' => $course->id]);
+        groups_add_member($group1, $user1);
+        $group2 = $generator->create_group(['courseid' => $course->id]);
+        groups_add_member($group2, $user2);
+
+        self::setUser($user1);
+
+        if ($separate_groups) {
+            // Change to separate groups mode, so students can't view information about each other in different groups.
+            $course->groupmode = SEPARATEGROUPS;
+            update_course($course);
+        }
+
+        $courses = core_enrol_external::clean_returnvalue(
+            core_enrol_external::get_users_courses_returns(),
+            core_enrol_external::get_users_courses($user2->id)
+        );
+
+        if ($separate_groups) {
+            self::assertEmpty($courses);
+        } else {
+            self::assertCount(1, $courses);
+            self::assertEquals($course->id, reset($courses)['id']);
+        }
+    }
 }
