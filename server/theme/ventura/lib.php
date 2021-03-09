@@ -45,6 +45,10 @@ function theme_ventura_extend_navigation_category_settings($navigation, $context
         return;
     }
 
+    if ($PAGE->theme->name !== 'ventura') {
+        return;
+    }
+
     $tenant = $DB->get_record('tenant', ['categoryid' => $context->instanceid]);
     if (!$tenant) {
         return null;
