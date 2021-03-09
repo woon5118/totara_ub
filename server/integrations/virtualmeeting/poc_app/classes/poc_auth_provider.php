@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package totara_core
+ * @package virtualmeeting_poc_app
  */
 
-namespace totara_core\virtualmeeting\poc;
+namespace virtualmeeting_poc_app;
 
 use core\entity\user;
 use core_user;
@@ -37,7 +37,7 @@ use totara_core\virtualmeeting\user_auth;
  */
 class poc_auth_provider implements auth_provider {
     /** @var string */
-    private $name;
+    private $pluginname;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ class poc_auth_provider implements auth_provider {
      * @param string $name substring of plugin name
      */
     public function __construct(string $name) {
-        $this->name = $name;
+        $this->pluginname = 'poc_' . $name;
     }
 
     /**
@@ -54,9 +54,9 @@ class poc_auth_provider implements auth_provider {
     public function get_authentication_endpoint(): string {
         global $CFG;
         $url = new moodle_url(
-            '/totara/core/classes/virtualmeeting/poc/index.php',
+            "/integrations/virtualmeeting/{$this->pluginname}/index.php",
             [
-                'redirect_uri' => $CFG->wwwroot.'/integrations/virtualmeeting/auth_callback.php/poc_'.$this->name,
+                'redirect_uri' => "{$CFG->wwwroot}/integrations/virtualmeeting/auth_callback.php/{$this->pluginname}",
             ]
         );
         return $url->out(false);
@@ -69,7 +69,7 @@ class poc_auth_provider implements auth_provider {
         if (strpos($user->username, 'fail') !== false) {
             throw new auth_exception('you are failed');
         }
-        $auth = user_auth::load('poc_user', $user, true);
+        $auth = user_auth::load($this->pluginname, $user, true);
         $user = core_user::get_user_by_username($auth->get_token());
         if (!$user) {
             throw new auth_exception('invalid user');
@@ -88,7 +88,7 @@ class poc_auth_provider implements auth_provider {
         if (strpos($user->username, 'fail') !== false) {
             throw new auth_exception('you are failed');
         }
-        user_auth::create_or_replace('poc_user', $user, function (virtual_meeting_auth $entity) use ($query_get) {
+        user_auth::create_or_replace($this->pluginname, $user, function (virtual_meeting_auth $entity) use ($query_get) {
             $entity->access_token = $query_get['username'];
             $entity->refresh_token = 'T!O!T!A!R!A!Totara!!';
             $entity->timeexpiry = time() + YEARSECS;

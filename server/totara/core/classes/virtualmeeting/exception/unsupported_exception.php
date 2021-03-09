@@ -42,6 +42,16 @@ class unsupported_exception extends base_exception {
     }
 
     /**
+     * Exception: info unsupported by plugin
+     *
+     * @param string $plugin
+     * @return self
+     */
+    public static function info(string $plugin): self {
+        return new self('info unsupported by plugin: '.$plugin);
+    }
+
+    /**
      * Exception: feature unsupported by plugin
      *
      * @param string $plugin

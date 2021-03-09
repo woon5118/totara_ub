@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package totara_core
+ * @package virtualmeeting_poc_app
  */
 
 use core\plugininfo\virtualmeeting;
@@ -27,9 +27,11 @@ use core\plugininfo\virtualmeeting;
  * The PoC meeting page.
  */
 
+// @codeCoverageIgnoreStart
+
 global $CFG;
 if (empty($CFG)) {
-    require_once(__DIR__ . '/../../../../../config.php');
+    require_once(__DIR__ . '/../../../config.php');
 }
 
 if (!isset($USER) || !isset($PAGE) || !virtualmeeting::is_poc_available()) {

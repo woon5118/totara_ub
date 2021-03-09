@@ -30,6 +30,7 @@ use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
 /**
+ * @group virtualmeeting
  * @coversDefaultClass totara_core\userdata\virtualmeetings
  */
 class totara_core_userdata_virtualmeetings_testcase extends advanced_testcase {
@@ -78,7 +79,7 @@ class totara_core_userdata_virtualmeetings_testcase extends advanced_testcase {
         /** @var export */
         $result = virtualmeetings::execute_export(new target_user($user1), context_system::instance());
         $expected = array_map(function (virtual_meeting_entity $entity) {
-            $names = ['poc_app' => 'PoC App', 'poc_user' => 'PoC User', 'poc_none' => ''];
+            $names = ['poc_app' => 'Fake Dev App', 'poc_user' => 'Fake Dev User', 'poc_none' => ''];
             return (object)[
                 'id' => $entity->id,
                 'plugin' => $entity->plugin,

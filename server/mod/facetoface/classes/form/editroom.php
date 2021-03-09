@@ -106,7 +106,7 @@ class editroom extends \moodleform {
         $pluginsadded = [];
 
         if ($adhoc) {
-            $plugindata = virtual_meeting::get_availale_plugins_info();
+            $plugindata = virtual_meeting::get_availale_plugins_info(null, true);
             $conditions_no_auth = array_keys($meeting_options);
             foreach ($plugindata as $pluginname => $info) {
                 $meeting_options[$pluginname] = $info['name'];

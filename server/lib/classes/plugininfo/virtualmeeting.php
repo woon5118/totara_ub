@@ -60,73 +60,30 @@ class virtualmeeting extends base {
     }
 
     /**
-     * Return an array of the PoC plugins.
-     * Note that the PoC plugins are not actually installed on a system.
-     *
-     * @return array of [name => displayname]
-     * @codeCoverageIgnore
-     */
-    private static function get_poc_plugins(): array {
-        return [
-            'poc_app' => 'PoC App',
-            'poc_user' => 'PoC User',
-        ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function is_installed_and_upgraded() {
-        if (self::is_poc_available()) {
-            return true;
-        }
-        return parent::is_installed_and_upgraded(); // @codeCoverageIgnore
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_plugins($type, $typerootdir, $typeclass, $pluginman) {
-        global $CFG;
-        // If PoC plugin is enabled, all you see is PoC plugins.
-        if ($type === 'virtualmeeting' && self::is_poc_available()) {
-            $plugins = [];
-            $names = self::get_poc_plugins();
-            foreach (self::get_enabled_plugins() as $name => $x) {
-                $plugin              = new self();
-                $plugin->type        = $type;
-                $plugin->typerootdir = $CFG->dirroot.'/totara/core/classes/virtualmeeting/poc';
-                $plugin->name        = $name;
-                $plugin->rootdir     = $CFG->dirroot.'/totara/core/classes/virtualmeeting/poc';
-                $plugin->displayname = $names[$name] ?? $name;
-                $plugin->versiondb   = '2020120100';
-                $plugin->pluginman   = $pluginman;
-                $plugin->source      = core_plugin_manager::PLUGIN_SOURCE_STANDARD;
-                $plugin->description = $plugin->displayname;
-                $plugins[$name] = $plugin;
-            }
-            return $plugins;
-        }
-        return parent::get_plugins($type, $typerootdir, $typeclass, $pluginman); // @codeCoverageIgnore
-    }
-
-    /**
      * Get the plugininfo instance of all plugins.
      *
-     * @return self[]
+     * @param boolean $sorted_by_displayname set true to sort by plugin's display name, otherwise sort by plugin name
+     * @return self[] array of pluginname => plugininfo
      * @codeCoverageIgnore
      */
-    public static function get_all_plugins(): array {
-        return core_plugin_manager::instance()->get_plugins_of_type('virtualmeeting');
+    public static function get_all_plugins(bool $sorted_by_displayname = false): array {
+        $plugins = core_plugin_manager::instance()->get_plugins_of_type('virtualmeeting');
+        if ($sorted_by_displayname) {
+            uasort($plugins, function ($x, $y) {
+                return $x->get_name() <=> $y->get_name();
+            });
+        }
+        return $plugins;
     }
 
     /**
      * Get the plugininfo instance of all available plugins.
      *
-     * @return self[]
+     * @param boolean $sorted_by_displayname set true to sort by plugin's display name, otherwise sort by plugin name
+     * @return self[] array of pluginname => plugininfo
      */
-    public static function get_available_plugins(): array {
-        $plugins = self::get_all_plugins();
+    public static function get_available_plugins(bool $sorted_by_displayname = false): array {
+        $plugins = self::get_all_plugins($sorted_by_displayname);
         foreach ($plugins as $pluginname => $plugin) {
             if (!$plugin->is_available()) {
                 unset($plugins[$pluginname]);
@@ -240,19 +197,12 @@ class virtualmeeting extends base {
      * @inheritDoc
      */
     public static function get_enabled_plugins() {
-        // If PoC plugin is enabled, all you see is PoC plugins.
-        if (self::is_poc_available()) {
-            $plugins = array_keys(self::get_poc_plugins());
-            return array_combine($plugins, $plugins);
-        }
-        // @codeCoverageIgnoreStart
         $plugins = core_plugin_manager::instance()->get_installed_plugins('virtualmeeting');
         $enabled = array();
         foreach ($plugins as $plugin => $version) {
             $enabled[$plugin] = $plugin;
         }
         return $enabled;
-        // @codeCoverageIgnoreEnd
     }
 
     /**

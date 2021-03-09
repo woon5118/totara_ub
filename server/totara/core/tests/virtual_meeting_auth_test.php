@@ -28,12 +28,12 @@ use totara_core\entity\virtual_meeting_auth as virtual_meeting_auth_entity;
 use totara_core\http\clients\simple_mock_client;
 use totara_core\virtualmeeting\exception\auth_exception;
 use totara_core\virtualmeeting\exception\unsupported_exception;
-use totara_core\virtualmeeting\poc\poc_auth_provider;
-use totara_core\virtualmeeting\poc\poc_factory;
 use totara_core\virtualmeeting\virtual_meeting_auth;
+use virtualmeeting_poc_app\poc_auth_provider;
+use virtualmeeting_poc_app\poc_factory;
 
 /**
- * @group totara_core_virtualmeeting
+ * @group virtualmeeting
  * @coversDefaultClass totara_core\virtualmeeting\virtual_meeting_auth
  */
 class totara_core_virtual_meeting_auth_testcase extends advanced_testcase {
@@ -220,7 +220,7 @@ class totara_core_virtual_meeting_auth_testcase extends advanced_testcase {
     public function test_get_authentication_endpoint(): void {
         global $CFG;
         $url = virtual_meeting_auth::get_authentication_endpoint('poc_user');
-        $this->assertEquals($CFG->wwwroot.'/totara/core/classes/virtualmeeting/poc/index.php?redirect_uri='.rawurlencode($CFG->wwwroot.'/integrations/virtualmeeting/auth_callback.php/poc_user'), $url);
+        $this->assertEquals($CFG->wwwroot.'/integrations/virtualmeeting/poc_user/index.php?redirect_uri='.rawurlencode($CFG->wwwroot.'/integrations/virtualmeeting/auth_callback.php/poc_user'), $url);
         try {
             virtual_meeting_auth::get_authentication_endpoint('poc_app');
             $this->fail('unsupported_exception expected');

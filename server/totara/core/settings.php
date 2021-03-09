@@ -32,7 +32,6 @@ foreach (core_plugin_manager::instance()->get_plugins_of_type('tabexport') as $p
 // Virtual room service providers.
 $ADMIN->add('modules', new admin_category('virtualmeetingfolder', new lang_string('plugintype_virtualmeetings', 'totara_core')));
 
-foreach (core_plugin_manager::instance()->get_plugins_of_type('virtualmeeting') as $plugin) {
-    /** @var \core\plugininfo\virtualmeeting $plugin */
+foreach (\core\plugininfo\virtualmeeting::get_all_plugins(true) as $plugin) {
     $plugin->load_settings($ADMIN, 'virtualmeetingfolder', $hassiteconfig);
 }

@@ -42,6 +42,7 @@ use totara_core\virtualmeeting\exception\auth_exception;
 use totara_core\virtualmeeting\exception\base_exception;
 use totara_core\virtualmeeting\exception\meeting_exception;
 use totara_core\virtualmeeting\exception\not_implemented_exception;
+use totara_core\virtualmeeting\exception\unsupported_exception;
 use totara_core\virtualmeeting\plugin\factory\auth_factory;
 use totara_core\virtualmeeting\plugin\factory\factory;
 use totara_core\virtualmeeting\plugin\provider\provider;
@@ -287,6 +288,8 @@ final class virtual_meeting extends model {
                     $result = $provider->get_info($meeting, $what);
                 } catch (not_implemented_exception $ex) {
                     throw new meeting_exception($what.' not available');
+                } catch (unsupported_exception $ex) {
+                    throw new meeting_exception($what.' not available');
                 }
             }
             if ($result === '') {
@@ -401,15 +404,16 @@ final class virtual_meeting extends model {
     /**
      * Get all the plugin information in a serialisable format.
      *
-     * @param client|null $client
+     * @param client|null $client set the client instance or null to use the default curl_client
+     * @param boolean $sorted_by_displayname set true to sort by plugin's display name, otherwise sort by plugin name
      * @return array of {plugin_name: {name: 'display name', auth_endpoint: 'authentication URL'}, ...}
      */
-    public static function get_availale_plugins_info(client $client = null): array {
+    public static function get_availale_plugins_info(client $client = null, bool $sorted_by_displayname = false): array {
         if ($client === null) {
             $client = new curl_client();
         }
         $result = [];
-        $plugins = virtualmeeting_plugininfo::get_available_plugins();
+        $plugins = virtualmeeting_plugininfo::get_available_plugins($sorted_by_displayname);
         foreach ($plugins as $plugin) {
             $data = [
                 'name' => $plugin->get_name(),

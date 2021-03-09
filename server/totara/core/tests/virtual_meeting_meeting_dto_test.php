@@ -26,11 +26,11 @@ use totara_core\entity\virtual_meeting_auth as virtual_meeting_auth_entity;
 use totara_core\virtualmeeting\dto\meeting_dto;
 use totara_core\virtualmeeting\dto\meeting_edit_dto;
 use totara_core\virtualmeeting\exception\auth_exception;
-use totara_core\virtualmeeting\poc\poc_factory;
 use totara_core\virtualmeeting\storage;
+use virtualmeeting_poc_app\poc_factory;
 
 /**
- * @group totara_core_virtualmeeting
+ * @group virtualmeeting
  */
 class totara_core_virtual_meeting_meeting_dto_testcase extends advanced_testcase {
     /** @var stdClass */

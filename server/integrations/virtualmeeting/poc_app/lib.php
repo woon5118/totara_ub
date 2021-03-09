@@ -18,14 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package totara_core
+ * @package virtualmeeting_poc_app
  */
 
-use totara_core\http\client;
-use totara_core\virtualmeeting\plugin\factory\auth_factory;
-use totara_core\virtualmeeting\plugin\provider\auth_provider;
-use totara_core\virtualmeeting\poc\poc_auth_provider;
-use totara_core\virtualmeeting\poc\poc_factory;
+use virtualmeeting_poc_app\poc_factory;
 
 /**
  * PoC App plugin
@@ -34,20 +30,4 @@ class virtualmeeting_poc_app_factory extends poc_factory {
     protected const NAME = 'app';
     protected const DESC = 'app auth based fake meeting provider';
     protected const USER_AUTH = false;
-}
-
-/**
- * PoC User plugin
- */
-class virtualmeeting_poc_user_factory extends poc_factory implements auth_factory {
-    protected const NAME = 'user';
-    protected const DESC = 'user auth based fake meeting provider';
-    protected const USER_AUTH = true;
-
-    /**
-     * @inheritDoc
-     */
-    public function create_auth_service_provider(client $client): auth_provider {
-        return new poc_auth_provider(static::NAME);
-    }
 }

@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Test vitualmeeting rooms classes
+ * @group virtualmeeting
  */
 class mod_facetoface_virtualmeeting_room_testcase extends advanced_testcase {
 

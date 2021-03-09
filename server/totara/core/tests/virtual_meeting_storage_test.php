@@ -28,7 +28,7 @@ use totara_core\entity\virtual_meeting_config as virtual_meeting_config_entity;
 use totara_core\virtualmeeting\storage;
 
 /**
- * @group totara_core_virtualmeeting
+ * @group virtualmeeting
  * @coversDefaultClass totara_core\virtualmeeting\storage
  */
 class totara_core_virtual_meeting_storage_testcase extends advanced_testcase {

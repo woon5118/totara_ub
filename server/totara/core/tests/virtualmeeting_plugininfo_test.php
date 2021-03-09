@@ -23,10 +23,10 @@
 
 use core\plugininfo\virtualmeeting as plugininfo;
 use totara_core\virtualmeeting\plugin\feature;
-use totara_core\virtualmeeting\poc\poc_factory;
+use virtualmeeting_poc_app\poc_factory;
 
 /**
- * @group totara_core_virtualmeeting
+ * @group virtualmeeting
  * @coversDefaultClass core\plugininfo\virtualmeeting
  */
 class totara_core_virtualmeeting_plugininfo_testcase extends advanced_testcase {
@@ -66,25 +66,6 @@ class totara_core_virtualmeeting_plugininfo_testcase extends advanced_testcase {
      */
     public function test_is_poc_available(): void {
         $this->assertTrue(plugininfo::is_poc_available());
-    }
-
-    /**
-     * @covers ::is_installed_and_upgraded
-     */
-    public function test_is_installed_and_upgraded(): void {
-        foreach (plugininfo::get_all_plugins() as $plugin) {
-            $this->assertTrue($plugin->is_installed_and_upgraded());
-        }
-    }
-
-    /**
-     * @covers ::get_plugins
-     */
-    public function test_get_plugins(): void {
-        $plugins = plugininfo::get_plugins('virtualmeeting', 'notused', 'NotUsed', null);
-        $this->assertCount(2, $plugins);
-        $this->assertInstanceOf(plugininfo::class, $plugins['poc_app']);
-        $this->assertInstanceOf(plugininfo::class, $plugins['poc_user']);
     }
 
     /**
@@ -214,7 +195,7 @@ class totara_core_virtualmeeting_plugininfo_testcase extends advanced_testcase {
      */
     public function test_get_enabled_plugins(): void {
         $plugins = plugininfo::get_enabled_plugins();
-        $this->assertCount(2, $plugins);
+        $this->assertGreaterThanOrEqual(2, count($plugins));
         $this->assertEquals('poc_app', $plugins['poc_app']);
         $this->assertEquals('poc_user', $plugins['poc_user']);
     }

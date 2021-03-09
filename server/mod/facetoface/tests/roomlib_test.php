@@ -1761,6 +1761,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
     }
 
     /**
+     * @group virtualmeeting
      * @covers mod_facetoface\room_helper::save
      */
     public function test_save_virtualmeeting() {
@@ -1799,6 +1800,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
 
     /**
      * Test room_helper::save() api to test converting room from internal to none
+     * @group virtualmeeting
      */
     public function test_update_internal_room_to_none() {
 

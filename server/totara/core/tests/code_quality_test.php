@@ -33,13 +33,13 @@ use totara_core\virtualmeeting\plugin\factory\auth_factory;
 use totara_core\virtualmeeting\plugin\factory\factory;
 use totara_core\virtualmeeting\plugin\provider\auth_provider;
 use totara_core\virtualmeeting\plugin\provider\provider;
-use totara_core\virtualmeeting\poc\poc_auth_provider;
-use totara_core\virtualmeeting\poc\poc_factory;
-use totara_core\virtualmeeting\poc\poc_service_provider;
 use totara_core\virtualmeeting\storage;
 use totara_core\virtualmeeting\user_auth;
 use totara_core\virtualmeeting\virtual_meeting as virtual_meeting_model;
 use totara_core\virtualmeeting\virtual_meeting_auth as virtual_meeting_auth_model;
+use virtualmeeting_poc_app\poc_auth_provider;
+use virtualmeeting_poc_app\poc_factory;
+use virtualmeeting_poc_app\poc_service_provider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -73,6 +73,8 @@ class totara_core_code_quality_testcase extends totara_core_code_quality_testcas
         user_auth::class,
         meeting_dto::class,
         meeting_edit_dto::class,
+
+        // virtualmeeting plugins
         poc_auth_provider::class,
         poc_factory::class,
         poc_service_provider::class,

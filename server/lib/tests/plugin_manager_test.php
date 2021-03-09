@@ -285,8 +285,6 @@ class core_plugin_manager_testcase extends advanced_testcase {
                     $this->assertSame(core_plugin_manager::PLUGIN_STATUS_MISSING, $info->get_status(), 'Invalid '.$info->component.' state');
                 } else if ($info->component === 'tool_installaddon') {
                     $this->assertSame(core_plugin_manager::PLUGIN_STATUS_DELETE, $info->get_status(), 'Invalid '.$info->component.' state');
-                } else if (strpos($info->component, 'virtualmeeting_poc_') === 0) {
-                    $this->assertSame(core_plugin_manager::PLUGIN_STATUS_MISSING, $info->get_status(), 'Invalid '.$info->component.' state');
                 } else {
                     $this->assertSame(core_plugin_manager::PLUGIN_STATUS_UPTODATE, $info->get_status(), 'Invalid '.$info->component.' state');
                 }

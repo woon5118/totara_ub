@@ -3203,6 +3203,9 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertStringContainsString('Capacity: 1 / 10 (minimum: 4)', $message->fullmessage);
     }
 
+    /**
+     * @group virtualmeeting
+     */
     function test_facetoface_send_notification_virtual_meeting_creation_failure() {
         global $DB;
         $this->init_sample_data();

@@ -26,11 +26,11 @@ use core\orm\query\exceptions\record_not_found_exception;
 use totara_core\entity\virtual_meeting_auth as virtual_meeting_auth_entity;
 use totara_core\virtualmeeting\authoriser\mock_authoriser;
 use totara_core\virtualmeeting\exception\auth_exception;
-use totara_core\virtualmeeting\poc\poc_factory;
 use totara_core\virtualmeeting\user_auth;
+use virtualmeeting_poc_app\poc_factory;
 
 /**
- * @group totara_core_virtualmeeting
+ * @group virtualmeeting
  * @coversDefaultClass totara_core\virtualmeeting\user_auth
  */
 class totara_core_virtual_meeting_user_auth_testcase extends advanced_testcase {

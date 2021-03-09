@@ -67,17 +67,17 @@ Feature: User sees a seminar virtual room meeting
     And I click on "Select rooms" "link" in the "Pacific/Auckland" "table_row"
     And I click on "Create" "link_exact" in the "[aria-describedby='selectrooms0-dialog']" "css_element"
     And I set the following fields to these values:
-      | Name                  | Party night |
-      | Capacity              | 100         |
-      | Add virtual room link | PoC App     |
+      | Name                  | Party night  |
+      | Capacity              | 100          |
+      | Add virtual room link | Fake Dev App |
     And I click on "OK" "button_exact" in the "[aria-describedby='editcustomroom0-dialog']" "css_element"
 
     And I click on "Select rooms" "link" in the "Europe/Prague" "table_row"
     And I click on "Create" "link_exact" in the "[aria-describedby='selectrooms1-dialog']" "css_element"
     And I set the following fields to these values:
-      | Name                  | Live music |
-      | Capacity              | 200        |
-      | Add virtual room link | PoC User   |
+      | Name                  | Live music    |
+      | Capacity              | 200           |
+      | Add virtual room link | Fake Dev User |
     And I click on "Connect" "button" in the "[aria-describedby='editcustomroom1-dialog']" "css_element"
     And I wait "1" seconds
     And I switch to "virtualmeeting_connect" window
@@ -156,9 +156,9 @@ Feature: User sees a seminar virtual room meeting
     And I click on the link "Select rooms" in row 1
     And I click on "Create" "link_exact" in the "[aria-describedby='selectrooms0-dialog']" "css_element"
     And I set the following fields to these values:
-      | Name                  | Party night |
-      | Capacity              | 64          |
-      | Add virtual room link | PoC App     |
+      | Name                  | Party night  |
+      | Capacity              | 64           |
+      | Add virtual room link | Fake Dev App |
     And I click on "OK" "button_exact" in the "[aria-describedby='editcustomroom0-dialog']" "css_element"
     And I press "Save changes"
     And I click on the seminar event action "Edit event" in row "Australia/Perth"
@@ -185,9 +185,9 @@ Feature: User sees a seminar virtual room meeting
     And I click on the link "Select rooms" in row 1
     And I click on "Create" "link_exact" in the "[aria-describedby='selectrooms0-dialog']" "css_element"
     And I set the following fields to these values:
-      | Name                  | Party night |
-      | Capacity              | 64          |
-      | Add virtual room link | PoC User    |
+      | Name                  | Party night   |
+      | Capacity              | 64            |
+      | Add virtual room link | Fake Dev User |
     And I click on "Connect" "button"
     And I switch to "virtualmeeting_connect" window
     And I set the following fields to these values:
@@ -214,7 +214,7 @@ Feature: User sees a seminar virtual room meeting
 
   Scenario: mod_facetoface_virtualmeeting_006: Enable and disable virtualmeeting plugins
     Given I log in as "admin"
-    And I navigate to "PoC User" node in "Site administration > Plugins > Virtual meetings"
+    And I navigate to "Fake Dev User" node in "Site administration > Plugins > Virtual meetings"
     And I set the following fields to these values:
       | Enabled | 0 |
     And I press "Save changes"
@@ -223,14 +223,14 @@ Feature: User sees a seminar virtual room meeting
     And I click on the seminar event action "Edit event" in row "Pacific/Auckland"
     And I click on the link "Select rooms" in row 1
     And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
-    And I should not see "PoC User" in the "Add virtual room link" "field"
-    And I should see "PoC App" in the "Add virtual room link" "field"
+    And I should not see "Fake Dev User" in the "Add virtual room link" "field"
+    And I should see "Fake Dev App" in the "Add virtual room link" "field"
     And I click on "Cancel" "button" in the "Create new room" "totaradialogue"
-    Then I navigate to "PoC User" node in "Site administration > Plugins > Virtual meetings"
+    Then I navigate to "Fake Dev User" node in "Site administration > Plugins > Virtual meetings"
     And I set the following fields to these values:
       | Enabled | 1 |
     And I press "Save changes"
-    And I follow "PoC App"
+    And I follow "Fake Dev App"
     And I set the following fields to these values:
       | Enabled | 0 |
     And I press "Save changes"
@@ -238,8 +238,8 @@ Feature: User sees a seminar virtual room meeting
     And I click on the seminar event action "Edit event" in row "Pacific/Auckland"
     And I click on the link "Select rooms" in row 1
     And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
-    And I should see "PoC User" in the "Add virtual room link" "field"
-    And I should not see "PoC App" in the "Add virtual room link" "field"
+    And I should see "Fake Dev User" in the "Add virtual room link" "field"
+    And I should not see "Fake Dev App" in the "Add virtual room link" "field"
 
   Scenario: mod_facetoface_virtualmeeting_007: Valid users can see join now on the event details page for virtual meetings
     Given I log in as "admin"
@@ -250,7 +250,7 @@ Feature: User sees a seminar virtual room meeting
     And I set the following fields to these values:
       | Name                  | Future Sailor |
       | Capacity              | 100           |
-      | Add virtual room link | PoC App       |
+      | Add virtual room link | Fake Dev App  |
     And I click on "OK" "button_exact" in the "[aria-describedby='editcustomroom0-dialog']" "css_element"
     And I press "Save changes"
 
@@ -261,7 +261,7 @@ Feature: User sees a seminar virtual room meeting
     And I set the following fields to these values:
       | Name                  | Electronic Castaway |
       | Capacity              | 100                 |
-      | Add virtual room link | PoC App             |
+      | Add virtual room link | Fake Dev App        |
     And I click on "OK" "button_exact" in the "[aria-describedby='editcustomroom0-dialog']" "css_element"
     And I press "Save changes"
 

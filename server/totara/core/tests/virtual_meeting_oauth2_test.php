@@ -29,10 +29,10 @@ use totara_core\http\request;
 use totara_core\http\response;
 use totara_core\virtualmeeting\authoriser\oauth2_authoriser;
 use totara_core\virtualmeeting\exception\auth_exception;
-use totara_core\virtualmeeting\poc\poc_factory;
+use virtualmeeting_poc_app\poc_factory;
 
 /**
- * @group totara_core_virtualmeeting
+ * @group virtualmeeting
  * @coversDefaultClass totara_core\virtualmeeting\authoriser\oauth2_authoriser
  */
 class totara_core_virtual_meeting_oauth2_testcase extends advanced_testcase {

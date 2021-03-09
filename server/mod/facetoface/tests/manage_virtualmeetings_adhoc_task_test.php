@@ -24,11 +24,13 @@
 use totara_core\virtualmeeting\virtual_meeting as virtualmeeting_model;
 use mod_facetoface\seminar_event;
 use mod_facetoface\seminar_session;
+use virtualmeeting_poc_app\poc_factory;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Test the manage_virtualmeetings_adhoc_task task.
+ * @group virtualmeeting
  * @coversDefaultClass mod_facetoface\task\manage_virtualmeetings_adhoc_task
  */
 class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced_testcase {
@@ -361,7 +363,7 @@ class mod_facetoface_manage_virtualmeetings_adhoc_task_testcase extends advanced
     public function test_execute_unavailable_plugin() {
         // call execute()
         // ensure adhoc task fails with 'plugin is not configured'
-        set_config('virtualmeeting_poc_app_enabled', '0', 'totara_core');
+        poc_factory::toggle('poc_app', false);
         $sink = $this->redirectMessages();
 
         $task = \mod_facetoface\task\manage_virtualmeetings_adhoc_task::create_from_seminar_event_id($this->event1);

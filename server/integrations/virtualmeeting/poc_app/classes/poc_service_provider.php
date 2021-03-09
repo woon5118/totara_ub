@@ -18,18 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package totara_core
+ * @package virtualmeeting_poc_app
  */
 
-namespace totara_core\virtualmeeting\poc;
+namespace virtualmeeting_poc_app;
 
 use totara_core\virtualmeeting\dto\meeting_dto;
 use totara_core\virtualmeeting\dto\meeting_edit_dto;
 use totara_core\virtualmeeting\exception\meeting_exception;
-use totara_core\virtualmeeting\exception\not_implemented_exception;
 use totara_core\virtualmeeting\plugin\provider\provider;
 use core_user;
 use moodle_url;
+use totara_core\virtualmeeting\exception\unsupported_exception;
 use totara_core\virtualmeeting\plugin\feature;
 
 /**
@@ -63,9 +63,9 @@ class poc_service_provider implements provider {
      * @param boolean $host
      * @return string
      */
-    private static function make_url(meeting_edit_dto $meeting, string $username, int $age, bool $host): string {
+    private function make_url(meeting_edit_dto $meeting, string $username, int $age, bool $host): string {
         $url = new moodle_url(
-            '/totara/core/classes/virtualmeeting/poc/meet.php',
+            "/integrations/virtualmeeting/poc_{$this->name}/meet.php",
             [
                 'name' => $meeting->name,
                 'timestart' => $meeting->timestart->getTimestamp(),
@@ -105,16 +105,16 @@ class poc_service_provider implements provider {
         }
         $username = $this->extract_username($meeting);
         $age = $meeting->get_storage()->get('age') ?? 0;
-        if (get_config('totara_core', "virtualmeeting_poc_{$this->name}_" . feature::LOSSY_UPDATE)) {
+        if (get_config("virtualmeeting_poc_{$this->name}", 'feature__' . feature::LOSSY_UPDATE)) {
             $age++; // new age
         }
         $meeting->get_storage()
             ->delete_all()
             ->set('id', $update ? 'updated' : 'created')
             ->set('age', $age)
-            ->set('join_url', self::make_url($meeting, $username, $age, false));
+            ->set('join_url', $this->make_url($meeting, $username, $age, false));
         if (strpos($meeting->name, 'nohost') === false) {
-            $meeting->get_storage()->set('host_url', self::make_url($meeting, $username, $age, true));
+            $meeting->get_storage()->set('host_url', $this->make_url($meeting, $username, $age, true));
         }
     }
 
@@ -158,8 +158,8 @@ class poc_service_provider implements provider {
      * @inheritDoc
      */
     public function get_info(meeting_dto $meeting, string $what): string {
-        if (!get_config('totara_core', "virtualmeeting_poc_{$this->name}_{$what}")) {
-            throw new not_implemented_exception();
+        if (!get_config("virtualmeeting_poc_{$this->name}", "info__{$what}")) {
+            throw unsupported_exception::info("poc_{$this->name}");
         }
         if ($what === provider::INFO_HOST_URL) {
             return $meeting->get_storage()->get('host_url', true);
@@ -170,6 +170,6 @@ class poc_service_provider implements provider {
             $username = $this->extract_username($meeting);
             return '<p>info from '.s($username).'</p>';
         }
-        throw new not_implemented_exception();
+        throw unsupported_exception::info("poc_{$this->name}");
     }
 }
