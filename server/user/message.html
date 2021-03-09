@@ -36,7 +36,8 @@
         foreach ($SESSION->emailto[$id] as $user) {
             echo '<tr><td>'.fullname($user,true).'</td>';
             // Check to see if we should be showing the email address.
-            if ($user->maildisplay == 0) { // 0 = don't display my email to anyone.
+            if ($user->maildisplay == 0 // 0 = don't display my email to anyone.
+                || strpos($CFG->showuseridentity, 'email') === false) {
                 echo '<td>' . get_string('emaildisplayhidden') . '</td><td>';
             } else {
                 echo '<td>'.clean_string($user->email).'</td><td>';
