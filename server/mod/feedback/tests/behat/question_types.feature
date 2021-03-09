@@ -134,3 +134,47 @@ Feature: Test creating different types of feedback questions for anonymous feedb
     And I should see "1 (50.00 %)" in the "option a" "table_row"
     And I should see "1 (50.00 %)" in the "option b" "table_row"
     And I log out
+
+  @javascript
+  Scenario: Ensure stored XSS is cleaned up correctly
+    Given the following "users" exist:
+      | username | firstname | lastname |
+      | teacher1 | Teacher   | 1        |
+      | student1 | Student   | 1        |
+    And the following "courses" exist:
+      | fullname | shortname |
+      | Course 1 | C1        |
+    And the following "course enrolments" exist:
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
+    And the following "activities" exist:
+      | activity   | name                | course | idnumber    |
+      | feedback   | Learning experience | C1     | feedback0   |
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Learning experience"
+    And I click on "Edit questions" "link" in the "[role=main]" "css_element"
+    And I add a "Short text answer" question to the feedback with:
+      | Question               | this is a short text answer |
+      | Label                  | shorttext                   |
+      | Maximum characters accepted | 200                    |
+    And I log out
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Learning experience"
+    And I follow "Answer the questions..."
+    And I set the following fields to these values:
+      | this is a short text answer  | &#x3c;script&#x3e;alert(origin);&#x3c;/script&#x3e; |
+    And I press "Submit your answers"
+    And I log out
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Learning experience"
+    And I navigate to "Show responses" in current page administration
+    Then I should see "Response number: 1"
+    And I should see "<script>alert(origin);</script>"
+    When I follow "Response number: 1"
+    And I should see "<script>alert(origin);</script>"
+    And I log out
+
