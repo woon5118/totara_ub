@@ -80,5 +80,30 @@ function xmldb_totara_catalog_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020051300, 'totara', 'catalog');
     }
 
+    if ($oldversion < 2020100102) {
+        // Find and remove catalog previews for GIF images.
+        $query = "
+            SELECT DISTINCT preview.*
+              FROM {files} AS preview
+              JOIN {files} AS origin
+                ON preview.filename = origin.contenthash
+             WHERE preview.component = 'core'
+               AND preview.filearea = 'preview'
+               AND preview.filepath = '/totara_catalog_medium/ventura/'
+               AND origin.id IS NOT NULL
+               AND origin.component IN ('course', 'totara_program', 'engage_article')
+               AND origin.filearea IN ('images', 'image')
+               AND origin.mimetype = 'image/gif'
+        ";
+
+        $fstorage = get_file_storage();
+        $records = $DB->get_records_sql($query);
+        foreach ($records as $record) {
+            $fstorage->get_file_instance($record)->delete();
+        }
+
+        upgrade_plugin_savepoint(true, 2020100102, 'totara', 'catalog');
+    }
+
     return true;
 }

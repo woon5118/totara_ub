@@ -239,7 +239,7 @@ final class preview_helper {
         $mime_type = $file->get_mimetype();
         $data = null;
 
-        if ($mime_type === 'image/gif' || $mime_type === 'image/jpeg' || $mime_type === 'image/png') {
+        if ($mime_type === 'image/jpeg' || $mime_type === 'image/png') {
             // make a preview of the image
             $data = $this->get_preview_content($file, $name);
         } else {

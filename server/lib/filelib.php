@@ -2547,7 +2547,8 @@ function send_stored_file($stored_file, $lifetime=null, $filter=0, $forcedownloa
         $lifetime = $CFG->filelifetime;
     }
 
-    if (!empty($options['preview'])) {
+    // Note: As of TL-29920 we're not previewing gifs as they lose animation.
+    if (!empty($options['preview']) && $stored_file->get_mimetype() !== 'image/gif') {
         $theme = null;
         if (isset($options['theme'])) {
             $theme = \theme_config::load($options['theme']);
