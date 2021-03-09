@@ -385,4 +385,46 @@ describe('Reform', () => {
 
     expect(focusHandler).toHaveBeenCalled();
   });
+
+  it('always clones error result objects', async () => {
+    // regression test for TL-29929:
+    // error result objects sometimes did not get cloned before merging,
+    // resulting in validation errors persisting after the validator stopped
+    // returning them.
+
+    const { scope, submit } = createSimple({
+      els: [{ value: null }, { value: null }],
+    });
+
+    scope.register('validator', ['els', 0, 'value'], () => null);
+    scope.register('validator', ['els', 1, 'value'], () => null);
+
+    scope.register('validator', 'els', items =>
+      items.map((item, index) => {
+        const isDuplicate =
+          items.findIndex((x, i) => i != index && x.value === item.value) !==
+          -1;
+        return {
+          value: isDuplicate ? 'dupe' : null,
+        };
+      })
+    );
+
+    scope.update(['els', 0, 'value'], 5);
+    scope.update(['els', 1, 'value'], 5);
+
+    await submit();
+
+    expect(scope.getError([])).toEqual({
+      els: [{ value: 'dupe' }, { value: 'dupe' }],
+    });
+
+    scope.update(['els', 1, 'value'], 9);
+
+    await validateWait();
+
+    expect(scope.getError([])).toEqual({
+      els: [{ value: null }, { value: null }],
+    });
+  });
 });

@@ -624,6 +624,7 @@ export default {
         if (!val) return;
         if (k in result && result[k] != null) {
           if (isDataStructure(val)) {
+            result[k] = structuralShallowClone(result[k]);
             this.$_mergeErrors(result[k], val, keepResult);
           } else {
             if (!keepResult) {
