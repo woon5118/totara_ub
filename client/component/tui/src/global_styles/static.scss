@@ -48,7 +48,7 @@ html {
   }
 
   &__embedContainer {
-    max-width: 700px;
+    max-width: var(--embedded-media-max-width);
   }
 }
 

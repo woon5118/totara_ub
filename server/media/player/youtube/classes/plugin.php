@@ -70,17 +70,15 @@ class media_youtube_plugin extends core_media_player_external {
 
         self::pick_video_size($width, $height);
 
+        $grow = !empty($options[core_media_manager::OPTION_GROW]);
+
         if ($this->isplaylist) {
 
             $site = $this->matches[1];
             $playlist = $this->matches[3];
 
-            $iframe = $this->responsive_iframe("https://$site/embed/videoseries?list=$playlist", $width, $height, $info);
+            $frame_url = "https://$site/embed/videoseries?list=$playlist";
 
-            return html_writer::tag('div', $iframe, [
-                'class' => 'mediaplugin mediaplugin_youtube mediaplugin--iframe-centered',
-                'style' => 'max-width: ' . $this->dimension_to_css($width) . ';',
-            ]);
         } else {
 
             $videoid = end($this->matches);
@@ -97,14 +95,20 @@ class media_youtube_plugin extends core_media_player_external {
                 $params .= "list=$listid&";
             }
 
-            $iframe = $this->responsive_iframe("https://www.youtube.com/embed/$videoid?{$params}rel=0&wmode=transparent", $width, $height, $info);
+            $frame_url = "https://www.youtube.com/embed/$videoid?{$params}rel=0&wmode=transparent";
 
-            return html_writer::tag('div', $iframe, [
-                'class' => 'mediaplugin mediaplugin_youtube mediaplugin--iframe-centered',
-                'style' => 'max-width: ' . $this->dimension_to_css($width) . ';',
-            ]);
         }
 
+        $content = $this->responsive_iframe($frame_url, $width, $height, $info);
+
+        $content = html_writer::tag('div', $content, [
+            'class' => $grow ? 'mediaplugin_grow_limit' : null,
+            'style' => $grow ? null : 'max-width: ' . $this->dimension_to_css($width) . ';',
+        ]);
+
+        return html_writer::tag('div', $content, [
+            'class' => 'mediaplugin mediaplugin_youtube',
+        ]);
     }
 
     /**

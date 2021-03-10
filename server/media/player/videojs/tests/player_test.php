@@ -312,5 +312,12 @@ class media_videojs_testcase extends advanced_testcase {
             '~<div class="mediaplugin mediaplugin_videojs"><div style="max-width:100%;"><video .*</video></div></div>~',
             format_text($embedcode, FORMAT_HTML)
         );
+
+        // data-grow
+        $embedcode = '<video controls="" width="400" height="200" data-grow><source src="https://example.com/v.mp4" type="video/mp4"></video>';
+        $this->assertRegExp(
+            '~<div class="mediaplugin mediaplugin_videojs"><div class="mediaplugin_grow_limit"><video .*</div>~',
+            format_text($embedcode, FORMAT_HTML)
+        );
     }
 }

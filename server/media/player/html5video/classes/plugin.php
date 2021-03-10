@@ -41,22 +41,12 @@ class media_html5video_plugin extends core_media_player_native {
             return $options[core_media_manager::OPTION_ORIGINAL_TEXT];
         }
 
-        // Special handling to make videos play on Android devices pre 2.3.
-        // Note: I tested and 2.3.3 (in emulator) works without, is 533.1 webkit.
-        $oldandroid = core_useragent::is_webkit_android() &&
-            !core_useragent::check_webkit_android_version('533.1');
-
         // Build array of source tags.
         $sources = array();
         foreach ($urls as $url) {
             $mimetype = core_media_manager::instance()->get_mimetype($url);
             $source = html_writer::empty_tag('source', array('src' => $url, 'type' => $mimetype));
             if ($mimetype === 'video/mp4') {
-                if ($oldandroid) {
-                    // Old Android fails if you specify the type param.
-                    $source = html_writer::empty_tag('source', array('src' => $url));
-                }
-
                 // Better add m4v as first source, it might be a bit more
                 // compatible with problematic browsers.
                 array_unshift($sources, $source);
@@ -67,44 +57,34 @@ class media_html5video_plugin extends core_media_player_native {
 
         $sources = implode("\n", $sources);
         $title = $this->get_name($name, $urls);
-        // Escape title but prevent double escaping.
-        $title = s(preg_replace(['/&amp;/', '/&gt;/', '/&lt;/'], ['&', '>', '<'], $title));
+        // Prevent double escaping in title.
+        $title = preg_replace(['/&amp;/', '/&gt;/', '/&lt;/'], ['&', '>', '<'], $title);
 
         self::pick_video_size($width, $height);
-        if (!$height) {
-            // Let browser choose height automatically.
-            $size = "width=\"$width\"";
-        } else {
-            $size = "width=\"$width\" height=\"$height\"";
-        }
-
-        $sillyscript = '';
-        $idtag = '';
-        if ($oldandroid) {
-            // Old Android does not support 'controls' option.
-            $id = 'core_media_html5v_' . md5(time() . '_' . rand());
-            $idtag = 'id="' . $id . '"';
-            $sillyscript = <<<OET
-<script type="text/javascript">
-document.getElementById('$id').addEventListener('click', function() {
-    this.play();
-}, false);
-</script>
-OET;
-        }
 
         // We don't want fallback to another player because list_supported_urls() is already smart.
         // Otherwise we could end up with nested <video> tags. Fallback to link only.
         $fallback = self::LINKPLACEHOLDER;
-        return <<<OET
-<span class="mediaplugin mediaplugin_html5video">
-<video $idtag controls="true" $size preload="metadata" title="$title">
-    $sources
-    $fallback
-</video>
-$sillyscript
-</span>
-OET;
+
+        $grow = !empty($options[core_media_manager::OPTION_GROW]);
+
+        $content = html_writer::tag('video', $sources.$fallback, [
+            'style' => $grow ? 'width: 100%;' : null,
+            'controls' => true,
+            'width' => $grow ? null : $width,
+            // Let the browser choose the height automatically.
+            'height' => $grow || !$height ? null : $height,
+            'preload' => 'metadata',
+            'title' => $title,
+        ]);
+
+        if ($grow) {
+            $content = html_writer::tag('div', $content, [
+                'class' => 'mediaplugin_grow_limit',
+            ]);
+        }
+
+        return html_writer::tag('div', $content, ['class' => 'mediaplugin mediaplugin_html5video']);
     }
 
     public function get_supported_extensions() {

@@ -2085,6 +2085,8 @@ function purify_html($text, $options = array()) {
                 'controls' => 'Bool',
                 'width' => 'Length',
                 'height' => 'Length',
+                // Totara: custom "data-grow" attribute on video elements
+                'data-grow' => 'Bool',
             ]);
             // https://html.spec.whatwg.org/#the-audio-element
             $def->addElement('audio', 'Block', 'Optional: #PCDATA | Flow | source | track', 'Common', [

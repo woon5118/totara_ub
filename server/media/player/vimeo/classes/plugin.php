@@ -45,12 +45,17 @@ class media_vimeo_plugin extends core_media_player_external {
         // option that seems to work on most devices.
         self::pick_video_size($width, $height);
 
-        $iframe = $this->responsive_iframe("https://player.vimeo.com/video/$videoid", $width, $height, $info);
+        $grow = !empty($options[core_media_manager::OPTION_GROW]);
 
+        $content = $this->responsive_iframe("https://player.vimeo.com/video/$videoid", $width, $height, $info);
 
-        return html_writer::tag('div', $iframe, [
-            'class' => 'mediaplugin mediaplugin_vimeo mediaplugin--iframe-centered',
-            'style' => 'max-width: ' . $this->dimension_to_css($width) . ';',
+        $content = html_writer::tag('div', $content, [
+            'class' => $grow ? 'mediaplugin_grow_limit' : null,
+            'style' => $grow ? null : 'max-width: ' . $this->dimension_to_css($width) . ';',
+        ]);
+
+        return html_writer::tag('div', $content, [
+            'class' => 'mediaplugin mediaplugin_vimeo',
         ]);
     }
 

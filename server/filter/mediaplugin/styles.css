@@ -19,11 +19,12 @@
 }
 
 .mediaplugin > div {
-    margin: inherit;
+    margin: auto;
 }
 
-.mediaplugin--iframe-centered {
-    margin: 5px auto;
+.mediaplugin_grow_limit {
+    /* overridden in Totara default theme */
+    max-width: 700px;
 }
 
 /* Responsive aspect ratio - https://css-tricks.com/aspect-ratio-boxes/ */

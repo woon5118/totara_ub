@@ -235,6 +235,9 @@ class filter_mediaplugin extends moodle_text_filter {
             $width = $this->parse_dimension(core_media_player_native::get_attribute($fulltext, 'width', PARAM_RAW));
             $height = $this->parse_dimension(core_media_player_native::get_attribute($fulltext, 'height', PARAM_RAW));
             $name = core_media_player_native::get_attribute($fulltext, 'title');
+            if (core_media_player_native::get_attribute($fulltext, 'data-grow') !== null) {
+                $options[core_media_manager::OPTION_GROW] = true;
+            }
             return $this->embed_alternatives($urls, $name, $width, $height, $options);
         }
         return $fulltext;

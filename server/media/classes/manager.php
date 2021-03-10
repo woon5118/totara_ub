@@ -88,6 +88,11 @@ final class core_media_manager {
      */
     const OPTION_ORIGINAL_TEXT = 'originaltext';
 
+    /**
+     * Option: Media player should grow to the available width (subject to limits).
+     */
+    const OPTION_GROW = 'grow';
+
     /** @var array Array of available 'player' objects */
     private $players;
 

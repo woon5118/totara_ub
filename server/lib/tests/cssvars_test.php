@@ -57,6 +57,18 @@ class core_cssvars_testcase extends basic_testcase {
         $this->assertEquals(":root{--bg:\n#06c;-var--bg:\n#06c;}", $transformed);
     }
 
+    public function test_value_fallback() {
+        $cssvars = new \core\cssvars();
+
+        $css = 'a { width: var(--val, 20px); }';
+        $transformed = $cssvars->transform($css);
+        $this->assertStringContainsString('a { width: 20px; }', $transformed);
+
+        $css = ':root { --val: 30px; } a { width: var(--val, 20px); }';
+        $transformed = $cssvars->transform($css);
+        $this->assertStringContainsString('a { width: 30px; }', $transformed);
+    }
+
     public function test_nested_calc_replacing() {
         $cssvars = new \core\cssvars();
 

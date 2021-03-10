@@ -200,36 +200,45 @@ class media_youtube_testcase extends advanced_testcase {
         // no width/height
         $embedcode = '<video controls=""><source src="http://www.youtube.com/v/vyrwMmsufJc" type="video/mp4"></video>';
         $this->assertRegExp(
-            '~<div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: ' . $default_w . 'px;">'.
+            '~<div class="mediaplugin mediaplugin_youtube"><div style="max-width: ' . $default_w . 'px;">'.
             '<div class="mediaplugin__iframe_responsive" style="padding-top: ' . (($default_h / $default_w) * 100) . '%">'.
-            '<iframe width="' . $default_w . '" height="' . $default_h . '" src="https://www.youtube.com/embed[^>]+></iframe></div></div>~',
+            '<iframe width="' . $default_w . '" height="' . $default_h . '" src="https://www.youtube.com/embed[^>]+></iframe></div></div></div>~',
             format_text($embedcode, FORMAT_HTML)
         );
 
         // width and height
         $embedcode = '<video controls="" width="500" height="200"><source src="http://www.youtube.com/v/vyrwMmsufJc" type="video/mp4"></video>';
         $this->assertRegExp(
-            '~<div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: 500px;">'.
+            '~<div class="mediaplugin mediaplugin_youtube"><div style="max-width: 500px;">'.
             '<div class="mediaplugin__iframe_responsive" style="padding-top: 40%">'.
-            '<iframe width="500" height="200" src="https://www.youtube.com/embed[^>]+></iframe></div></div>~',
+            '<iframe width="500" height="200" src="https://www.youtube.com/embed[^>]+></iframe></div></div></div>~',
             format_text($embedcode, FORMAT_HTML)
         );
 
         // percentage width
         $embedcode = '<video controls="" width="100%"><source src="http://www.youtube.com/v/vyrwMmsufJc" type="video/mp4"></video>';
         $this->assertRegExp(
-            '~<div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: 100%;">'.
+            '~<div class="mediaplugin mediaplugin_youtube"><div style="max-width: 100%;">'.
             '<div class="mediaplugin__iframe_responsive" style="padding-top: ' . (($default_h / $default_w) * 100) . '%">'.
-            '<iframe width="' . $default_w . '" height="' . $default_h . '" src="https://www.youtube.com/embed[^>]+></iframe></div></div>~',
+            '<iframe width="' . $default_w . '" height="' . $default_h . '" src="https://www.youtube.com/embed[^>]+></iframe></div></div></div>~',
             format_text($embedcode, FORMAT_HTML)
         );
 
         // percentage width + invalid height
         $embedcode = '<video controls="" width="100%" height="auto"><source src="http://www.youtube.com/v/vyrwMmsufJc" type="video/mp4"></video>';
         $this->assertRegExp(
-            '~<div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: 100%;">'.
+            '~<div class="mediaplugin mediaplugin_youtube"><div style="max-width: 100%;">'.
             '<div class="mediaplugin__iframe_responsive" style="padding-top: ' . (($default_h / $default_w) * 100) . '%">'.
-            '<iframe width="' . $default_w . '" height="' . $default_h . '" src="https://www.youtube.com/embed[^>]+></iframe></div></div>~',
+            '<iframe width="' . $default_w . '" height="' . $default_h . '" src="https://www.youtube.com/embed[^>]+></iframe></div></div></div>~',
+            format_text($embedcode, FORMAT_HTML)
+        );
+
+        // data-grow
+        $embedcode = '<video controls="" width="500" height="200" data-grow><source src="http://www.youtube.com/v/vyrwMmsufJc" type="video/mp4"></video>';
+        $this->assertRegExp(
+            '~<div class="mediaplugin mediaplugin_youtube"><div class="mediaplugin_grow_limit">'.
+            '<div class="mediaplugin__iframe_responsive" style="padding-top: 40%">'.
+            '<iframe width="500" height="200" src="https://www.youtube.com/embed[^>]+></iframe></div></div></div>~',
             format_text($embedcode, FORMAT_HTML)
         );
     }
