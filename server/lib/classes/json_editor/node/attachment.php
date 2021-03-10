@@ -157,7 +157,7 @@ final class attachment extends base_file {
      */
     public function to_text(formatter $formatter): string {
         $url = $this->get_file_url();
-        return "[{$this->filename}]({$url->out()})";
+        return "[{$this->filename}]({$url->out()})\n\n";
     }
 
     /**

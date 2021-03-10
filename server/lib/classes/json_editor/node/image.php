@@ -114,7 +114,7 @@ final class image extends base_file implements block_node {
      */
     public function to_text(formatter $formatter): string {
         $url = $this->get_file_url();
-        return "({$this->filename})[{$url->out(false)}]";
+        return "({$this->filename})[{$url->out(false)}]\n\n";
     }
 
     /**

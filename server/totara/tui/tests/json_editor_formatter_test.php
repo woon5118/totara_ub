@@ -29,6 +29,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use core\json_editor\node\text;
 use totara_tui\json_editor\formatter\formatter;
 use core\json_editor\node\mention;
 use core\json_editor\node\paragraph;
@@ -79,15 +80,64 @@ class totara_tui_json_editor_formatter_testcase extends advanced_testcase {
         $document = [
             'type' => 'doc',
             'content' => [
-                paragraph::create_json_node_from_text('hello '),
-                mention::create_raw_node($user->id)
+                [
+                    'type' => 'heading',
+                    'attrs' => ['level' => 1],
+                    'content' => [text::create_json_node_from_text('heading 1')]
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        text::create_json_node_from_text('hello '),
+                        mention::create_raw_node($user->id)
+                    ]
+                ]
             ]
         ];
 
         $formatter = new formatter();
         $fullname = fullname($user);
 
-        $expected = "hello @{$fullname}";
+        $expected = "# heading 1\nhello @{$fullname}\n\n";
         $this->assertEquals($expected, $formatter->to_text($document));
+    }
+
+    /**
+     * @return void
+     */
+    public function test_to_markdown(): void {
+        $document = [
+            'type' => 'doc',
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        text::create_json_node_from_text('abc'),
+                    ]
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        text::create_json_node_from_text('def'),
+                    ]
+                ],
+                [
+                    'type' => 'heading',
+                    'attrs' => ['level' => 1],
+                    'content' => [text::create_json_node_from_text('heading 1')]
+                ],
+                [
+                    'type' => 'heading',
+                    'attrs' => ['level' => 2],
+                    'content' => [text::create_json_node_from_text('heading 2')]
+                ],
+            ]
+        ];
+
+        $formatter = new formatter();
+        $expected = "abc\n\ndef\n\nHEADING 1\n\nHEADING 2\n\n";
+        $text = markdown_to_html($formatter->to_text($document));
+        $text = html_to_text($text);
+        $this->assertEquals($expected, $text);
     }
 }

@@ -40,11 +40,31 @@ final class create_new_discussion extends template {
         if (!defined('CLI_SCRIPT') || !CLI_SCRIPT) {
             throw new coding_exception("Cannot instantiate the template for web page usage");
         }
+
         $text = $discussion->get_content_text();
+        if (core_text::strlen($text) > 75) {
+            $array = explode("\n", $text);
+            $len = 0;
+            $text = '';
+            foreach ($array as $ele) {
+                if (core_text::strlen($ele) == 0) {
+                    continue;
+                }
+                $len += core_text::strlen($ele);
+                $text .= markdown_to_html($ele);
+                if ($len > 75) {
+                    $text .= '...';
+                    break;
+                }
+            }
+        } else {
+            $text = markdown_to_html($text);
+        }
+
         $a = [
             'author' => fullname($discussion->get_user()),
             'workspace' => $workspace_name,
-            'discussion' => core_text::strlen($text) > 75 ? core_text::substr($text, 0, 75). '...' : $text
+            'discussion' => $text
         ];
 
         $data = [

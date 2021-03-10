@@ -260,16 +260,16 @@ final class heading extends node implements block_node {
 
         switch ($this->level) {
             case static::LEVEL_ONE:
-                return "# {$content}";
+                return "# {$content}\n";
 
             case static::LEVEL_TWO:
-                return "## {$content}";
+                return "## {$content}\n";
 
             default:
                 // Default to level one, but we need debugging it here.
 
                 debugging("Invalid level of heading: {$this->level}", DEBUG_DEVELOPER);
-                return "# {$content}";
+                return "# {$content}\n";
         }
     }
 

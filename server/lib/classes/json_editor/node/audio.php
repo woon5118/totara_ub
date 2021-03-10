@@ -160,7 +160,7 @@ final class audio extends base_file implements block_node, has_extra_linked_file
      */
     public function to_text(formatter $formatter): string {
         $url = $this->get_file_url();
-        return "[{$this->filename}]({$url->out(false)})";
+        return "[{$this->filename}]({$url->out(false)})\n\n";
     }
 
     /**

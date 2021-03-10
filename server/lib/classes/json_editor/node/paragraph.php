@@ -215,7 +215,7 @@ final class paragraph extends node implements block_node {
             $str .= $node->to_text($formatter);
         }
 
-        return $str;
+        return $str. "\n\n";
     }
 
     /**

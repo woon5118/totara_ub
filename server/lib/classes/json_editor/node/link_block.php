@@ -159,7 +159,7 @@ final class link_block extends base_link implements block_node {
      * @return string
      */
     public function to_text(formatter $formatter): string {
-        return "{$this->title} ({$this->url})";
+        return "{$this->title} ({$this->url})\n\n";
     }
 
     /**
