@@ -37,7 +37,8 @@ use \mod_facetoface\{
     seminar_session,
     seminar_event_list,
     attendees_helper,
-    signup_list
+    signup_list,
+    calendar
 };
 use \mod_facetoface\signup\state\{
     waitlisted,
@@ -969,6 +970,49 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $facetoface1 = $this->facetoface['f2f0'];
         $f2f = (object)$facetoface1;
         $this->assertTrue((bool)facetoface_update_instance($f2f));
+    }
+
+    function test_facetoface_is_required_calendar_update() {
+        $this->init_sample_data();
+
+        // Define test variables.
+        $facetoface = (object)$this->facetoface['f2f0'];
+
+        $old_seminar = new seminar($facetoface->id);
+        $new_seminar = new seminar($facetoface->id);
+
+        // Test nothing changed
+        $this->assertFalse(calendar::is_update_required($new_seminar, $old_seminar));
+
+        $new_seminar->set_showoncalendar(
+            $old_seminar->get_showoncalendar() == 0 ? 1 : 0
+        );
+        // Test show on calendar is changed
+        $this->assertTrue(calendar::is_update_required($new_seminar, $old_seminar));
+
+        $new_seminar->set_usercalentry(
+            $old_seminar->get_usercalentry() == 0 ? 1 : 0
+        );
+        // Test user calendar entry is changed
+        $this->assertTrue(calendar::is_update_required($new_seminar, $old_seminar));
+
+        $new_seminar->set_intro(
+            $old_seminar->get_intro() . ', elementum mauris vitae tortor.'
+        );
+        // Test seminar description is changed
+        $this->assertTrue(calendar::is_update_required($new_seminar, $old_seminar));
+
+        $new_seminar->set_name(
+            $old_seminar->get_name() . ', elementum mauris vitae tortor.'
+        );
+        // Test seminar name is changed
+        $this->assertTrue(calendar::is_update_required($new_seminar, $old_seminar));
+
+        $new_seminar->set_shortname(
+            $old_seminar->get_shortname() . '_tortor.'
+        );
+        // Test seminar short name is changed
+        $this->assertTrue(calendar::is_update_required($new_seminar, $old_seminar));
     }
 
     function test_facetoface_delete_instance() {

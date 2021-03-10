@@ -31,12 +31,12 @@ use mod_facetoface\{
     seminar,
     signup,
     seminar_event,
-    seminar_session,
     notice_sender,
     signup_list,
-    signup_helper,
     seminar_event_list,
-    reservations
+    reservations,
+    attendees_helper,
+    calendar
 };
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\sortorder\past_sortorder;
@@ -327,29 +327,27 @@ function facetoface_update_instance($facetoface, $mform = null) {
     global $DB;
 
     $facetoface->id = $facetoface->instance;
-    $previousapproval = $DB->get_field('facetoface', 'approvaltype', array('id' => $facetoface->id));
-
+    $old_seminar = new seminar($facetoface->id);
     if (!$DB->update_record('facetoface', $facetoface)) {
         return false;
     }
 
     facetoface_grade_item_update($facetoface);
 
-        //Get time.
-        $now = time();
-
-
     $seminar = new seminar($facetoface->id);
+    $require_calendar_update = calendar::is_update_required($seminar, $old_seminar);
 
     foreach ($seminar->get_events() as $seminarevent) {
         /**
          * @var seminar_event $seminarevent
          */
-        \mod_facetoface\calendar::update_entries($seminarevent);
-        $helper = new \mod_facetoface\attendees_helper($seminarevent);
+        if ($require_calendar_update) {
+            calendar::update_entries($seminarevent);
+        }
+        $helper = new attendees_helper($seminarevent);
 
         // If manager changed from approval required to not
-        if ($facetoface->approvaltype != $previousapproval) {
+        if ($seminar->get_approvaltype() != $old_seminar->get_approvaltype()) {
             $status = [
                 signup\state\requested::get_code(),
                 signup\state\requestedrole::get_code(),

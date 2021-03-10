@@ -55,8 +55,8 @@ if (!empty($options['help'])) {
 
 Options:
     -f, --facilitators    Do *NOT* create facilitators
-    -a, --asset           Do *NOT* create assets
-    -r, --room            Do *NOT* create rooms
+    -a, --assets          Do *NOT* create assets
+    -r, --rooms           Do *NOT* create rooms
     -h, --help            Print out this help
 ');
     exit(0);
@@ -67,6 +67,15 @@ $users = ['f2flearner' => ['Learner', 'student'], 'f2ftrainer' => ['Trainer', 't
 
 if (empty($options['facilitators'])) {
     $users['f2ffacilitator'] = ['Facilitator', 'student'];
+}
+
+/** @var moodle_database $DB */
+$catid = $DB->get_field('course_categories', 'id', ['id' => $CFG->defaultrequestcategory, 'issystem' => 0]);
+if (!$catid) {
+    $catid = $DB->get_field('course_categories', 'id', ['name' => 'Miscellaneous', 'issystem' => 0]);
+}
+if (!$catid) {
+    cli_error('Cannot find a usable category. Make sure $CFG->defaultrequestcategory points to a valid category ID.');
 }
 
 $userids = [];
@@ -194,8 +203,6 @@ $timeses = [
         ]
     ],
 ];
-
-$catid = $DB->get_field('course_categories', 'id', ['name' => 'Miscellaneous']);
 
 for ($i = 1; $i <= 2; $i++) {
     for ($j = 1; $j <= 2; $j++) {

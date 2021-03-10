@@ -437,4 +437,33 @@ final class calendar {
 
         return array('sess' => $sessfields, 'room' => $roomfields);
     }
+
+    /**
+     * Check if we need to update the calendar
+     * @param seminar $new_seminar
+     * @param seminar $old_seminar
+     * @return bool
+     */
+    public static function is_update_required(seminar $new_seminar, seminar $old_seminar): bool {
+        $is_changed = false;
+        if ($new_seminar->get_showoncalendar() !== $old_seminar->get_showoncalendar()) {
+            $is_changed = true;
+        }
+        if ($new_seminar->get_usercalentry() !== $old_seminar->get_usercalentry()) {
+            $is_changed = true;
+        }
+        if (strcmp($new_seminar->get_intro(), $old_seminar->get_intro()) !== 0) {
+            $is_changed = true;
+        }
+        if (strcmp($new_seminar->get_shortname(), $old_seminar->get_shortname()) !== 0) {
+            $is_changed = true;
+        }
+        if (empty($new_seminar->get_shortname())) {
+            // We use a full seminar name in calendar if short name is not exist
+            if (strcmp($new_seminar->get_name(), $old_seminar->get_name()) !== 0) {
+                $is_changed = true;
+            }
+        }
+        return $is_changed;
+    }
 }
