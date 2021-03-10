@@ -170,7 +170,7 @@ Bug fixes:
     TL-29443       Fixed a redirection problem of the Find learning tab on Microsoft Teams
     TL-29444       Fixed rendering of graphs when exporting reports to PDF
     TL-29445       Fixed redirection to home page after adding missing required profile data when user logs in via OAuth 2
-    TL-29446       Added custom CSS and log in image to tenant-customisable theme config
+    TL-29446       Added login image and footer to tenant-customisable theme config
     TL-29464       Fixed upgrade step issue when creating Learning Plan assignment types for Programs introduced via TL-24703
     TL-29465       Fixed a typo for seminar manager approval help string
     TL-29560       Fixed caseless searching of seminar room, asset, and facilitator dialogs when non-ascii characters are used
