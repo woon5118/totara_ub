@@ -36,7 +36,10 @@ require_once($CFG->dirroot . '/filter/mediaplugin/filter.php'); // Include the c
 class filter_mediaplugin_testcase extends advanced_testcase {
 
     function test_filter_mediaplugin_link() {
-        $this->resetAfterTest(true);
+        global $CFG;
+        
+        $default_w = $CFG->media_default_width;
+        $default_h = $CFG->media_default_height;
 
         $context = \context_system::instance();
 
@@ -98,8 +101,8 @@ class filter_mediaplugin_testcase extends advanced_testcase {
         $originalurl = '<p>Some text.</p><pre style="color: rgb(0, 0, 0); line-height: normal;">' .
             '<a href="https://www.youtube.com/watch?v=uUhWl9Lm3OM">Valid link</a></pre><pre style="color: rgb(0, 0, 0); line-height: normal;">';
         $paddedurl = str_pad($originalurl, 6000, 'z');
-        $validpaddedurl = '<p>Some text.</p><pre style="color: rgb(0, 0, 0); line-height: normal;"><div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: 400px">
-<div class="mediaplugin__iframe_responsive" style="padding-top: 75%"><iframe width="400" height="300" src="https://www.youtube.com/embed/uUhWl9Lm3OM?rel=0&amp;wmode=transparent" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="1" title="Valid link"></iframe></div>
+        $validpaddedurl = '<p>Some text.</p><pre style="color: rgb(0, 0, 0); line-height: normal;"><div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: ' . $default_w . 'px">
+<div class="mediaplugin__iframe_responsive" style="padding-top: ' . (($default_h / $default_w) * 100) . '%"><iframe width="' . $default_w . '" height="' . $default_h . '" src="https://www.youtube.com/embed/uUhWl9Lm3OM?rel=0&amp;wmode=transparent" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="1" title="Valid link"></iframe></div>
 </div></pre><pre style="color: rgb(0, 0, 0); line-height: normal;">';
         $validpaddedurl = str_pad($validpaddedurl, 6000 + (strlen($validpaddedurl) - strlen($originalurl)), 'z');
 
