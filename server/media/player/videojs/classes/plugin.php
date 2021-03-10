@@ -46,8 +46,8 @@ class media_videojs_plugin extends core_media_player_native {
      *
      * @param moodle_url[] $urls
      * @param string $name
-     * @param int $width
-     * @param int $height
+     * @param int|string|null $width
+     * @param int|string|null $height
      * @param array $options
      * @return string
      */
@@ -188,7 +188,7 @@ class media_videojs_plugin extends core_media_player_native {
         if ($responsive) {
             self::pick_video_size($width, $height);
             if ($width) {
-                $text = html_writer::div($text, null, ['style' => 'max-width:' . $width . 'px;']);
+                $text = html_writer::div($text, null, ['style' => 'max-width:' . $this->dimension_to_css($width) . ';']);
             }
         }
 
@@ -199,8 +199,8 @@ class media_videojs_plugin extends core_media_player_native {
      * Utility function that sets width and height to defaults if not specified
      * as a parameter to the function (will be specified either if, (a) the calling
      * code passed it, or (b) the URL included it).
-     * @param int $width Width passed to function (updated with final value)
-     * @param int $height Height passed to function (updated with final value)
+     * @param int|string|null $width Width passed to function (updated with final value)
+     * @param int|string|null $height Height passed to function (updated with final value)
      */
     protected static function pick_video_size(&$width, &$height) {
         if (!get_config('media_videojs', 'limitsize')) {

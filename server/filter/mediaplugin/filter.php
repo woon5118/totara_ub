@@ -232,12 +232,46 @@ class filter_mediaplugin extends moodle_text_filter {
         // Extract width/height/title attributes and call embed_alternatives to find a suitable media player.
         if ($urls) {
             $options = [core_media_manager::OPTION_ORIGINAL_TEXT => $fulltext];
-            $width = core_media_player_native::get_attribute($fulltext, 'width', PARAM_INT);
-            $height = core_media_player_native::get_attribute($fulltext, 'height', PARAM_INT);
+            $width = $this->parse_dimension(core_media_player_native::get_attribute($fulltext, 'width', PARAM_RAW));
+            $height = $this->parse_dimension(core_media_player_native::get_attribute($fulltext, 'height', PARAM_RAW));
             $name = core_media_player_native::get_attribute($fulltext, 'title');
             return $this->embed_alternatives($urls, $name, $width, $height, $options);
         }
         return $fulltext;
+    }
+
+    /**
+     * Sanitize and parse dimension.
+     *
+     * Supported formats: 100, 100px, 100%
+     * Other formats will be treated as px for backwards compatibility
+     *
+     * @param string Input dimension
+     * @return int|string|null Int for px, string for percentage or other CSS value, or null if invalid.
+     */
+    private function parse_dimension($dimension) {
+        if (!$dimension) {
+            return null;
+        }
+
+        $dimension = trim($dimension);
+
+        // pixels
+        if (preg_match('/^(\d+)(?:px)?$/', $dimension, $matches)) {
+            return (int)$matches[1];
+        }
+
+        // percentage (non-standard on video/audio elements, but supported by all browsers)
+        if (preg_match('/^\d+(?:\.\d+)?%$/', $dimension)) {
+            return $dimension;
+        }
+        
+        // leading numeric -- keep pre Totara 13.6 behavior and treat as a px value
+        if (!preg_match('/^\d/', $dimension)) {
+            return (int)$dimension;
+        }
+
+        return null;
     }
 
     /**

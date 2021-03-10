@@ -47,13 +47,11 @@ class media_vimeo_plugin extends core_media_player_external {
 
         $iframe = $this->responsive_iframe("https://player.vimeo.com/video/$videoid", $width, $height, $info);
 
-        $output = <<<OET
-<div class="mediaplugin mediaplugin_vimeo mediaplugin--iframe-centered" style="max-width: {$width}px">
-$iframe
-</div>
-OET;
 
-        return $output;
+        return html_writer::tag('div', $iframe, [
+            'class' => 'mediaplugin mediaplugin_vimeo mediaplugin--iframe-centered',
+            'style' => 'max-width: ' . $this->dimension_to_css($width) . ';',
+        ]);
     }
 
     /**

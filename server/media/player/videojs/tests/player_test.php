@@ -281,4 +281,36 @@ class media_videojs_testcase extends advanced_testcase {
         $this->assertStringNotContainsString('mediaplugin_videojs', $t);
 
     }
+
+    function test_dimensions() {
+        global $CFG;
+
+        // no width/height
+        $embedcode = '<video controls=""><source src="https://example.com/v.mp4" type="video/mp4"></video>';
+        $this->assertRegExp(
+            '~<div class="mediaplugin mediaplugin_videojs"><div style="max-width:' . $CFG->media_default_width . 'px;"><video .*</div></div>~',
+            format_text($embedcode, FORMAT_HTML)
+        );
+
+        // width and height
+        $embedcode = '<video controls="" width="400" height="200"><source src="https://example.com/v.mp4" type="video/mp4"></video>';
+        $this->assertRegExp(
+            '~<div class="mediaplugin mediaplugin_videojs"><div style="max-width:400px;"><video .*</div></div>~',
+            format_text($embedcode, FORMAT_HTML)
+        );
+
+        // percentage width
+        $embedcode = '<video controls="" width="100%"><source src="https://example.com/v.mp4" type="video/mp4"></video>';
+        $this->assertRegExp(
+            '~<div class="mediaplugin mediaplugin_videojs"><div style="max-width:100%;"><video .*</video></div></div>~',
+            format_text($embedcode, FORMAT_HTML)
+        );
+
+        // percentage width + invalid height
+        $embedcode = '<video controls="" width="100%" height="auto"><source src="https://example.com/v.mp4" type="video/mp4"></video>';
+        $this->assertRegExp(
+            '~<div class="mediaplugin mediaplugin_videojs"><div style="max-width:100%;"><video .*</video></div></div>~',
+            format_text($embedcode, FORMAT_HTML)
+        );
+    }
 }

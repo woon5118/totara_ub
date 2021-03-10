@@ -232,8 +232,8 @@ abstract class core_media_player {
      * Utility function that sets width and height to defaults if not specified
      * as a parameter to the function (will be specified either if, (a) the calling
      * code passed it, or (b) the URL included it).
-     * @param int $width Width passed to function (updated with final value)
-     * @param int $height Height passed to function (updated with final value)
+     * @param int|string|null $width Width passed to function (updated with final value)
+     * @param int|string|null $height Height passed to function (updated with final value)
      */
     protected static function pick_video_size(&$width, &$height) {
         global $CFG;
@@ -241,6 +241,19 @@ abstract class core_media_player {
             $width = $CFG->media_default_width;
             $height = $CFG->media_default_height;
         }
+    }
+
+    /**
+     * Convert dimension to CSS value
+     *
+     * @param int|string|null $dimension
+     * @return string|null
+     */
+    protected static function dimension_to_css($dimension): ?string {
+        if ($dimension === null) {
+            return null;
+        }
+        return is_numeric($dimension) ? "{$dimension}px" : "$dimension";
     }
 
     /**

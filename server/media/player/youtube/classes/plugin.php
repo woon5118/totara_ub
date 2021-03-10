@@ -77,11 +77,10 @@ class media_youtube_plugin extends core_media_player_external {
 
             $iframe = $this->responsive_iframe("https://$site/embed/videoseries?list=$playlist", $width, $height, $info);
 
-            return <<<OET
-<div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: {$width}px">
-$iframe
-</div>
-OET;
+            return html_writer::tag('div', $iframe, [
+                'class' => 'mediaplugin mediaplugin_youtube mediaplugin--iframe-centered',
+                'style' => 'max-width: ' . $this->dimension_to_css($width) . ';',
+            ]);
         } else {
 
             $videoid = end($this->matches);
@@ -100,11 +99,10 @@ OET;
 
             $iframe = $this->responsive_iframe("https://www.youtube.com/embed/$videoid?{$params}rel=0&wmode=transparent", $width, $height, $info);
 
-            return <<<OET
-<div class="mediaplugin mediaplugin_youtube mediaplugin--iframe-centered" style="max-width: {$width}px">
-$iframe
-</div>
-OET;
+            return html_writer::tag('div', $iframe, [
+                'class' => 'mediaplugin mediaplugin_youtube mediaplugin--iframe-centered',
+                'style' => 'max-width: ' . $this->dimension_to_css($width) . ';',
+            ]);
         }
 
     }

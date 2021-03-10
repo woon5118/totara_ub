@@ -123,6 +123,14 @@ abstract class core_media_player_external extends core_media_player {
         // See also:
         // * https://css-tricks.com/aspect-ratio-boxes/
         // * .mediaplugin__iframe_responsive styles in filter_mediaplugin/styles.css.
+
+        // use default dimensions for aspect calculation if none are specified
+        if ($width === null || $height === null) {
+            global $CFG;
+            $width = $CFG->media_default_width;
+            $height = $CFG->media_default_height;
+        }
+
         $padding_top = ($height / $width) * 100 . '%';
 
         $iframe = html_writer::tag('iframe', '', [
