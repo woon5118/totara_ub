@@ -25,6 +25,7 @@ namespace block_totara_recently_viewed\totara_playlist;
 
 use block_totara_recently_viewed\card as base_card;
 use moodle_url;
+use theme_config;
 use totara_engage\link\builder;
 use totara_engage\rating\rating_manager;
 use totara_playlist\entity\playlist_resource;
@@ -115,9 +116,10 @@ class card implements base_card {
 
     /**
      * @param bool $tile_view
+     * @param theme_config $theme_config
      * @return moodle_url|null
      */
-    public function get_image(bool $tile_view): ?\moodle_url {
+    public function get_image(bool $tile_view, theme_config $theme_config): ?\moodle_url {
         global $OUTPUT;
         $processor = image_processor::make();
         $file_image = $processor->get_image_for_playlist($this->playlist, !$tile_view);

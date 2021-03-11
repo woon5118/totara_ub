@@ -214,7 +214,8 @@ class totara_playlist_share_graphql_testcase extends advanced_testcase {
         $ec = execution_context::create('ajax', 'totara_engage_share_recipients');
         $parameters = [
             'itemid' => $playlist->get_id(),
-            'component' => $playlist::get_resource_type()
+            'component' => $playlist::get_resource_type(),
+            'theme' => 'ventura',
         ];
 
         $result = graphql::execute_operation($ec, $parameters);

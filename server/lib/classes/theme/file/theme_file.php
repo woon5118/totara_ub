@@ -27,6 +27,7 @@ use core\files\file_area;
 use core\files\file_helper;
 use core\files\type\file_type;
 use core\theme\settings as theme_settings;
+use core\theme\helper as theme_helper;
 use context;
 use moodle_url;
 use stored_file;
@@ -63,12 +64,10 @@ abstract class theme_file {
      * theme_file constructor.
      *
      * @param theme_config|null $theme_config
-     * @param string|null $theme
+     * @param string|null $unused This parameter is no longer used as of Totara 13.6
      */
-    public function __construct(?theme_config $theme_config = null, ?string $theme = null) {
-        global $PAGE;
-        $this->theme_config = $theme_config
-            ?? theme_config::load($theme ?? $PAGE->theme->name);
+    public function __construct(?theme_config $theme_config = null, ?string $unused = null) {
+        $this->theme_config = $theme_config;
     }
 
     /**
@@ -110,6 +109,17 @@ abstract class theme_file {
     }
 
     /**
+     * @return theme_config
+     */
+    protected function get_theme_config(): theme_config {
+        if (empty($this->theme_config)) {
+            $this->theme_config = theme_helper::load_theme_config();
+        }
+
+        return $this->theme_config;
+    }
+
+    /**
      * @param int $item_id
      */
     public function set_item_id(int $item_id): void {
@@ -128,7 +138,7 @@ abstract class theme_file {
         global $DB;
 
         $id = $tenant_id ?? $this->tenant_id;
-        $plugin = "theme_" . ($theme ?? $this->theme_config->name);
+        $plugin = "theme_" . ($theme ?? $this->get_theme_config()->name);
         $name = "tenant_{$id}_settings";
 
         // Always make sure that there is a record representing this config.
@@ -156,7 +166,7 @@ abstract class theme_file {
      * @return string
      */
     public function get_name(): string {
-        return "{$this->get_component()}/{$this->get_area()}";
+        return $this->get_component() . "/" . $this->get_area();
     }
 
     /**
@@ -203,10 +213,7 @@ abstract class theme_file {
         }
 
         // Return first file found.
-        /** @var stored_file $file */
-        $file = reset($files);
-
-        return $file;
+        return reset($files);
     }
 
     /**
@@ -224,8 +231,7 @@ abstract class theme_file {
             return null;
         }
 
-        $theme_settings = new theme_settings($this->theme_config, $this->tenant_id);
-        $file = $this->get_current_file($this->get_item_id($this->tenant_id, $theme));
+        $theme_settings = new theme_settings($this->get_theme_config(), $this->tenant_id);
 
         // If not using custom tenant branding or no file found check if site setting is set for theme.
         if ($this->tenant_id > 0 && !$theme_settings->is_tenant_branding_enabled()) {
@@ -233,6 +239,8 @@ abstract class theme_file {
                 $this->get_item_id(0, $theme),
                 \context_system::instance()
             );
+        } else {
+            $file = $this->get_current_file($this->get_item_id($this->tenant_id, $theme));
         }
 
         return !empty($file) ? $this->get_url($file) : null;
@@ -276,7 +284,7 @@ abstract class theme_file {
         if ($this->has_default()) {
             $parts = explode('/', static::get_id());
             return $this->type->create_url(
-                $this->theme_config->name,
+                $this->get_theme_config()->name,
                 $parts[0],
                 $parts[1],
                 theme_get_revision(),
@@ -371,7 +379,7 @@ abstract class theme_file {
             $this->get_name(),
             '',
             '',
-            $this->get_area(),
+            static::get_area(),
             $this->get_item_id(),
             [
                 'accepted_types' => $this->get_type()->get_group(),

@@ -72,6 +72,7 @@ import PlaylistResourcesGrid from 'totara_playlist/components/grid/PlaylistResou
 import HeaderBox from 'totara_playlist/components/page/HeaderBox';
 import BookmarkButton from 'totara_engage/components/buttons/BookmarkButton';
 import { UrlSourceType } from 'totara_engage/index';
+import { config } from 'tui/config';
 
 // GraphQL
 import getPlaylist from 'totara_playlist/graphql/get_playlist';
@@ -153,6 +154,7 @@ export default {
           footnotes_type: 'playlist',
           footnotes_item_id: this.pageProps.playlistId,
           include_footnotes: true,
+          theme: config.theme.name,
         };
       },
     },
@@ -183,6 +185,7 @@ export default {
             variables: {
               id: playlistId,
               source: UrlSourceType.playlist(playlistId),
+              theme: config.theme.name,
             },
           },
         ],

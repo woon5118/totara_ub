@@ -49,6 +49,7 @@ import Modal from 'tui/components/modal/Modal';
 import WorkspaceForm from 'container_workspace/components/form/WorkspaceForm';
 import ModalContent from 'tui/components/modal/ModalContent';
 import { notify } from 'tui/notifications';
+import { config } from 'tui/config';
 
 // GraphQL queries
 import createWorkspace from 'container_workspace/graphql/create_workspace';
@@ -142,6 +143,7 @@ export default {
             description_format: descriptionFormat,
             private: isPrivate,
             hidden: isHidden,
+            theme: config.theme.name,
           },
         });
 

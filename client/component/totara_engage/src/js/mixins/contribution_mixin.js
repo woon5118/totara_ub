@@ -16,6 +16,8 @@
  * @module totara_engage
  */
 
+import { config } from 'tui/config';
+
 // GraphQL
 import contributionCards from 'totara_engage/graphql/contribution_cards';
 
@@ -78,6 +80,7 @@ export default {
             area: this.contributionArea,
             include_footnotes: this.includeFootnotes,
             source: this.contributionSource,
+            theme: config.theme.name,
           },
           this.footnotes
         );

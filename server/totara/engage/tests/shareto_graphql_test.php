@@ -30,6 +30,8 @@ use totara_webapi\graphql;
 class totara_engage_shareto_graphql_testcase extends advanced_testcase {
 
     public function test_shareto_recipients() {
+        global $CFG;
+
         $gen = $this->getDataGenerator();
         /** @var totara_playlist_generator $playlistgen */
         $engagegen = $gen->get_plugin_generator('totara_engage');
@@ -45,6 +47,7 @@ class totara_engage_shareto_graphql_testcase extends advanced_testcase {
             'component' => 'no_component',
             'search' => 'some1 a',
             'access' => access::get_code(access::RESTRICTED),
+            'theme' => 'ventura',
         ];
 
         $result = graphql::execute_operation($ec, $parameters);
@@ -58,5 +61,21 @@ class totara_engage_shareto_graphql_testcase extends advanced_testcase {
         $this->assertArrayHasKey('user', $user);
         $this->assertArrayHasKey('display_fields', $user['user']['card_display']);
         $this->assertEquals('Some1 Any1', $user['user']['card_display']['display_fields'][0]['value']);
+
+        // Confirm that we get debug message when theme not passed.
+        $ec = execution_context::create('ajax', 'totara_engage_shareto_recipients');
+        $parameters = [
+            'itemid' => 0,
+            'component' => 'no_component',
+            'search' => 'some1 a',
+            'access' => access::get_code(access::RESTRICTED),
+        ];
+
+        $result = graphql::execute_operation($ec, $parameters);
+        $this->assertEmpty($result->errors, !empty($result->errors) ? $result->errors[0]->message : '');
+        $this->assertDebuggingCalled(
+            "'theme' parameter not set. Falling back on {$CFG->theme}. The resolved assets "
+            . "will be associated with {$CFG->theme}, which might not be the expected result."
+        );
     }
 }

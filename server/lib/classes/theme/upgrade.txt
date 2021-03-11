@@ -5,3 +5,5 @@ information provided here is intended especially for developers.
 
 * Added optional second parameter (bool $include_default_file_categories) to function core\theme\settings::get_categories
   to specify if default file categories should be included in the output.
+* Removed optional second parameter "$theme" from theme_file::__constructor.
+* Functions theme_file::get_component and theme_file::get_area made static.

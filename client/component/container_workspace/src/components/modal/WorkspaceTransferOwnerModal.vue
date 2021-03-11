@@ -49,6 +49,7 @@ import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import WorkspaceTransferOwnerForm from 'container_workspace/components/form/WorkspaceTransferOwnerForm';
 import { notify } from 'tui/notifications';
+import { config } from 'tui/config';
 
 // GraphQL queries.
 import getWorkspace from 'container_workspace/graphql/get_workspace';
@@ -76,6 +77,7 @@ export default {
       variables() {
         return {
           id: this.workspaceId,
+          theme: config.theme.name,
         };
       },
     },

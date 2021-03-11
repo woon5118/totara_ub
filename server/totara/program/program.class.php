@@ -2496,6 +2496,8 @@ class program {
      * @return string
      */
     public function get_image() {
+        global $PAGE;
+
         $fs = get_file_storage();
         $files = array_values(
             $fs->get_area_files(
@@ -2524,8 +2526,8 @@ class program {
 
         // There have not being any files uploaded so return the default image.
         $program_image = $this->is_certif()
-            ? new certification_image()
-            : new program_image();
+            ? new certification_image($PAGE->theme)
+            : new program_image($PAGE->theme);
         return $program_image->get_current_or_default_url()->out();
     }
 }

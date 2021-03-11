@@ -94,6 +94,7 @@ class ml_recommender_get_recommended_articles_testcase extends advanced_testcase
         $parameters = [
             'article_id' => $target_article->get_id(),
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -114,6 +115,7 @@ class ml_recommender_get_recommended_articles_testcase extends advanced_testcase
         $parameters = [
             'article_id' => $target_article2->get_id(),
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -130,6 +132,7 @@ class ml_recommender_get_recommended_articles_testcase extends advanced_testcase
         $parameters = [
             'article_id' => $target_article->get_id(),
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -224,6 +227,7 @@ class ml_recommender_get_recommended_articles_testcase extends advanced_testcase
         $parameters = [
             'article_id' => $base_article->get_id(),
             'cursor' => null,
+            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);

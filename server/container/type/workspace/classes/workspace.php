@@ -32,6 +32,7 @@ use core_container\container;
 use core_container\container_helper;
 use core_container\facade\category_name_provider;
 use container_workspace\entity\workspace as workspace_entity;
+use theme_config;
 
 /**
  * Class workspace
@@ -466,13 +467,14 @@ final class workspace extends container implements category_name_provider {
     }
 
     /**
+     * @param theme_config $theme_config
      * @return \moodle_url
      */
-    public function get_image(): \moodle_url {
+    public function get_image(theme_config $theme_config): \moodle_url {
         $file_helper = new file_helper(self::get_type(), self::IMAGE_AREA, $this->get_context());
         $url = $file_helper->get_file_url();
         if (empty($url)) {
-            $workspace_image = new workspace_image();
+            $workspace_image = new workspace_image($theme_config);
             $url = $workspace_image->get_current_or_default_url();
         }
         return $url;

@@ -22,6 +22,7 @@
  */
 namespace totara_engage\share;
 
+use theme_config;
 use totara_engage\share\recipient\manager as recipient_manager;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
@@ -57,10 +58,11 @@ final class helper {
     /**
      * Get recipients into the required graphql structure.
      *
-     * @param $recipients
+     * @param array $recipients
+     * @param theme_config $theme_config
      * @return array
      */
-    public static function format_recipients(array $recipients): array {
+    public static function format_recipients(array $recipients, theme_config $theme_config): array {
         $recipients = recipient_manager::create_from_array($recipients);
 
         // Get data for each recipient.
@@ -80,7 +82,7 @@ final class helper {
                 'component' => $recipient->get_component(),
                 'area' => $recipient->get_area(),
                 'instanceid' => $recipient->get_id(),
-                $area => $recipient->get_data()
+                $area => $recipient->get_data($theme_config),
             ];
         }
 

@@ -22,6 +22,7 @@
  */
 namespace totara_engage\webapi\resolver\type;
 
+use core\theme\helper as theme_helper;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use totara_engage\access\access;
@@ -38,7 +39,7 @@ final class card implements type_resolver {
      * @return mixed
      */
     public static function resolve(string $field, $source, array $args, execution_context $ec) {
-        global $USER;
+        global $USER, $CFG;
 
         if (!($source instanceof abstract_card)) {
             throw new \coding_exception("Invalid type of card being passed");
@@ -53,7 +54,8 @@ final class card implements type_resolver {
                 return access::get_code($access);
 
             case 'extra':
-                $extra = $source->get_extra_data();
+                $theme_config = theme_helper::load_theme_config($args['theme'] ?? null);
+                $extra = $source->get_extra_data($theme_config);
                 $json = json_encode($extra);
 
                 if (JSON_ERROR_NONE !== json_last_error()) {
@@ -88,7 +90,8 @@ final class card implements type_resolver {
                 return $source->get_url($args);
 
             case 'image':
-                $card_image = $source->get_card_image($args['preview_mode'] ?? null);
+                $theme_config = theme_helper::load_theme_config($args['theme'] ?? null);
+                $card_image = $source->get_card_image($theme_config, $args['preview_mode'] ?? null);
                 return $card_image ? $card_image->out(false) : null;
 
             default:

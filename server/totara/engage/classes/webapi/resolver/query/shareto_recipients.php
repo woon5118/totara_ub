@@ -23,6 +23,7 @@
 namespace totara_engage\webapi\resolver\query;
 
 use core\orm\query\builder;
+use core\theme\helper as theme_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -64,6 +65,7 @@ final class shareto_recipients implements query_resolver, has_middleware {
             throw new coding_exception('Access is a required field.');
         }
 
+        $theme_config = theme_helper::load_theme_config($args['theme'] ?? null);
         $itemid = $args['itemid'];
         $component = $args['component'];
         $access = access::get_value($args['access']);
@@ -152,7 +154,7 @@ final class shareto_recipients implements query_resolver, has_middleware {
                     'alreadyshared' => $isrecipient,
                     'summary' => $recipient->get_summary(),
                     'minimum_access' => access::get_code($recipient->get_minimum_access()),
-                    $area => $recipient->get_data()
+                    $area => $recipient->get_data($theme_config),
                 ];
             }
         }

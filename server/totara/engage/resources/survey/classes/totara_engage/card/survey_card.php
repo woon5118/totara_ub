@@ -23,6 +23,7 @@
 namespace engage_survey\totara_engage\card;
 
 use moodle_url;
+use theme_config;
 use totara_engage\card\card;
 use totara_engage\link\builder;
 use totara_engage\question\question;
@@ -61,9 +62,10 @@ final class survey_card extends card {
     }
 
     /**
+     * @param theme_config $theme_config
      * @return array
      */
-    public function get_extra_data(): array {
+    public function get_extra_data(theme_config $theme_config): array {
         global $USER, $OUTPUT;
         $ownerid = $this->get_userid();
 
@@ -164,10 +166,11 @@ final class survey_card extends card {
     }
 
     /**
+     * @param theme_config $theme_config
      * @param string|null $preview_mode
      * @return moodle_url|null
      */
-    public function get_card_image(?string $preview_mode = null): ?moodle_url {
+    public function get_card_image(theme_config $theme_config, ?string $preview_mode = null): ?moodle_url {
         return null;
     }
 

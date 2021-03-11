@@ -49,10 +49,9 @@ class favicon_image extends theme_file {
      * favicon_image constructor.
      *
      * @param theme_config|null $theme_config
-     * @param string|null $theme
      */
-    public function __construct(?theme_config $theme_config = null, ?string $theme = null) {
-        parent::__construct($theme_config, $theme);
+    public function __construct(?theme_config $theme_config = null) {
+        parent::__construct($theme_config);
         $this->type = new icon();
     }
 
@@ -109,7 +108,7 @@ class favicon_image extends theme_file {
 
         // Fall back on global setting when tenant favicon not set.
         if ($this->tenant_id > 0) {
-            $settings = new settings($this->theme_config, $this->tenant_id);
+            $settings = new settings($this->get_theme_config(), $this->tenant_id);
             if (!$settings->is_tenant_branding_enabled()) {
                 $this->tenant_id = 0;
             }

@@ -3991,9 +3991,8 @@ EOD;
      * @return string
      */
     public function render_login(\core_auth\output\login $form) {
-        global $PAGE;
         $context = $form->export_for_template($this);
-        $image = new \core\theme\file\login_image($PAGE->theme);
+        $image = new \core\theme\file\login_image($this->page->theme);
         $tenantid = \core\theme\helper::get_prelogin_tenantid();
         $image->set_tenant_id($tenantid);
 

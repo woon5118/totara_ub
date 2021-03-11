@@ -44,7 +44,8 @@ class totara_engage_webapi_shareto_recipients_testcase extends advanced_testcase
         $result = $this->execute_query([
             'itemid' => $article->get_id(),
             'component' => $article::get_resource_type(),
-            'access' => access::get_code($article->get_access())
+            'access' => access::get_code($article->get_access()),
+            'theme' => 'ventura',
         ]);
 
         $this->assertIsArray($result);
@@ -78,7 +79,8 @@ class totara_engage_webapi_shareto_recipients_testcase extends advanced_testcase
             'itemid' => $article->get_id(),
             'component' => $article::get_resource_type(),
             'access' => access::get_code($article->get_access()),
-            'search' => 'cc'
+            'search' => 'cc',
+            'theme' => 'ventura',
         ]);
 
         $this->assertIsArray($result);
@@ -106,6 +108,7 @@ class totara_engage_webapi_shareto_recipients_testcase extends advanced_testcase
             'itemid' => $article->get_id(),
             'component' => 'engage_aaaarticle',
             'access' => access::get_code($article->get_access()),
+            'theme' => 'ventura',
         ]);
     }
 
@@ -123,6 +126,7 @@ class totara_engage_webapi_shareto_recipients_testcase extends advanced_testcase
             'itemid' => '111',
             'component' => $article::get_resource_type(),
             'access' => access::get_code($article->get_access()),
+            'theme' => 'ventura',
         ]);
     }
 
@@ -145,6 +149,7 @@ class totara_engage_webapi_shareto_recipients_testcase extends advanced_testcase
             'itemid' => $article->get_id(),
             'component' => $article::get_resource_type(),
             'access' => access::get_code($article->get_access()),
+            'theme' => 'ventura',
         ]);
     }
 

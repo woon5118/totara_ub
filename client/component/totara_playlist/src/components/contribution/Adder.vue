@@ -50,6 +50,7 @@
 import EngageAdderModal from 'totara_engage/components/modal/EngageAdderModal';
 import EngagePrivacyWarningModal from 'totara_engage/components/modal/EngagePrivacyWarningModal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import { config } from 'tui/config';
 
 // GraphQL
 import resources from 'totara_playlist/graphql/resources';
@@ -109,6 +110,7 @@ export default {
           area: 'adder',
           include_footnotes: false,
           image_preview_mode: 'totara_engage_adder_thumbnail',
+          theme: config.theme.name,
         });
       },
       update({ resources: { cursor, cards } }) {

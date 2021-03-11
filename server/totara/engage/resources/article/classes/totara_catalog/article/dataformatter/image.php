@@ -93,7 +93,7 @@ class image extends formatter {
                 ]
             );
         } else {
-            $article_image = new article_image();
+            $article_image = new article_image($PAGE->theme);
             $image->url = $article_image->get_current_or_default_url()->out();
         }
 

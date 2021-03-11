@@ -68,6 +68,7 @@ import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import WorkspaceWarningModal from 'container_workspace/components/modal/WorkspaceWarningModal';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import Lozenge from 'tui/components/lozenge/Lozenge';
+import { config } from 'tui/config';
 
 //GraphQL
 import removeMemberFromWorkspace from 'container_workspace/graphql/remove_member_from_workspace';
@@ -143,6 +144,7 @@ export default {
               query: getWorkspace,
               variables: {
                 id: this.workspaceId,
+                theme: config.theme.name,
               },
             },
           ],

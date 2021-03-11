@@ -57,7 +57,7 @@ class masthead_logo implements \renderable, \templatable {
             $defaultpage = $CFG->wwwroot . '/totara/catalog/index.php';
         }
 
-        $logo = new logo_image();
+        $logo = new logo_image($PAGE->theme);
         $logotenantid = $USER->tenantid ?? 0;
         // If not logged in, there may still be a tenant theme in play...
         if (!$logotenantid && (!isloggedin() || isguestuser())) {
@@ -66,7 +66,7 @@ class masthead_logo implements \renderable, \templatable {
         $logo->set_tenant_id($logotenantid);
         $logo_url = $logo->get_current_url();
 
-        $favicon = new favicon_image();
+        $favicon = new favicon_image($PAGE->theme);
         $favicon->set_tenant_id($USER->tenantid ?? 0);
         $favicon_url = $favicon->get_current_url();
 

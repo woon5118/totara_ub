@@ -50,10 +50,9 @@ class workspace_image extends theme_file {
      * workspace_image constructor.
      *
      * @param theme_config|null $theme_config
-     * @param string|null $theme
      */
-    public function __construct(?theme_config $theme_config = null, ?string $theme = null) {
-        parent::__construct($theme_config, $theme);
+    public function __construct(?theme_config $theme_config = null) {
+        parent::__construct($theme_config);
         $this->type = new web_image();
     }
 

@@ -22,6 +22,8 @@
  */
 namespace block_totara_recently_viewed;
 
+use theme_config;
+
 /**
  * A card that's rendered by this block must implement this interface and provide the defined data.
  * Any additional data can be provided in
@@ -78,9 +80,10 @@ interface card {
      * If null is returned, there is no image on this card (eg survey).
      *
      * @param bool $tile_view If true, the image should be in the rectangular ratio
+     * @param theme_config $theme_config
      * @return \moodle_url|null
      */
-    public function get_image(bool $tile_view): ?\moodle_url;
+    public function get_image(bool $tile_view, theme_config $theme_config): ?\moodle_url;
 
     /**
      * Return any additional data to be passed directly to the card template.

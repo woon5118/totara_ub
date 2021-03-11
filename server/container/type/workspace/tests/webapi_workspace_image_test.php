@@ -31,12 +31,16 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
     use webapi_phpunit_helper;
 
     public function test_no_workspace(): void {
+        global $CFG;
+
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
         $this->setUser($user_one);
 
         $result = $this->execute_graphql_operation(
-            'container_workspace_upload_metadata', []
+            'container_workspace_upload_metadata', [
+                'theme' => 'ventura',
+            ]
         );
 
         $this->assertEmpty($result->errors);
@@ -45,6 +49,16 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
         $this->assertSame(
             'https://www.example.com/moodle/theme/image.php/_s/ventura/container_workspace/1/default_space',
             $result->data['image_url']
+        );
+
+        // Confirm that we get debug message when theme not passed.
+        $result = $this->execute_graphql_operation(
+            'container_workspace_upload_metadata', []
+        );
+        $this->assertEmpty($result->errors, !empty($result->errors) ? $result->errors[0]->message : '');
+        $this->assertDebuggingCalled(
+            "'theme' parameter not set. Falling back on {$CFG->theme}. The resolved assets "
+            . "will be associated with {$CFG->theme}, which might not be the expected result."
         );
     }
 
@@ -59,7 +73,8 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
 
         $result = $this->execute_graphql_operation(
             'container_workspace_upload_metadata', [
-                'workspace_id' => $workspace->id
+                'workspace_id' => $workspace->id,
+                'theme' => 'ventura',
             ]
         );
 
@@ -106,7 +121,8 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
 
         $result = $this->execute_graphql_operation(
             'container_workspace_upload_metadata', [
-                'workspace_id' => $workspace->id
+                'workspace_id' => $workspace->id,
+                'theme' => 'ventura',
             ]
         );
 

@@ -122,6 +122,8 @@ class core_theme_settings_testcase extends advanced_testcase {
      * Test default properties via the web api.
      */
     public function test_webapi_get_theme_settings() {
+        global $CFG;
+
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
         $this->setUser($user_one);
@@ -283,7 +285,7 @@ class core_theme_settings_testcase extends advanced_testcase {
      * Test that site logo behaves as it should.
      */
     public function test_logo() {
-        global $OUTPUT;
+        global $OUTPUT, $CFG;
 
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
@@ -379,13 +381,21 @@ class core_theme_settings_testcase extends advanced_testcase {
             "https://www.example.com/moodle/pluginfile.php/1/totara_core/logo/{$logo_image->get_item_id()}/new_site_logo.png",
             $mastheaddata['logourl']
         );
+
+        // Test without theme parameter
+        $logo_image = new logo_image();
+        $logo_image->get_current_or_default_url();
+        $this->assertDebuggingCalled(
+            "'theme' parameter not set. Falling back on {$CFG->theme}. The resolved assets "
+            . "will be associated with {$CFG->theme}, which might not be the expected result."
+        );
     }
 
     /**
      * Test that favicon behaves as expected.
      */
     public function test_favicon() {
-        global $OUTPUT;
+        global $OUTPUT, $CFG;
 
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
@@ -453,6 +463,14 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertEquals(
             "https://www.example.com/moodle/pluginfile.php/1/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
             $mastheaddata['faviconurl']
+        );
+
+        // Test without theme parameter
+        $favicon_image = new favicon_image();
+        $favicon_image->get_current_or_default_url();
+        $this->assertDebuggingCalled(
+            "'theme' parameter not set. Falling back on {$CFG->theme}. The resolved assets "
+            . "will be associated with {$CFG->theme}, which might not be the expected result."
         );
     }
 

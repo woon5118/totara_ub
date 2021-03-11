@@ -61,7 +61,12 @@ class totara_engage_webapi_resolver_query_user_contributions_testcase extends ad
     public function test_user_contribution(): void {
         $user = $this->setup_user();
         $this->create_article('test', $user->id);
-        $result = $this->execute_query(['component' => 'engage_article', 'user_id' => $user->id, 'area' => 'otheruserlib']);
+        $result = $this->execute_query([
+            'component' => 'engage_article',
+            'user_id' => $user->id,
+            'area' => 'otheruserlib',
+            'theme' => 'ventura',
+        ]);
         $this->assertArrayHasKey('cursor', $result);
         $this->assertArrayHasKey('cards', $result);
     }
@@ -76,21 +81,33 @@ class totara_engage_webapi_resolver_query_user_contributions_testcase extends ad
         $user = $this->setup_user();
         self::expectException(coding_exception::class);
         self::expectExceptionMessage("Component is a required field.");
-        $this->execute_query(['user_id' => $user->id, 'area' => 'otheruserlib']);
+        $this->execute_query([
+            'user_id' => $user->id,
+            'area' => 'otheruserlib',
+            'theme' => 'ventura',
+        ]);
     }
 
     public function test_invalid_area_not_accepted(): void {
         $user = $this->setup_user();
         self::expectException(coding_exception::class);
         self::expectExceptionMessage("Query user_contributions does not support the 'test' area.");
-        $this->execute_query(['component' => 'engage_article', 'user_id' => $user->id, 'area' => 'test']);
+        $this->execute_query([
+            'component' => 'engage_article',
+            'user_id' => $user->id,
+            'area' => 'test',
+            'theme' => 'ventura',
+        ]);
     }
 
     public function test_invalid_userid_not_accepted(): void {
         $this->setup_user();
         self::expectException(coding_exception::class);
         self::expectExceptionMessage('Query user_contributions must specify the "user_id" field');
-        $this->execute_query(['component' => 'engage_article']);
+        $this->execute_query([
+            'component' => 'engage_article',
+            'theme' => 'ventura',
+        ]);
     }
 
     public function test_successful_ajax_call(): void {
@@ -98,7 +115,13 @@ class totara_engage_webapi_resolver_query_user_contributions_testcase extends ad
 
         $result = $this->parsed_graphql_operation(
             self::OPERATION_NAME,
-            ['component' => 'engage_article', 'user_id' => $user->id, 'area' => 'otheruserlib', 'include_footnotes' => true]
+            [
+                'component' => 'engage_article',
+                'user_id' => $user->id,
+                'area' => 'otheruserlib',
+                'include_footnotes' => true,
+                'theme' => 'ventura',
+            ]
         );
         $this->assert_webapi_operation_successful($result);
     }
@@ -111,7 +134,13 @@ class totara_engage_webapi_resolver_query_user_contributions_testcase extends ad
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(
             self::OPERATION_NAME,
-            ['component' => 'engage_article', 'user_id' => $user->id, 'area' => 'otheruserlib', 'include_footnotes' => false]
+            [
+                'component' => 'engage_article',
+                'user_id' => $user->id,
+                'area' => 'otheruserlib',
+                'include_footnotes' => false,
+                'theme' => 'ventura',
+            ]
         );
         $this->assert_webapi_operation_failed($result, 'Feature engage_resources is not available.');
     }

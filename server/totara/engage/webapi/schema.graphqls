@@ -86,10 +86,10 @@ type totara_engage_card {
   component: String!
   tuicomponent: String!
   imagetuicomponent: String!
-  image(preview_mode: String): String
+  image(theme: param_component!, preview_mode: String): String
   access: totara_engage_access!
   timecreated: String!
-  extra: String!
+  extra(theme: param_component!): String!
   comments: Int!
   reactions: Int!
   sharedbycount: Int!

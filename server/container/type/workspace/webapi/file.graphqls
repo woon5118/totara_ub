@@ -68,7 +68,10 @@ extend type Query {
     draft_id: param_integer
   ): container_workspace_file_area!
 
-  container_workspace_workspace_image(workspace_id: param_integer): String!
+  container_workspace_workspace_image(
+    workspace_id: param_integer
+    theme: param_component
+  ): String!
 
   """
   Query to load the files from workspace

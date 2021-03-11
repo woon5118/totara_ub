@@ -23,6 +23,7 @@
 namespace container_workspace\webapi\resolver\query;
 
 use core\files\file_helper;
+use core\theme\helper as theme_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -44,7 +45,8 @@ final class workspace_image implements query_resolver, has_middleware {
      * @return string
      */
     public static function resolve(array $args, execution_context $ec): string {
-        $workspace_image = new workspace_image_file();
+        $theme = theme_helper::load_theme_config($args['theme'] ?? null);
+        $workspace_image = new workspace_image_file($theme);
 
         if (empty($args['workspace_id'])) {
             $url = $workspace_image->get_current_or_default_url();

@@ -25,6 +25,7 @@ namespace core\theme;
 
 use core\theme\settings as theme_settings;
 use core\theme\file\theme_file;
+use theme_config;
 use totara_core\advanced_feature;
 
 /**
@@ -120,6 +121,30 @@ final class helper {
             }
         }
         return 0;
+    }
+
+    /**
+     * Load theme_config based on the theme parameter passed.
+     *
+     * For backward compatibility this function provides a fallback theme_config object in
+     * situations where theme was not passed as a parameter to a resolver or theme_file.
+     *
+     * @param string|null $theme
+     *
+     * @return theme_config
+     */
+    public static function load_theme_config(?string $theme = null): theme_config {
+        global $CFG;
+
+        if (empty($theme)) {
+            debugging(
+                "'theme' parameter not set. Falling back on {$CFG->theme}. The resolved assets "
+                . "will be associated with {$CFG->theme}, which might not be the expected result."
+            );
+            return theme_config::load($CFG->theme);
+        }
+
+        return theme_config::load($theme);
     }
 
 }
