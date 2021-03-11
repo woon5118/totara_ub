@@ -140,8 +140,7 @@ class container_workspace_create_testcase extends advanced_testcase {
                 'summary' => 'This is summary',
                 'summary_format' => FORMAT_PLAIN,
                 'hidden' => false,
-                'private' => false,
-                'theme' => 'ventura',
+                'private' => false
             ]
         );
 
@@ -346,8 +345,7 @@ class container_workspace_create_testcase extends advanced_testcase {
                 'description' => $summary,
                 'summary_format' => FORMAT_JSON_EDITOR,
                 'hidden' => false,
-                'private' => false,
-                'theme' => 'ventura',
+                'private' => false
             ]
         );
 

@@ -56,10 +56,7 @@ class container_workspace_webapi_get_workspace_testcase extends advanced_testcas
         // Now the workspace does not have any owner - test if we are able to fetch the workspace.
         $result = $this->execute_graphql_operation(
             'container_workspace_get_workspace',
-            [
-                'id' => $workspace->get_id(),
-                'theme' => 'ventura',
-            ]
+            ['id' => $workspace->get_id()]
         );
 
         $this->assertEmpty($result->errors);

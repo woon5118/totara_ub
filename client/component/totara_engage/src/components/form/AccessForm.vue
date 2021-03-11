@@ -114,7 +114,6 @@ import RecipientsSelector from 'totara_engage/components/form/access/RecipientsS
 import AccessSelector from 'totara_engage/components/form/access/AccessSelector';
 import SharedBoard from 'totara_engage/components/form/SharedBoard';
 import { AccessManager, TimeViewType } from 'totara_engage/index';
-import { config } from 'tui/config';
 
 // GraphQL
 import ShareRecipients from 'totara_engage/graphql/share_recipients';
@@ -261,7 +260,6 @@ export default {
       return {
         itemid: this.containerValues.instanceId || this.itemId,
         component: this.containerValues.component || this.component,
-        theme: config.theme.name,
       };
     },
 

@@ -1,17 +1,17 @@
 query totara_engage_share_recipients(
   $itemid: param_integer!
   $component: param_component!
-  $theme: param_component!
 ) {
   recipients: totara_engage_share_recipients(
     itemid: $itemid
     component: $component
-    theme: $theme
   ) {
+    __typename
     component
     area
     instanceid
     user {
+      __typename
       id
       fullname
       profileimageurl
@@ -19,6 +19,7 @@ query totara_engage_share_recipients(
       email
     }
     other {
+      __typename
       category
       fullname
       imageurl

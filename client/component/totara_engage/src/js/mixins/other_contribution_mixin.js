@@ -16,7 +16,6 @@
  * @module totara_engage
  */
 
-import { config } from 'tui/config';
 import userContributionCards from 'totara_engage/graphql/user_contribution_cards';
 
 export default {
@@ -59,7 +58,6 @@ export default {
           include_footnotes: false,
           source: this.contributionSource,
           user_id: this.userId,
-          theme: config.theme.name,
         });
       },
 

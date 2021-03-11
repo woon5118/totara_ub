@@ -24,7 +24,6 @@ namespace totara_engage\card;
 
 use core_user\totara_engage\share\recipient\user;
 use moodle_url;
-use theme_config;
 use totara_engage\entity\engage_bookmark;
 use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
@@ -33,7 +32,6 @@ use totara_engage\query\provider\helper;
 use totara_engage\repository\bookmark_repository;
 use totara_engage\repository\share_recipient_repository;
 use totara_engage\repository\share_repository;
-use totara_engage\share\recipient\recipient;
 use totara_tui\output\component;
 
 /**
@@ -302,10 +300,9 @@ abstract class card {
      * A function to provide the extra data that is needed at front-end. Override this function, if you want
      * to inject extra data into the front-end for rendering.
      *
-     * @param theme_config $theme_config
      * @return array
      */
-    public function get_extra_data(theme_config $theme_config): array {
+    public function get_extra_data(): array {
         return [];
     }
 
@@ -388,13 +385,10 @@ abstract class card {
                     list($sharer, $recipient) = $info;
 
                     if ($recipient->area !== user::AREA) {
-                        /** @var recipient $share_recipient */
-                        $share_recipient = \totara_engage\share\recipient\helper::get_recipient_class(
-                            $recipient->component,
-                            $recipient->area
-                        );
-                        $share_recipient = new $share_recipient($recipient->instanceid);
-                        $has_capability = $share_recipient->can_unshare_resources();
+                        $library = \totara_engage\share\recipient\helper::get_recipient_class($recipient->component, $recipient->area);
+                        $library = new $library($recipient->instanceid);
+                        $data = $library->get_data();
+                        $has_capability = $data['unshare'];
                     }
                 }
 
@@ -538,11 +532,10 @@ abstract class card {
      * Return the URL of the image for this card.
      * Return null if there is no valid image involved.
      *
-     * @param theme_config $theme_config
      * @param string|null $preview_mode
      * @return moodle_url|null
      */
-    abstract public function get_card_image(theme_config $theme_config, ?string $preview_mode = null): ?moodle_url;
+    abstract public function get_card_image(?string $preview_mode = null): ?moodle_url;
 
     /**
      * Return the component used to render the card image

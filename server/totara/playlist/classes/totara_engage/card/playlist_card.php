@@ -22,7 +22,6 @@
  */
 namespace totara_playlist\totara_engage\card;
 
-use theme_config;
 use totara_comment\loader\comment_loader;
 use totara_engage\rating\rating_manager;
 use totara_engage\card\card;
@@ -42,10 +41,9 @@ final class playlist_card extends card {
     }
 
     /**
-     * @param theme_config $theme_config
      * @return array
      */
-    public function get_extra_data(theme_config $theme_config): array {
+    public function get_extra_data(): array {
         global $USER;
 
         /** @var playlist_resource_repository $repo */
@@ -53,7 +51,7 @@ final class playlist_card extends card {
 
         $rating = rating_manager::instance($this->instanceid, 'totara_playlist', 'playlist');
         $extra = [
-            'image' => $this->get_card_image($theme_config, 'totara_playlist_card')->out(false),
+            'image' => $this->get_card_image('totara_playlist_card')->out(false),
             // Default to false, but update this field base on the capability and access manager.
             'actions' => false,
             'resources' => $repo->get_total_of_resources($this->instanceid),
@@ -92,12 +90,10 @@ final class playlist_card extends card {
     }
 
     /**
-     * @param theme_config $theme_config
      * @param string|null $preview_mode
      * @return \moodle_url|null
-     * @throws \coding_exception
      */
-    public function get_card_image(theme_config $theme_config, ?string $preview_mode = null): ?\moodle_url {
+    public function get_card_image(?string $preview_mode = null): ?\moodle_url {
         global $OUTPUT, $PAGE;
 
         $playlist = playlist::from_id($this->get_instanceid());

@@ -167,8 +167,7 @@ class engage_survey_webapi_multi_tenancy_fetch_recipients_testcase extends advan
             'itemid' => $survey->get_id(),
             'component' => survey::get_resource_type(),
             'access' => $survey->get_access_code(),
-            'search' => $search_string,
-            'theme' => 'ventura',
+            'search' => $search_string
         ];
     }
 
@@ -453,8 +452,7 @@ class engage_survey_webapi_multi_tenancy_fetch_recipients_testcase extends advan
                 'itemid' => $survey->get_id(),
                 'component' => survey::get_resource_type(),
                 'access' => $survey->get_access_code(),
-                'search' => $this->tenant_one_user_one->firstname,
-                'theme' => 'ventura',
+                'search' => $this->tenant_one_user_one->firstname
             ]
         );
 

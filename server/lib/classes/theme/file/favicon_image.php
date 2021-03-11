@@ -49,9 +49,10 @@ class favicon_image extends theme_file {
      * favicon_image constructor.
      *
      * @param theme_config|null $theme_config
+     * @param string|null $theme
      */
-    public function __construct(?theme_config $theme_config = null) {
-        parent::__construct($theme_config);
+    public function __construct(?theme_config $theme_config = null, ?string $theme = null) {
+        parent::__construct($theme_config, $theme);
         $this->type = new icon();
     }
 
@@ -65,14 +66,14 @@ class favicon_image extends theme_file {
     /**
      * @inheritDoc
      */
-    public static function get_component(): string {
+    public function get_component(): string {
         return 'totara_core';
     }
 
     /**
      * @inheritDoc
      */
-    public static function get_area(): string {
+    public function get_area(): string {
         return 'favicon';
     }
 

@@ -27,7 +27,6 @@ use block_totara_recently_viewed\card as base_card;
 use container_workspace\loader\member\loader;
 use container_workspace\workspace;
 use moodle_url;
-use theme_config;
 
 /**
  * Workspace card for the recently viewed block
@@ -92,12 +91,11 @@ class card implements base_card {
 
     /**
      * @param bool $tile_view
-     * @param theme_config $theme_config
      * @return moodle_url|null
      */
-    public function get_image(bool $tile_view, theme_config $theme_config): ?\moodle_url {
+    public function get_image(bool $tile_view): ?\moodle_url {
         global $OUTPUT;
-        $image = $this->workspace->get_image($theme_config);
+        $image = $this->workspace->get_image();
         if (!$image) {
             // No image, use the default
             return $OUTPUT->image_url('default_space', 'engage_workspace');

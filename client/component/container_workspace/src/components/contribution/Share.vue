@@ -47,7 +47,6 @@
 import EngageAdderModal from 'totara_engage/components/modal/EngageAdderModal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import WorkspaceWarningModal from 'container_workspace/components/modal/WorkspaceWarningModal';
-import { config } from 'tui/config';
 
 // GraphQL
 import shareWithRecipient from 'totara_engage/graphql/share_with_recipient';
@@ -106,7 +105,6 @@ export default {
           area: 'adder',
           include_footnotes: false,
           image_preview_mode: 'totara_engage_adder_thumbnail',
-          theme: config.theme.name,
         });
       },
       update({ contribution: { cursor, cards } }) {

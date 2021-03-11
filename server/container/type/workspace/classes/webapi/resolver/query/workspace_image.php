@@ -31,7 +31,6 @@ use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
 use container_workspace\theme\file\workspace_image as workspace_image_file;
-use theme_config;
 
 /**
  * Class workspace_image
@@ -45,11 +44,7 @@ final class workspace_image implements query_resolver, has_middleware {
      * @return string
      */
     public static function resolve(array $args, execution_context $ec): string {
-        if (!isset($args['theme'])) {
-            throw new \coding_exception('Theme is a required field.');
-        }
-        
-        $workspace_image = new workspace_image_file(theme_config::load($args['theme']));
+        $workspace_image = new workspace_image_file();
 
         if (empty($args['workspace_id'])) {
             $url = $workspace_image->get_current_or_default_url();

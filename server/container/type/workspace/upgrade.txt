@@ -1,16 +1,6 @@
 This files describes API changes in /container/type/workspace/*.
 The information here is intended only for developers.
 
-=== 13.5 ===
-
---- Update to general functionality ---
-* Added required parameter "$theme_config" to the totara_engage\share\recipient\library::get_data function
-* Added required parameter "$theme_config" to the workspace::get_image function
-
---- Update to graphQL ---
-* Added "theme" parameter to the "image" field in the "container_workspace_workspace" type
-* Added required "theme" parameter to "container_workspace_workspace_image" query
-
 === 13.2 ===
 
 --- Update to general functionality ---

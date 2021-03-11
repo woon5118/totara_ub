@@ -23,7 +23,7 @@ type container_workspace_workspace {
   """
   Url for default image.
   """
-  image(theme: param_component!): String!
+  image: String!
   """
   Time description of a workspace about create/update time.
   """

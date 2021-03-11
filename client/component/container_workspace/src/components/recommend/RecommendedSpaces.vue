@@ -44,7 +44,6 @@
 <script>
 import Loading from 'tui/components/icons/Loading';
 import SpaceCardsGrid from 'container_workspace/components/grid/SpaceCardsGrid';
-import { config } from 'tui/config';
 
 // GraphQL Queries
 import recommendedSpaces from 'ml_recommender/graphql/get_recommended_user_workspaces';
@@ -66,11 +65,6 @@ export default {
     workspaces: {
       query: recommendedSpaces,
       fetchPolicy: 'network-only',
-      variables() {
-        return {
-          theme: config.theme.name,
-        };
-      },
     },
   },
 

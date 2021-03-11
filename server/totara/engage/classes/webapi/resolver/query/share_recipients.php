@@ -28,7 +28,6 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use theme_config;
 use totara_engage\access\access_manager;
 use totara_engage\access\accessible;
 use totara_engage\entity\share as share_entity;
@@ -60,10 +59,6 @@ final class share_recipients implements query_resolver, has_middleware {
             throw new \coding_exception('Component is a required field.');
         }
 
-        if (!isset($args['theme'])) {
-            throw new \coding_exception('Theme is a required field.');
-        }
-
         $component = $args['component'];
         $itemid = $args['itemid'];
 
@@ -89,7 +84,7 @@ final class share_recipients implements query_resolver, has_middleware {
         $recipients = $repo->get_recipients($itemid, $component);
 
         if (!empty($recipients)) {
-            $recipients = helper::format_recipients($recipients, theme_config::load($args['theme']));
+            $recipients = helper::format_recipients($recipients);
         }
 
         return $recipients;

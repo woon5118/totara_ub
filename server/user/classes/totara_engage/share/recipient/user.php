@@ -24,7 +24,6 @@ namespace core_user\totara_engage\share\recipient;
 
 use context_user;
 use core_user;
-use theme_config;
 use totara_engage\access\access;
 use totara_engage\engage_core;
 use totara_engage\entity\share as share_entity;
@@ -102,15 +101,8 @@ class user extends recipient {
     /**
      * @inheritDoc
      */
-    public function get_data(theme_config $theme_config) {
+    public function get_data() {
         return \core_user::get_user($this->instanceid);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function can_unshare_resources(): bool {
-        return false;
     }
 
     /**

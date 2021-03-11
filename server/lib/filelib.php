@@ -4657,7 +4657,7 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme 
             }
 
             $course_image = new \core_course\theme\file\course_image();
-            $item_id = $course_image->get_item_id(null, $theme);
+            $item_id = $course_image->get_item_id();
 
             $filename = array_shift($args);
             $fs = get_file_storage();

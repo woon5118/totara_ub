@@ -47,7 +47,6 @@
 <script>
 import RelatedCard from 'engage_article/components/card/RelatedCard';
 import { UrlSourceType } from 'totara_engage/index';
-import { config } from 'tui/config';
 
 import getRecommendation from 'ml_recommender/graphql/get_recommended_articles';
 import updateBookmark from 'totara_engage/graphql/update_bookmark';
@@ -82,7 +81,6 @@ export default {
           variables: {
             article_id: this.resourceId,
             source: UrlSourceType.article(this.resourceId),
-            theme: config.theme.name,
           },
         })
         .then(({ data }) => {

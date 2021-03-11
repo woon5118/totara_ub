@@ -3757,7 +3757,7 @@ function course_save_image(stdClass $data, int $courseid) {
  * @return moodle_url
  */
 function course_get_image($course) {
-    global $DB, $OUTPUT, $PAGE;
+    global $DB, $OUTPUT;
 
     if (is_object($course)) {
         if (empty($course->cacherev)) {
@@ -3781,7 +3781,7 @@ function course_get_image($course) {
         $url = moodle_url::make_pluginfile_url($context->id, 'course', 'images', $course->cacherev, '/', 'image', false);
         return $url;
     }
-    $course_image = new course_image($PAGE->theme);
+    $course_image = new course_image();
     $file = $course_image->get_current_or_default_url();
     if ($file) {
         return $file;

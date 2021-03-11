@@ -49,7 +49,6 @@
 <script>
 import RelatedCard from 'totara_playlist/components/card/RelatedCard';
 import { UrlSourceType } from 'totara_engage/index';
-import { config } from 'tui/config';
 
 import getRecommendation from 'ml_recommender/graphql/get_recommended_playlists';
 import updateBookmark from 'totara_engage/graphql/update_bookmark';
@@ -84,7 +83,6 @@ export default {
           variables: {
             playlist_id: this.playlistId,
             source: UrlSourceType.playlist(this.playlistId),
-            theme: config.theme.name,
           },
         })
         .then(({ data }) => {

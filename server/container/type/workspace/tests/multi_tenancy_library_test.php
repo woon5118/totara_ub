@@ -83,8 +83,7 @@ class container_workspace_multi_tenancy_library_testcase extends advanced_testca
             [
                 'workspace_id' => $workspace->get_id(),
                 'area' => 'library',
-                'include_footnotes' => false,
-                'theme' => 'ventura',
+                'include_footnotes' => false
             ]
         );
 
@@ -103,8 +102,7 @@ class container_workspace_multi_tenancy_library_testcase extends advanced_testca
             [
                 'workspace_id' => $workspace->get_id(),
                 'area' => 'library',
-                'include_footnotes' => false,
-                'theme' => 'ventura',
+                'include_footnotes' => false
             ]
         );
 
@@ -170,8 +168,7 @@ class container_workspace_multi_tenancy_library_testcase extends advanced_testca
         $parameters = [
             'workspace_id' => $workspace->get_id(),
             'area' => 'library',
-            'include_footnotes' => false,
-            'theme' => 'ventura',
+            'include_footnotes' => false
         ];
 
         $this->setUser($user_two);

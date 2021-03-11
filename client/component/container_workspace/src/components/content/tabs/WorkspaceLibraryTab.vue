@@ -59,7 +59,6 @@
 import ContributionBaseContent from 'totara_engage/components/contribution/BaseContent';
 import ContributionFilter from 'totara_engage/components/contribution/Filter';
 import { UrlSourceType } from 'totara_engage/index';
-import { config } from 'tui/config';
 
 // Mixins
 import ContributionMixin from 'totara_engage/mixins/contribution_mixin';
@@ -125,7 +124,6 @@ export default {
           footnotes_area: 'library',
           footnotes_component: 'container_workspace',
           source: UrlSourceType.workspace(this.workspaceId),
-          theme: config.theme.name,
         });
       },
       update({ contribution: { cursor, cards } }) {

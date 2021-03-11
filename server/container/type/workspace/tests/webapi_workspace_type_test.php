@@ -300,9 +300,7 @@ class container_workspace_webapi_workspace_type_testcase extends advanced_testca
             'container_workspace_workspace',
             'image',
             $workspace,
-            [
-                'theme' => 'ventura',
-            ],
+            [],
             $context
         );
 

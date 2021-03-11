@@ -58,7 +58,6 @@ import WorkspaceFilter from 'container_workspace/components/filter/WorkspaceFilt
 import SpaceCardsGrid from 'container_workspace/components/grid/SpaceCardsGrid';
 import { cardGrid } from 'container_workspace/index';
 import apolloClient from 'tui/apollo_client';
-import { config } from 'tui/config';
 
 // GraphQL queries
 import findWorkspaces from 'container_workspace/graphql/find_workspaces';
@@ -105,7 +104,6 @@ export default {
           sort: this.inner.selectedSort,
           search_term: this.inner.searchTerm,
           access: this.inner.selectedAccess,
-          theme: config.theme.name,
         };
       },
 
@@ -185,7 +183,6 @@ export default {
         sort: this.inner.selectedSort,
         search_term: this.inner.searchTerm,
         access: this.inner.selectedAccess,
-        theme: config.theme.name,
       };
     },
   },

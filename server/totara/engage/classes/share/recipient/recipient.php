@@ -23,7 +23,6 @@
 
 namespace totara_engage\share\recipient;
 
-use theme_config;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\shareable;
 
@@ -114,10 +113,9 @@ abstract class recipient {
     /**
      * Get data for specific recipient.
      *
-     * @param theme_config $theme_config
      * @return mixed
      */
-    abstract public function get_data(theme_config $theme_config);
+    abstract public function get_data();
 
     /**
      * Get the minimum access required by an item to be shared with this recipient.
@@ -125,14 +123,6 @@ abstract class recipient {
      * @return int
      */
     abstract public function get_minimum_access(): int;
-
-    /**
-     * Indicate that this recipient can unshare the resources
-     * shared to it.
-     *
-     * @return bool
-     */
-    abstract public function can_unshare_resources(): bool;
 
     /**
      * Search for recipient.

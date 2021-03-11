@@ -26,7 +26,6 @@ namespace block_totara_recently_viewed\engage_article;
 use block_totara_recently_viewed\card as base_card;
 use engage_article\totara_engage\resource\article;
 use moodle_url;
-use theme_config;
 use totara_engage\link\builder;
 use totara_engage\timeview\time_view;
 use totara_reaction\loader\reaction_loader;
@@ -92,10 +91,9 @@ class card implements base_card {
 
     /**
      * @param bool $tile_view
-     * @param theme_config $theme_config
      * @return moodle_url|null
      */
-    public function get_image(bool $tile_view, theme_config $theme_config): ?\moodle_url {
+    public function get_image(bool $tile_view): ?\moodle_url {
         global $OUTPUT;
         $image = $this->article->get_image();
         if (!$image) {

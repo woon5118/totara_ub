@@ -93,7 +93,6 @@ class ml_recommender_get_recommended_playlists_testcase extends advanced_testcas
         $parameters = [
             'playlist_id' => $target_playlist->get_id(),
             'cursor' => null,
-            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -114,7 +113,6 @@ class ml_recommender_get_recommended_playlists_testcase extends advanced_testcas
         $parameters = [
             'playlist_id' => $target_playlist2->get_id(),
             'cursor' => null,
-            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -131,7 +129,6 @@ class ml_recommender_get_recommended_playlists_testcase extends advanced_testcas
         $parameters = [
             'playlist_id' => $target_playlist->get_id(),
             'cursor' => null,
-            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -226,7 +223,6 @@ class ml_recommender_get_recommended_playlists_testcase extends advanced_testcas
         $parameters = [
             'playlist_id' => $base_playlist->get_id(),
             'cursor' => null,
-            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
@@ -242,7 +238,6 @@ class ml_recommender_get_recommended_playlists_testcase extends advanced_testcas
         $parameters = [
             'playlist_id' => $base_playlist->get_id(),
             'cursor' => null,
-            'theme' => 'ventura',
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);

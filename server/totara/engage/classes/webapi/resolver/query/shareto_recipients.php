@@ -28,7 +28,6 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use theme_config;
 use totara_engage\access\access;
 use totara_engage\access\access_manager;
 use totara_engage\access\accessible;
@@ -63,10 +62,6 @@ final class shareto_recipients implements query_resolver, has_middleware {
 
         if (!isset($args['access'])) {
             throw new coding_exception('Access is a required field.');
-        }
-
-        if (!isset($args['theme'])) {
-            throw new \coding_exception('Theme is a required field.');
         }
 
         $itemid = $args['itemid'];
@@ -157,7 +152,7 @@ final class shareto_recipients implements query_resolver, has_middleware {
                     'alreadyshared' => $isrecipient,
                     'summary' => $recipient->get_summary(),
                     'minimum_access' => access::get_code($recipient->get_minimum_access()),
-                    $area => $recipient->get_data(theme_config::load($args['theme'])),
+                    $area => $recipient->get_data()
                 ];
             }
         }

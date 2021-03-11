@@ -16,7 +16,6 @@ query totara_engage_contribution_cards(
   $cursor: String
   $source: String
   $image_preview_mode: String
-  $theme: param_component!
 ) {
   contribution: totara_engage_contributions(
     component: $component
@@ -49,14 +48,14 @@ query totara_engage_contribution_cards(
       component
       tuicomponent
       imagetuicomponent
-      image(theme: $theme, preview_mode: $image_preview_mode)
+      image(preview_mode: $image_preview_mode)
       access
       comments
       reactions
       timecreated
       sharedbycount
       bookmarked
-      extra(theme: $theme)
+      extra
       owned
       user {
         id

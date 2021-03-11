@@ -5,7 +5,6 @@ mutation container_workspace_create_workspace(
   $draft_id: param_integer
   $private: param_boolean!
   $hidden: param_boolean!
-  $theme: param_component!
 ) {
   workspace: container_workspace_create(
     name: $name
@@ -21,7 +20,7 @@ mutation container_workspace_create_workspace(
     description(format: PLAIN)
     description_format
     time_description
-    image(theme: $theme)
+    image
     total_members
     interactor {
       __typename

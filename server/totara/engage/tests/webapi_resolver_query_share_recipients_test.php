@@ -82,11 +82,7 @@ class totara_engage_webapi_resolver_query_share_recipients_testcase extends adva
             [$recipient1, $recipient2, $recipient3]
         );
 
-        $result = $this->execute_query([
-                'component' => $article::get_resource_type(),
-                'itemid' => $article->get_id(),
-                'theme' => 'ventura',
-        ]);
+        $result = $this->execute_query(['component' => $article::get_resource_type(), 'itemid' => $article->get_id()]);
         $this->assertIsArray($result);
         $this->assertNotEmpty($result);
         $instance_ids = array_column($result, 'instanceid');
@@ -114,11 +110,7 @@ class totara_engage_webapi_resolver_query_share_recipients_testcase extends adva
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Permission denied');
-        $this->execute_query([
-            'component' => $article::get_resource_type(),
-            'itemid' => 11,
-            'theme' => 'ventura',
-        ]);
+        $this->execute_query(['component' => $article::get_resource_type(), 'itemid' => 11]);
     }
 
     /**
@@ -126,11 +118,7 @@ class totara_engage_webapi_resolver_query_share_recipients_testcase extends adva
      */
     public function test_share_recipients_with_empty_itemid() {
         $this->setup_user();
-        $result = $this->execute_query([
-            'component' => 'engage_article',
-            'itemid' => 0,
-            'theme' => 'ventura',
-        ]);
+        $result = $this->execute_query(['component' => 'engage_article', 'itemid' => 0]);
         $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
@@ -154,11 +142,7 @@ class totara_engage_webapi_resolver_query_share_recipients_testcase extends adva
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Permission denied');
-        $this->execute_query([
-            'component' => 'engage_aaarticle',
-            'itemid' => $article->get_id(),
-            'theme' => 'ventura',
-        ]);
+        $this->execute_query(['component' => 'engage_aaarticle', 'itemid' => $article->get_id()]);
     }
 
     public function test_share_recipients_with_different_logged_user() {
@@ -184,11 +168,7 @@ class totara_engage_webapi_resolver_query_share_recipients_testcase extends adva
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Permission denied');
-        $this->execute_query([
-            'component' => $article::get_resource_type(),
-            'itemid' => $article->get_id(),
-            'theme' => 'ventura',
-        ]);
+        $this->execute_query(['component' => $article::get_resource_type(), 'itemid' => $article->get_id()]);
     }
 
     public function test_share_recipients_with_admin() {
@@ -209,11 +189,7 @@ class totara_engage_webapi_resolver_query_share_recipients_testcase extends adva
         );
 
         $this->setAdminUser();
-        $result = $this->execute_query([
-            'component' => $article::get_resource_type(),
-            'itemid' => $article->get_id(),
-            'theme' => 'ventura',
-        ]);
+        $result = $this->execute_query(['component' => $article::get_resource_type(), 'itemid' => $article->get_id()]);
 
         $this->assertIsArray($result);
         $this->assertNotEmpty($result);

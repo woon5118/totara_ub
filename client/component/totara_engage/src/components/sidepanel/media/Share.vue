@@ -73,7 +73,6 @@ import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import Share from 'tui/components/icons/Share';
-import { config } from 'tui/config';
 
 import { AccessManager } from 'totara_engage/index';
 import ButtonIconWithLabel from 'tui/components/buttons/LabelledButtonTrigger';
@@ -105,7 +104,6 @@ export default {
         return {
           itemid: this.instanceId,
           component: this.component,
-          theme: config.theme.name,
         };
       },
       update({ recipients }) {

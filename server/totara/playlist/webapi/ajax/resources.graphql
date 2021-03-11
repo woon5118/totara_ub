@@ -14,7 +14,6 @@ query totara_playlist_resources(
   $footnotes_component: param_component
   $cursor: String
   $image_preview_mode: String
-  $theme: param_component!
 ) {
   resources: totara_playlist_resources(
     playlist_id: $playlist_id
@@ -46,14 +45,14 @@ query totara_playlist_resources(
       component
       tuicomponent
       imagetuicomponent
-      image(theme: $theme, preview_mode: $image_preview_mode)
+      image(preview_mode: $image_preview_mode)
       access
       comments
       reactions
       timecreated
       sharedbycount
       bookmarked
-      extra(theme: $theme)
+      extra
       owned
       user {
         __typename

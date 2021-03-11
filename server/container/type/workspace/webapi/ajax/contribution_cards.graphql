@@ -14,7 +14,6 @@ query container_workspace_contribution_cards(
   $footnotes_component: param_component
   $cursor: String
   $image_preview_mode: String
-  $theme: param_component!
 ) {
   contribution: container_workspace_contributions(
     workspace_id: $workspace_id
@@ -46,14 +45,14 @@ query container_workspace_contribution_cards(
       component
       tuicomponent
       imagetuicomponent
-      image(theme: $theme, preview_mode: $image_preview_mode)
+      image(preview_mode: $image_preview_mode)
       access
       comments
       reactions
       timecreated
       sharedbycount
       bookmarked
-      extra(theme: $theme)
+      extra
       owned
       user {
         id

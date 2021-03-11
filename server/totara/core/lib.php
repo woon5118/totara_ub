@@ -319,16 +319,17 @@ function totara_core_pluginfile($course, $cm, $context, $filearea, $args, $force
     $filename = $args[1];
     $fs = get_file_storage();
 
-    /** @var theme_file[] $classes */
     $classes = \core\theme\file\helper::get_classes();
 
     $theme_file_areas = [];
     foreach ($classes as $class) {
-        if ($class::get_component() !== 'totara_core') {
+        /** @var theme_file $theme_file */
+        $theme_file = new $class();
+        if ($theme_file->get_component() !== 'totara_core') {
             continue;
         }
 
-        $theme_file_areas[] = $class::get_area();
+        $theme_file_areas[] = $theme_file->get_area();
     }
 
     if (in_array($filearea, $theme_file_areas)) {
@@ -340,9 +341,6 @@ function totara_core_pluginfile($course, $cm, $context, $filearea, $args, $force
                 send_file_not_found();
             }
         }
-
-        // By default, theme files must be cache-able by both browsers and proxies.
-        $options['cacheability'] = 'public';
     }
 
     $file = $fs->get_file($context->id, $component, $filearea, $itemid, '/', $filename);

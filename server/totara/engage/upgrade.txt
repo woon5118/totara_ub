@@ -1,20 +1,6 @@
 This files describes API changes in /totara/engage,
 information provided here is intended especially for developers.
 
-=== 13.5 ===
-
---- Update to general functionality ---
-* Added required parameter "$theme_config" to the totara_engage\card\card::get_extra_data function needed
-  by the theme files.
-* Added second required parameter "$theme_config" to the totara_engage\share\helper::format_recipients function needed
-  by the theme files.
-
---- Update to graphQL ---
-* Added "theme" parameter to the "image" field in the "totara_engage_card" type
-* Added "theme" parameter to the "extra" field in the "totara_engage_card" type
-* Added required "theme" parameter to "totara_engage_shareto_recipients" query
-* Added required "theme" parameter to "totara_engage_share_recipients" query
-
 === 13.2 ===
 
 * Deprecated $visibility parameter in share_repository::is_recipient

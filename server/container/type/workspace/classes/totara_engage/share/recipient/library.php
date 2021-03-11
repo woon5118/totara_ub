@@ -28,7 +28,6 @@ use container_workspace\workspace;
 use container_workspace\loader\workspace\loader as workspace_loader;
 use core\orm\query\builder;
 use core_container\factory;
-use theme_config;
 use totara_core\advanced_feature;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\access\access;
@@ -85,27 +84,19 @@ class library extends recipient {
     /**
      * @inheritDoc
      */
-    public function get_data(theme_config $theme_config) {
-        $workspace = $this->get_workspace();
-
-        return [
-            'category' => 'WORKSPACE',
-            'fullname' => $workspace->get_name(),
-            'imageurl' => $workspace->get_image($theme_config),
-            'imagealt' => get_string('workspace_image_alt', 'container_workspace'),
-            'unshare' => $this->can_unshare_resources(),
-        ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function can_unshare_resources(): bool {
+    public function get_data() {
         global $USER;
 
         $workspace = $this->get_workspace();
         $interactor = new interactor($workspace, $USER->id);
-        return $interactor->can_unshare_resources();
+
+        return [
+            'category' => 'WORKSPACE',
+            'fullname' => $workspace->get_name(),
+            'imageurl' => $workspace->get_image(),
+            'imagealt' => get_string('workspace_image_alt', 'container_workspace'),
+            'unshare' => $interactor->can_unshare_resources()
+        ];
     }
 
     /**

@@ -26,9 +26,7 @@ namespace block_totara_recently_viewed\container_course;
 use block_totara_recently_viewed\card as base_card;
 use completion_completion;
 use container_course\course;
-use core_course\theme\file\course_image;
 use moodle_url;
-use theme_config;
 
 /**
  * Course card for the recently viewed block
@@ -89,12 +87,51 @@ class card implements base_card {
 
     /**
      * @param bool $tile_view
-     * @param theme_config $theme_config
      * @return moodle_url|null
      */
-    public function get_image(bool $tile_view, theme_config $theme_config): ?\moodle_url {
-        $course_image = new course_image($theme_config);
-        return $course_image->get_current_or_default_url();
+    public function get_image(bool $tile_view): ?\moodle_url {
+        global $CFG, $OUTPUT;
+
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $fs = get_file_storage();
+
+        $component = 'course'; // Files are stored in course not container_course
+        $context = $this->course->get_context();
+
+        $files = $fs->get_area_files(
+            $context->id,
+            $component,
+            'images',
+            0
+        );
+
+        // Remove any directory.
+        $files = array_filter(
+            $files,
+            function(\stored_file $file): bool {
+                return !$file->is_directory();
+            }
+        );
+
+        if (empty($files)) {
+            return $OUTPUT->image_url('course_defaultimage', 'core');
+        }
+
+        if (1 !== count($files)) {
+            debugging("There are more than one default image file", DEBUG_DEVELOPER);
+        }
+
+        /** @var \stored_file $file */
+        $file = reset($files);
+
+        return \moodle_url::make_pluginfile_url(
+            $context->id,
+            $component,
+            'images',
+            0,
+            '/',
+            $file->get_filename()
+        );
     }
 
     /**

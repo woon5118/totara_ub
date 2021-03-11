@@ -69,7 +69,6 @@ import Upload from 'tui/components/form/Upload';
 import Button from 'tui/components/buttons/Button';
 import Loading from 'tui/components/icons/Loading';
 import PageLoader from 'tui/components/loading/Loader';
-import { config } from 'tui/config';
 
 // GraphQL queries
 import getUploadMetadata from 'container_workspace/graphql/upload_metadata';
@@ -112,7 +111,6 @@ export default {
         return {
           workspace_id: this.workspaceId,
           draft_id: this.draftId,
-          theme: config.theme.name,
         };
       },
 

@@ -12,7 +12,6 @@ query totara_engage_user_contribution_cards(
   $include_footnotes: Boolean!
   $cursor: String
   $source: String
-  $theme: param_component!
 ) {
   contribution: totara_engage_user_contributions(
     user_id: $user_id
@@ -45,7 +44,7 @@ query totara_engage_user_contribution_cards(
       timecreated
       sharedbycount
       bookmarked
-      extra(theme: $theme)
+      extra
       owned
       user {
         id

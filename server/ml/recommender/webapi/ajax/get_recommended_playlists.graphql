@@ -3,7 +3,6 @@ query ml_recommender_get_recommended_playlists(
   $playlist_id: param_integer!
   $cursor: param_text
   $source: String
-  $theme: param_component!
 ) {
   cursor: ml_recommender_recommended_playlists_cursor(
     playlist_id: $playlist_id
@@ -29,7 +28,7 @@ query ml_recommender_get_recommended_playlists(
     timecreated
     sharedbycount
     bookmarked
-    extra(theme: $theme)
+    extra
     owned
     user {
       id
