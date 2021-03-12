@@ -141,11 +141,13 @@ final class video extends base_file implements block_node, has_extra_linked_file
      * @return string
      */
     public function to_html(formatter $formatter): string {
-        // Just return a dummy url for now. VideoJS will in later.
         return html_writer::tag(
-            'a',
-            $this->filename,
-            ['href' => $this->get_file_url()->out(false)]
+            'div',
+            html_writer::tag('video', null, [
+                'src' => $this->get_file_url()->out(false),
+                'controls' => true,
+                'data-grow' => true,
+            ])
         );
     }
 
