@@ -73,7 +73,7 @@ extend type Query {
   totara_engage_share_recipients(
     itemid: param_integer!
     component: param_component!
-    theme: param_component!
+    theme: param_component
   ): [totara_engage_recipient_out!]!
 }
 

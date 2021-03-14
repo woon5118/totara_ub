@@ -6,7 +6,7 @@ mutation container_workspace_update_workspace(
   $draft_id: param_integer
   $private: param_boolean
   $hidden: param_boolean
-  $theme: param_component!
+  $theme: param_component
 ) {
   workspace: container_workspace_update(
     id: $id

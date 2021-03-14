@@ -102,15 +102,8 @@ class user extends recipient {
     /**
      * @inheritDoc
      */
-    public function get_data(theme_config $theme_config) {
+    public function get_data(?theme_config $theme_config = null) {
         return \core_user::get_user($this->instanceid);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function can_unshare_resources(): bool {
-        return false;
     }
 
     /**

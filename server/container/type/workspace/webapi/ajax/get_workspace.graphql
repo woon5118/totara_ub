@@ -1,6 +1,6 @@
 query container_workspace_get_workspace(
   $id: param_integer!
-  $theme: param_component!
+  $theme: param_component
 ) {
   workspace: container_workspace_workspace(id: $id) {
     __typename

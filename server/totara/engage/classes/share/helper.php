@@ -58,11 +58,13 @@ final class helper {
     /**
      * Get recipients into the required graphql structure.
      *
+     * @since Totara 13.6 added parameter $theme_config
+     *
      * @param array $recipients
-     * @param theme_config $theme_config
+     * @param theme_config|null $theme_config
      * @return array
      */
-    public static function format_recipients(array $recipients, theme_config $theme_config): array {
+    public static function format_recipients(array $recipients, ?theme_config $theme_config = null): array {
         $recipients = recipient_manager::create_from_array($recipients);
 
         // Get data for each recipient.

@@ -98,6 +98,16 @@ abstract class recipient {
     }
 
     /**
+     * Indicate that this recipient can unshare the resources
+     * shared to it.
+     *
+     * @return bool
+     */
+    public function can_unshare_resources(): bool {
+        return false;
+    }
+
+    /**
      * User space label for this recipient.
      *
      * @return string
@@ -114,10 +124,12 @@ abstract class recipient {
     /**
      * Get data for specific recipient.
      *
-     * @param theme_config $theme_config
+     * @since Totara 13.6 added parameter $theme_config
+     *
+     * @param theme_config|null $theme_config
      * @return mixed
      */
-    abstract public function get_data(theme_config $theme_config);
+    abstract public function get_data(?theme_config $theme_config = null);
 
     /**
      * Get the minimum access required by an item to be shared with this recipient.
@@ -125,14 +137,6 @@ abstract class recipient {
      * @return int
      */
     abstract public function get_minimum_access(): int;
-
-    /**
-     * Indicate that this recipient can unshare the resources
-     * shared to it.
-     *
-     * @return bool
-     */
-    abstract public function can_unshare_resources(): bool;
 
     /**
      * Search for recipient.

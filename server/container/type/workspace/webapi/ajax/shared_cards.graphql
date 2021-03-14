@@ -17,7 +17,7 @@ query container_workspace_shared_cards(
   $footnotes_component: param_component
   $source: String
   $cursor: String
-  $theme: param_component!
+  $theme: param_component
 ) {
   contribution: container_workspace_shared_cards(
     workspace_id: $workspace_id

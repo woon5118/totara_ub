@@ -467,10 +467,12 @@ final class workspace extends container implements category_name_provider {
     }
 
     /**
-     * @param theme_config $theme_config
+     * @since Totara 13.6 added parameter $theme_config
+     *
+     * @param theme_config|null $theme_config
      * @return \moodle_url
      */
-    public function get_image(theme_config $theme_config): \moodle_url {
+    public function get_image(?theme_config $theme_config = null): \moodle_url {
         $file_helper = new file_helper(self::get_type(), self::IMAGE_AREA, $this->get_context());
         $url = $file_helper->get_file_url();
         if (empty($url)) {

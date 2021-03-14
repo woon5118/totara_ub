@@ -1,7 +1,7 @@
 # Load recommended workspaces for the user
 query ml_recommender_get_recommended_user_workspaces(
   $cursor: param_text
-  $theme: param_component!
+  $theme: param_component
 ) {
   cursor: ml_recommender_recommended_user_workspaces_cursor(cursor: $cursor) {
     __typename

@@ -1,7 +1,7 @@
 query totara_engage_share_recipients(
   $itemid: param_integer!
   $component: param_component!
-  $theme: param_component!
+  $theme: param_component
 ) {
   recipients: totara_engage_share_recipients(
     itemid: $itemid

@@ -62,10 +62,10 @@ final class survey_card extends card {
     }
 
     /**
-     * @param theme_config $theme_config
+     * @param theme_config|null $theme_config
      * @return array
      */
-    public function get_extra_data(theme_config $theme_config): array {
+    public function get_extra_data(?theme_config $theme_config = null): array {
         global $USER, $OUTPUT;
         $ownerid = $this->get_userid();
 
@@ -166,11 +166,13 @@ final class survey_card extends card {
     }
 
     /**
-     * @param theme_config $theme_config
+     * @since Totara 13.6 added parameter $theme_config
+     *
      * @param string|null $preview_mode
+     * @param theme_config|null $theme_config
      * @return moodle_url|null
      */
-    public function get_card_image(theme_config $theme_config, ?string $preview_mode = null): ?moodle_url {
+    public function get_card_image(?string $preview_mode = null, ?theme_config $theme_config = null): ?moodle_url {
         return null;
     }
 

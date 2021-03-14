@@ -45,8 +45,8 @@ final class workspace_image implements query_resolver, has_middleware {
      * @return string
      */
     public static function resolve(array $args, execution_context $ec): string {
-        $theme = theme_helper::load_theme_config($args['theme'] ?? null);
-        $workspace_image = new workspace_image_file($theme);
+        $theme_config = theme_helper::load_theme_config($args['theme'] ?? null);
+        $workspace_image = new workspace_image_file($theme_config);
 
         if (empty($args['workspace_id'])) {
             $url = $workspace_image->get_current_or_default_url();

@@ -91,7 +91,7 @@ final class card implements type_resolver {
 
             case 'image':
                 $theme_config = theme_helper::load_theme_config($args['theme'] ?? null);
-                $card_image = $source->get_card_image($theme_config, $args['preview_mode'] ?? null);
+                $card_image = $source->get_card_image($args['preview_mode'] ?? null, $theme_config);
                 return $card_image ? $card_image->out(false) : null;
 
             default:

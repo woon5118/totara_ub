@@ -379,7 +379,7 @@ abstract class theme_file {
             $this->get_name(),
             '',
             '',
-            static::get_area(),
+            $this->get_area(),
             $this->get_item_id(),
             [
                 'accepted_types' => $this->get_type()->get_group(),

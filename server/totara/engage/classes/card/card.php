@@ -302,10 +302,12 @@ abstract class card {
      * A function to provide the extra data that is needed at front-end. Override this function, if you want
      * to inject extra data into the front-end for rendering.
      *
-     * @param theme_config $theme_config
+     * @since Totara 13.6 added parameter $theme_config
+     *
+     * @param theme_config|null $theme_config
      * @return array
      */
-    public function get_extra_data(theme_config $theme_config): array {
+    public function get_extra_data(?theme_config $theme_config = null): array {
         return [];
     }
 
@@ -538,11 +540,13 @@ abstract class card {
      * Return the URL of the image for this card.
      * Return null if there is no valid image involved.
      *
-     * @param theme_config $theme_config
+     * @since Totara 13.6 added parameter $theme_config
+     *
      * @param string|null $preview_mode
+     * @param theme_config|null $theme_config
      * @return moodle_url|null
      */
-    abstract public function get_card_image(theme_config $theme_config, ?string $preview_mode = null): ?moodle_url;
+    abstract public function get_card_image(?string $preview_mode = null, ?theme_config $theme_config = null): ?moodle_url;
 
     /**
      * Return the component used to render the card image

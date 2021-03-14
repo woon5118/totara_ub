@@ -324,11 +324,13 @@ function totara_core_pluginfile($course, $cm, $context, $filearea, $args, $force
 
     $theme_file_areas = [];
     foreach ($classes as $class) {
-        if ($class::get_component() !== 'totara_core') {
+        /** @var theme_file $theme_file */
+        $theme_file = new $class();
+        if ($theme_file->get_component() !== 'totara_core') {
             continue;
         }
 
-        $theme_file_areas[] = $class::get_area();
+        $theme_file_areas[] = $theme_file->get_area();
     }
 
     if (in_array($filearea, $theme_file_areas)) {

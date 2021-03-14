@@ -85,7 +85,7 @@ class library extends recipient {
     /**
      * @inheritDoc
      */
-    public function get_data(theme_config $theme_config) {
+    public function get_data(?theme_config $theme_config = null) {
         $workspace = $this->get_workspace();
 
         return [

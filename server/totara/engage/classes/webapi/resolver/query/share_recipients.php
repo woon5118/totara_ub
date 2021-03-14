@@ -60,7 +60,6 @@ final class share_recipients implements query_resolver, has_middleware {
             throw new \coding_exception('Component is a required field.');
         }
 
-        $theme_config = theme_helper::load_theme_config($args['theme'] ?? null);
         $component = $args['component'];
         $itemid = $args['itemid'];
 
@@ -86,6 +85,7 @@ final class share_recipients implements query_resolver, has_middleware {
         $recipients = $repo->get_recipients($itemid, $component);
 
         if (!empty($recipients)) {
+            $theme_config = theme_helper::load_theme_config($args['theme'] ?? null);
             $recipients = helper::format_recipients($recipients, $theme_config);
         }
 

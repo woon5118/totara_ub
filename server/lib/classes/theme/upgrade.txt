@@ -1,6 +1,10 @@
 This file describes API changes in core theme libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.6 ===
+
+* Deprecated optional second parameter "$theme" in theme_file::__constructor.
+
 === 13.4 ===
 
 * Added optional second parameter (bool $include_default_file_categories) to function core\theme\settings::get_categories

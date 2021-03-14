@@ -16,7 +16,7 @@ query totara_engage_contribution_cards(
   $cursor: String
   $source: String
   $image_preview_mode: String
-  $theme: param_component!
+  $theme: param_component
 ) {
   contribution: totara_engage_contributions(
     component: $component

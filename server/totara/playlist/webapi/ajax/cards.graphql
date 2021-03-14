@@ -7,7 +7,7 @@ query totara_playlist_cards(
   $footnotes_item_id: core_id
   $footnotes_area: param_area
   $footnotes_component: param_component
-  $theme: param_component!
+  $theme: param_component
 ) {
   contribution: totara_playlist_cards(
     id: $id
