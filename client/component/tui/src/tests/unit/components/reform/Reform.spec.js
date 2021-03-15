@@ -427,4 +427,39 @@ describe('Reform', () => {
       els: [{ value: null }, { value: null }],
     });
   });
+
+  it('handles undefined result in scope validator', async () => {
+    // regression test for TL-30045:
+    // scope validators that returned either undefined or an object would cause
+    // an error on submit if the result was previously undefined.
+
+    const { scope, submit } = createSimple({ fields: [{}] });
+    let draft = true;
+
+    scope.register('validator', ['fields', 1], () =>
+      draft ? undefined : { foo: 'error' }
+    );
+
+    await submit();
+
+    draft = false;
+    // submit will throw if merging doesn't work correctly
+    await submit();
+    expect(scope.getTouched(['fields', 1, 'foo'])).toBe(true);
+  });
+
+  it('handles direct touch with existing undefined validator result', async () => {
+    // regression test for TL-30045:
+    // scope validators that returned either undefined or an object would cause
+    // an error on on real touch if the form was previously submitted with
+    // undefined as the validator result.
+
+    const { scope, submit } = createSimple({ fields: [{}] });
+    scope.register('validator', ['fields', 1], () => undefined);
+
+    await submit();
+
+    scope.touch(['fields', 1, 'foo']);
+    expect(scope.getTouched(['fields', 1, 'foo'])).toBe(true);
+  });
 });

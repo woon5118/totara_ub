@@ -592,7 +592,7 @@ export default {
 
       // combine errors into a single object
       const mergedErrors = validatorResults.reduce(
-        (acc, [, errors]) => this.$_mergeErrors(acc, errors, false),
+        (acc, [, errors]) => this.$_mergeErrors(acc, errors),
         this.errors ? structuralDeepClone(this.errors) : {}
       );
 
@@ -613,24 +613,21 @@ export default {
      * @internal
      * @param {object} result Error result. Will be mutated.
      * @param {object} newErrors Errors to merge in.
-     * @param {bool} keepResult Give properties already on result priority?
      */
-    $_mergeErrors(result, newErrors, keepResult) {
+    $_mergeErrors(result, newErrors) {
       if (!newErrors) {
         return result;
       }
       Object.keys(newErrors).forEach(k => {
         const val = newErrors[k];
-        if (!val) return;
         if (k in result && result[k] != null) {
+          if (!val) return;
           if (isDataStructure(val)) {
             result[k] = structuralShallowClone(result[k]);
-            this.$_mergeErrors(result[k], val, keepResult);
+            this.$_mergeErrors(result[k], val);
           } else {
-            if (!keepResult) {
-              // Vue.set not needed as already in result
-              result[k] = val;
-            }
+            // Vue.set not needed as already in result
+            result[k] = val;
           }
         } else {
           // doesn't exist in result - just assign
@@ -674,7 +671,11 @@ export default {
     $_makeAllTouch(errors) {
       return Object.entries(errors).reduce(
         (acc, [key, value]) => {
-          acc[key] = isDataStructure(value) ? this.$_makeAllTouch(value) : true;
+          if (value) {
+            acc[key] = isDataStructure(value)
+              ? this.$_makeAllTouch(value)
+              : true;
+          }
           return acc;
         },
         Array.isArray(errors) ? [] : {}
