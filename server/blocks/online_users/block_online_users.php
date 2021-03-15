@@ -75,8 +75,10 @@ class block_online_users extends block_base {
         //Calculate minutes
         $minutes  = floor($timetoshowusers/60);
 
-        // Verify if we can see the list of users, if not just print number of users
-        if (!has_capability('block/online_users:viewlist', $this->page->context)) {
+        // Verify if we can see the list of users, if not just print number of users.
+        // If the current user is not logged in OR it's a guest then don't show any users.
+        if (!has_capability('block/online_users:viewlist', $this->page->context)
+                || isguestuser() || !isloggedin()) {
             if (!$usercount = $onlineusers->count_users()) {
                 $usercount = get_string("none");
             }
@@ -84,8 +86,15 @@ class block_online_users extends block_base {
             return $this->content;
         }
         $userlimit = 50; // We'll just take the most recent 50 maximum.
+        $initialcount = 0;
         if ($users = $onlineusers->get_users($userlimit)) {
+            require_once($CFG->dirroot . '/user/lib.php');
+            $initialcount = count($users);
             foreach ($users as $user) {
+                if (!user_can_view_profile($user)) {
+                    unset($users[$user->id]);
+                    continue;
+                }
                 $users[$user->id]->fullname = fullname($user);
             }
         } else {
@@ -137,6 +146,14 @@ class block_online_users extends block_base {
 
                     $this->content->text .= '<div class="message">'.$anchortag.'</div>';
                 }
+                $this->content->text .= "</li>\n";
+            }
+            if ($initialcount - count($users) > 0) {
+                $this->content->text .= '<li class="listentry"><div class="otherusers">';
+                $this->content->text .= html_writer::span(
+                    get_string('otherusers', 'block_online_users', $initialcount - count($users))
+                );
+                $this->content->text .= "</div>";
                 $this->content->text .= "</li>\n";
             }
             $this->content->text .= '</ul><div class="clearer"><!-- --></div>';

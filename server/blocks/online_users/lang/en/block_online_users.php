@@ -27,6 +27,7 @@ $string['configtimetosee'] = 'Number of minutes determining the period of inacti
 $string['online_users:addinstance'] = 'Add a new online users block';
 $string['online_users:myaddinstance'] = 'Add a new online users block to the My Learning page';
 $string['online_users:viewlist'] = 'View list of online users';
+$string['otherusers'] = 'Other Users ({$a})';
 $string['periodnminutes'] = 'last {$a} minutes';
 $string['pluginname'] = 'Online users';
 $string['timetosee'] = 'Remove after inactivity (minutes)';

@@ -5,7 +5,9 @@ Feature: The online users block allow you to see who is currently online
   I can add the online users block to a course page
 
   Background:
-    Given the following "courses" exist:
+    Given I disable the "engage_resources" advanced feature
+    And I disable the "container_workspace" advanced feature
+    And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And the following "users" exist:
