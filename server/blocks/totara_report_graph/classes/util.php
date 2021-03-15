@@ -41,9 +41,10 @@ class util {
      *
      * @param int $blockid
      * @param \stdClass $config
+     * @param \stdClass $rawreport
      * @return string|null key
      */
-    protected static function get_cache_key(int $blockid, \stdClass $config): ?string {
+    protected static function get_cache_key(int $blockid, \stdClass $config, \stdClass $rawreport): ?string {
         global $USER;
 
         if (!isset($config->reportfor) || empty($config->reportorsavedid)) {
@@ -59,7 +60,14 @@ class util {
             $height = null;
         }
 
-        return 'b' . $blockid . 'f' . $reportfor . 'h' . $height . 'l' . current_language();
+        $key = 'b' . $blockid . 'f' . $reportfor . 'h' . $height . 'l' . current_language();
+
+        // Allow plugins to tweak keys in special cases, such as custom dynamic content restrictions.
+        $hook = new \block_totara_report_graph\hook\get_cache_key($key, $config->reportorsavedid, $config->reportfor, $rawreport);
+        $hook->execute();
+        $key = $hook->key;
+
+        return $key;
     }
 
     /**
@@ -127,7 +135,7 @@ class util {
             return null;
         }
 
-        $key = self::get_cache_key($blockid, $config);
+        $key = self::get_cache_key($blockid, $config, $rawreport);
         $cache = null;
         if ($key) {
             $cache = \cache::make('block_totara_report_graph', 'graph');
@@ -213,7 +221,7 @@ class util {
             return [];
         }
 
-        $key = self::get_cache_key($blockid, $config);
+        $key = self::get_cache_key($blockid, $config, $rawreport);
         if (!$key) {
             // No caching.
             return null;
