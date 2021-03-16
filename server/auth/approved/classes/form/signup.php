@@ -396,6 +396,7 @@ final class signup extends \moodleform {
               FROM {%s} h
               JOIN {%s} hf on h.frameworkid = hf.id
              WHERE h.visible = 1
+          ORDER BY hf.sortorder ASC, h.fullname ASC
         ', $table, $tablefw);
 
         $frameworks = get_config('auth_approved', $cfgkey);
