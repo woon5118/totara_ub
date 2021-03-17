@@ -1496,7 +1496,7 @@ function xmldb_totara_core_upgrade($oldversion) {
          * Either way we need to resort the course categories.
          */
         if ($changed || !empty($topcat->issystem)) {
-            totara_core_fix_course_sortorder();
+            totara_core_fix_course_sortorder(true); // Verbose.
         }
 
         // Main savepoint reached.

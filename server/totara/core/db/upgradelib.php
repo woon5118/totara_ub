@@ -1476,7 +1476,7 @@ function totara_core_refresh_default_category() {
  *
  * @return bool
  */
-function totara_core_fix_course_sortorder() {
+function totara_core_fix_course_sortorder($verbose = false) {
     global $DB;
 
     // First move any categories that are not sorted yet to the end.
@@ -1494,7 +1494,7 @@ function totara_core_fix_course_sortorder() {
     );
 
     $sortorder = 0;
-    totara_core_fix_category_sortorder($topcats, $sortorder, 0);
+    totara_core_fix_category_sortorder($topcats, $sortorder, 0, false, $verbose);
 
 
     // Make sure course sortorder is within the new category bounds.
@@ -1528,9 +1528,11 @@ function totara_core_fix_course_sortorder() {
  * @param array $categories
  * @param int   $sortorder
  * @param int   $parent
+ * @param bool  $changesmade
+ * @param bool  $verbose
  * @return bool
  */
-function totara_core_fix_category_sortorder($categories, &$sortorder, $parent, $changesmade = false) {
+function totara_core_fix_category_sortorder($categories, &$sortorder, $parent, $changesmade = false, $verbose = false) {
     global $DB;
 
     // First move any system categories to the back.
@@ -1577,12 +1579,18 @@ function totara_core_fix_category_sortorder($categories, &$sortorder, $parent, $
         // When we're all done, rebuild the context paths.
         if ($parent === 0) {
             $start = time();
-            echo str_pad(userdate($start, '%H:%M:%S'), 10) . "Updating context paths, this may take a minute...\n";
+            if ($verbose) {
+                // Implement our own smaller version of verbose rather than using the build all paths verbose,
+                // As we aren't doing a forced run it shouldn't take any where near as long, so we just give a small warning.
+                mtrace(str_pad(userdate($start, '%H:%M:%S'), 10) . "Updating context paths, this may take a minute...\n");
+            }
             context_helper::build_all_paths(false, false); // Not forced, not verbose.
             $duration = time()  - $start;
             $seconds = $duration % 60;
             $minutes = (int)floor($duration / 60);
-            echo str_pad(userdate(time(), '%H:%M:%S'), 10) . "... done, duration {$minutes}:{$seconds}\n";
+            if ($verbose) {
+                mtrace(str_pad(userdate(time(), '%H:%M:%S'), 10) . "... done, duration {$minutes}:{$seconds}\n");
+            }
         }
     }
     unset($categories);
