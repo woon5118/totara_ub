@@ -39,7 +39,8 @@ $usesvg    = optional_param('svg', 1, PARAM_BOOL);
 $rtl       = optional_param('rtl', false, PARAM_BOOL);
 $legacy    = optional_param('legacy', false, PARAM_BOOL);
 // Totara: add tenant.
-$tenant    = optional_param('tenant', 0, PARAM_INT);
+$tenant    = optional_param('tenant', 'tenant_0', PARAM_SAFEDIR);
+$tenant = (preg_match('#^tenant_(\d+)$#', $tenant, $matches)) ? (int)$matches[1] : 0;
 
 if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
     // The theme exists in standard location - ok.

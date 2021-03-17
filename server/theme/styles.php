@@ -66,7 +66,8 @@ if ($slashargument = min_get_slash_argument()) {
     $legacy    = (bool)min_optional_param('legacy', 0, 'INT');
 
     // Totara: add tenant.
-    $tenant    = min_optional_param('tenant', 0, 'INT');
+    $tenant    = min_optional_param('tenant', 'tenant_0', PARAM_SAFEDIR);
+    $tenant = (preg_match('#^tenant_(\d+)$#', $tenant, $matches)) ? (int)$matches[1] : 0;
 }
 
 // Totara: Removed chunking support as it's not used by currently supported browsers
