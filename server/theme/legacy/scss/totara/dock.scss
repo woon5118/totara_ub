@@ -45,12 +45,17 @@
 body.has_dock {
   #page,
   .page-footer-main-content,
-  .breadcrumb-container {
+  .breadcrumb-container,
+  .totaraNav_prim > .container-fluid {
     padding-left: ($dock-width + ($dock-title-margin * 3)) +
       ($grid-gutter-width / 2);
   }
-  .navbar-site {
+  .navbar-site,
+  .page-footer-poweredby {
     padding-left: ($dock-width + ($dock-title-margin * 3));
+  }
+  .totaraNav_prim--list_showMobile {
+    padding-left: calc(#{$dock-width + ($dock-title-margin * 3)} + var(--gap-4));
   }
   #dock {
     display: inline;
