@@ -3008,6 +3008,16 @@ function feedback_send_email($cm, $feedback, $course, $user, $completed = null) 
         $groups = array_values($groups);
 
         $teachers = feedback_get_receivemail_users($cm->id, $groups);
+
+        // If user not in a group, $teachers will include all trainers.
+        // Lets remove any trainers who are assigned in a group.
+        if (empty($groups)) {
+            foreach ($teachers as $id => $teacher) {
+                if (groups_has_membership($cm, $teacher->id)) {
+                    unset($teachers[$id]);
+                }
+            }
+        }
     } else {
         $teachers = feedback_get_receivemail_users($cm->id);
     }
