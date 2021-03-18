@@ -127,10 +127,12 @@ final class video extends base_file implements block_node, has_extra_linked_file
         if (array_key_exists('subtitle', $cleaned_raw_node['attrs'])) {
             $subtitle = $cleaned_raw_node['attrs']['subtitle'];
 
-            $subtitle['url'] = clean_param($subtitle['url'], PARAM_URL);
-            $subtitle['filename'] = clean_param($subtitle['filename'], PARAM_FILE);
+            if (!is_null($subtitle)) {
+                $subtitle['url'] = clean_param($subtitle['url'], PARAM_URL);
+                $subtitle['filename'] = clean_param($subtitle['filename'], PARAM_FILE);
 
-            $cleaned_raw_node['attrs']['subtitle'] = $subtitle;
+                $cleaned_raw_node['attrs']['subtitle'] = $subtitle;
+            }
         }
 
         return $cleaned_raw_node;
