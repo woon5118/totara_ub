@@ -28,16 +28,16 @@
     >
       <div v-if="slotProps.currentBoundaryName === 'small'">
         <Grid direction="vertical">
-          <GridItem>
+          <GridItem key="1">
             <h3 class="tui-layoutThreeColumn__heading">
               <slot name="page-title" />
             </h3>
             <slot name="center" />
           </GridItem>
-          <GridItem>
+          <GridItem key="2">
             <slot name="left" />
           </GridItem>
-          <GridItem>
+          <GridItem key="3">
             <slot name="right" />
           </GridItem>
         </Grid>
@@ -45,7 +45,7 @@
       <!-- /small -->
       <div v-if="slotProps.currentBoundaryName === 'medium'">
         <Grid direction="horizontal">
-          <GridItem :units="6" :order="2">
+          <GridItem key="2" :units="6" :order="2">
             <h3 class="tui-layoutThreeColumn__heading">
               <slot name="page-title" />
             </h3>
@@ -53,10 +53,10 @@
                 in the center with flexbox order -->
             <slot name="center" :units="6" />
           </GridItem>
-          <GridItem :units="3" :order="1">
+          <GridItem key="1" :units="3" :order="1">
             <slot name="left" :units="3" />
           </GridItem>
-          <GridItem :units="3" :order="3">
+          <GridItem key="3" :units="3" :order="3">
             <slot name="right" :units="3" />
           </GridItem>
         </Grid>
@@ -64,7 +64,7 @@
       <!-- /medium -->
       <div v-if="slotProps.currentBoundaryName === 'large'">
         <Grid direction="horizontal">
-          <GridItem :units="8" :order="2">
+          <GridItem key="2" :units="8" :order="2">
             <h3 class="tui-layoutThreeColumn__heading">
               <slot name="page-title" />
             </h3>
@@ -72,10 +72,10 @@
                 in the center with flexbox order -->
             <slot name="center" :units="8" />
           </GridItem>
-          <GridItem :units="2" :order="1">
+          <GridItem key="1" :units="2" :order="1">
             <slot name="left" :units="2" />
           </GridItem>
-          <GridItem :units="2" :order="3">
+          <GridItem key="3" :units="2" :order="3">
             <slot name="right" :units="2" />
           </GridItem>
         </Grid>

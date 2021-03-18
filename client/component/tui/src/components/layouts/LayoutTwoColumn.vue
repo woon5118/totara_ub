@@ -28,13 +28,13 @@
     >
       <div v-if="slotProps.currentBoundaryName === 'small'">
         <Grid direction="vertical">
-          <GridItem>
+          <GridItem key="1">
             <h3 class="tui-layoutTwoColumn__heading">
               <slot name="page-title" />
             </h3>
             <slot name="right" :units="12" :direction="'vertical'" />
           </GridItem>
-          <GridItem>
+          <GridItem key="2">
             <slot name="left" :units="12" :direction="'vertical'" />
           </GridItem>
         </Grid>
@@ -42,10 +42,10 @@
       <!-- /small -->
       <div v-if="slotProps.currentBoundaryName === 'medium'">
         <Grid direction="horizontal">
-          <GridItem :units="3">
+          <GridItem key="2" :units="3">
             <slot name="left" :units="3" :direction="'horizontal'" />
           </GridItem>
-          <GridItem :units="9">
+          <GridItem key="1" :units="9">
             <h3 class="tui-layoutTwoColumn__heading">
               <slot name="page-title" />
             </h3>
@@ -56,10 +56,10 @@
       <!-- /medium -->
       <div v-if="slotProps.currentBoundaryName === 'large'">
         <Grid direction="horizontal">
-          <GridItem :units="2">
+          <GridItem key="2" :units="2">
             <slot name="left" :units="2" :direction="'horizontal'" />
           </GridItem>
-          <GridItem :units="10">
+          <GridItem key="1" :units="10">
             <h3 class="tui-layoutTwoColumn__heading">
               <slot name="page-title" />
             </h3>
