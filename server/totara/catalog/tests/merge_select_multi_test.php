@@ -49,11 +49,19 @@ class totara_catalog_merge_select_multi_testcase extends advanced_testcase {
         };
         $multi->add_options_loader($optionsloader2);
 
+        $optionsloader3 = function () {
+            return [
+                'testoptionkey4' => 'testoptionnameY',
+            ];
+        };
+        $multi->add_options_loader($optionsloader3);
+
         $options = $multi->get_options();
         $expectedoptions = [
             'testoptionkey2' => 'testoptionname2',
             'testoptionkey3' => 'testoptionname3',
             'testoptionkey1' => 'testoptionnamex', // Sorted alphabetically.
+            'testoptionkey4' => 'testoptionnameY', // Sorted alphabetically by case insensitive orders.
         ];
 
         $this->assertEquals($expectedoptions, $options);
@@ -63,6 +71,36 @@ class totara_catalog_merge_select_multi_testcase extends advanced_testcase {
             implode(',', array_keys($expectedoptions)),
             implode(',', array_keys($options))
         );
+    }
+
+    public function test_get_options_sorting() {
+        if (PHP_OS_FAMILY === 'Windows' || (float)PHP_VERSION < 7.3) {
+            $this->markTestSkipped('Sorry, not supported');
+        }
+        $multi = new \totara_catalog\merge_select\multi('testmergeselectkey', 'testtitle');
+        $multi->add_options_loader(function () {
+            return [
+                'key0' => 'IoT',
+                'key1' => 'iOS',
+                'key2' => 'totará',
+                'key3' => 'totara1',
+                'key4' => 'totara10',
+                'key5' => 'totaRa2',
+                'key6' => 'totara3.14',
+                'key7' => 'totara🥰',
+                'key8' => 'to Tar A',
+                'key9' => 'tot-ara',
+            ];
+        });
+        $options = $multi->get_options();
+        $expected_keys = [
+            'key1', 'key0', 'key9', 'key8', 'key3', 'key5', 'key6', 'key4', 'key7', 'key2'
+        ];
+        $expected_values = [
+            'iOS','IoT', 'tot-ara', 'to Tar A', 'totara1', 'totaRa2', 'totara3.14', 'totara10', 'totara🥰', 'totará'
+        ];
+        $this->assertEquals($expected_keys, array_keys($options));
+        $this->assertEquals($expected_values, array_values($options));
     }
 
     public function test_get_optional_params() {
