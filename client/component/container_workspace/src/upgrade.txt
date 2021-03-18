@@ -1,6 +1,11 @@
 This files describes API changes in /client/component/container_workspace,
 information provided here is intended especially for developers.
 
+=== 13.5 ===
+
+* Updates in WorkspaceMenu.vue:
+  * Deprecated method "canCreate()" in favour of computed property "canCreateWorkspace"
+
 === 13.3 ===
 
 * Updated DiscussionWithCommentCard.vue to add prop "editor" for totara_comment CommentBox.vue

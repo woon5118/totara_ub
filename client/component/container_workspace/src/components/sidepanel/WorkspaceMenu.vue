@@ -27,7 +27,7 @@
       class="tui-workspaceMenu__group"
     >
       <ContributeWorkspace
-        v-if="canCreate"
+        v-if="canCreateWorkspace"
         slot="heading-side"
         :disabled="$apollo.queries.workspaces.loading"
         @create-workspace="addWorkspace"
@@ -108,6 +108,15 @@ export default {
     };
   },
 
+  computed: {
+    /**
+     * @returns {boolean}
+     */
+    canCreateWorkspace() {
+      return this.categoryInteractor.can_create;
+    },
+  },
+
   watch: {
     selectedWorkspaceId(value) {
       this.innerSelectedWorkspaceId = value;
@@ -137,9 +146,13 @@ export default {
     },
 
     /**
+     * @deprecated since 13.5
      * @returns {boolean}
      */
     canCreate() {
+      console.warn(
+        'canCreate() method has been deprecated, please do not use it.'
+      );
       return this.categoryInteractor.can_create;
     },
   },
