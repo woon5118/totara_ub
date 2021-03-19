@@ -396,7 +396,6 @@ final class signup extends \moodleform {
               FROM {%s} h
               JOIN {%s} hf on h.frameworkid = hf.id
              WHERE h.visible = 1
-          ORDER BY hf.sortorder ASC, h.fullname ASC
         ', $table, $tablefw);
 
         $frameworks = get_config('auth_approved', $cfgkey);
@@ -407,6 +406,9 @@ final class signup extends \moodleform {
             $params += $fwp;
             $select .= " AND frameworkid $fws";
         }
+
+        $select .= ' ORDER BY hf.sortorder ASC, h.fullname ASC';
+
         $hierarchies = $DB->get_records_sql($select, $params);
 
         return array_reduce(
