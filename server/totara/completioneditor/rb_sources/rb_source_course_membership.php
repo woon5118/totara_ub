@@ -140,6 +140,22 @@ class rb_source_course_membership extends rb_base_source {
                     ),
                     'noexport' => true,
                 )
+            ),
+            new rb_column_option(
+                'coursemembership',
+                'enrolled',
+                get_string('enrolled', 'rb_source_course_membership'),
+                '(SELECT CASE WHEN COUNT(ue.id) >= 1 THEN 1 ELSE 0 END
+                        FROM {user_enrolments} ue
+                        JOIN {enrol} e ON e.id = ue.enrolid
+                        WHERE ue.userid = base.userid
+                        AND e.courseid = course.id
+                        AND e.status = 0)',
+                array(
+                    'displayfunc' => 'yes_or_no',
+                    'issubquery' => true,
+                    'dbdatatype' => 'boolean',
+                )
             )
         );
 
@@ -157,6 +173,17 @@ class rb_source_course_membership extends rb_base_source {
      */
     protected function define_filteroptions() {
         $filteroptions = array();
+
+        $filteroptions[] = new \rb_filter_option(
+            'coursemembership',
+            'enrolled',
+            get_string('enrolled', 'rb_source_course_membership'),
+            'select',
+            array(
+                'selectchoices' => array(0 => get_string('no'), 1 => get_string('yes')),
+                'simplemode' => true
+            )
+        );
 
         $this->add_core_user_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions);

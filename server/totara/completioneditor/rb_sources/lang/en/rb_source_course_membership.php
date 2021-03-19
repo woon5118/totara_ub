@@ -22,6 +22,7 @@
  */
 
 $string['editcompletion'] = 'Edit completion records';
+$string['enrolled'] = 'Currently enrolled?';
 $string['isassigned'] = 'Is currently assigned';
 $string['sourcelabel'] = 'Course';
 $string['sourcesummary'] = 'Details about course members.';
