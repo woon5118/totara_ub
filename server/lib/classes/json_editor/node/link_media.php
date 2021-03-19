@@ -274,13 +274,13 @@ final class link_media extends base_link implements block_node {
                 return [
                     'type' => 'video',
                     'url' => 'https://vimeo.com/' . $match[1],
-                    'image' => null, // Vimeo images come back mixed up currently
+                    'image' => $this->image, // Return vimeo images.
                 ];
             } else {
                 return [
                     'type' => 'iframe',
                     'url' => 'https://player.vimeo.com/video/' . $match[1] . '?portrait=0',
-                    'image' => null, // Vimeo images come back mixed up currently
+                    'image' => $this->image, // Return vimeo images.
                 ];
             }
         }

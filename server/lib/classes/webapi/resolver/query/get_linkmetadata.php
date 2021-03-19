@@ -22,7 +22,8 @@
  */
 namespace core\webapi\resolver\query;
 
-use core\link\metadata_reader;
+use coding_exception;
+use core\link\reader_factory;
 use core\webapi\execution_context;
 use core\webapi\middleware\rate_limiter;
 use core\webapi\middleware\require_login;
@@ -43,13 +44,15 @@ final class get_linkmetadata implements query_resolver, has_middleware {
      * @return array|mixed
      */
     public static function resolve(array $args, execution_context $ec) {
-        if (empty($args['url'])) {
+        $url = $args['url'];
+        if (empty($url)) {
             return null;
         }
 
         try {
-            return metadata_reader::get_metadata_info($args['url']);
-        } catch (\coding_exception $e) {
+            $reader = reader_factory::get_reader_classname($url);
+            return $reader::get_metadata_info($url);
+        } catch (coding_exception $e) {
             // Only catch the coding_exception for now, as there might be some things that failed because of dev env.
             debugging($e->getMessage(), DEBUG_DEVELOPER);
             return null;

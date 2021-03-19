@@ -24,7 +24,7 @@ namespace core\link;
 
 use core\link\http\request;
 
-final class metadata_reader {
+final class metadata_reader implements reader {
     /**
      * @var array
      */
