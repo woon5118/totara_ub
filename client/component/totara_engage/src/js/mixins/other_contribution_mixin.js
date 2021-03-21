@@ -200,7 +200,7 @@ export default {
         return;
       }
       this.loadingMore = true;
-      this.$apollo.queries.contribution.fetchMore({
+      this.$apollo.queries.otherUserContributions.fetchMore({
         variables: Object.assign({}, this.filterValue, {
           cursor: this.contribution.cursor.next,
         }),
