@@ -1,3 +1,235 @@
+Release 13.6 (24th March 2021):
+===============================
+
+
+Security issues:
+
+    TL-29937       Added missing role validation in course enrolment interface
+    TL-29939       Backported MDL-70822: Fixed profile access check when fetching a user's enrolled courses via web service
+
+                   Previously, the external method core_enrol_get_users_courses didn't check
+                   for each course that the acting user can view the other user's profile in
+                   that course. For courses with "Separate groups" mode and enabled setting
+                   "Force group mode", this could lead to visibility of user enrolments via
+                   webservice when it should have been hidden. This patch fixes this bug.
+
+    TL-29940       Backported MDL-70767: Fixed cleanup of feedback answer text to prevent possibility to store XSS and blind SSRF
+    TL-29941       Backported MDL-70668: Prevented user account confirmation without valid secret key
+
+                   An internal function was vulnerable to confirming user accounts with an
+                   invalid secret key. The function has been improved to prevent this. All
+                   existing places where the function are being used already provided valid
+                   secret keys to the function, so did not expose a security vulnerability -
+                   this proactive change was made to ensure that it cannot happen in future.
+
+    TL-29943       Backported MDL-69844: Fixed the bulk messaging page for courses not obeying the site-wide user email visibility policy
+    TL-29945       Backported MDL-69378: Fixed upload methods for enrolments
+    TL-29946       Backported MDL-68486: Fixed arbitrary PHP code execution by site admin via shibboleth configuration
+    TL-29947       Backported MDL-68426: Set a limit on paths length in yui_combo
+    TL-29948       Backported MDL-67837: Teacher is able to unenrol users without permission during course restore
+    TL-29949       Backported MDL-67782: Added a max length attribute to the personal message input box
+    TL-29950       Backported MDL-67015: Improved testing around database module group access
+    TL-29951       Backported MDL-65552: Fixed XSS vulnerabilities within activity results block
+    TL-29953       Backported MDL-59293: Fixed checks whether current user can view online users
+    TL-29954       Backported MDL-56310 and MDL-65326: Fixed privilege escalation within course when restoring role overrides 
+
+Performance improvements:
+
+    TL-29733       Added function to get names of enabled editors without having to load them all
+
+                   This function gets the names of all the enabled editors without having to
+                   load the editors. Using the new function editors_get_enabled_names()
+                   instead of instead of editors_get_enabled() improves performance due to it
+                   being used in page navigation.
+
+    TL-29782       Optimised capability and access control checks when generating the settings navigation structure
+
+Improvements:
+
+    TL-29537       Fixed Tui Date selector input order
+
+                   Tui Date selector input order assumed NZ/UK d-m-Y, it now respects
+                   internationalisation
+
+    TL-29553       Fixed autocomplete default settings used by Tui Forms
+
+                   Tui Forms autocomplete now uses same default as Legacy Forms
+
+    TL-29616       Converted warning text to info banner in course badges page when start date is in the future
+    TL-29617       Usages of the SCSS @extend directive resulting in excessively large selectors have been removed
+
+                   This improved IE11 developer tools time to open, and reduced overall CSS
+                   bundle size dramatically.
+
+                   It is recommended to avoid this directive unless you are extending an SCSS
+                   placeholder.
+
+    TL-29778       Added a new Report Builder column in the 'Assignment submissions' report source which displays the Assignment name with a link to the assignment activity
+    TL-29852       Fixed Ventura theme showing under tenant menu when it is not the current theme
+    TL-30039       Added new hook for altering of cache key in totara_report_graph block
+
+Bug fixes:
+
+    TL-28969       Restored seminar change notifications when only rooms or facilitators have changed
+    TL-29060       Made core_renderer::favicon() always return moodle_url
+
+                   The function was supposed to return string but some code secretly relied on
+                   the internal implimentation that it had actually been moodle_url. With this
+                   patch, the function now always returns moodle_url.
+
+    TL-29064       Prevented a second request to accept site policies when using email-based self registration
+
+                   New users are no longer required to accept site policies twice when using
+                   email-based self registration.
+
+    TL-29068       Fixed the tui theme mediator not allowing themes with numbers in their name to load
+    TL-29176       Added an automatic reload of the page when an evidence type selection gets cancelled in the evidence bank
+
+                   Previously when the user selected, then cancelled an evidence type to add
+                   to his evidence bank, the selected option was not automatically redisplayed
+                   in the list of available evidence types. It was only when the user selected
+                   another evidence type or refreshed the page that the correct list of
+                   evidence types was displayed. This fix forces a page refresh so that the
+                   correct options are displayed.
+
+    TL-29206       Fixed user data purge for users no longer assigned to programs and certifications
+
+                   Before the fix, if a user was not assigned to a program or certification at
+                   the time of a data purge, their completion data was not being deleted. If
+                   this completion data is unwanted then a data purge should be reapplied.
+
+    TL-29274       Fixed typo in totara message task_description string
+    TL-29277       Hid the 'reset profile for all users' button when there are no custom user profiles
+    TL-29307       Fixed tenant parameter validation for fetching styles
+
+                   Fixed styles_debug to correctly interpret the tenant parameter. A bug
+                   caused the tenant parameter to be incorrectly interpreted, thus ignoring
+                   the tenant parameter and loading site CSS settings instead.
+
+    TL-29394       Converted 'Required grade' label in 'Course completion' report source to a language string
+    TL-29404       Added notice informing users that updating MS Teams virtual meeting rooms will cause their settings to be reset
+
+                   Due to limitations of the Microsoft Graph API for meeting rooms, it is not
+                   currently possible to update a room. In order to work around this
+                   limitation, when meeting times are changed the MS Teams virtualmeeting
+                   plugin deletes the existing room and creates a new room with the correct
+                   times. This patch adds a warning to the seminar event edit screen, so that
+                   room creators know to check their meeting settings in Teams after update.
+
+    TL-29418       Fixed responsiveness of embedded YouTube and Vimeo media
+
+                   Embedded YouTube and Vimeo media are now responsive when there is not
+                   enough width to display with their configured size
+
+    TL-29473       Fixed MS Teams theme so that it inherits some settings from Ventura theme
+
+                   Before patch MS Teams theme inherited only default settings from Ventura
+                   theme, so administrators cannot change colors, fonts, etc.
+
+                   Now, any custom CSS setting from Ventura theme will be applied in MS Teams
+                   application as well.
+
+    TL-29480       Fixed recommenders crashes when there is no users or items data
+
+                   Fixed recommenders not being able to provide any recommendations when there
+                   is no users, content items (e.g. resources), or interactions exists within
+                   any single tenant.
+
+    TL-29535       Fixed language pack issue when using program notification
+
+                   The German language pack didn't take effect when doing local customisation
+                   in a part of Program messages. With this patch, Local Customisation shows
+                   the preferred language edited string correctly.
+
+    TL-29565       Prevented creating job assignment specific subject instances where the job assignment no longer exists
+    TL-29578       Fixed a bug where some videos would no longer be centered, and fixed handling of percentage widths in media plugins
+    TL-29608       Fixed the issue of mixing hidden workspace with setting enable audience-based visibility which show the hidden workspaces to the non member users
+
+                   Prior to the patch, when the global setting Audience-based visibility is
+                   enabled, and a hidden workspace was created, then a non member users of
+                   that workspace were able to see the workspace. Which it was an actual bug.
+
+                   With this patch applied, the hidden workspace will no respect the setting
+                   Audience-based visibility and non member users of the hidden workspace will
+                   not be able to see the hidden workspace.
+
+    TL-29624       Added manager id to the seminar 'Event booking request created' event log
+    TL-29629       Fixed notifications messages formatting
+
+                   Fixed notifications formatting issue when some notifications (mostly Engage
+                   related) where sent as single line text instead of being formatted as plain
+                   text.
+
+    TL-29634       Fixed theme panel button colour not applying to non-Tui buttons
+    TL-29664       Fixed seminar 'Sign-up' report 'Booked by' filter
+    TL-29665       Top level tenant course category visibility is synchronised with tenant suspension
+    TL-29667       Fixed dock overlaying main navigation logo on small screens
+    TL-29724       Fixed theme colours not applying properly to navigation on mobile-sized screens
+    TL-29749       Fixed an error when viewing evidence reports that only have the 'Name' column shown
+    TL-29785       Allowed users who have the ability to create programmes or certifications in sub-categories to create them directly from the catalogue
+
+                   Previously, the 'Create program' and 'Create certification' options would
+                   only appear for users with the ability to create those learning items at
+                   the site level. Creation options are now available for users who can create
+                   items in any category or sub-category, even if they cannot create at the
+                   site level.
+
+    TL-29791       Fixed external participants being unable to view files uploaded to static content elements in a performance activity
+    TL-29795       Fixed display of the 'Featured Links' block when using random display of gallery type tiles
+
+                   This resolves an issue where the first tile would always be the same tile
+                   and would not be randomised correctly.
+
+    TL-29800       Fixed the Seminar update instance to skip the calendar update if there is a minor seminar changes
+
+                   Previously if existing seminar is updated without changes it will re-create
+                   all calendar entries which takes a lot of time to process it if the seminar
+                   has 100+ events.
+
+                   Now it fixed, the calendar entries will be updated if one value of these
+                   fields is changed:
+                    # Seminar name
+                    # Seminar description
+                    # Seminar short name
+                    # Seminar calendar display settings
+                    # Seminar show entry on user's calendar
+
+    TL-29854       Fixed an overflow issue with the Tui checkbox component
+    TL-29862       Fixed @mention and #hashtag suggestions appearing below the editor in some situations
+    TL-29869       Weka fallback text area is now the same width as the editor was
+    TL-29907       Removed unnecessary recursive method call in perform activity schedule tasks
+    TL-29911       Added missing format_string() for Program & Certification names that are displayed on the Required Learning page
+    TL-29920       Fixed animated gifs on the grid catalogue
+
+                   The catalogue creates previews for learning item images in order to reduce
+                   file size and load times. In the case of animated gifs, this was creating a
+                   static image of the first frame. Previews will no longer be used for .gif
+                   files, allowing them to be animated on the catalogue.
+
+    TL-29924       Fixed display of the course participants page when the user is not in a group
+    TL-29929       Fixed an edge case where old Uniform/Reform form field errors can stick around when related fields are edited
+    TL-29960       Fixed theme loading in theme settings with minimisation of API changes
+
+                   Previously theme settings relied on the global moodle page object to
+                   determine the correct theme to use. This proved to be problematic as the
+                   moodle page object is not set up in all scenarios, especially for GraphQL
+                   requests. This fix causes the front-end components to pass the theme, set
+                   up during the page request, to the API's that needs it in order to load the
+                   theme settings.
+
+                   A debugging message will be logged if the theme config parameter is not
+                   passed for a specific API and the default config specified theme will be
+                   used. To avoid any debugging message, or default theme config being used,
+                   always pass theme config where possible to any theme settings API.
+
+    TL-30045       Fixed exception that could occur with FormScope validators
+    TL-30052       Ensured the selection of available Organisations and Positions are in an alphabetical order when using Self-registration with approval
+
+Contributions:
+
+    * Wajdi Bshara from Xtractor - TL-29060
+
+
 Release 13.5 (24th February 2021):
 ==================================
 

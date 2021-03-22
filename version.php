@@ -23,4 +23,4 @@
  */
 
 $TOTARA = new \stdClass;
-$TOTARA->version    = '13.5+';          // Please keep as string.
+$TOTARA->version    = '13.6';          // Please keep as string.
