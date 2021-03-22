@@ -2316,7 +2316,8 @@ define(['jquery', 'jqueryui'], function($){
                             hourText: tstr.hour,
                             minuteText: tstr.minute,
                             isRTL: $('body').hasClass('dir-rtl'),
-                            dateFormat: 'yy-mm-dd'
+                            dateFormat: 'yy-mm-dd',
+                            separator: 'T'
                         };
 
                         datepoly.inited.resolve();
