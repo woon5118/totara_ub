@@ -46,8 +46,9 @@ class migration_helper {
 
         $dbman = $DB->get_manager();
         $comp_record_table = new xmldb_table('comp_record');
+        $comp_record_history_table = new xmldb_table('comp_record_history');
 
-        if (!$dbman->table_exists($comp_record_table)) {
+        if (!$dbman->table_exists($comp_record_table) || !$dbman->table_exists($comp_record_history_table)) {
             // This might be an initial install or some other scenario. Whatever the reason may be, nothing to do.
             return;
         }
@@ -62,8 +63,7 @@ class migration_helper {
         // may have happened, we'll take the one linked to the comp_record since that's been the one the user considers current
         // up til now.
         // If there's no comp_record, then we'll just be making a history record the most recent timestamp the current one.
-
-        $histories = $DB->get_recordset_sql("
+        $query_sql = "
             SELECT
                 crh.id,
                 crh.competencyid,
@@ -80,13 +80,12 @@ class migration_helper {
             ORDER BY crh.competencyid,
                 crh.userid,
                 comp_record_id DESC,
-                crh.timemodified DESC
-        ");
+                crh.timemodified DESC,
+                crh.id
+        ";
 
         $now = time();
         $all_scale_values = $DB->get_records('comp_scale_values');
-        $comp_achievements = [];
-        $comp_assignment = [];
 
         // Each combination of user/competency should have one active achievement record.
         // We've ordered by competency and user so that records for each combination are grouped together.
@@ -95,62 +94,74 @@ class migration_helper {
         // This is true when we are at the first record for a given user and competency.
         $first = true;
 
-        foreach ($histories as $history) {
-            if ($current_competency != $history->competencyid || $current_user != $history->userid) {
-                // This means we are now up to the records of another user/competency combination.
-                $current_competency = $history->competencyid;
-                $current_user = $history->userid;
-                $first = true;
+        $offset = 0;
+        $limit = 10000;
+        $has_items = true;
+        while ($has_items) {
+            $histories = $DB->get_recordset_sql($query_sql, [], $offset, $limit);
+            $has_items = $histories->valid();
+            $offset += $limit;
+
+            $comp_achievements = [];
+            $comp_assignment = [];
+
+            foreach ($histories as $history) {
+                if ($current_competency != $history->competencyid || $current_user != $history->userid) {
+                    // This means we are now up to the records of another user/competency combination.
+                    $current_competency = $history->competencyid;
+                    $current_user = $history->userid;
+                    $first = true;
+                }
+
+                // We need to create an assignment record, but only for the first record for a given user and competency
+                if ($first) {
+                    $comp_assignment = [
+                        'type' => 'legacy',
+                        'user_group_type' => 'user',
+                        'competency_id' => $history->competencyid,
+                        'user_group_id' => $history->userid,
+                        'optional' => 0,
+                        'status' => 2,
+                        'created_by' => 0,
+                        'created_at' => $history->timemodified,
+                        'updated_at' => $history->timemodified,
+                        'archived_at' => $now,
+                    ];
+
+                    // We aren't going to batch assignments, since we'd need to get the assignment id anyway, to insert into achievements...
+                    $comp_assignment['id'] = $DB->insert_record('totara_competency_assignments', $comp_assignment);
+                }
+
+                $comp_achievement = new stdClass();
+                $comp_achievement->competency_id = $history->competencyid;
+                $comp_achievement->user_id = $history->userid;
+                $comp_achievement->assignment_id = $comp_assignment['id'] ?? 0; // This should not be 0
+                $comp_achievement->scale_value_id = $history->proficiency;
+                $comp_achievement->proficient = $all_scale_values[$history->proficiency]->proficient ?? 0;
+
+                if ($first) {
+                    // Represents an achievement from an archived assignment.
+                    $comp_achievement->status = 1;
+                    // This makes sure we don't try to add another current record.
+                    $first = false;
+                } else {
+                    // Represents an achievement that was superseded by another.
+                    $comp_achievement->status = 2;
+                }
+
+                $comp_achievement->time_created = $history->timemodified;
+                $comp_achievement->time_proficient = $history->timeproficient;
+                $comp_achievement->time_status = $history->timemodified;
+                $comp_achievement->time_scale_value = $history->timemodified;
+                $comp_achievement->last_aggregated = $now;
+
+                $comp_achievements[] = $comp_achievement;
             }
 
-            // We need to create an assignment record, but only for the first record for a given user and competency
-            if ($first) {
-                $comp_assignment = [
-                    'type' => 'legacy',
-                    'user_group_type' => 'user',
-                    'competency_id' => $history->competencyid,
-                    'user_group_id' => $history->userid,
-                    'optional' => 0,
-                    'status' => 2,
-                    'created_by' => 0,
-                    'created_at' => $history->timemodified,
-                    'updated_at' => $history->timemodified,
-                    'archived_at' => $now,
-                ];
+            $DB->insert_records_via_batch('totara_competency_achievement', $comp_achievements);
 
-                // We aren't going to batch assignments, since we'd need to get the assignment id anyway, to insert into achievements...
-                $comp_assignment['id'] = $DB->insert_record('totara_competency_assignments', $comp_assignment);
-            }
-
-            $comp_achievement = new stdClass();
-            $comp_achievement->competency_id = $history->competencyid;
-            $comp_achievement->user_id = $history->userid;
-            $comp_achievement->assignment_id = $comp_assignment['id'] ?? 0; // This should not be 0
-            $comp_achievement->scale_value_id = $history->proficiency;
-            $comp_achievement->proficient = $all_scale_values[$history->proficiency]->proficient ?? 0;
-
-            if ($first) {
-                // Represents an achievement from an archived assignment.
-                $comp_achievement->status = 1;
-                // This makes sure we don't try to add another current record.
-                $first = false;
-            } else {
-                // Represents an achievement that was superseded by another.
-                $comp_achievement->status = 2;
-            }
-
-            $comp_achievement->time_created = $history->timemodified;
-            $comp_achievement->time_proficient = $history->timeproficient;
-            $comp_achievement->time_status = $history->timemodified;
-            $comp_achievement->time_scale_value = $history->timemodified;
-            $comp_achievement->last_aggregated = $now;
-
-            $comp_achievements[] = $comp_achievement;
+            $histories->close();
         }
-
-        $DB->insert_records_via_batch('totara_competency_achievement', $comp_achievements);
-
-        $histories->close();
 
         // Set the configuration value to prevent running the migration again
         set_config($config_setting, 1, $plugin);
