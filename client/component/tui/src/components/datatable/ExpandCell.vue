@@ -22,7 +22,7 @@
     :class="{ 'tui-dataTableExpandCell--header': header }"
     role="cell"
   >
-    <template v-if="!header || empty">
+    <template v-if="!header && !empty">
       <ButtonIcon
         :aria-expanded="expandState.toString()"
         :aria-label="$str('a11y_row_details', 'totara_core', ariaLabel)"

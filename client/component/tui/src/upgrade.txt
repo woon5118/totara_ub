@@ -1,6 +1,11 @@
 This file describes API changes in /client/component/tui,
 information provided here is intended especially for developers.
 
+=== 13.7 ===
+
+* Fixed ExpandCell display logic 
+  * Template changes
+
 === 13.4 ===
 * Updated TagList.vue to display placeholder and color change on icon. 
   * LangString, template & SCSS changes
