@@ -31,9 +31,11 @@
       :title="$str('workspace:add_library', 'container_workspace')"
       :open="showAdder"
       :cards="contribution.cards"
+      :cursor="contribution.cursor"
       :filter-value="filterValue"
       filter-component="container_workspace"
       filter-area="adder"
+      @load-more="loadMoreItems"
       @added="processAddingItems"
       @cancel="$emit('close', $event)"
       @topic="filterTopic"
@@ -201,6 +203,37 @@ export default {
       this.warning.message = '';
 
       this.currentItems = [];
+    },
+
+    async loadMoreItems() {
+      if (!this.contribution.cursor.next) {
+        return;
+      }
+
+      this.$apollo.queries.contribution.fetchMore({
+        variables: {
+          cursor: this.contribution.cursor.next,
+          workspace_id: this.workspaceId,
+          area: 'adder',
+          include_footnotes: false,
+          image_preview_mode: 'totara_engage_adder_thumbnail',
+          theme: config.theme.name,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const oldData = previousResult;
+          const newData = fetchMoreResult;
+          const newList = oldData.contribution.cards.concat(
+            newData.contribution.cards
+          );
+
+          return {
+            contribution: {
+              cursor: newData.contribution.cursor,
+              cards: newList,
+            },
+          };
+        },
+      });
     },
   },
 };

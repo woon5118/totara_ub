@@ -21,6 +21,8 @@
     :open="open"
     :title="title"
     :existing-items="existingItems"
+    :show-load-more="isLoadMore"
+    @load-more="$emit('load-more')"
     @added="$emit('added', $event)"
     @cancel="$emit('cancel')"
   >
@@ -108,6 +110,13 @@ export default {
       required: true,
     },
 
+    cursor: {
+      type: Object,
+      default() {
+        return { total: null, next: null };
+      },
+    },
+
     filterComponent: {
       type: String,
       required: true,
@@ -122,7 +131,14 @@ export default {
   data() {
     return {
       cardsSelected: [],
+      isLoadMore: !!this.cursor.next,
     };
+  },
+
+  watch: {
+    cursor(value) {
+      this.isLoadMore = !!value.next;
+    },
   },
 
   methods: {
