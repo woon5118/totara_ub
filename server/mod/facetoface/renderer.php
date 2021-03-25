@@ -192,6 +192,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $stringsource = 'customfieldother';
         }
 
+        $label = html_writer::tag('label', get_string($stringsource, 'facetoface', $field->fullname) . ':', ['for' => 'id_' . $fieldname]);
+
         $value = empty($currentvalue) ? '' : $currentvalue;
         $values = array();
         switch ($field->datatype) {
@@ -208,15 +210,15 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $values = array(0 => get_string('no'), 1 => get_string('yes'));
                 break;
             case 'datetime':
-                $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
+                $input = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
                 build_datepicker_js('#id_' . $fieldname);
-                return html_writer::tag('label', get_string($stringsource, 'facetoface', $field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
+                return html_writer::div($label . $input, 'mod_facetoface__calendarfilter');
                 break;
             case 'location':
             case 'textarea':
             case 'text':
-                $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 15, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
-                return html_writer::tag('label', get_string($stringsource, 'facetoface', $field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
+                $input = html_writer::empty_tag('input', array('type' => 'text', 'size' => 15, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
+                return html_writer::div($label . $input, 'mod_facetoface__calendarfilter');
                 break;
             default:
                 return false;
@@ -238,9 +240,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         $currentvalue = empty($currentvalue) ? $nothingvalue : $currentvalue;
 
-        $dropdown = html_writer::select($options, $fieldname, $currentvalue, array($nothingvalue => $nothing));
+        $dropdown = html_writer::select($options, $fieldname, $currentvalue, array($nothingvalue => $nothing), ['id' => 'id_' . $fieldname]);
 
-        return html_writer::tag('label', get_string($stringsource, 'facetoface', $field->fullname) . ':', array('for' => 'id_customfields')) . $dropdown;
+        return html_writer::div($label . $dropdown, 'mod_facetoface__calendarfilter');
 
     }
 

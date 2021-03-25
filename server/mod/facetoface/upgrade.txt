@@ -1,6 +1,10 @@
 This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
+=== 13.7 ===
+
+* Updated mod_facetoface_renderer::custom_field_chooser() adding divs to wrap form controls
+
 === 13.5 ===
 
 * In notification template for virtual meeting creation failure [session:room:link] was changed to [seminareventdetailslink]

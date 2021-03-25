@@ -68,6 +68,32 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*='id_booked_type'] {
   background-color: transparent;
 }
 
+.mod_facetoface__calendarfilter {
+  display: block;
+  margin-bottom: var(--gap-4);
+
+  label {
+    width: 100%;
+    vertical-align: middle;
+
+    + * {
+      vertical-align: middle;
+    }
+  }
+
+  @media (min-width: $tui-screen-md) {
+    label {
+      width: 25%;
+    } 
+  }
+}
+
+@media (min-width: $tui-screen-md) {
+  #module_filter_facetoface [name="applyfacetofacefilter"] {
+    margin-left: 25%;
+  }
+}
+
 .mod_facetoface-addremove button {
   min-width: 100px;
 }
