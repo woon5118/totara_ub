@@ -760,6 +760,7 @@ class core_course_renderer extends plugin_renderer_base {
      */
     public function course_section_cm_availability(cm_info $mod, $displayoptions = array()) {
         global $CFG;
+        $output = '';
         if (!$mod->uservisible) {
             // this is a student who is not allowed to see the module but might be allowed
             // to see availability info (i.e. "Available from ...")
