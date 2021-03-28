@@ -470,4 +470,51 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
         $this->assertEquals($oldstatus->get_id(), $newstatus->get_id());
         $this->assertEquals($oldstatus->get_id(), signup_status::from_current($signup)->get_id());
     }
+
+    public function test_signup_after_declined() {
+        global $CFG, $DB, $PAGE, $OUTPUT, $USER;
+        require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+        $seminar = new seminar($gen->get_plugin_generator('mod_facetoface')->create_instance(['course' => $course->id])->id);
+        $seminarevent = $this->create_event_and_sessions($seminar, DAYSECS, DAYSECS);
+        $user = $gen->create_user(['firstname' => 'One', 'lastname' => 'Uno']);
+        $this->setUser($user);
+        $gen->enrol_user($user->id, $course->id);
+        $signup = signup::create($user->id, $seminarevent)->set_managerid(42)->set_jobassignmentid(64)->set_bookedby(77)->save();
+        mod_facetoface\signup_status::create($signup, new mod_facetoface\signup\state\declined($signup))->save();
+
+        $signup = $DB->get_record('facetoface_signups', ['userid' => $user->id, 'sessionid' => $seminarevent->get_id()], '*', MUST_EXIST);
+        $this->assertEquals(42, $signup->managerid);
+        $this->assertEquals(64, $signup->jobassignmentid);
+        $this->assertEquals(77, $signup->bookedby);
+        $this->assertInstanceOf(mod_facetoface\signup\state\declined::class, signup::create($user->id, $seminarevent)->get_state());
+
+        define('FACETOFACE_EVENTINFO_INTERNAL', 9);
+        $s = $seminarevent->get_id();
+        $cancelsignup = false;
+        $action = 'signup';
+        $cm = $seminar->get_coursemodule();
+        $context = context_module::instance($cm->id);
+        $pageurl = new moodle_url('');
+        mod_facetoface\form\signup::mock_submit([
+            's' => $seminarevent->get_id(),
+            'action' => 'signup',
+            'notificationtype' => MDL_F2F_NONE,
+            'managerid' => '',
+            'submitbutton' => 'Request approval',
+        ]);
+        $signup = signup::create($user->id, $seminarevent, MDL_F2F_NONE);
+        try {
+            require_once($CFG->dirroot . '/mod/facetoface/signup.php');
+        } catch (moodle_exception $ex) {
+            $this->assertStringContainsString('Unsupported redirect detected', $ex->getMessage());
+        }
+
+        $signup = $DB->get_record('facetoface_signups', ['userid' => $user->id, 'sessionid' => $seminarevent->get_id()], '*', MUST_EXIST);
+        $this->assertNull($signup->managerid);
+        $this->assertNull($signup->jobassignmentid);
+        $this->assertNull($signup->bookedby);
+        $this->assertInstanceOf(booked::class, signup::create($user->id, $seminarevent)->get_state());
+    }
 }

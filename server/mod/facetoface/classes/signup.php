@@ -660,10 +660,10 @@ final class signup implements seminar_iterator_item {
     }
 
     /**
-     * @param int $bookedby
+     * @param int|null $bookedby
      * @return signup
      */
-    public function set_bookedby(int $bookedby) : signup {
+    public function set_bookedby(?int $bookedby) : signup {
         $this->bookedby = $bookedby;
         return $this;
     }
@@ -684,10 +684,10 @@ final class signup implements seminar_iterator_item {
     }
 
     /**
-     * @param int $managerid
+     * @param int|null $managerid
      * @return signup
      */
-    public function set_managerid(int $managerid) : signup {
+    public function set_managerid(?int $managerid) : signup {
         $this->managerid = $managerid;
         return $this;
     }
@@ -699,10 +699,10 @@ final class signup implements seminar_iterator_item {
         return (int)$this->jobassignmentid;
     }
     /**
-     * @param int $jobassignmentid
+     * @param int|null $jobassignmentid
      * @return signup
      */
-    public function set_jobassignmentid(int $jobassignmentid) : signup {
+    public function set_jobassignmentid(?int $jobassignmentid) : signup {
         $this->jobassignmentid = $jobassignmentid;
         return $this;
     }

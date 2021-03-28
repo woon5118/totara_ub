@@ -218,4 +218,61 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
         $this->assertStringContainsString(fullname($users[3]), $reporthtml);
         $this->assertStringContainsString(fullname($users[4]), $reporthtml);
     }
+
+    public function test_attendee_added_after_decliened(): void {
+        global $DB;
+        $this->setAdminUser();
+
+        $gen = $this->getDataGenerator();
+        $event = $this->create_seminar_event();
+
+        $time = time() + DAYSECS;
+        $session = (new seminar_session())->set_sessionid($event->get_id())->set_timestart($time)->set_timefinish($time + HOURSECS);
+        $session->save();
+
+        $user = $gen->create_user(['firstname' => 'One', 'lastname' => 'Uno']);
+        $this->setUser($user);
+        $signup = signup::create($user->id, $event)->set_managerid(42)->set_jobassignmentid(64)->set_bookedby(77)->save();
+        mod_facetoface\signup_status::create($signup, new mod_facetoface\signup\state\declined($signup))->save();
+        $signup = $DB->get_record('facetoface_signups', ['userid' => $user->id, 'sessionid' => $event->get_id()], '*', MUST_EXIST);
+        $this->assertEquals(42, $signup->managerid);
+        $this->assertEquals(64, $signup->jobassignmentid);
+        $this->assertEquals(77, $signup->bookedby);
+        $this->assertInstanceOf(mod_facetoface\signup\state\declined::class, signup::create($user->id, $event)->get_state());
+
+        $listid = sprintf('f2f%x', random_int(0, PHP_INT_MAX));
+        $currenturl = new moodle_url('/mod/facetoface/attendees/list/add.php', array('s' => $event->get_facetoface(), 'listid' => $listid));
+
+        $list = new mod_facetoface\bulk_list($listid, $currenturl, 'add');
+        $list->set_user_ids([$user->id]);
+        $signup = signup::create($user->id, $event);
+        $list->set_validaton_results([]);
+
+        $list = new mod_facetoface\bulk_list($listid);
+        $userlist = $list->get_user_ids();
+        $this->assertNotCount(0, $userlist);
+        mod_facetoface\form\attendees_add_confirm::mock_submit([
+            's' => $event->get_id(),
+            'listid' => $listid,
+            'notifyuser' => 1,
+            'notifymanager' => 1,
+        ]);
+
+        $mform = new mod_facetoface\form\attendees_add_confirm(null, [
+            's' => $event->get_id(),
+            'listid' => $listid,
+            'isapprovalrequired' => false,
+            'enablecustomfields' => !$list->has_user_data(),
+            'ignoreconflicts' => 0,
+            'is_notification_active' => 0
+        ]);
+        $data = $mform->get_data();
+        mod_facetoface\attendees_list_helper::add($data);
+
+        $signup = $DB->get_record('facetoface_signups', ['userid' => $user->id, 'sessionid' => $event->get_id()], '*', MUST_EXIST);
+        $this->assertNull($signup->managerid);
+        $this->assertNull($signup->jobassignmentid);
+        $this->assertNull($signup->bookedby);
+        $this->assertInstanceOf(booked::class, signup::create($user->id, $event)->get_state());
+    }
 }

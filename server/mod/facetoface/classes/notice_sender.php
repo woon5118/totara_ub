@@ -112,7 +112,7 @@ class notice_sender {
 
         $fromuser = $signup->get_fromuser();
         if (empty($fromuser) && !empty($signup->get_managerid())) {
-            $fromuser = \core_user::get_user($signup->get_managerid());
+            $fromuser = \core_user::get_user($signup->get_managerid()) ?: null;
         }
 
         return static::send($signup, $params, $notificationtype, MDL_F2F_INVITE, $fromuser);

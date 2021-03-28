@@ -158,11 +158,16 @@ final class attendees_list_helper {
                 }
                 if ($attendee->id != $USER->id) {
                     $signup->set_bookedby($USER->id);
+                } else {
+                    $signup->set_bookedby(null);
                 }
                 $userdata = $list->get_user_data($attendee->id);
                 if (!empty($userdata['jobassignmentid'])) {
                     $signup->set_jobassignmentid($userdata['jobassignmentid']);
+                } else {
+                    $signup->set_jobassignmentid(null);
                 }
+                $signup->set_managerid(null);
                 if (signup_helper::can_signup($signup)) {
                     signup_helper::signup($signup);
                     $added[] = [

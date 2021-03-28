@@ -35,6 +35,14 @@ if (!defined('FACETOFACE_EVENTINFO_INTERNAL')) {
 
 defined('MOODLE_INTERNAL') || die();
 
+/** @var mod_facetoface\seminar $seminar            declared in eventinfo.php */
+/** @var mod_facetoface\seminar_event $seminarevent declared in eventinfo.php */
+/** @var mod_facetoface\signup $signup              declared in eventinfo.php */
+/** @var stdClass $course                           declared in eventinfo.php */
+/** @var stdClass $cm                               declared in eventinfo.php */
+/** @var context_module $context                    declared in eventinfo.php */
+/** @var moodle_url $pageurl                        declared in eventinfo.php */
+
 if (isguestuser()) {
     redirect(
         $returnurl,
@@ -132,15 +140,20 @@ if ($fromform = $mform->get_data()) {
 
     $signup->set_notificationtype($fromform->notificationtype);
     $signup->set_discountcode($fromform->discountcode);
+    $signup->set_bookedby(null);
 
     $managerselect = get_config(null, 'facetoface_managerselect');
     if ($managerselect && isset($fromform->managerid) && !empty($fromform->managerid)) {
         $signup->set_managerid($fromform->managerid);
+    } else {
+        $signup->set_managerid(null);
     }
 
     $f2fselectedjobassignmentelemid = 'selectedjobassignment_' . $seminar->get_id();
     if (property_exists($fromform, $f2fselectedjobassignmentelemid)) {
         $signup->set_jobassignmentid($fromform->$f2fselectedjobassignmentelemid);
+    } else {
+        $signup->set_jobassignmentid(null);
     }
 
     if (signup_helper::can_signup($signup)) {
