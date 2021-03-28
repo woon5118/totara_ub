@@ -114,9 +114,22 @@ export default {
         return true;
       }
 
-      if (this.$slots.title && this.$slots.title[0].text.trim().length > 0) {
-        // Modal has content in a title slot
-        return true;
+      if (this.$slots.title) {
+        // is the slot plain text content?
+        if (
+          this.$slots.title[0].text &&
+          this.$slots.title[0].text.trim().length > 0
+        ) {
+          return true;
+        }
+
+        // is the slot a series of nodes? (not a great check but better than nothing)
+        if (
+          this.$slots.title[0].children &&
+          this.$slots.title[0].children.length > 0
+        ) {
+          return true;
+        }
       }
 
       console.error(
