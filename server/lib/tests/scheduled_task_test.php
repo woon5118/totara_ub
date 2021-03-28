@@ -51,34 +51,33 @@ class core_scheduled_task_testcase extends advanced_testcase {
     }
 
     public function test_get_next_scheduled_time() {
-        global $CFG;
         $this->resetAfterTest();
 
         $this->setTimezone('Europe/London');
 
-        // Test job run at 1 am.
+        // Test job run at 6 am.
         $testclass = new \core\task\scheduled_test_task();
 
         // All fields default to '*'.
-        $testclass->set_hour('1');
+        $testclass->set_hour('6');
         $testclass->set_minute('0');
-        // Next valid time should be 1am of the next day.
+        // Next valid time should be 6am of the next day.
         $nexttime = $testclass->get_next_scheduled_time();
 
-        $oneamdate = new DateTime('now', new DateTimeZone('Europe/London'));
-        $oneamdate->setTime(1, 0, 0);
-        // Make it 1 am tomorrow if the time is after 1am.
-        if ($oneamdate->getTimestamp() < time()) {
-            $oneamdate->add(new DateInterval('P1D'));
+        $sixamdate = new DateTime('now', new DateTimeZone('Europe/London'));
+        $sixamdate->setTime(6, 0, 0);
+        // Make it 6 am tomorrow if the time is after 6am.
+        if ($sixamdate->getTimestamp() < time()) {
+            $sixamdate->add(new DateInterval('P1D'));
         }
-        $oneam = $oneamdate->getTimestamp();
+        $sixam = $sixamdate->getTimestamp();
 
-        $this->assertEquals($oneam, $nexttime, 'Next scheduled time is 1am.');
+        $this->assertEquals($sixam, $nexttime, 'Next scheduled time is 6am.');
 
         // Disabled flag does not affect next time.
         $testclass->set_disabled(true);
         $nexttime = $testclass->get_next_scheduled_time();
-        $this->assertEquals($oneam, $nexttime, 'Next scheduled time is 1am.');
+        $this->assertEquals($sixam, $nexttime, 'Next scheduled time is 6am.');
 
         // Now test for job run every 10 minutes.
         $testclass = new \core\task\scheduled_test_task();
