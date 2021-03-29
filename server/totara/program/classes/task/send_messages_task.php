@@ -134,6 +134,9 @@ class send_messages_task extends \core\task\scheduled_task {
 
         $enrolments = $DB->get_records_sql($sql, $params);
 
+        // Array of messages sent to avoid duplicates.
+        $sent = [];
+
         // Transaction start.
         $transaction = $DB->start_delegated_transaction();
         foreach ($enrolments as $enrolment) {
@@ -155,9 +158,13 @@ class send_messages_task extends \core\task\scheduled_task {
             if ($isviewable) {
                 // Send notifications to user and (optionally) the user's manager.
                 foreach ($messages as $message) {
-                    if ($message->messagetype == MESSAGETYPE_ENROLMENT) {
-                        if ($message->send_message($user) && $debugging) {
-                            mtrace("Message {$message->id} sent(Program:{$enrolment->programid}-User:{$enrolment->userid})");
+                    if ($message->messagetype == MESSAGETYPE_ENROLMENT &&
+                        empty($sent[$enrolment->userid . '|' . $enrolment->messageid])) {
+                        if ($message->send_message($user)) {
+                            $sent[$enrolment->userid . '|' . $enrolment->messageid] = true;
+                            if ($debugging) {
+                                mtrace("Message {$message->id} sent(Program:{$enrolment->programid}-User:{$enrolment->userid})");
+                            }
                         }
                     }
                 }
