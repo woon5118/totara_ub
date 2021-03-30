@@ -83,5 +83,12 @@ function xmldb_scorm_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017111301, 'scorm');
     }
 
+    if ($oldversion < 2017111301.04) {
+        $DB->execute('UPDATE {scorm} SET completionstatusallscos = 0 WHERE completionstatusallscos IS NULL');
+
+        // Scorm savepoint reached.
+        upgrade_mod_savepoint(true, 2017111301.04, 'scorm');
+    }
+
     return true;
 }
