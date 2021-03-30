@@ -39,7 +39,7 @@ if (!empty($CFG->enablesitepolicies)) {
     // Set context and url manually
     $PAGE->set_context(null); // set context to system context
     require_login();
-    $url = new moodle_url('/admin/toot/sitepolicy/sitepolicyreport.php');
+    $url = new moodle_url('/admin/tool/sitepolicy/sitepolicyreport.php');
     $PAGE->set_url($url);
 }
 
