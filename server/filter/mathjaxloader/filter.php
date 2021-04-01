@@ -169,6 +169,10 @@ class filter_mathjaxloader extends moodle_text_filter {
      * a boolean that is true if any changes were made to the text.
      */
     protected function wrap_math_in_nolink($text) {
+        // Cast to string to ensure that its not a
+        // lang_string object.
+        $text = (string)$text;
+
         $i = 1;
         $len = strlen($text);
         $displaystart = -1;

@@ -118,4 +118,22 @@ class filter_mathjaxloader_filter_testcase extends advanced_testcase {
         ];
     }
 
+    /**
+     * Test that wrap_math_in_nolink works with strings and lang_string objects
+     */
+    public function test_wrap_math_in_nolink() {
+        $filter = new filter_mathjaxloader(context_system::instance(), []);
+
+        $reflection = new ReflectionMethod('filter_mathjaxloader', 'wrap_math_in_nolink');
+        $reflection->setAccessible(true);
+
+        $plaintext = 'Test';
+        $result = $reflection->invoke($filter, $plaintext);
+        $this->assertEquals(['Test', false], $result);
+
+        $stringobject = new \lang_string('filtername', 'filter_mathjaxloader');
+        $result = $reflection->invoke($filter, $stringobject);
+        $this->assertEquals(['MathJax', false], $result);
+    }
+
 }

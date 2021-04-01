@@ -166,6 +166,10 @@ class navigation_node implements renderable {
             // action       - The action to attribute to this node, usually a URL to link to
             if (array_key_exists('text', $properties)) {
                 $this->text = $properties['text'];
+
+                // Cast $text to a string to ensure its not
+                // actually a lang_string object
+                $this->text = (string)$this->text;
             }
             if (array_key_exists('shorttext', $properties)) {
                 $this->shorttext = $properties['shorttext'];
