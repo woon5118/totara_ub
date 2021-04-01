@@ -60,6 +60,20 @@ class mod_perform_activity_generator_configuration {
     private $relationships_per_section = [constants::RELATIONSHIP_SUBJECT];
 
     /**
+     * List of section relationships that should be created as view only
+     *
+     * @var string[]
+     */
+    private $view_only_relationships = [];
+
+    /**
+     * Per section relationships that should be created
+     *
+     * @var string[][]
+     */
+    private $relationships_for_sections = [];
+
+    /**
      * The number of elements that should be created per section.
      *
      * @var int
@@ -222,6 +236,24 @@ class mod_perform_activity_generator_configuration {
         $this->relationships_per_section = $relationship_idnumber;
 
         return $this;
+    }
+
+    /**
+     * @param array $relationship_idnumber
+     * @return $this
+     */
+    public function set_view_only_relationships(array $relationship_idnumber): self {
+        $this->view_only_relationships = $relationship_idnumber;
+
+        return $this;
+    }
+
+    /**
+     * Get view only relationship idnumbers
+     * @return array
+     */
+    public function get_view_only_relationships(): array {
+        return $this->view_only_relationships;
     }
 
     /**

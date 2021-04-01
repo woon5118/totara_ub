@@ -664,13 +664,22 @@ class mod_perform_generator extends component_generator_base {
                 }
             }
 
+            $view_only_relationships = $configuration->get_view_only_relationships();
+
             for ($k = 0; $k < $configuration->get_number_of_sections_per_activity(); $k++) {
                 $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
                 foreach ($relationships as $relationship_idnumber) {
                     if (in_array($relationship_idnumber, $manual_idnumbers, true)) {
                         $manual_relationships[] = $relationship_idnumber;
                     }
-                    $this->create_section_relationship($section, ['relationship' => $relationship_idnumber]);
+
+                    $can_view = true;
+                    $can_answer = true;
+                    if (in_array($relationship_idnumber, $view_only_relationships)) {
+                        $can_answer = false;
+                    }
+
+                    $this->create_section_relationship($section, ['relationship' => $relationship_idnumber], $can_view, $can_answer);
                 }
                 for ($j = 1; $j <= $configuration->get_number_of_elements_per_section(); $j++) {
                     $title = $section->title . " element$j";

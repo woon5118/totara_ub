@@ -30,8 +30,9 @@ use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance;
-use mod_perform\state\participant_instance\closed as participant_instance_closed;
+use mod_perform\state\participant_instance\open as participant_instance_open;
 use mod_perform\state\subject_instance\closed as subject_instance_closed;
+use mod_perform\state\subject_instance\pending;
 
 class user {
 
@@ -58,7 +59,12 @@ class user {
             ->map_to(subject_instance::class);
 
         foreach ($subject_instances as $subject_instance) {
-            $subject_instance->manually_close();
+            if ($subject_instance->manual_state instanceof pending) {
+                // An instance which is pending cannot be closed and can be deleted directly
+                subject_instance_entity::repository()->where('id', $subject_instance->id)->delete();
+            } else {
+                $subject_instance->manually_close();
+            }
         }
 
         // Now close all participant instance not closed yet
@@ -66,7 +72,8 @@ class user {
         $participant_instances = participant_instance_entity::repository()
             ->where('participant_id', $event->objectid)
             ->where('participant_source', participant_source::INTERNAL)
-            ->where('availability', '<>', participant_instance_closed::get_code())
+            // Only open instance can be closed
+            ->where('availability', participant_instance_open::get_code())
             ->get()
             ->map_to(participant_instance::class);
 
