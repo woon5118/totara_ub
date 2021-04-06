@@ -92,6 +92,10 @@ if (!$device) {
 $user = $DB->get_record('user', array('id' => $device->userid), '*', MUST_EXIST);
 core\session\manager::write_close(); // Make 100% sure we cannot affect normal sessions.
 core\session\manager::set_user($user);
+if (!empty($user->lang)) {
+    // Make sure the session is using the userlanguage.
+    $SESSION->lang = clean_param($user->lang, PARAM_LANG);
+}
 
 if (user_not_fully_set_up($user, false)) {
     util::send_error('User not fully set up', 401);

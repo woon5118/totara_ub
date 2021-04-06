@@ -176,3 +176,67 @@ Feature: Test the totara_mobile_course query
     Then I should not see "Coding error detected" in the "#response2" "css_element"
     And I should see "\"fullname\": \"Course 1\"" in the "#response2" "css_element"
     And I should see "https://www.example.com" in the "#response2" "css_element"
+
+  Scenario: Test the availability of course items based off user language in mobile
+    Given remote langimport tests are enabled
+    And I navigate to "Language packs" node in "Site administration > Localisation"
+    Given language pack installation succeeds
+    And I set the field "Available language packs" to "de"
+    And I press "Install selected language pack(s)"
+    Given I am on "Course 1" course homepage with editing mode on
+
+    And I follow "Add an activity or resource"
+    When I click on "label" "radio" in the "Add an activity or resource" "dialogue"
+    And I click on "Add" "button" in the "Add an activity or resource" "dialogue"
+    And I set the field "Label text" to "Label (en)"
+    And I follow "Restrict access"
+    And I click on "Add restriction..." "button"
+    And I click on "User language" "button"
+    And I set the field "User language" to "en"
+    And I click on "Save and return to course" "button"
+
+    And I follow "Add an activity or resource"
+    When I click on "label" "radio" in the "Add an activity or resource" "dialogue"
+    And I click on "Add" "button" in the "Add an activity or resource" "dialogue"
+    And I set the field "Label text" to "Label (de)"
+    And I follow "Restrict access"
+    And I click on "Add restriction..." "button"
+    And I click on "User language" "button"
+    And I set the field "User language" to "de"
+    And I click on "Save and return to course" "button"
+
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_course\",\"variables\": {\"courseid\": 2}}"
+    And I click on "Submit Request 2" "button"
+    And I should not see "Coding error detected" in the "#response2" "css_element"
+    Then I should see "\"fullname\": \"Course 1\"" in the "#response2" "css_element"
+    And I should see "Not available unless: Your language is Deutsch" in the "#response2" "css_element"
+    And I should not see "Not available unless: Your language is English (en)" in the "#response2" "css_element"
+
+    Given I am on profile page for user "student1"
+    And I click on "Preferences" "link" in the ".block_totara_user_profile_category_administration" "css_element"
+    And I click on "Preferred language" "link"
+    And I set the field "Preferred language" to "de"
+    And I click on "Save changes" "button"
+
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_course\",\"variables\": {\"courseid\": 2}}"
+    And I click on "Submit Request 2" "button"
+    And I should not see "Coding error detected" in the "#response2" "css_element"
+    Then I should see "\"fullname\": \"Course 1\"" in the "#response2" "css_element"
+    And I should see "Nicht verfügbar, es sei denn: Ihre Sprache ist English" in the "#response2" "css_element"
+    And I should not see "Nicht verfügbar, es sei denn: Ihre Sprache ist Deutsch" in the "#response2" "css_element"
