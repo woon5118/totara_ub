@@ -44,7 +44,6 @@ Feature: Saving, using and deleting feedback templates
     And I follow "Templates"
     Then I should see "No templates available yet"
     And "Use a template" "field" should not exist
-    And "Public" "field" should not exist
     And I follow "Delete template..."
     And "No templates available yet" "text" should exist in the ".coursetemplates" "css_element"
     And ".publictemplates" "css_element" should not exist
