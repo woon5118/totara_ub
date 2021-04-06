@@ -63,7 +63,9 @@ export default {
             'participant_instance_card_participant_full_name',
             'mod_perform'
           ),
-          text: this.participantInstance.participant.fullname,
+          text: this.participantInstance.participant
+            ? this.participantInstance.participant.fullname
+            : this.$str('hidden_anonymised', 'mod_perform'),
         },
         {
           label: this.$str(
@@ -77,7 +79,9 @@ export default {
             'participant_instance_card_relationship',
             'mod_perform'
           ),
-          text: this.participantInstance.core_relationship.name,
+          text: this.participantInstance.participant
+            ? this.participantInstance.core_relationship.name
+            : this.$str('hidden_anonymised', 'mod_perform'),
         },
         {
           label: this.$str('instance_info_card_creation_date', 'mod_perform'),
@@ -103,6 +107,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "hidden_anonymised",
       "instance_info_card_subject_full_name",
       "instance_info_card_creation_date",
       "participant_instance_card_participant_full_name",

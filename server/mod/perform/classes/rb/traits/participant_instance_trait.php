@@ -315,11 +315,14 @@ trait participant_instance_trait {
             'participant_instance',
             'participant_source',
             get_string('participant_source', 'rb_source_perform_participation_participant_instance'),
-            "$join.participant_source",
+            $this->get_anonymised_field_sql("$join.participant_source"),
             [
                 'joins' => $join,
                 'dbdatatype' => 'char',
                 'displayfunc' => 'participant_source',
+                'extrafields' => [
+                    'anonymous_responses' => "perform.anonymous_responses",
+                ],
             ]
         );
 

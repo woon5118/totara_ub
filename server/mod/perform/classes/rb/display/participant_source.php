@@ -38,6 +38,12 @@ class participant_source extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        if ($extrafields->anonymous_responses) {
+            return get_string('hidden_anonymised', 'mod_perform');
+        }
+
         switch ($value) {
             case \mod_perform\models\activity\participant_source::EXTERNAL:
                 return get_string('participant_source_external', 'rb_source_perform_participation_participant_instance');

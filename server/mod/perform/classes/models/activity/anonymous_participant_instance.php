@@ -73,6 +73,7 @@ class anonymous_participant_instance extends participant_instance {
         'availability',
         'subject_instance_id',
         'core_relationship_id',
+        'created_at',
     ];
 
     protected $model_accessor_whitelist = [
@@ -83,6 +84,7 @@ class anonymous_participant_instance extends participant_instance {
         'subject_instance',
         'participant',
         'participant_id',
+        'participant_source',
         'core_relationship',
         'participant_sections',
         'is_for_current_user',
@@ -113,5 +115,10 @@ class anonymous_participant_instance extends participant_instance {
     public function get_participant_id(): ?int {
         return null;
     }
+
+    public function get_participant_source(): ?int {
+        return null;
+    }
+
 
 }
