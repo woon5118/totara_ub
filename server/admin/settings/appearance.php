@@ -252,31 +252,25 @@ preferences,moodle|/user/preferences.php|preferences',
             new lang_string('courselistshortnames', 'admin'),
             new lang_string('courselistshortnames_desc', 'admin'), 0));
 
-    if (empty($CFG->catalogtype) || $CFG->catalogtype == 'moodle') {
-        $temp->add(
-            new admin_setting_configtext(
-                'coursesperpage',
-                new lang_string('coursesperpage', 'admin'),
-                new lang_string('configcoursesperpage', 'admin'),
-                20,
-                PARAM_INT
-            )
-        );
+    if (empty($CFG->catalogtype)) {
+        $courses_per_page_description = new lang_string('configcoursesperpage', 'admin');
     } else if ($CFG->catalogtype == 'enhanced') {
-        $temp->add(
-            new admin_setting_nothing(
-                'coursesperpage', new lang_string('coursesperpage', 'admin'),
-                new lang_string('configcoursesperpageenhcatenabled', 'admin')
-            )
-        );
+        $courses_per_page_description = new lang_string('configcoursesperpageenhcatenabled', 'admin');
     } else if ($CFG->catalogtype == 'totara') {
-        $temp->add(
-            new admin_setting_nothing(
-                'coursesperpage', new lang_string('coursesperpage', 'admin'),
-                new lang_string('configcoursesperpagetotaracatenabled', 'totara_catalog')
-            )
-        );
+        $courses_per_page_description = new lang_string('configcoursesperpagetotaracatenabled', 'totara_catalog');
+    } else {
+        $courses_per_page_description = new lang_string('configcoursesperpage', 'admin');
     }
+    $temp->add(
+        new admin_setting_configtext(
+            'coursesperpage',
+            new lang_string('coursesperpage', 'admin'),
+            $courses_per_page_description,
+            20,
+            PARAM_INT
+        )
+    );
+
     $temp->add(
         new admin_setting_configtext(
             'courseswithsummarieslimit',
