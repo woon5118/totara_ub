@@ -221,4 +221,26 @@ export default class ComponentView {
   destroy() {
     this.vm.$destroy();
   }
+
+  /**
+   * @see {@link https://prosemirror.net/docs/ref/#view.NodeView.ignoreMutation}
+   */
+  ignoreMutation(mutation) {
+    // default behavior: ignore all non-selection mutations unless there is content
+    if (!this.contentDOM && mutation.type !== 'selection') {
+      return true;
+    }
+
+    // added behavior: if there is content, ignore all non-selection mutations that don't target the content
+    // otherwise we are unable to modify the dom without the entire node rerendering
+    if (
+      this.contentDOM &&
+      mutation.type !== 'selection' &&
+      !this.contentDOM.contains(mutation.target)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
 }
