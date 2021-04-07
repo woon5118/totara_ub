@@ -307,6 +307,10 @@ export default {
     },
 
     handleModalOuterClick(e) {
+      if (this.$refs.modal && !this.$refs.modal.contains(e.target)) {
+        return;
+      }
+
       if (this.$refs.inner && !this.$refs.inner.contains(e.target)) {
         e.preventDefault();
         if (this.dismissableSources.backdropClick) {
