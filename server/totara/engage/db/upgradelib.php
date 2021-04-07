@@ -52,3 +52,20 @@ function totara_engage_create_engage_profile_block(): void {
         $block_config
     );
 }
+
+/**
+ * @return void
+ */
+function totara_engage_set_context_id_for_resource(): void {
+    global $DB;
+
+    foreach ($DB->get_records_select('engage_resource', 'contextid IS NULL') as $record) {
+        if (is_null($record->contextid)) {
+            $context_id = (context_user::instance($record->userid))->id;
+            $DB->execute(
+                'UPDATE {engage_resource} SET contextid = :context_id WHERE id = :id',
+                ['context_id' => $context_id, 'id' => $record->id]
+            );
+        }
+    }
+}

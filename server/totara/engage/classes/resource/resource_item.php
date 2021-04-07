@@ -496,6 +496,12 @@ abstract class resource_item implements accessible, shareable {
      * @return int
      */
     public function get_context_id(): int {
+        if (empty($this->resource->contextid)) {
+            $context = $this->get_context();
+            $this->resource->contextid = $context->id;
+            $this->resource->save();
+        }
+
         return $this->resource->contextid;
     }
 

@@ -37,5 +37,12 @@ function xmldb_totara_engage_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020100102, 'totara', 'engage');
     }
 
+    if ($oldversion < 2020100104) {
+        require_once($CFG->dirroot.'/totara/engage/db/upgradelib.php');
+        totara_engage_set_context_id_for_resource();
+
+        upgrade_plugin_savepoint(true, 2020100104, 'totara', 'engage');
+    }
+
     return true;
 }
