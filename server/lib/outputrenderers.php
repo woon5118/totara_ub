@@ -3678,10 +3678,16 @@ EOD;
      * @return moodle_url The favicon URL
      */
     public function favicon() {
+        global $CFG;
         // Totara: Look for the theme_ventura/favicon setting. (or equivalent)
         // If it is empty, then look for the default favicon.
         $url = $this->page->theme->resolve_favicon_url();
         if (!empty($url)) {
+            // If the URL is protocol relative e.g. the one by theme_config::setting_file_url,
+            // prepend the scheme because moodle_url doesn't support it.
+            if (is_string($url) && strncmp($url, '//', 2) == 0) {
+                $url = parse_url($CFG->wwwroot, PHP_URL_SCHEME) . ':' . $url;
+            }
             return new moodle_url($url);
         }
         return $this->image_url('favicon', 'theme');
