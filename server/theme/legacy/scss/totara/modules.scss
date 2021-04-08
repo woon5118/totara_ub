@@ -352,21 +352,26 @@ div#dock {
   text-align: center;
 }
 
-.path-mod-lesson .answeroption .fcheckbox > span {
-  position: relative;
-  float: left;
-}
+.path-mod-lesson .answeroption {
+  .fcheckbox,
+  .fradio {
+    > span {
+      position: relative;
+      float: left;
+    }
 
-.path-mod-lesson .answeroption .fcheckbox input {
-  position: absolute;
-  top: 2px;
-  margin-top: 0;
-  left: 0;
-}
+    input {
+      position: absolute;
+      top: 2px;
+      margin-top: 0;
+      left: 0;
+    }
 
-.path-mod-lesson .answeroption .fcheckbox label {
-  padding-left: 20px;
-  float: left;
+    label {
+      padding-left: 30px;
+      float: left;
+    }
+  }
 }
 
 .path-mod-lesson .answeroption .felement label p:last-child {
