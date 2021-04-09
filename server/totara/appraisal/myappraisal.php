@@ -58,6 +58,8 @@ if (!$appraisal->can_access($roleassignment)) {
     throw new appraisal_exception(get_string('error:cannotaccessappraisal', 'totara_appraisal'));
 }
 
+$PAGE->set_pagelayout('noblocks');
+
 // Set system context.
 $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
@@ -300,8 +302,6 @@ $PAGE->navbar->add($appraisal->name, $pageurl);
 $PAGE->set_url($pageurl);
 if ($preview) {
     $PAGE->set_pagelayout('popup');
-} else {
-    $PAGE->set_pagelayout('noblocks');
 }
 $heading = get_string('myappraisals', 'totara_appraisal');
 $renderer = $PAGE->get_renderer('totara_appraisal');
