@@ -528,7 +528,8 @@ class dp_competency_component extends dp_base_component {
         }
 
         list($insql, $inparams) = $DB->get_in_or_equal($competencies, SQL_PARAMS_NAMED);
-        list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid, 'c.id', 'c.visible', 'c.audiencevisible', 'c', 'course');
+        // Checking visibility for the user who is creating the plan. This way the behaviour would be similar to loading courses for a plan.
+        list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible', 'c', 'course');
 
         $sql = "
             SELECT
