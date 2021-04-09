@@ -57,3 +57,10 @@ const upperFirst = str => str.slice(0, 1).toUpperCase() + str.slice(1);
     throw new Error('Console output triggered');
   };
 });
+
+
+// Work around JSDOM throwing an error when jest-axe calls window.getComputedStyle(elt, pseudoElt)
+// https://github.com/nickcolley/jest-axe/issues/147
+const dummyStyle = global.getComputedStyle(document.createElement('div'));
+const originalComputedStyle = global.getComputedStyle;
+global.getComputedStyle = (elt, pseudoElt) => pseudoElt ? dummyStyle : originalComputedStyle(elt);

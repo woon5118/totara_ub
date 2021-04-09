@@ -372,11 +372,7 @@ describe('Reform', () => {
     scope.register('validator', 'a', validator);
 
     const aEl = document.createElement('input');
-    // hack, querySelectorAll doesn't seem to be working properly
-    Object.defineProperty(aEl, 'querySelectorAll', {
-      value: () => [aEl],
-      enumerable: false,
-    });
+    document.body.append(aEl);
     const focusHandler = jest.fn();
     aEl.addEventListener('focus', focusHandler);
     scope.register('element', 'a', () => aEl);
@@ -384,6 +380,7 @@ describe('Reform', () => {
     await submit();
 
     expect(focusHandler).toHaveBeenCalled();
+    aEl.remove();
   });
 
   it('always clones error result objects', async () => {
