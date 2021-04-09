@@ -886,9 +886,11 @@ function enrol_user_sees_own_courses($user = null) {
  * @param bool $onlyactive return only active enrolments in courses user may see
  * @param string|array $fields
  * @param string $sort
+ * @param int $limitfrom return a subset of records, starting at this point (optional).
+ * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @return array
  */
-function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
+function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC', $limitfrom = 0, $limitnum = 0) {
     global $DB, $CFG;
 
     // Guest account does not have any courses
@@ -986,7 +988,8 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
     $params['userid']  = $userid;
     $params['containertype'] = \container_course\course::get_type();
 
-    $courses = $DB->get_records_sql($sql, $params);
+    // TOTARA: add pagination
+    $courses = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
     foreach ($courses as $courseid => $course) {
         context_helper::preload_from_record($course);
         if ($onlyactive && !totara_course_is_viewable($course, $userid)) {

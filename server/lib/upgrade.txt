@@ -1,6 +1,10 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.7 ===
+
+* enrol_get_all_users_courses() added $limitfrom and $limitnum to support pagination
+
 === 13.6 ===
 
 * enrol_course_delete() in enrollib.php now may receive userid as argument and check permission before removing enrolment instances

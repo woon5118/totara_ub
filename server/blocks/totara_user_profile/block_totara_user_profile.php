@@ -220,7 +220,7 @@ class block_totara_user_profile extends block_base {
          * @var core_user\output\myprofile\renderer $renderer
          */
         $renderer = $this->page->get_renderer('core_user', 'myprofile');
-        $tree = core_user\output\myprofile\manager::build_tree($user, $currentuser, $course);
+        $tree = $this->build_profile_tree($user, $currentuser, $course);
         $newtree = $this->tree_filter($tree);
 
         $category = current($newtree->categories);
@@ -229,6 +229,27 @@ class block_totara_user_profile extends block_base {
         } else {
             $this->content->text = $renderer->render($newtree);
         }
+    }
+
+    /**
+     * Build the my profile tree or fetch one if already cached.
+     * The cache only exists during page loading.
+     *
+     * @param \stdClass $user
+     * @param boolean $currentuser
+     * @param \stdClass|null $course
+     * @return \core_user\output\myprofile\tree
+     */
+    private function build_profile_tree($user, $currentuser, $course) {
+        static $cached_trees = [];
+        $currentornot = $currentuser ? 'y' : 'n';
+        $courseid = $course ? $course->id : 0;
+        $cache_key = "{$user->id}-{$currentornot}-{$courseid}";
+        if (!isset($cached_trees[$cache_key])) {
+            $tree = core_user\output\myprofile\manager::build_tree($user, $currentuser, $course);
+            $cached_trees[$cache_key] = $tree;
+        }
+        return fullclone($cached_trees[$cache_key]);
     }
 
     /**
