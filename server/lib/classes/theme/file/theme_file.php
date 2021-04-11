@@ -60,6 +60,9 @@ abstract class theme_file {
     /** @var int */
     protected $item_id = 0;
 
+    /** @var theme_settings|null */
+    protected $theme_settings = null;
+
     /**
      * theme_file constructor.
      *
@@ -92,11 +95,13 @@ abstract class theme_file {
     }
 
     /**
+     * @param bool $determine_tenant_branding
+     *
      * @return context|null
      */
-    public function get_context(): ?context {
+    public function get_context(bool $determine_tenant_branding = true): ?context {
         if (empty($this->context)) {
-            return $this->get_default_context();
+            return $this->get_default_context(null, $determine_tenant_branding);
         }
         return $this->context;
     }
@@ -137,7 +142,7 @@ abstract class theme_file {
     public function get_item_id(?int $tenant_id = null, ?string $theme = null): int {
         global $DB;
 
-        $id = $tenant_id ?? $this->tenant_id;
+        $id = $tenant_id ?? $this->get_tenant_id();
         $plugin = "theme_" . ($theme ?? $this->get_theme_config()->name);
         $name = "tenant_{$id}_settings";
 
@@ -231,18 +236,7 @@ abstract class theme_file {
             return null;
         }
 
-        $theme_settings = new theme_settings($this->get_theme_config(), $this->tenant_id);
-
-        // If not using custom tenant branding or no file found check if site setting is set for theme.
-        if ($this->tenant_id > 0 && !$theme_settings->is_tenant_branding_enabled()) {
-            $file = $this->get_current_file(
-                $this->get_item_id(0, $theme),
-                \context_system::instance()
-            );
-        } else {
-            $file = $this->get_current_file($this->get_item_id($this->tenant_id, $theme));
-        }
-
+        $file = $this->get_current_file($this->get_item_id($this->get_tenant_id(), $theme));
         return !empty($file) ? $this->get_url($file) : null;
     }
 
@@ -380,10 +374,10 @@ abstract class theme_file {
             '',
             '',
             $this->get_area(),
-            $this->get_item_id(),
+            $this->get_item_id($this->tenant_id),
             [
                 'accepted_types' => $this->get_type()->get_group(),
-                'context' => $this->get_context()
+                'context' => $this->get_context(false)
             ]
         );
 
@@ -434,7 +428,6 @@ abstract class theme_file {
         );
 
         // Reset instance_files
-        $this->set_tenant_id($this->tenant_id);
         $this->save_files($draft_id);
     }
 
@@ -485,18 +478,58 @@ abstract class theme_file {
      *  - Tenant context to fetch files limited to a specific tenant.
      *  - System context if we don't have tenants.
      *
+     * @param int|null $unused Deprecated since Totara 13.1
+     * @param bool|null $determine_tenant_branding
+     *
      * @return context|null
      */
-    protected function get_default_context(): ?context {
+    protected function get_default_context(?int $unused = null, ?bool $determine_tenant_branding = true): ?context {
         global $USER;
 
-        if (!empty($this->tenant_id)) {
-            return \context_tenant::instance($this->tenant_id);
-        } else if (!empty($USER->tenantid)) {
-            return \context_tenant::instance($USER->tenantid);
+        // Determine if we need to use tenant context.
+        if (!$determine_tenant_branding || $this->is_tenant_branding_enabled()) {
+            if (!empty($this->tenant_id)) {
+                return \context_tenant::instance($this->tenant_id);
+            } else if (!empty($USER->tenantid)) {
+                return \context_tenant::instance($USER->tenantid);
+            }
         }
 
+        // Fall back on site branding when tenant branding is not enabled.
         return \context_system::instance();
+    }
+
+    /**
+     * @return bool
+     */
+    protected function is_tenant_branding_enabled(): bool {
+        $settings = $this->get_theme_settings_instance();
+        return $settings->is_tenant_branding_enabled();
+    }
+
+    /**
+     * @return int
+     */
+    protected function get_tenant_id(): int {
+        if ($this->is_tenant_branding_enabled()) {
+            return $this->tenant_id;
+        }
+        return 0;
+    }
+
+    /**
+     * @return theme_settings
+     */
+    protected function get_theme_settings_instance(): theme_settings {
+        if (is_null($this->theme_settings)) {
+            // Load theme settings for current tenant.
+            $this->theme_settings = new theme_settings($this->get_theme_config(), $this->tenant_id);
+        }
+
+        // Reset the tenant ID as it might have changed.
+        $this->theme_settings->set_tenant_id($this->tenant_id);
+
+        return $this->theme_settings;
     }
 
     /**

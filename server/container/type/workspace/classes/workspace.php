@@ -473,10 +473,13 @@ final class workspace extends container implements category_name_provider {
      * @return \moodle_url
      */
     public function get_image(?theme_config $theme_config = null): \moodle_url {
+        global $USER;
+
         $file_helper = new file_helper(self::get_type(), self::IMAGE_AREA, $this->get_context());
         $url = $file_helper->get_file_url();
         if (empty($url)) {
             $workspace_image = new workspace_image($theme_config);
+            $workspace_image->set_tenant_id(!empty($USER->tenantid) ? $USER->tenantid : 0);
             $url = $workspace_image->get_current_or_default_url();
         }
         return $url;

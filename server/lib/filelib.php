@@ -4650,15 +4650,7 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme 
                 send_file_not_found();
             }
 
-            $themerev = array_shift($args);
-            $lifetime = 60;
-            if ($themerev > 0) {
-                $lifetime = 60 * 60 * 2;
-            }
-
-            $course_image = new \core_course\theme\file\course_image();
-            $item_id = $course_image->get_item_id(null, $theme);
-
+            $item_id = array_shift($args);
             $filename = array_shift($args);
             $fs = get_file_storage();
             $files = $fs->get_area_files($context->id, 'course', 'defaultcourseimage', $item_id, "timemodified DESC", false);
@@ -4674,7 +4666,7 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme 
                 'theme' => $theme,
                 'cacheability' => 'public', // Default course images are cache-able
             ];
-            send_stored_file($file, $lifetime, 0, $forcedownload, $options);
+            send_stored_file($file, 60 * 60 * 2, 0, $forcedownload, $options);
         }
         // Totara: one image per course for background in grid catalogue.
         if ($filearea === 'images') {

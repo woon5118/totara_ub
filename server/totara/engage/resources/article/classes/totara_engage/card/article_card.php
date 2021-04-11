@@ -96,11 +96,14 @@ final class article_card extends card {
      * @return moodle_url|null
      */
     public function get_card_image(?string $preview_mode = null, ?theme_config $theme_config = null): ?moodle_url {
+        global $USER;
+
         $extra = $this->get_json_decoded_extra();
         if (!empty($extra['image'])) {
             $image = new \moodle_url($extra['image'], ['theme' => $theme_config->name]);
         } else {
             $article_image = new article_image($theme_config);
+            $article_image->set_tenant_id($USER->tenantid ?? 0);
             $image = $article_image->get_current_or_default_url();
         }
 

@@ -105,12 +105,4 @@ class article_image extends theme_file {
         return $this->type;
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function get_default_context(?int $tenant_id = null): ?context {
-        // This item is only configurable on the system level at the moment
-        return \context_system::instance();
-    }
-
 }

@@ -139,12 +139,4 @@ class course_image extends theme_file {
         );
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function get_default_context(?int $tenant_id = null): ?context {
-        // This item is only configurable on the system level at the moment
-        return \context_system::instance();
-    }
-
 }

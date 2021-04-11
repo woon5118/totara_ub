@@ -23,7 +23,6 @@
 
 namespace core\theme\file;
 
-use context;
 use core\files\type\file_type;
 use core\files\type\icon;
 use core\theme\settings;
@@ -95,25 +94,6 @@ class favicon_image extends theme_file {
      */
     public function get_type(): file_type {
         return $this->type;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function is_available(): bool {
-        // Check if feature is disabled.
-        if (!$this->is_enabled()) {
-            return false;
-        }
-
-        // Fall back on global setting when tenant favicon not set.
-        if ($this->tenant_id > 0) {
-            $settings = new settings($this->get_theme_config(), $this->tenant_id);
-            if (!$settings->is_tenant_branding_enabled()) {
-                $this->tenant_id = 0;
-            }
-        }
-        return true;
     }
 
 }

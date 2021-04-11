@@ -336,4 +336,79 @@ class engage_article_image_testcase extends advanced_testcase {
         $contents = self::call_engage_article_pluginfile(...$image2args);
         $this->assert_png($contents);
     }
+
+    public function test_multitenant_images(): void {
+        $generator = $this->getDataGenerator();
+
+        // Enable tenants.
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        // Create tenants.
+        $tenant_one = $tenant_generator->create_tenant();
+        $tenant_two = $tenant_generator->create_tenant();
+
+        // Create tenant user.
+        $tenant_user1 = $generator->create_user(
+            ['tenantid' => $tenant_one->id, 'tenantdomainmanager' => $tenant_one->idnumber]
+        );
+        $tenant_user2 = $generator->create_user(
+            ['tenantid' => $tenant_two->id, 'tenantdomainmanager' => $tenant_two->idnumber]
+        );
+        $this->setUser($tenant_user1);
+
+        $theme_config = theme_config::load('ventura');
+
+        // Update article image for tenant two.
+        $this->setUser($tenant_user2);
+        $theme_settings = new settings($theme_config, $tenant_two->id);
+
+        // Enable settings for tenant two.
+        $categories = [
+            [
+                'name' => 'tenant',
+                'properties' => [
+                    [
+                        'name' => 'formtenant_field_tenant',
+                        'type' => 'boolean',
+                        'value' => 'true',
+                    ]
+                ],
+            ],
+        ];
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        $user_context = context_user::instance($tenant_user2->id);
+        $files = [
+            [
+                'ui_key' => 'engageresource',
+                'draft_id' => $this->create_image('new_article_image', $user_context),
+            ],
+        ];
+        $theme_settings->validate_files($files);
+        $theme_settings->update_files($files);
+
+        // Confirm that tenant two has new resource image
+        $article_image = new article_image($theme_config);
+        $article_image->set_tenant_id($tenant_two->id);
+        $url = $article_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$article_image->get_context()->id}/totara_core/defaultarticleimage/{$article_image->get_item_id()}/new_article_image.png",
+            $url
+        );
+
+        // Confirm that tenant one still has default resource image
+        $article_image = new article_image($theme_config);
+        $article_image->set_tenant_id($tenant_one->id);
+        $url = $article_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/engage_article/1/default",
+            $url
+        );
+    }
 }

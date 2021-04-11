@@ -2496,7 +2496,7 @@ class program {
      * @return string
      */
     public function get_image() {
-        global $PAGE;
+        global $PAGE, $USER;
 
         $fs = get_file_storage();
         $files = array_values(
@@ -2528,6 +2528,7 @@ class program {
         $program_image = $this->is_certif()
             ? new certification_image($PAGE->theme)
             : new program_image($PAGE->theme);
+        $program_image->set_tenant_id(!empty($USER->tenantid) ? $USER->tenantid : 0);
         return $program_image->get_current_or_default_url()->out();
     }
 }

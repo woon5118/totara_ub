@@ -30,6 +30,9 @@ use core\theme\file\login_image;
 use core\theme\file\logo_image;
 use core\theme\helper;
 use core\theme\settings;
+use core_course\theme\file\course_image;
+use totara_certification\theme\file\certification_image;
+use totara_program\theme\file\program_image;
 use totara_tui\local\locator\bundle;
 use totara_tui\local\mediation\resolver;
 use totara_tui\local\mediation\styles\resolver as styles_resolver;
@@ -122,8 +125,6 @@ class core_theme_settings_testcase extends advanced_testcase {
      * Test default properties via the web api.
      */
     public function test_webapi_get_theme_settings() {
-        global $CFG;
-
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
         $this->setUser($user_one);
@@ -180,7 +181,7 @@ class core_theme_settings_testcase extends advanced_testcase {
 
         $this->setUser($tenant_user1);
 
-        // Should be able to get tenant one theme settings.
+        // User1 should be able to get tenant one theme settings.
         $result = $this->execute_graphql_operation(
             'core_get_theme_settings', [
                 'theme' => 'ventura',
@@ -195,6 +196,30 @@ class core_theme_settings_testcase extends advanced_testcase {
             'core_get_theme_settings', [
                 'theme' => 'ventura',
                 'tenant_id' => $tenant2->id
+            ]
+        );
+        $this->assertNotEmpty($result->errors);
+        $this->assertEquals(
+            'Sorry, but you do not currently have permissions to do that (Manage theme settings)',
+            $result->errors[0]->message
+        );
+
+        $this->setUser($tenant_user2);
+
+        // User2 should be able to get tenant two theme settings.
+        $result = $this->execute_graphql_operation(
+            'core_get_theme_settings', [
+                'theme' => 'ventura',
+                'tenant_id' => $tenant2->id
+            ]
+        );
+        $this->assertEmpty($result->errors);
+
+        // Confirm that domain manager of tenant two can not access settings of tenant one.
+        $result = $this->execute_graphql_operation(
+            'core_get_theme_settings', [
+                'theme' => 'ventura',
+                'tenant_id' => $tenant1->id
             ]
         );
         $this->assertNotEmpty($result->errors);
@@ -368,8 +393,9 @@ class core_theme_settings_testcase extends advanced_testcase {
 
         // Confirm that the default URL is still pointing to the correct default image.
         $url = $logo_image->get_default_url();
+        $rev = theme_get_revision();
         $this->assertEquals(
-            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_core/1/logo",
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_core/{$rev}/logo",
             $url->out()
         );
 
@@ -649,6 +675,11 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertEquals('New alternative text', $login_image->get_alt_text());
     }
 
+    /**
+     * Testing the following scenarios:
+     *   1. Tenants default images
+     *   2. Update images for a tenant and confirm other tenants are still on default
+     */
     public function test_multitenant_images() {
         $generator = $this->getDataGenerator();
 
@@ -665,34 +696,24 @@ class core_theme_settings_testcase extends advanced_testcase {
             ['tenantid' => $tenant_one->id, 'tenantdomainmanager' => $tenant_one->idnumber]
         );
         $tenant_user2 = $generator->create_user(
-            ['tenantid' => $tenant_two->id]
+            ['tenantid' => $tenant_two->id, 'tenantdomainmanager' => $tenant_two->idnumber]
         );
         $this->setUser($tenant_user1);
 
         $theme_config = theme_config::load('ventura');
 
-        // Confirm that logo has not been changed for tenant one.
-        $logo_image = new logo_image($theme_config);
-        $logo_image->set_tenant_id($tenant_one->id);
-        $url = $logo_image->get_current_or_default_url();
-        $this->assertInstanceOf(moodle_url::class, $url);
-        $url = $url->out();
-        $this->assertEquals(
-            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_core/1/logo",
-            $url
-        );
-        $this->assertEquals('Totara Logo', $logo_image->get_alt_text());
+        // Go through all theme files and confirm that they have not changed for tenant.
+        $theme_settings = new settings($theme_config, $tenant_one->id);
+        $files = $theme_settings->get_files();
+        foreach ($files as $file) {
+            $actual_url = $file->get_current_or_default_url();
+            $expected_url = $file->get_default_url();
 
-        // Confirm that favicon has not been changed for tenant one.
-        $favicon_image = new favicon_image($theme_config);
-        $favicon_image->set_tenant_id($tenant_two->id);
-        $url = $favicon_image->get_current_or_default_url();
-        $this->assertInstanceOf(moodle_url::class, $url);
-        $url = $url->out();
-        $this->assertEquals(
-            "https://www.example.com/moodle/theme/image.php/_s/ventura/theme/1/favicon",
-            $url
-        );
+            // Just confirm that the default URL points to the image resolver, as it always should, and not to a pluginfile.
+            $this->assertStringContainsString('/moodle/theme/image.php', $expected_url->get_path());
+
+            $this->assertEquals($expected_url, $actual_url);
+        }
 
         // Enable settings for tenant one.
         $categories = [
@@ -738,6 +759,7 @@ class core_theme_settings_testcase extends advanced_testcase {
         $theme_settings->update_files($files);
 
         // Confirm that tenant one has new logo.
+        $logo_image = new logo_image($theme_config);
         $logo_image->set_tenant_id($tenant_one->id);
         $url = $logo_image->get_current_or_default_url();
         $this->assertInstanceOf(moodle_url::class, $url);
@@ -750,33 +772,15 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertEquals(true, $logo_image->is_available());
 
         // Confirm that tenant one has new favicon.
+        $favicon_image = new favicon_image($theme_config);
         $favicon_image->set_tenant_id($tenant_one->id);
         $url = $favicon_image->get_current_or_default_url();
         $this->assertInstanceOf(moodle_url::class, $url);
         $url = $url->out();
         $this->assertEquals(
-            "https://www.example.com/moodle/pluginfile.php/{$logo_image->get_context()->id}/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
+            "https://www.example.com/moodle/pluginfile.php/{$favicon_image->get_context()->id}/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
             $url
         );
-
-        // Confirm that tenant can not update files he/she does not have capability for.
-        $files = [
-            [
-                'ui_key' => 'sitelogin',
-                'draft_id' => $this->create_image('new_site_login_image', $user_context),
-            ],
-            [
-                'ui_key' => 'learncourse',
-                'draft_id' => $this->create_image('new_course_image', $user_context),
-            ]
-        ];
-
-        try {
-            $theme_settings->validate_files($files);
-            $this->fail('Exception expected. User does not have the required capability');
-        } catch (moodle_exception $ex) {
-            self::assertStringContainsString('You do not have permission to manage theme file', $ex->getMessage());
-        }
 
         // Confirm that tenant two does not have new logo.
         $this->setUser($tenant_user2);
@@ -801,6 +805,111 @@ class core_theme_settings_testcase extends advanced_testcase {
             "https://www.example.com/moodle/theme/image.php/_s/ventura/theme/1/favicon",
             $url
         );
+
+        // Update images for tenant two.
+        $this->setUser($tenant_user2);
+        $theme_settings->set_tenant_id($tenant_two->id);
+
+        // Enable settings for tenant two.
+        $categories = [
+            [
+                'name' => 'tenant',
+                'properties' => [
+                    [
+                        'name' => 'formtenant_field_tenant',
+                        'type' => 'boolean',
+                        'value' => 'true',
+                    ]
+                ],
+            ],
+        ];
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        $user_context = context_user::instance($tenant_user2->id);
+        $files = [
+            [
+                'ui_key' => 'learncourse',
+                'draft_id' => $this->create_image('new_course_image', $user_context),
+            ],
+            [
+                'ui_key' => 'learnprogram',
+                'draft_id' => $this->create_image('new_program_image', $user_context),
+            ],
+            [
+                'ui_key' => 'learncert',
+                'draft_id' => $this->create_image('new_certification_image', $user_context),
+            ],
+        ];
+        $theme_settings->validate_files($files);
+        $theme_settings->update_files($files);
+
+        // Confirm that tenant two has new course image
+        $course_image = new course_image($theme_config);
+        $course_image->set_tenant_id($tenant_two->id);
+        $url = $course_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$course_image->get_context()->id}/course/defaultcourseimage/{$course_image->get_item_id()}/new_course_image.png",
+            $url
+        );
+
+        // Confirm that tenant two has new program image
+        $program_image = new program_image($theme_config);
+        $program_image->set_tenant_id($tenant_two->id);
+        $url = $program_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$program_image->get_context()->id}/totara_core/defaultprogramimage/{$program_image->get_item_id()}/new_program_image.png",
+            $url
+        );
+
+        // Confirm that tenant two has new certification image
+        $certification_image = new certification_image($theme_config);
+        $certification_image->set_tenant_id($tenant_two->id);
+        $url = $certification_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$certification_image->get_context()->id}/totara_core/defaultcertificationimage/{$certification_image->get_item_id()}/new_certification_image.png",
+            $url
+        );
+
+        // Confirm that tenant one still has default course image
+        $course_image = new course_image($theme_config);
+        $course_image->set_tenant_id($tenant_one->id);
+        $url = $course_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage",
+            $url
+        );
+
+        // Confirm that tenant one still has default program image
+        $program_image = new program_image($theme_config);
+        $program_image->set_tenant_id($tenant_one->id);
+        $url = $program_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_program/1/defaultimage",
+            $url
+        );
+
+        // Confirm that tenant one still has default certification image
+        $certification_image = new certification_image($theme_config);
+        $certification_image->set_tenant_id($tenant_one->id);
+        $url = $certification_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_certification/1/defaultimage",
+            $url
+        );
+
     }
 
     /**
@@ -1033,24 +1142,24 @@ class core_theme_settings_testcase extends advanced_testcase {
         $site_settings->update_files($files);
 
         $site_files = $site_settings->get_files();
-        $site_logo = array_filter($site_files, function ($file) {
+        $site_files = array_filter($site_files, function ($file) {
             return $file instanceof logo_image;
         });
-        $this->assertCount(1, $site_logo);
+        $this->assertCount(1, $site_files);
         /** @var logo_image $site_logo */
-        $site_logo = reset($site_logo);
+        $site_logo = reset($site_files);
 
         $tenant_settings = new settings($theme_config, $tenant1->id);
-        $tenant_files = $tenant_settings->get_files();
-        $tenant_logo = array_filter($tenant_files, function ($file) {
+        $site_files = $tenant_settings->get_files();
+        $site_files = array_filter($site_files, function ($file) {
             return $file instanceof logo_image;
         });
-        $this->assertCount(1, $tenant_logo);
+        $this->assertCount(1, $site_files);
         /** @var logo_image $tenant_logo */
-        $tenant_logo = reset($tenant_logo);
+        $tenant_logo = reset($site_files);
 
         $site_item_id = $site_logo->get_item_id();
-        $tenant_item_id = $tenant_logo->get_item_id();
+        $tenant_item_id = $tenant_logo->get_item_id($tenant1->id);
 
         // tenant should not have a file
         $site_file_record = $this->get_logo_file_record($site_item_id);
@@ -1073,6 +1182,197 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertNotNull($site_file_record);
         $this->assertNotNull($tenant_file_record);
         $this->assertNotEqualsCanonicalizing($site_file_record, $tenant_file_record);
+    }
+
+    /**
+     * Test that file validation validates incorrect ui keys.
+     */
+    public function test_theme_file_with_invalid_ui_key(): void {
+        $this->setAdminUser();
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+        $files = [
+            [
+                'ui_key' => 'sitelogo',
+                'draft_id' => 0,
+            ],
+            [
+                'ui_key' => 'invalid_ui_key',
+                'draft_id' => 0,
+            ]
+        ];
+        try {
+            $theme_settings->validate_files($files);
+            $this->fail('Expected a coding_exception for invalid UI key');
+        } catch (Exception $e) {
+            $this->assertInstanceOf('moodle_exception', $e);
+            $this->assertEquals("Invalid theme file UI key: 'invalid_ui_key'", $e->getMessage());
+        }
+    }
+
+    /**
+     * Test the following scenarios:
+     *   1. Tenant images default to site.
+     *   2. When setting tenant images only that tenant is affected.
+     *   3. When disabling tenant theme settings the fallback is site images.
+     */
+    public function test_fallback_on_site_when_tenant_branding_disabled(): void {
+        global $USER;
+
+        $generator = $this->getDataGenerator();
+
+        // Enable tenants.
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        // Create tenants.
+        $tenant_one = $tenant_generator->create_tenant();
+        $tenant_two = $tenant_generator->create_tenant();
+
+        // Create tenant user.
+        $tenant_user1 = $generator->create_user(
+            ['tenantid' => $tenant_one->id, 'tenantdomainmanager' => $tenant_one->idnumber]
+        );
+        $tenant_user2 = $generator->create_user(
+            ['tenantid' => $tenant_two->id, 'tenantdomainmanager' => $tenant_two->idnumber]
+        );
+
+        // Set user to tenant one's domain manager.
+        $this->setAdminUser();
+
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+
+        // Add a logo and favicon for the site
+        $admin_context = context_user::instance($USER->id);
+        $files = [
+            [
+                'ui_key' => 'sitelogo',
+                'draft_id' => $this->create_image('new_site_logo', $admin_context),
+            ],
+            [
+                'ui_key' => 'sitefavicon',
+                'draft_id' => $this->create_image('new_site_favicon', $admin_context),
+            ]
+        ];
+        $theme_settings->validate_files($files);
+        $theme_settings->update_files($files);
+
+        // Set user to tenant one's domain manager.
+        $this->setUser($tenant_user1);
+
+        // Enable settings for tenant one.
+        $categories = [
+            [
+                'name' => 'tenant',
+                'properties' => [
+                    [
+                        'name' => 'formtenant_field_tenant',
+                        'type' => 'boolean',
+                        'value' => 'true',
+                    ]
+                ],
+            ],
+        ];
+        $theme_settings->set_tenant_id($tenant_one->id);
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        // Add a logo and favicon for the tenant one.
+        $user_context = context_user::instance($tenant_user1->id);
+        $files = [
+            [
+                'ui_key' => 'sitelogo',
+                'draft_id' => $this->create_image('new_tenant_one_logo', $user_context),
+            ],
+            [
+                'ui_key' => 'sitefavicon',
+                'draft_id' => $this->create_image('new_tenant_one_favicon', $user_context),
+            ]
+        ];
+        $theme_settings->validate_files($files);
+        $theme_settings->update_files($files);
+
+        // User one should see new site logo.
+        $logo_image = new logo_image($theme_config);
+        $logo_image->set_tenant_id($tenant_one->id);
+        $url = $logo_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$logo_image->get_context()->id}/totara_core/logo/{$logo_image->get_item_id()}/new_tenant_one_logo.png",
+            $url
+        );
+
+        // User one should see new favicon.
+        $favicon_image = new favicon_image($theme_config);
+        $favicon_image->set_tenant_id($tenant_one->id);
+        $url = $favicon_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$favicon_image->get_context()->id}/totara_core/favicon/{$favicon_image->get_item_id()}/new_tenant_one_favicon.png",
+            $url
+        );
+
+        // User two should see site logo.
+        $this->setUser($tenant_user2);
+        $logo_image->set_tenant_id($tenant_two->id);
+        $url = $logo_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$logo_image->get_context()->id}/totara_core/logo/{$logo_image->get_item_id()}/new_site_logo.png",
+            $url
+        );
+
+        // User two should see site favicon.
+        $favicon_image->set_tenant_id($tenant_two->id);
+        $url = $favicon_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$favicon_image->get_context()->id}/totara_core/favicon/{$favicon_image->get_item_id()}/new_site_favicon.png",
+            $url
+        );
+
+        // Disable tenant branding for tenant one.
+        $theme_settings = new settings($theme_config, $tenant_one->id);
+        $categories = [
+            [
+                'name' => 'tenant',
+                'properties' => [
+                    [
+                        'name' => 'formtenant_field_tenant',
+                        'type' => 'boolean',
+                        'value' => 'false',
+                    ]
+                ],
+            ],
+        ];
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        // User ons should now see site logo.
+        $this->setUser($tenant_user2);
+        $logo_image->set_tenant_id($tenant_one->id);
+        $url = $logo_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$logo_image->get_context()->id}/totara_core/logo/{$logo_image->get_item_id()}/new_site_logo.png",
+            $url
+        );
+
+        // User one should now see site favicon.
+        $favicon_image->set_tenant_id($tenant_one->id);
+        $url = $favicon_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/{$favicon_image->get_context()->id}/totara_core/favicon/{$favicon_image->get_item_id()}/new_site_favicon.png",
+            $url
+        );
     }
 
     public function test_get_categories() {
@@ -1118,11 +1418,7 @@ class core_theme_settings_testcase extends advanced_testcase {
         $expected = [
             'brand' => '*',
             'colours' => '*',
-            'images' => [
-                'sitelogin',
-                'formimages_field_displaylogin',
-                'formimages_field_loginalttext',
-            ],
+            'images' => '*',
             'custom' => ['formcustom_field_customfooter'],
             'tenant' => '*',
         ];

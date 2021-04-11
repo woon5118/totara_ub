@@ -432,6 +432,7 @@ $string['nofiltersenabled'] = 'No filters are enabled.';
 $string['nofolder'] = 'Requested directory does not exist';
 $string['noformdesc'] = 'No formslib form description file found for this activity.';
 $string['noguest'] = 'No guests here!';
+$string['nohandlerthemefile'] = 'Invalid theme file UI key: \'{$a}\'';
 $string['noinstances'] = 'There are no instances of {$a} in this course!';
 $string['nologinas'] = 'You are not allowed to log in as that user';
 $string['nonmeaningfulcontent'] = 'Non meaningful content';

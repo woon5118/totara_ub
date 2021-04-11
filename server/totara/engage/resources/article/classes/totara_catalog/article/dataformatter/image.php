@@ -57,7 +57,7 @@ class image extends formatter {
      * @return \stdClass
      */
     public function get_formatted_value(array $data, \context $context): \stdClass {
-        global $PAGE;
+        global $PAGE, $USER;
 
         if (!array_key_exists('resourceid', $data)) {
             throw new \coding_exception("article image data formatter expects 'resourceid'");
@@ -94,6 +94,7 @@ class image extends formatter {
             );
         } else {
             $article_image = new article_image($PAGE->theme);
+            $article_image->set_tenant_id($USER->tenantid ?? 0);
             $image->url = $article_image->get_current_or_default_url()->out();
         }
 

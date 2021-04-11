@@ -378,4 +378,10 @@ $definitions = array(
         'simpledata' => true,
         'staticacceleration' => true,
     ),
+
+    // Used to store theme setting categories.
+    'theme_setting_categories' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+    ),
 );

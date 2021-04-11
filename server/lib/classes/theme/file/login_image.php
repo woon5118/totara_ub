@@ -124,13 +124,8 @@ class login_image extends theme_file {
      * @inheritDoc
      */
     public function is_available(): bool {
-        // Check if feature is disabled.
-        if (!$this->is_enabled()) {
-            return false;
-        }
-
         // Check if setting is enabled.
-        $settings = new settings($this->get_theme_config(), 0);
+        $settings = $this->get_theme_settings_instance();
         return $settings->is_enabled('images', 'formimages_field_displaylogin', true);
     }
 
@@ -140,7 +135,7 @@ class login_image extends theme_file {
      * @return string
      */
     public function get_alt_text(): string {
-        $settings = new settings($this->get_theme_config(), $this->tenant_id);
+        $settings = $this->get_theme_settings_instance();
         $property = $settings->get_property('images', 'formimages_field_loginalttext');
         if (!empty($property)) {
             return $property['value'];

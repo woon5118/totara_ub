@@ -136,26 +136,4 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
         );
     }
 
-    public function test_image_enabled() {
-        $generator = $this->getDataGenerator();
-        $user_one = $generator->create_user();
-        $this->setUser($user_one);
-        $theme_config = theme_config::load('ventura');
-
-        // Disable advanced feature.
-        advanced_feature::disable('container_workspace');
-
-        // Image should be disabled and not found in files.
-        $workspace_image = new workspace_image($theme_config);
-        $this->assertEquals(false, $workspace_image->is_enabled());
-
-        $theme_settings = new settings($theme_config, 0);
-        $files = $theme_settings->get_files();
-        foreach ($files as $file) {
-            if ($file instanceof workspace_image) {
-                $this->assertFalse($file->is_enabled());
-            }
-        }
-    }
-
 }

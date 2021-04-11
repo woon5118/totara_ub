@@ -1,6 +1,13 @@
 This file describes API changes in core theme libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.7 ===
+* Added optional parameter to core\theme\file\theme_file::get_context to indicate if we need to check if tenant settings
+  are enabled before resolving context.
+* Added optional second parameter to core\theme\file\theme_file::get_default_context to indicate if we need to check if tenant
+  settings are enabled before resolving context.
+* Added caching for core\theme\settings categories to improve performance.
+
 === 13.6 ===
 
 * Deprecated optional second parameter "$theme" in theme_file::__constructor.
@@ -11,3 +18,6 @@ information provided here is intended especially for developers.
   to specify if default file categories should be included in the output.
 * Removed optional second parameter "$theme" from theme_file::__constructor.
 * Functions theme_file::get_component and theme_file::get_area made static.
+
+=== 13.1 ===
+* core\theme\file\theme_file::get_default_context() the first argument is no longer used. Functionality has not changed.
