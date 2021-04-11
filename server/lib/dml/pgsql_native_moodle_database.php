@@ -43,6 +43,9 @@ class pgsql_native_moodle_database extends moodle_database {
     /** @var resource $pgsql database resource */
     protected $pgsql     = null;
 
+    /** @var null string */
+    private $last_error = null;
+
     protected $last_error_reporting; // To handle pgsql driver default verbosity
 
     /** @var bool savepoint hack for MDL-35506 - workaround for automatic transaction rollback on error */
@@ -261,6 +264,7 @@ class pgsql_native_moodle_database extends moodle_database {
         parent::query_start($sql, $params, $type, $extrainfo);
         // pgsql driver tents to send debug to output, we do not need that ;-)
         $this->last_error_reporting = error_reporting(0);
+        $this->last_error = null;
     }
 
     /**
@@ -273,6 +277,8 @@ class pgsql_native_moodle_database extends moodle_database {
         error_reporting($this->last_error_reporting);
 
         if ($result === false) {
+            $this->last_error = pg_last_error($this->pgsql);
+
             // Totara: for consistency with other DBs we return to pre-error savepoint, we need to do this before db logging in parent method.
             if ($this->savepointpresent) {
                 $res = @pg_query($this->pgsql, "ROLLBACK TO SAVEPOINT moodle_pg_savepoint; SAVEPOINT moodle_pg_savepoint");
@@ -291,6 +297,7 @@ class pgsql_native_moodle_database extends moodle_database {
                 pg_free_result($res);
             }
         }
+        $this->last_error = null;
     }
 
     /**
@@ -332,10 +339,10 @@ class pgsql_native_moodle_database extends moodle_database {
 
     /**
      * Returns last error reported by database engine.
-     * @return string error message
+     * @return string|null error message
      */
     public function get_last_error() {
-        return pg_last_error($this->pgsql);
+        return $this->last_error;
     }
 
     /**
