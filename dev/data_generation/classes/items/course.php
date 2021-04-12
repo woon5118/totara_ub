@@ -105,9 +105,20 @@ class course extends item {
 
         $course = (array) App::generator()->create_course($properties);
 
-        unset($course['numsections']);
-        unset($course['hiddensections']);
-        unset($course['coursedisplay']);
+        // Remove non-entity properties.
+        $unset_properties = [
+            'numsections',
+            'hiddensections',
+            'coursedisplay',
+            'collapsiblesections',
+            'collapsiblesectionscollapseall',
+            'headercolor',
+            'headerfgcolor',
+            'headerbgcolor',
+        ];
+        foreach ($unset_properties as $property) {
+            unset($course[$property]);
+        }
 
         $this->data = new course_entity($course);
 
