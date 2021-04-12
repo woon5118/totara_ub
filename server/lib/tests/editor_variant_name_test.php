@@ -51,4 +51,23 @@ class core_editor_variant_name_testcase extends advanced_testcase {
             self::fail("An expected exception was not thrown for invalid variant '{$str}'");
         }
     }
+
+    /**
+     * This test is to make sure that the function {@see variant_name::is_valid()} is always
+     * sync with the constant defined in variant_name.
+     *
+     * @return void
+     */
+    public function test_ensure_variant_name_constants_are_sync_with_function(): void {
+        $ref_class = new ReflectionClass(variant_name::class);
+        $constants = $ref_class->getReflectionConstants();
+
+        foreach ($constants as $ref_constant) {
+            self::assertTrue(
+                variant_name::is_valid($ref_constant->getValue()),
+                "It seems like the function \\core\\editor\\variant_name::is_valid " .
+                "is out of sync with the variant name \\core\\editor\\variant_name::{$ref_constant->getName()}"
+            );
+        }
+    }
 }

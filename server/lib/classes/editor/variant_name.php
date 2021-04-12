@@ -28,6 +28,10 @@ use coding_exception;
  * A metadata class that is used to store the editor's variant name.
  * These variant names are defined at core, but to each different editor plugin,
  * it can have a different meaning.
+ *
+ * Note: if you want to add a new variant name, please add a new constant which is a part of this class,
+ * and also update the function {@see \core\editor\variant_name::is_valid} to sync with the newly created
+ * constant function.
  */
 class variant_name {
     /**
