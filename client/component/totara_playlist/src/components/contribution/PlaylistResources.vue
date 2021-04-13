@@ -186,6 +186,7 @@ export default {
               id: playlistId,
               source: UrlSourceType.playlist(playlistId),
               theme: config.theme.name,
+              include_footnotes: true,
             },
           },
         ],
