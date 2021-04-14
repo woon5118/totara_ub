@@ -1387,10 +1387,18 @@ function scorm_get_completed_attempt_count ($userid, $scorm) {
                AND scormid = :scormid
                AND element = :element";
 
+    if (scorm_version_check($scorm->version, SCORM_13)) {
+        $element = 'cmi.score.raw';
+    } else if ($scorm->grademethod == GRADESCOES) {
+        $element = 'cmi.core.lesson_status';
+    } else {
+        $element = 'cmi.core.score.raw';
+    }
+
     $params = array(
         'userid' => $userid,
         'scormid' => $scorm->id,
-        'element' => 'cmi.core.lesson_status'
+        'element' => $element
     );
 
     $total = $DB->count_records_sql($sql, $params);
@@ -1400,25 +1408,10 @@ function scorm_get_completed_attempt_count ($userid, $scorm) {
         return 0;
     }
 
-    $values = array('completed', 'passed', 'failed');
+    // Check if the last completed attempt is the last one we found.
+    $lastcompletedattempt = scorm_get_last_completed_attempt($scorm->id, $userid);
 
-    list($vsql, $valueparams) = $DB->get_in_or_equal($values, SQL_PARAMS_NAMED);
-
-    // check status of last attempt
-    $sql = "SELECT id
-              FROM {scorm_scoes_track}
-             WHERE userid = :userid
-               AND scormid = :scormid
-               AND element = :element
-               AND attempt = :attempt
-               AND value $vsql";
-
-    $params['attempt'] = $total;
-    $params = array_merge($params, $valueparams);
-
-    $completed_last = $DB->record_exists_sql($sql, $params);
-
-    return !empty($completed_last) ? $total : $total-1;
+    return ($total == $lastcompletedattempt) ? $total : $total-1;
 }
 
 /**
