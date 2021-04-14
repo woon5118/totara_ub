@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,19 +20,19 @@
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
  * @package totara_msteams
  */
-
 use totara_msteams\botfw\auth\default_authoriser;
 use totara_msteams\botfw\mini_output;
 
 global $CFG;
+
 if (empty($CFG)) {
-    require_once(__DIR__ . '/../../../../config.php');
+    require_once(__DIR__ . '/../../config.php');
 }
 
 if (isset($USER) && isset($PAGE)) {
     // Turn off editing.
     $USER->editing = false;
-    $PAGE->set_url(new moodle_url('/totara/msteams/classes/botfw/login.php'));
+    $PAGE->set_url(new moodle_url('/totara/msteams/botlogin.php'));
 
     // Render as minimum HTML as possible to speed up the login process.
     $PAGE->set_context(context_system::instance());

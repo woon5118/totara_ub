@@ -75,7 +75,7 @@ class default_authoriser implements authoriser {
      * @inheritDoc
      */
     public function get_login_url(activity $activity, channel_account $account): moodle_url {
-        return new moodle_url('/totara/msteams/classes/botfw/login.php');
+        return new moodle_url('/totara/msteams/botlogin.php');
     }
 
     /**
@@ -152,7 +152,7 @@ class default_authoriser implements authoriser {
         $userstate->timecreated = time();
         $userstate->save();
 
-        $redirecturl = new moodle_url('/totara/msteams/classes/botfw/login.php', ['state' => $userstate->id]);
+        $redirecturl = new moodle_url('/totara/msteams/botlogin.php', ['state' => $userstate->id]);
 
         if (!empty($USER->id)) {
             // Already logged in.

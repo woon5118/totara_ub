@@ -511,7 +511,7 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
         $this->assertEquals('signin', $json->attachments[0]->content->buttons[0]->type);
         $this->assertEquals(get_string('botfw:msg_signin_button', 'totara_msteams'), $json->attachments[0]->content->buttons[0]->title);
         $this->assertEquals(get_string('botfw:msg_signin_button', 'totara_msteams'), $json->attachments[0]->content->buttons[0]->text);
-        $this->assertEquals($CFG->wwwroot.'/totara/msteams/classes/botfw/login.php', $json->attachments[0]->content->buttons[0]->value);
+        $this->assertEquals($CFG->wwwroot.'/totara/msteams/botlogin.php', $json->attachments[0]->content->buttons[0]->value);
 
         $this->set_up_subscription();
         $json = $this->post_message(get_string('botfw:cmd_signin', 'totara_msteams'), false);
@@ -580,7 +580,7 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
         $this->assertEquals('auth', $json->composeExtension->type);
         $this->assertEquals('openUrl', $json->composeExtension->suggestedActions->actions[0]->type);
         $this->assertEquals('516N 1N', $json->composeExtension->suggestedActions->actions[0]->title);
-        $this->assertEquals($CFG->wwwroot.'/totara/msteams/classes/botfw/login.php', $json->composeExtension->suggestedActions->actions[0]->value);
+        $this->assertEquals($CFG->wwwroot.'/totara/msteams/botlogin.php', $json->composeExtension->suggestedActions->actions[0]->value);
 
         $this->set_up_subscription();
         $activity = $this->messaging_extension($group, '');
@@ -649,7 +649,7 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
         $this->assertEquals('auth', $json->composeExtension->type);
         $this->assertEquals('openUrl', $json->composeExtension->suggestedActions->actions[0]->type);
         $this->assertEquals('516N 1N', $json->composeExtension->suggestedActions->actions[0]->title);
-        $this->assertEquals($CFG->wwwroot.'/totara/msteams/classes/botfw/login.php', $json->composeExtension->suggestedActions->actions[0]->value);
+        $this->assertEquals($CFG->wwwroot.'/totara/msteams/botlogin.php', $json->composeExtension->suggestedActions->actions[0]->value);
 
         $context = rawurlencode(json_encode([
             'subEntityId' => base64url::encode(json_encode([
