@@ -885,7 +885,7 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
             ob_end_clean();
             $this->assertTrue($result);
             $this->assertEquals('message', $data->composeExtension->type);
-            $this->assertEquals('Browse learning content', $data->composeExtension->text);
+            $this->assertEquals('Browse the Totara catalogue to share learning content.', $data->composeExtension->text);
 
             // The messaging_extension class should call set_user() during the catalogue retrieval process.
             $this->assertEquals([$this->user->id], $this->hook->setusers);
