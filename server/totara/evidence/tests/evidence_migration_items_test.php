@@ -191,6 +191,37 @@ class totara_evidence_migration_items_testcase extends totara_evidence_migration
     }
 
     /**
+     * If there aren't any evidence types defined, but there is completion evidence, then there shouldn't be a type field created.
+     */
+    public function test_migrate_completion_evidence_when_no_types_exist(): void {
+        global $DB;
+        $this->generator()->create_evidence_item([
+            'name' => "Completion Evidence",
+            'readonly' => 1,
+            'evidencetypeid' => 0,
+            'timecreated' => 0,
+            'timemodified' => 0,
+            'usermodified' => 0,
+            'userid' => 0,
+        ]);
+
+        $this->assertEquals(0, builder::table('dp_evidence_type')->count());
+        $this->assertEquals(0, evidence_type::repository()->count());
+        $this->assertEquals(1, builder::table('dp_plan_evidence')->count());
+        $this->assertEquals(0, evidence_item::repository()->count());
+
+        totara_evidence_migrate();
+
+        $this->assertEquals(0, builder::table('dp_evidence_type')->count());
+        $this->assertEquals(2, evidence_type::repository()->count());
+        $this->assertEquals(0, builder::table('dp_plan_evidence')->count());
+        $this->assertEquals(1, evidence_item::repository()->count());
+
+        // Since there are no types, there is no need to create an field to store what evidence type it was pre-migration.
+        $this->assertFalse($DB->record_exists_select('totara_evidence_type_info_field', "shortname LIKE 'oldtypename%'"));
+    }
+
+    /**
      * Create evidence field data, storing a unique number per data record.
      * This is so we can assert the evidence has the correct data numbers after migration.
      *

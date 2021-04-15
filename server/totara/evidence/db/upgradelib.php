@@ -761,7 +761,9 @@ function totara_evidence_migrate_completion_history_evidence($current_time, $adm
     }
 
     $uploaded_type = $DB->get_record('totara_evidence_type', ['idnumber' => 'legacycompletionimport']);
+    $old_type_field_id = null;
     if ($uploaded_type) {
+        // Upgrade has already been started, so reuse the already created type field.
         $uploaded_type_id = $uploaded_type->id;
         $uploaded_type_field_ids = totara_evidence_migrate_get_migrated_type_fields($uploaded_type_id);
         $fields = $DB->get_records('totara_evidence_type_info_field', ['typeid' => $uploaded_type_id]);
@@ -811,14 +813,16 @@ function totara_evidence_migrate_completion_history_evidence($current_time, $adm
             );
 
             // If the evidence had a type associated with it, then add it to the type name field
-            $sql = "
-                INSERT INTO {totara_evidence_type_info_data}
-                    (evidenceid, fieldid, data) 
-                SELECT '{$new_item_id}', '{$old_type_field_id}', name 
-                FROM {dp_evidence_type}
-                WHERE id = :id
-            ";
-            $DB->execute($sql, ['id' => $item->evidencetypeid]);
+            if ($old_type_field_id) {
+                $sql = "
+                    INSERT INTO {totara_evidence_type_info_data}
+                        (evidenceid, fieldid, data) 
+                    SELECT '{$new_item_id}', '{$old_type_field_id}', name 
+                    FROM {dp_evidence_type}
+                    WHERE id = :id
+                ";
+                $DB->execute($sql, ['id' => $item->evidencetypeid]);
+            }
 
             $transaction->allow_commit();
 
