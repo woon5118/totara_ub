@@ -436,12 +436,6 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
 
     public function data_send_message(): array {
         return [
-            'help personal' => [
-                get_string('botfw:cmd_help', 'totara_msteams'),
-                false,
-                get_string('botfw:msg_help', 'totara_msteams'),
-                get_string('botfw:msg_help', 'totara_msteams'),
-            ],
             '??? personal' => [
                 '???',
                 false,
@@ -498,6 +492,20 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
         $json = $this->post_message($message, $group);
         $this->assertEquals('message', $json->type);
         $this->assertEquals($response_in, $json->text);
+    }
+
+    /**
+     * Send show_help.
+     */
+    public function test_send_show_help_message(): void {
+        $json = $this->post_message(get_string('botfw:cmd_help', 'totara_msteams'), false);
+        
+        $this->assertEquals('message', $json->type);
+        $this->assertEquals(get_string('botfw:msg_help_title', 'totara_msteams'), $json->attachments[0]->content->title);
+        $this->assertEquals(get_string('botfw:msg_help_body', 'totara_msteams'), $json->attachments[0]->content->text);
+        $this->assertEquals(get_string('botfw:msg_signin_button', 'totara_msteams'), $json->attachments[0]->content->buttons[0]->title);
+        $this->assertEquals(get_string('botfw:msg_signout_button', 'totara_msteams'), $json->attachments[0]->content->buttons[1]->title);
+        $this->assertEquals(get_string('botfw:msg_help_button', 'totara_msteams'), $json->attachments[0]->content->buttons[2]->title);
     }
 
     /**
@@ -770,7 +778,6 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
 
     public function data_dispatcher_classes(): array {
         return [
-            [show_help::class, get_string('botfw:msg_help', 'totara_msteams')],
             [signin_request::class, get_string('botfw:msg_signin_already', 'totara_msteams', 'Bobby')],
             [signout_request::class, get_string('botfw:msg_signout_done', 'totara_msteams', 'Bobby')],
             [cant_hear_you::class, get_string('botfw:msg_canthearyou', 'totara_msteams')],
@@ -797,7 +804,27 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
         $this->assertContains('Authorization: Bearer '.$this->bot_access_token, $headers);
         $json = json_decode($request->get_post_data());
         $this->assertEquals('message', $json->type);
-        $this->assertEquals($expectedmessage, $json->text);
+        if ($classname == show_help::class) {
+            $this->assertEquals($expectedmessage, $json->attachments[0]->content->title);
+        } else {
+            $this->assertEquals($expectedmessage, $json->text);
+        }
+    }
+
+    /**
+     * @retrun void
+     */
+    public function test_direct_dispatch_success_for_help_command(): void {
+        $this->set_up_subscription();
+        $activity = $this->message(false, '');
+        $result = $this->bot->process_callback($activity, function(activity $activity, $x)  {
+            return $this->router->direct_dispatch(show_help::class, $this->bot, $activity);
+        });
+        $this->assertTrue($result);
+        $request = $this->client->get_request($this->bot_post_url1);
+        $json = json_decode($request->get_post_data());
+        $this->assertEquals('message', $json->type);
+        $this->assertEquals(get_string('botfw:msg_help_title', 'totara_msteams'), $json->attachments[0]->content->title);
     }
 
     /**

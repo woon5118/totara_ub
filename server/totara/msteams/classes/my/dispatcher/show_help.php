@@ -26,6 +26,7 @@ namespace totara_msteams\my\dispatcher;
 use lang_string;
 use totara_msteams\botfw\activity;
 use totara_msteams\botfw\bot;
+use totara_msteams\botfw\builder;
 use totara_msteams\botfw\describable;
 use totara_msteams\botfw\dispatchable;
 
@@ -58,6 +59,37 @@ class show_help implements dispatchable, describable {
      * @inheritDoc
      */
     public function dispatch(bot $bot, activity $activity): void {
-        $bot->reply_text_to($activity, get_string('botfw:msg_help', 'totara_msteams'));
+        $entityid = 'help';
+        $appid = get_config('totara_msteams', 'manifest_app_id');
+        $tab_url = new \moodle_url("https://teams.microsoft.com/l/entity/{$appid}/{$entityid}");
+
+        $message = builder::message()
+            ->conversation($activity->conversation)
+            ->from($activity->recipient)
+            ->recipient($activity->from)
+            ->add_attachment(
+                builder::hero_card()
+                    ->title(get_string('botfw:msg_help_title', 'totara_msteams'))
+                    ->text(get_string('botfw:msg_help_body', 'totara_msteams'))
+                    ->add_button(
+                        builder::action()
+                            ->message_back(get_string('botfw:msg_signin_button', 'totara_msteams'), get_string('botfw:cmd_signin', 'totara_msteams'))
+                            ->build()
+                    )
+                    ->add_button(
+                        builder::action()
+                            ->message_back(get_string('botfw:msg_signout_button', 'totara_msteams'), get_string('botfw:cmd_signout', 'totara_msteams'))
+                            ->build()
+                    )
+                    ->add_button(
+                        builder::action()
+                            ->title(get_string('botfw:msg_help_button', 'totara_msteams'))
+                            ->value($tab_url->out(false))
+                            ->build()
+                    )
+                    ->build()
+            );
+
+        $bot->reply_to($activity, $message->build());
     }
 }

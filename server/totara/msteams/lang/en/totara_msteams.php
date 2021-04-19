@@ -39,7 +39,11 @@ $string['botfw:help_signin'] = 'Sign in to receive notifications';
 $string['botfw:help_signout'] = 'Sign out to disable notifications';
 $string['botfw:help_command'] = 'Run "{$a}" command';
 $string['botfw:msg_canthearyou'] = 'Sorry, I\'m unsure what you\'re asking. Please contact your site administrator or type \'Help\' to find out how you can use the app.';
-$string['botfw:msg_help'] = 'To find out what you can do with this app please contact your site administrator.';
+$string['botfw:msg_help_button'] = 'Go to help';
+$string['botfw:msg_help_title'] = 'Need help?';
+$string['botfw:msg_help_body'] = 'This chatbot allows you to sign in to receive Totara notifications within Microsoft Teams. 
+Choose one of the options below to sign in to the bot, sign out of the bot or go to the Help tab to learn more about how you can use Totara with Microsoft Teams.';
+
 $string['botfw:msg_private'] = 'Hi, I can\'t respond to that here. Please start a one-on-one chat instead.';
 $string['botfw:msg_private_name'] = 'Hi {$a}, I can\'t respond to that here. Please start a one-on-one chat instead.';
 $string['botfw:msg_signin'] = 'Sign in to get started.';
@@ -47,6 +51,7 @@ $string['botfw:msg_signin_already'] = 'Hi {$a}, you\'re already signed in.';
 $string['botfw:msg_signin_button'] = 'Sign in';
 $string['botfw:msg_signin_done'] = 'Great, {$a}. You\'re all set up to receive notifications.';
 $string['botfw:msg_signout_already'] = 'Hi, you\'re already signed out.';
+$string['botfw:msg_signout_button'] = 'Sign out';
 $string['botfw:msg_signout_done'] = 'Thanks {$a}, you are now signed out. Please sign in again to receive notifications.';
 $string['botfw:msg_subscribe_already'] = 'Hi {$a}, you\'re already set up to receive notifications.';
 $string['botfw:msg_welcome'] = 'Welcome! This bot will let you receive all your notifications right here. You\'ll need to sign in to your account to get this started.';
@@ -212,4 +217,5 @@ $string['userdataitemusersetting'] = 'MS Teams user settings';
 $string['userdataitemuserstate'] = 'MS Teams user authentication state';
 
 // Deprecated since Totara 13.3
+$string['botfw:msg_help'] = 'To find out what you can do with this app please contact your site administrator.';
 $string['settings:manifest_package_name_default'] = '';
