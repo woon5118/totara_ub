@@ -500,17 +500,25 @@ M.course_dndupload = {
     /**
      * Unhide the preview element for the given section and set it to display
      * the correct message
-     * @param section the YUI node representing the selected course section
-     * @param type the details of the data type detected in the drag (including the message to display)
+     * @param {YNode} section the YUI node representing the selected course section
+     * @param {Object} type the details of the data type detected in the drag (including the message to display)
      */
     show_preview_element: function(section, type) {
         this.hide_preview_element();
-        var preview = section.one('li.dndupload-preview').removeClass('dndupload-hidden');
+        var preview = section.one('li.dndupload-preview').removeClass('dndupload-hidden').getDOMNode();
         section.addClass('dndupload-over');
 
-        // Horrible work-around to allow the 'Add X here' text to be a drop target in Firefox.
-        var node = preview.one('span').getDOMNode();
-        node.firstChild.nodeValue = type.addmessage;
+        require(['core/templates', 'core/str', 'core/notification'], function(templatelib, stringslib, notificationLib) {
+            stringslib.get_string('droptoupload', 'core').then(function(string) {
+                return templatelib.renderIcon('document-new', string);
+            }).then(function(iconhtml) {
+                var indent = preview.querySelector('.mod-indent');
+                var namespan = document.createElement('span');
+                namespan.className = 'instancename';
+                namespan.innerText = type.addmessage;
+                indent.innerHTML = iconhtml + ' ' + namespan.outerHTML;
+            }).catch(notificationLib.exception);
+        });
     },
 
     /**
