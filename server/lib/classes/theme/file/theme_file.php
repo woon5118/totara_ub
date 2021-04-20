@@ -299,7 +299,7 @@ abstract class theme_file {
         $file_helper = new file_helper(
             $this->get_component(),
             $this->get_area(),
-            $this->get_context()
+            $this->get_context(false)
         );
 
         return $file_helper->create_file_area($USER->id);

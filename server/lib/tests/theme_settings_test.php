@@ -227,6 +227,19 @@ class core_theme_settings_testcase extends advanced_testcase {
             'Sorry, but you do not currently have permissions to do that (Manage theme settings)',
             $result->errors[0]->message
         );
+
+        // Switch on tenant isolation and confirm that user one still has access
+        $this->setUser($tenant_user1);
+        set_config('tenantsisolated', 1);
+        purge_all_caches();
+        $result = $this->execute_graphql_operation(
+            'core_get_theme_settings', [
+                'theme' => 'ventura',
+                'tenant_id' => $tenant1->id
+            ]
+        );
+        $this->assertEmpty($result->errors, !empty($result->errors) ? $result->errors[0]->message : '');
+        $this->assertNotEmpty($result->data);
     }
 
     public function test_webapi_update_theme_settings() {
