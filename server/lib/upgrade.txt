@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.7 ===
 
+* core_login_process_password_reset_request() now prevents processing password reset requests by email addresses
+  that are shared by multiple accounts.
 * enrol_get_all_users_courses() added $limitfrom and $limitnum to support pagination
 
 === 13.6 ===

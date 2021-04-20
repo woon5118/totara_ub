@@ -53,13 +53,17 @@ function core_login_process_password_reset_request() {
         } else {
             // Try to load the user record based on email address.
             // this is tricky because
-            // 1/ the email is not guaranteed to be unique - TODO: send email with all usernames to select the account for pw reset
+            // 1/ the email is not guaranteed to be unique - if it isn't unique, the request will not be processed.
+            //    The request has to be by username.
             // 2/ mailbox may be case sensitive, the email domain is case insensitive - let's pretend it is all case-insensitive.
-
-            $select = $DB->sql_like('email', ':email', false, true, false, '|') .
-                    " AND mnethostid = :mnethostid AND deleted=0 AND suspended=0";
-            $params = array('email' => $DB->sql_like_escape($data->email, '|'), 'mnethostid' => $CFG->mnet_localhost_id);
-            $user = $DB->get_record_select('user', $select, $params, '*', IGNORE_MULTIPLE);
+            if (core_login_email_exists_multiple_times($data->email)) {
+                $user = false;
+            } else {
+                $select = $DB->sql_like('email', ':email', false, true, false, '|') .
+                        " AND mnethostid = :mnethostid AND deleted=0 AND suspended=0";
+                $params = array('email' => $DB->sql_like_escape($data->email, '|'), 'mnethostid' => $CFG->mnet_localhost_id);
+                $user = $DB->get_record_select('user', $select, $params, '*', IGNORE_MULTIPLE);
+            }
         }
 
         // Totara: do not allow resetting of password when their tenant is disabled.
@@ -322,4 +326,13 @@ function core_login_get_return_url() {
         }
     }
     return $urltogo;
+}
+
+/**
+ * @param string $email
+ * @return bool
+ */
+function core_login_email_exists_multiple_times(string $email): bool {
+    global $DB;
+    return $DB->count_records_select('user', "LOWER(email) = LOWER(:email)", ['email' => $email]) > 1;
 }

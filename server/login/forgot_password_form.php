@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
+require_once(__DIR__ . '/lib.php');
 
 /**
  * Reset forgotten password form definition.
@@ -79,12 +80,14 @@ class login_forgot_password_form extends moodleform {
             if (!validate_email($data['email'])) {
                 $errors['email'] = get_string('invalidemail');
 
-            } else if ($DB->count_records_select('user', "LOWER(email) = LOWER(:email)", array('email' => $data['email'])) > 1) {
-                $errors['email'] = get_string('forgottenduplicate');
+            } else if (core_login_email_exists_multiple_times($data['email'])) {
+                if (empty($CFG->protectusernames)) {
+                    $errors['email'] = get_string('forgottenduplicate');
+                }
 
             } else {
                 if ($user = get_complete_user_data('email', $data['email'])) {
-                    if (empty($user->confirmed)) {
+                    if (empty($user->confirmed) && empty($CFG->protectusernames)) {
                         $errors['email'] = get_string('confirmednot');
                     }
                 }
@@ -95,8 +98,8 @@ class login_forgot_password_form extends moodleform {
 
         } else {
             if ($user = get_complete_user_data('username', $data['username'])) {
-                if (empty($user->confirmed)) {
-                    $errors['email'] = get_string('confirmednot');
+                if (empty($user->confirmed) && empty($CFG->protectusernames)) {
+                    $errors['username'] = get_string('confirmednot');
                 }
             }
             if (!$user and empty($CFG->protectusernames)) {
