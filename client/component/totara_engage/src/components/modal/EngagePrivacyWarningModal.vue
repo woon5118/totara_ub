@@ -24,8 +24,12 @@
     <ModalContent
       :close-button="closeButton"
       :title-id="$id('title')"
+      :title-visible="false"
       @dismiss="$emit('cancel')"
     >
+      <template v-slot:title>
+        {{ title }}
+      </template>
       <div class="tui-engageWarningModal__container">
         <div class="tui-engageWarningModal__icon">
           <warning size="700" :custom-class="'tui-icon--warning'" />
