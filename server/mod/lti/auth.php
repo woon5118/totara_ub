@@ -36,8 +36,22 @@ $responsemode = optional_param('response_mode', '', PARAM_TEXT);
 $nonce = optional_param('nonce', '', PARAM_TEXT);
 $prompt = optional_param('prompt', '', PARAM_TEXT);
 
+if (empty($redirecturi) || empty($SESSION->lti_message_hint)) {
+    throw new moodle_exception('invalidrequest', 'error');
+}
+list($courseid, $typeid, $id, $titleb64, $textb64) = explode(',', $SESSION->lti_message_hint, 5);
+$config = lti_get_type_type_config($typeid);
+if (empty($config)) {
+    throw new moodle_exception('invalidrequest', 'error');
+} else {
+    $uris = array_map("trim", explode("\n", $config->lti_redirectionuris));
+    if (!in_array($redirecturi, $uris)) {
+        throw new moodle_exception('invalidrequest', 'error');
+    }
+}
+
 $ok = !empty($scope) && !empty($responsetype) && !empty($clientid) &&
-      !empty($redirecturi) && !empty($loginhint) &&
+      !empty($loginhint) &&
       !empty($nonce) && !empty($SESSION->lti_message_hint);
 
 if (!$ok) {
@@ -52,12 +66,10 @@ if ($ok && ($responsetype !== 'id_token')) {
     $error = 'unsupported_response_type';
 }
 if ($ok) {
-    list($courseid, $typeid, $id, $titleb64, $textb64) = explode(',', $SESSION->lti_message_hint, 5);
     $ok = ($id !== $ltimessagehint);
     if (!$ok) {
         $error = 'invalid_request';
     } else {
-        $config = lti_get_type_type_config($typeid);
         $ok = ($clientid === $config->lti_clientid);
         if (!$ok) {
             $error = 'unauthorized_client';
@@ -68,14 +80,7 @@ if ($ok && ($loginhint !== $USER->id)) {
     $ok = false;
     $error = 'access_denied';
 }
-if ($ok) {
-    $uris = array_map("trim", explode("\n", $config->lti_redirectionuris));
-    $ok = in_array($redirecturi, $uris);
-    if (!$ok) {
-        $error = 'invalid_request';
-        $desc = 'Unregistered redirect_uri ' . $redirecturi;
-    }
-}
+
 if ($ok) {
     if (isset($responsemode)) {
         $ok = ($responsemode === 'form_post');
@@ -93,6 +98,12 @@ if ($ok && !empty($prompt) && ($prompt !== 'none')) {
     $ok = false;
     $error = 'invalid_request';
     $desc = 'Invalid prompt';
+}
+
+if ($ok && empty($courseid)) {
+    $ok = false;
+    $error = 'invalid_request';
+    $desc = 'Invalid course';
 }
 
 if ($ok) {
@@ -120,7 +131,8 @@ if ($ok) {
         $title = base64_decode($titleb64);
         $text = base64_decode($textb64);
         $request = lti_build_content_item_selection_request($typeid, $course, $returnurl, $title, $text,
-                                                            [], [], false, false, false, false, false, $nonce);
+            [], [], false, false, false, false, false, $nonce
+        );
         $endpoint = $request->url;
         $params = $request->params;
     }
@@ -138,8 +150,8 @@ $r = '<form action="' . $redirecturi . "\" name=\"ltiAuthForm\" id=\"ltiAuthForm
      "method=\"post\" enctype=\"application/x-www-form-urlencoded\">\n";
 if (!empty($params)) {
     foreach ($params as $key => $value) {
-        $key = htmlspecialchars($key);
-        $value = htmlspecialchars($value);
+        $key = s($key);
+        $value = s($value);
         $r .= "  <input type=\"hidden\" name=\"{$key}\" value=\"{$value}\"/>\n";
     }
 }
