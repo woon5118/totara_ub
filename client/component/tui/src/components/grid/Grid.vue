@@ -1,7 +1,7 @@
 <!--
   This file is part of Totara Enterprise Extensions.
 
-  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+  Copyright (C) 2021 onwards Totara Learning Solutions LTD
 
   Totara Enterprise Extensions is provided only to Totara
   Learning Solutions LTD's customers and partners, pursuant to
@@ -232,16 +232,18 @@ export default {
 
       // we have an intentional zero unit GridItem which needs special
       // consideration, such as having its gutter removed, and not being marked
-      // as a visually "frist" GridItem
-      if (addUnits === 0) {
+      // as a visually "first" GridItem
+      let zeroUnit = false;
+      if (vnode.componentOptions.propsData.units === 0) {
         vnode.data.class.push('tui-grid-item--no-units');
+        zeroUnit = true;
       }
 
       // save a reference to the first vnode, this is so we can apply className
       // that should be the first node regardless of source flex `order` which
       // may differ. beware, because zero units are supported, the first index
       // may not be "first" anymore
-      if (!firstGridItem && addUnits !== 0) {
+      if (!firstGridItem && !zeroUnit) {
         firstGridItem = vnode;
       }
 

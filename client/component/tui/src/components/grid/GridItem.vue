@@ -1,7 +1,7 @@
 <!--
   This file is part of Totara Enterprise Extensions.
 
-  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+  Copyright (C) 2021 onwards Totara Learning Solutions LTD
 
   Totara Enterprise Extensions is provided only to Totara
   Learning Solutions LTD's customers and partners, pursuant to
