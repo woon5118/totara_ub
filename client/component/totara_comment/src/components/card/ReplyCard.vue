@@ -57,9 +57,7 @@
   &__content {
     margin-bottom: var(--gap-2);
     padding-right: var(--gap-2);
-    -ms-word-break: break-all;
-    overflow-wrap: break-word;
-    hyphens: none;
+    @include tui-wordbreak--hyphens;
   }
 }
 </style>

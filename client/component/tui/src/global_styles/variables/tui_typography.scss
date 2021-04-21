@@ -172,3 +172,30 @@
   margin: 0;
   @include tui-font-heading-medium;
 }
+
+//
+// Text wrapping
+//
+
+// break when the word starts on a new line and breaks where it would have
+// overflown, auto inserting hyphens. useful for user-generated content whose
+// containers are generally flexible. machine-insertion of hyphens may not be
+// an end user preference, but it can be more readable than without.
+@mixin tui-wordbreak--hyphens {
+  overflow-wrap: break-word;
+  hyphens: auto;
+  .ie & {
+    -ms-hyphens: auto;
+  }
+}
+
+// break all words at the end of lines, don't hyphenate. useful for predictable
+// parts of the UI whose containers are less flexible.
+@mixin tui-wordbreak--hard {
+  word-break: break-word;
+  hyphens: none;
+  .ie & {
+    -ms-word-break: break-all;
+    -ms-hyphens: none;
+  }
+}

@@ -147,9 +147,7 @@ export default {
     flex-grow: 1;
     height: 100%;
     overflow: hidden;
-    -ms-word-break: break-all;
-    overflow-wrap: break-word;
-    hyphens: none;
+    @include tui-wordbreak--hyphens;
   }
 
   &__footer {

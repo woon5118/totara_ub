@@ -199,9 +199,8 @@ export default {
     width: 93%;
     margin: 0;
     margin-top: calc(var(--gap-2) / -1);
-    -ms-word-break: break-all;
-    overflow-wrap: break-word;
-    hyphens: none;
+
+    @include tui-wordbreak--hyphens;
   }
 }
 </style>

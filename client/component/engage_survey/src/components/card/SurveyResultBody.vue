@@ -132,9 +132,7 @@ export default {
     @include tui-font-heading-x-small();
     margin-bottom: var(--gap-6);
     color: var(--color-text);
-    -ms-word-break: break-all;
-    overflow-wrap: break-word;
-    hyphens: none;
+    @include tui-wordbreak--hyphens;
   }
 
   &__progress {

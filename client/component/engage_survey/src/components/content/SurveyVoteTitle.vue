@@ -89,9 +89,7 @@ export default {
     @include tui-font-heading-medium();
     width: 90%;
     margin: 0;
-    -ms-word-break: break-all;
-    overflow-wrap: break-word;
-    hyphens: none;
+    @include tui-wordbreak--hyphens;
 
     @media (max-width: $tui-screen-sm) {
       width: 100%;

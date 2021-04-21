@@ -165,9 +165,7 @@ export default {
     flex-grow: 1;
     width: 100%;
     .tui-rendered > p {
-      -ms-word-break: break-all;
-      overflow-wrap: break-word;
-      hyphens: none;
+      @include tui-wordbreak--hard;
     }
   }
 }

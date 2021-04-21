@@ -68,9 +68,7 @@ export default {
   &__formBox {
     flex: 1 1 auto;
     width: 100%;
-    -ms-word-break: break-all;
-    overflow-wrap: break-word;
-    hyphens: none;
+    @include tui-wordbreak--hyphens;
   }
 }
 </style>

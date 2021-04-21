@@ -218,9 +218,7 @@ export default {
   }
 
   &__text {
-    -ms-word-break: break-all;
-    word-break: break-word;
-    hyphens: none;
+    @include tui-wordbreak--hard;
   }
 
   &--alert {

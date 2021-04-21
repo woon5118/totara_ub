@@ -116,9 +116,7 @@ export default {
 
     .tui-radio__label {
       font-size: var(--font-size-15);
-      -ms-word-break: break-all;
-      overflow-wrap: break-word;
-      hyphens: none;
+      @include tui-wordbreak--hyphens;
     }
   }
 }

@@ -263,10 +263,8 @@ export default {
     &-text {
       width: 100%;
       margin: 0;
-      -ms-word-break: break-all;
-      word-break: break-word;
-      hyphens: none;
 
+      @include tui-wordbreak--hard;
       @include tui-font-heading-page-title;
     }
 
