@@ -716,9 +716,9 @@ class auth_plugin_mnet extends auth_plugin_base {
 
         foreach($superArray as $subArray) {
             $subArray = array_values($subArray);
-            $instring = "('".implode("', '",$subArray)."')";
-            $query = "select id, session_id, username from {mnet_session} where username in $instring";
-            $results = $DB->get_records_sql($query);
+            list($in_sql, $in_params) = $DB->get_in_or_equal($subArray);
+            $query = "select id, session_id, username from {mnet_session} where username $in_sql";
+            $results = $DB->get_records_sql($query, $in_params);
 
             if ($results == false) {
                 // We seem to have a username that breaks our query:
