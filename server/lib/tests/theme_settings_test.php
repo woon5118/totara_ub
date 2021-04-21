@@ -1189,11 +1189,15 @@ class core_theme_settings_testcase extends advanced_testcase {
 
         // Now update the tenant files without passing a file
         $tenant_settings->update_files([], true);
-        // The tenant should now have a copy of the site file
+
+        // The tenant should now have a reference copy of the site file
+        $tenant_reference_item_id = $tenant_logo->get_item_id($tenant1->id, null, true);
         $site_file_record = $this->get_logo_file_record($site_item_id);
         $tenant_file_record = $this->get_logo_file_record($tenant_item_id);
+        $tenant_file_reference_record = $this->get_logo_file_record($tenant_reference_item_id);
         $this->assertNotNull($site_file_record);
-        $this->assertNotNull($tenant_file_record);
+        $this->assertNull($tenant_file_record);
+        $this->assertNotNull($tenant_file_reference_record);
         $this->assertNotEqualsCanonicalizing($site_file_record, $tenant_file_record);
     }
 

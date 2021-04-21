@@ -73,7 +73,25 @@ class theme_file_formatter extends formatter {
      * @return mixed
      */
     protected function get_field(string $field) {
-        $get_function = 'get_' . $field;
-        return $this->object->{$get_function}();
+        switch ($field) {
+            case 'default_url':
+                return $this->get_default_url();
+            default:
+                $get_function = 'get_' . $field;
+                return $this->object->{$get_function}();
+        }
     }
+
+    /**
+     * Get the default URL taking the reference copy into consideration.
+     * @return string
+     */
+    protected function get_default_url(): string {
+        $url = $this->object->get_reference_url();
+        if (empty($url)) {
+            $url = $this->object->get_default_url();
+        }
+        return $url;
+    }
+
 }

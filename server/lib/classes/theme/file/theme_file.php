@@ -136,15 +136,23 @@ abstract class theme_file {
      *
      * @param int|null $tenant_id
      * @param string|null $theme
+     * @param bool|null $use_reference Use reference version of the file originally saved when copied from site branding.
      *
      * @return int
      */
-    public function get_item_id(?int $tenant_id = null, ?string $theme = null): int {
+    public function get_item_id(?int $tenant_id = null, ?string $theme = null, ?bool $use_reference = false): int {
         global $DB;
 
         $id = $tenant_id ?? $this->get_tenant_id();
+
+        // If we should use the reference version but this is for site then we just return nothing so that
+        // no image could be found as a reference copy.
+        if ($use_reference && $id === 0) {
+            return 0;
+        }
+
         $plugin = "theme_" . ($theme ?? $this->get_theme_config()->name);
-        $name = "tenant_{$id}_settings";
+        $name = "tenant_{$id}_settings" . ($use_reference ? '_reference' : '');
 
         // Always make sure that there is a record representing this config.
         if (!get_config($plugin, $name)) {
@@ -236,7 +244,15 @@ abstract class theme_file {
             return null;
         }
 
-        $file = $this->get_current_file($this->get_item_id($this->get_tenant_id(), $theme));
+        $tenant_id = $this->get_tenant_id();
+        $file = $this->get_current_file($this->get_item_id($tenant_id, $theme));
+
+        // If file is empty and this if for a tenant we need to see if there was a reference copy saved
+        // when we enabled tenant customisation.
+        if (empty($file) && $tenant_id > 0) {
+            $file = $this->get_current_file($this->get_item_id($tenant_id, $theme, true));
+        }
+
         return !empty($file) ? $this->get_url($file) : null;
     }
 
@@ -286,6 +302,14 @@ abstract class theme_file {
             );
         }
         return null;
+    }
+
+    /**
+     * @return moodle_url|null
+     */
+    public function get_reference_url(): ?moodle_url {
+        $file = $this->get_current_file($this->get_item_id($this->get_tenant_id(), null, true));
+        return !empty($file) ? $this->get_url($file) : null;
     }
 
     /**
@@ -366,15 +390,18 @@ abstract class theme_file {
      * Save files that are currently in draft area.
      *
      * @param int $draft_id
+     * @param bool|null $save_as_reference Save the file as a reference copy.
+     *
+     * @return void
      */
-    public function save_files(int $draft_id): void {
+    public function save_files(int $draft_id, ?bool $save_as_reference = false): void {
         // Get the settings currently used for this theme file.
         $setting = new \admin_setting_configstoredfile(
             $this->get_name(),
             '',
             '',
             $this->get_area(),
-            $this->get_item_id($this->tenant_id),
+            $this->get_item_id($this->tenant_id, null, $save_as_reference),
             [
                 'accepted_types' => $this->get_type()->get_group(),
                 'context' => $this->get_context(false)
@@ -427,8 +454,10 @@ abstract class theme_file {
             $site_file
         );
 
-        // Reset instance_files
-        $this->save_files($draft_id);
+        // In order to be able to reset a specific file back to the original we need to save a reference
+        // copy for that file so that we don't reset a file to theme default if there was a site one
+        // available at that time.
+        $this->save_files($draft_id, true);
     }
 
 
