@@ -6,6 +6,7 @@ exports[`engage_survey/components/card/SurveyCard.vue Checks snapshot 1`] = `
 >
   <corecard-stub
     class="tui-engageSurveyCard__cardContent tui-engageSurveyCard__cardContent--height"
+    clickable="true"
   >
     <div
       class="tui-engageSurveyCard__inner"

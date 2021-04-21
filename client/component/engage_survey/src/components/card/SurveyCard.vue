@@ -19,12 +19,13 @@
 <template>
   <div class="tui-engageSurveyCard">
     <CoreCard
-      :clickable="!editAble && voted"
+      :clickable="true"
       class="tui-engageSurveyCard__cardContent"
       :class="{
         'tui-engageSurveyCard__cardContent--calcHeight': showFootnotes,
         'tui-engageSurveyCard__cardContent--height': !showFootnotes,
       }"
+      @click="surveyEvent"
     >
       <div class="tui-engageSurveyCard__inner">
         <div class="tui-engageSurveyCard__header">
@@ -189,6 +190,14 @@ export default {
         },
       });
     },
+
+    surveyEvent() {
+      if (!this.voted) {
+        window.location.href = this.$url(this.url, { page: 'vote' });
+      } else if (this.owned && this.editAble) {
+        window.location.href = this.$url(this.url, { page: 'edit' });
+      }
+    },
   },
 };
 </script>
@@ -205,11 +214,6 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-
-  .tui-card {
-    // A hack to set the cursor back to normal cursor instead of pointer.
-    cursor: default;
-  }
 
   &__cardContent {
     width: 100%;
