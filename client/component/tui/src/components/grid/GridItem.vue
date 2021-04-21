@@ -54,7 +54,7 @@ export default {
       type: [String, Number],
       default: 1,
       validator: function(value) {
-        return value > 0;
+        return value >= 0;
       },
     },
     /**
@@ -125,6 +125,11 @@ export default {
     // props-based setting of a grid size, by using a single inline style for
     // flex-basis (and only this property!)
     getSize() {
+      // firstly, if this GridItem has zero units, it should use zero for size
+      if (this.units === 0) {
+        return 0;
+      }
+
       // sub-pixel rendering with IE11 works differently to other browsers,
       // when we don't allow flex-grow and we are also allowing flex-wrap it
       // is possible that GridItem widths will be mis-calculated

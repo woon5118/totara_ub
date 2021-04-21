@@ -206,7 +206,7 @@ export default {
       currentUnwrappedUnits = 0,
       itemHasWrapped = false;
 
-    gridItems = gridItems.map((vnode, index) => {
+    gridItems = gridItems.map(vnode => {
       // clone and modify props data sent in, as the original vnode should be
       // considered immutable
       vnode = cloneVNode(vnode);
@@ -222,10 +222,26 @@ export default {
         numberOfSuppliedGridItems: gridItems.length,
       };
 
+      // how many units does this GridItem add
+      let addUnits = 0;
+      if (typeof vnode.componentOptions.propsData.units !== 'undefined') {
+        addUnits += vnode.componentOptions.propsData.units;
+      } else {
+        addUnits += 1; // default, if not specified
+      }
+
+      // we have an intentional zero unit GridItem which needs special
+      // consideration, such as having its gutter removed, and not being marked
+      // as a visually "frist" GridItem
+      if (addUnits === 0) {
+        vnode.data.class.push('tui-grid-item--no-units');
+      }
+
       // save a reference to the first vnode, this is so we can apply className
       // that should be the first node regardless of source flex `order` which
-      // may differ. default to index-based first vnode
-      if (!firstGridItem && index === 0) {
+      // may differ. beware, because zero units are supported, the first index
+      // may not be "first" anymore
+      if (!firstGridItem && addUnits !== 0) {
         firstGridItem = vnode;
       }
 
@@ -235,14 +251,7 @@ export default {
       }
 
       // handle wrapping of too-large grid items
-      if (totalSuppliedUnits > this.maxUnits) {
-        let addUnits = 0;
-        if (typeof vnode.componentOptions.propsData.units !== 'undefined') {
-          addUnits += vnode.componentOptions.propsData.units;
-        } else {
-          addUnits += 1; // default, if not specified
-        }
-
+      if (this.direction !== 'vertical' && totalSuppliedUnits > this.maxUnits) {
         // we're going to wrap, at least once, on this item
         if (currentUnwrappedUnits + addUnits > this.maxUnits) {
           vnode.data.class.push('tui-grid-item--first');
@@ -252,6 +261,7 @@ export default {
           currentUnwrappedUnits += addUnits; // continue the count
         }
 
+        // add to all GridItems that wrap, when we first wrap
         if (itemHasWrapped) {
           vnode.data.class.push('tui-grid-item--wrapped');
         }
@@ -261,12 +271,16 @@ export default {
     });
 
     // give the first (visual, not DOM order) grid item a first modifier
-    firstGridItem.data.class.push('tui-grid-item--first');
+    try {
+      firstGridItem.data.class.push('tui-grid-item--first');
+    } catch (e) {
+      console.error('No first GridItem has been identified!', e);
+    }
 
     // apply default classNames to Grid node, plus any conditionally required
     // ones
     let additionalClasses = [];
-    if (totalSuppliedUnits > this.maxUnits) {
+    if (this.direction !== 'vertical' && totalSuppliedUnits > this.maxUnits) {
       if (this.useVerticalGap) {
         additionalClasses.push('tui-grid--wrapped', 'tui-grid--wrapped-gap');
       } else {
@@ -332,6 +346,8 @@ export default {
     flex-grow: 0; // by default we want item size to respect unit-based calculations
     flex-shrink: 1; // by default we want to auto-adjust for gutters
     min-width: 0; // allows flex items to shrink below their minimum content size
+    margin: 0;
+    padding: 0;
     hyphens: auto; // default prevents text from causing grid mis-alignments
 
     // Grid item modifiers based on supplied prop values
@@ -346,10 +362,6 @@ export default {
     }
     &--overflow {
       overflow: auto;
-    }
-    &--list {
-      margin: 0;
-      padding: 0;
     }
   }
 
@@ -383,6 +395,15 @@ export default {
     // only applies when grid items wrap, and if the gap is confgured as
     // desirable for a given grid
     margin-top: var(--grid-gutter);
+  }
+
+  // all zero unit GridItems should not show any gutters or content
+  &--vertical,
+  &--horizontal {
+    .tui-grid-item--no-units {
+      overflow: hidden;
+      border-width: 0;
+    }
   }
 
   // switch to stacked display at an container-based pixel width breakpoint
