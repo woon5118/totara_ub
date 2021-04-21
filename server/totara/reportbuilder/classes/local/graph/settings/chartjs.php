@@ -78,7 +78,8 @@ final class chartjs extends base {
                 'grid' => [
                     'display' => 'gridLines.display',
                     'color' => 'gridLines.color'
-                ]
+                ],
+                'max' => 'ticks.max'
             ],
             'y' => [
                 'display' => 'gridLines.drawBorder',
@@ -94,7 +95,8 @@ final class chartjs extends base {
                 'grid' => [
                     'display' => 'gridLines.display',
                     'color' => 'gridLines.color'
-                ]
+                ],
+                'max' => 'ticks.max'
             ]
         ]
     ];

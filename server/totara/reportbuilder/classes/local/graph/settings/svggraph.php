@@ -79,7 +79,8 @@ final class svggraph extends base {
                 'grid' => [
                     'display' => 'show_grid_v',
                     'color' => 'grid_colour_v'
-                ]
+                ],
+                'max' => 'axis_max_h'
             ],
             'y' => [
                 'display' => 'show_axis_h',
@@ -95,7 +96,8 @@ final class svggraph extends base {
                 'grid' => [
                     'display' => 'show_grid_h',
                     'color' => 'grid_colour_h'
-                ]
+                ],
+                'max' => 'axis_max_v'
             ]
         ]
     ];
