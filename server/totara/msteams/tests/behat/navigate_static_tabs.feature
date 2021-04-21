@@ -101,45 +101,45 @@ Feature: Navigate a learning item in a static tab
   Scenario: msteams201: Navigate the find learning tab
     Given I am on Microsoft Teams "catalog" page
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "Culinary arts 101" "text"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "Programming 201" "text"
     Then "Continue" "button" should be visible
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "Machine learning 101" "text"
     And I click on "Continue" "button"
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "Mastering arts" "text"
     Then "Find learning" "link" should exist in the ".totara_msteams__navigation" "css_element"
     When I follow "Culinary arts 101"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "Junior chef" "text"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "10 apps to boost your productivity" "text"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "Cool playlist" "text"
     And I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
   Scenario: msteams202: Sign up a seminar from the find learning tab
     Given I am on Microsoft Teams "catalog" page
@@ -161,23 +161,23 @@ Feature: Navigate a learning item in a static tab
 
     When I click on "Find learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Find learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
   Scenario: msteams203: Navigate the current learning tab
     Given I am on Microsoft Teams "mylearning" page
     Then I should see "Current learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "Mastering arts" "link"
     And I click on "Current learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Current learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I toggle "Mastering arts" in the current learning block
     And I click on "Culinary arts 101" "link"
     And I click on "Current learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Current learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
   Scenario: msteams204: Sign up a seminar from the current learning tab
     Given I am on Microsoft Teams "mylearning" page
@@ -200,17 +200,17 @@ Feature: Navigate a learning item in a static tab
 
     When I click on "Current learning" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Current learning" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
   Scenario: msteams205: Navigate the library tab
     Given I am on Microsoft Teams "library" page
     Then I should see "Your resources" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
     When I click on "10 apps to boost your productivity" "link"
     And I click on "Your resources" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Your resources" in the page title
-    And ".totara_msteams__navigation" "css_element" should not exist
+    And ".totara_msteams__navigation" "css_element" should exist
 
   Scenario Outline: msteams211: Navigate activities in a static tab
     Given I am on Microsoft Teams "<tab>" page

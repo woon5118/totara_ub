@@ -31,6 +31,7 @@ $PAGE->set_context(context_system::instance());
 
 $sesskey = optional_param('sesskey', '__notpresent__', PARAM_RAW); // we want not null default to prevent required sesskey warning
 $login   = optional_param('loginpage', 0, PARAM_BOOL);
+$redirect_url = optional_param('redirecturl', null, PARAM_URL);
 
 // can be overridden by auth plugins
 if ($login) {
@@ -38,13 +39,15 @@ if ($login) {
 } else {
     $redirect = $CFG->wwwroot.'/';
 }
+if (!is_null($redirect_url)) {
+    $redirect = $redirect_url;
+}
 
 if (!isloggedin()) {
     // no confirmation, user has already logged out
     require_logout();
     redirect($redirect);
-
-} else if (!confirm_sesskey($sesskey)) {
+} else if (!confirm_sesskey($sesskey) && is_null($redirect_url)) {
     $PAGE->set_title($SITE->fullname);
     $PAGE->set_heading($SITE->fullname);
     echo $OUTPUT->header();

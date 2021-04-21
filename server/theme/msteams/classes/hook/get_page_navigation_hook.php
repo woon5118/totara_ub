@@ -61,6 +61,13 @@ class get_page_navigation_hook extends base {
     public $alert = false;
 
     /**
+     * Check adding sign out link or not
+     *
+     * @var bool
+     */
+    public $has_sign_out;
+
+    /**
      * @param context $context
      * @param moodle_url $pageurl
      * @param array $tabdata array of [name, url, redirectUrl]
@@ -72,6 +79,7 @@ class get_page_navigation_hook extends base {
         $this->tabname = $tabdata['name'] ?? null;
         $this->taburl = isset($tabdata['redirectUrl']) ? new moodle_url($tabdata['redirectUrl']) : null;
         $this->customtab = $tabdata['customTab'] ?? false;
+        $this->has_sign_out = false;
     }
 
     /**

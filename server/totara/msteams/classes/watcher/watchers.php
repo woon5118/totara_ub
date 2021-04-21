@@ -78,6 +78,15 @@ final class watchers {
     ];
 
     /**
+     * @var array
+     */
+    private const SIGN_OUT_BLACKLIST = [
+        '/login/index.php',
+        '/totara/msteams/tabs/config.php',
+        '/totara/msteams/tabs/help.php'
+    ];
+
+    /**
      * Fill in the page navigation content.
      *
      * @param get_page_navigation_hook $hook
@@ -197,6 +206,15 @@ final class watchers {
             // The default is rewind.
             $desired_action = self::look_up_local_url($localurl, self::REWIND, self::LANDING_PAGE_URL_LIST);
         }
+
+        if (!in_array($localurl,self::SIGN_OUT_BLACKLIST) && !$hook->is_custom_tab()) {
+            $hook->has_sign_out = true;
+        }
+
+        if (!empty(get_config('totara_msteams', 'oauth2_issuer'))) {
+            $hook->has_sign_out = false;
+        }
+
         self::create_navigation($hook, $desired_action);
     }
 }

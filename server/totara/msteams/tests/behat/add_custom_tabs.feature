@@ -60,6 +60,8 @@ Feature: Add a tab to Teams Channel
     And I should see "10 apps to boost your productivity"
     But I should not see "Working from home or office?"
     And I should not see "We couldn't find any matches"
+    And I should not see "Logged in as User One."
+    And I should not see "Sign out"
 
     When I set the field "Search the catalog and select an item to be added in a new tab" to "korenga"
     Then I should see "We couldn't find any matches"
@@ -108,6 +110,8 @@ Feature: Add a tab to Teams Channel
     But I should not see "Junior chef"
     But I should not see "Cool playlist"
     But I should not see "10 apps to boost your productivity"
+    And I should not see "Logged in as User One."
+    And I should not see "Sign out"
 
     When I click on "Contemporary arts 102" "list_item"
     Then the field "Tab name" matches value "Contemporary arts 102"

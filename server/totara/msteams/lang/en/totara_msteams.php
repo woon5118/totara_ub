@@ -50,6 +50,7 @@ $string['botfw:msg_signin'] = 'Sign in to get started.';
 $string['botfw:msg_signin_already'] = 'Hi {$a}, you\'re already signed in.';
 $string['botfw:msg_signin_button'] = 'Sign in';
 $string['botfw:msg_signin_done'] = 'Great, {$a}. You\'re all set up to receive notifications.';
+$string['botfw:msg_signout_button'] = 'Sign out';
 $string['botfw:msg_signout_already'] = 'Hi, you\'re already signed out.';
 $string['botfw:msg_signout_button'] = 'Sign out';
 $string['botfw:msg_signout_done'] = 'Thanks {$a}, you are now signed out. Please sign in again to receive notifications.';

@@ -31,6 +31,11 @@
     * links.text: label
     * links.href: url
     * links.attributes: attributes
+    * links.marginauto: classname
+    * logout:
+    * logout.logouthref: url
+    * logout.logouttitle: label
+    * logout.logouttext: label
 
     Example content (json):
     {
@@ -52,6 +57,15 @@
                         "value": "_blank"
                     }
                 ]
+                "marginauto": true
+            }
+        ]
+
+        "logout" : [
+            {
+                "logouthref": "'https://localhost/login/logout.php?sesskey=sesskey&redirecturl=https://localhost/server/totara/msteams/tabs/catalog.php",
+                "logouttitle": "Login as user"
+                "logouttext": "Sign out"
             }
         ]
     }
@@ -59,9 +73,15 @@
 
 <div class="totara_msteams__navigation">
     {{#links}}
-        <a class="totara_msteams__navigation__link" href="{{href}}"{{#attributes}} {{name}}="{{value}}"{{/attributes}}>
+        <a class="totara_msteams__navigation__link  {{#marginauto}}totara_msteams__navigation__margin{{/marginauto}}" href="{{href}}" {{#attributes}}{{name}}="{{value}}"{{/attributes}}>
             {{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}
             <span class="totara_msteams__navigation__link__label">{{text}}</span>
         </a>
     {{/links}}
+    {{#logout}}
+        <div {{#links}}class="totara_msteams__navigation__logoutlink" {{/links}} {{^links}}class="totara_msteams__navigation__logout"{{/links}}  >
+            <span class="totara_msteams__navigation__logout__title">{{logouttitle}}</span>
+            <a class="totara_msteams__navigation__logout__link" href="{{logouthref}}">{{logouttext}}</a>
+        </div>
+    {{/logout}}
 </div>

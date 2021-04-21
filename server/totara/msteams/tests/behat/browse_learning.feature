@@ -18,6 +18,8 @@ Feature: Browse the current learning tab
     Given I log in as "user1"
     When I am on Microsoft Teams "mylearning" page
     Then I should see "Course 1" in the ".block_current_learning-row-item" "css_element"
+    And I should see "Logged in as User."
+    And I should see "Sign out"
     And I log out Microsoft Teams
     Given I log in as "user1"
     And I am on "Dashboard" page
@@ -28,7 +30,9 @@ Feature: Browse the current learning tab
     And I press "Save changes"
     When I am on Microsoft Teams "mylearning" page
     Then I should see "Course 1" in the ".block_current_learning-tile" "css_element"
-    And I log out Microsoft Teams
+    And I should see "Logged in as User."
+    And I should see "Sign out"
+    And I click on "Sign out" "link"
     Given I log in as "user2"
     When I am on Microsoft Teams "mylearning" page
     Then I should see "Course 1" in the ".block_current_learning-row-item" "css_element"
@@ -46,6 +50,8 @@ Feature: Browse the current learning tab
     Given I log in as "user1"
     When I am on Microsoft Teams "mylearning" page
     Then I should see "Course 1" in the ".block_current_learning-tile" "css_element"
+    And I should see "Logged in as User."
+    And I should see "Sign out"
 
   @tenant @totara_tenant
   Scenario: msteams503: Admin can customise the current learning page for each tenant
