@@ -1900,28 +1900,7 @@ class theme_config {
         if (!empty($theme_file)) {
             $theme_file->set_tenant_id(!empty($USER->tenantid) ? $USER->tenantid : 0);
             if ($theme_file->is_available()) {
-                $themes = $this->parents;
-                array_unshift($themes, $this->name);
-
-                // For every theme in the stack we need to check if there is an overridden file
-                // or if the current theme has a default set before we can check the next theme.
-                foreach ($themes as $theme) {
-                    $url = $theme_file->get_current_url($theme);
-                    if (!empty($url)) {
-                        return $url;
-                    }
-
-                    // For current theme, if no overridden file found then check if we have a default.
-                    $dir = $this->get_theme_directory($theme);
-                    $svg = $this->use_svg_icons();
-                    $image = $this->resolve_image_location($image_name, $component, $svg, true, $dir);
-                    if (!empty($image)) {
-                        // Default image found for current theme and this image takes precedence over any overridden
-                        // or default image of the parent theme. We can in this case just return null as the right
-                        // image should get loaded by the image mediation.
-                        return null;
-                    }
-                }
+                return $theme_file->get_current_url();
             }
         }
 
