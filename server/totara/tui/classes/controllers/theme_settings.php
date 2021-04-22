@@ -32,13 +32,12 @@ namespace totara_tui\controllers;
 
 use context;
 use moodle_url;
-use totara_mvc\controller;
+use totara_mvc\admin_controller;
 use totara_mvc\tui_view;
 use totara_tenant\entity\tenant;
 use core\theme\settings as core_theme_settings;
 
-
-class theme_settings extends controller {
+class theme_settings extends admin_controller {
 
     /**
      * @var string
@@ -72,6 +71,9 @@ class theme_settings extends controller {
         // Get the theme name from parameter.
         $this->theme = $this->get_required_param('theme_name', PARAM_COMPONENT);
         $this->tenant_id = $this->get_optional_param('tenant_id', null, PARAM_INT);
+
+        // Set external admin page name.
+        $this->admin_external_page_name = "{$this->theme}_editor";
 
         require_login(null, false);
         $url = new moodle_url('/totara/tui/theme_settings.php', ['theme_name' => $this->theme]);
