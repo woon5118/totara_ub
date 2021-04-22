@@ -88,7 +88,7 @@ final class settings {
 
         // Return from cache.
         $cache = cache::make('core', 'theme_setting_categories');
-        $key = "tenant_{$this->tenant_id}_categories_{$tenant_enabled}_{$include_default_file_categories}";
+        $key = "{$this->theme_config->name}_tenant_{$this->tenant_id}_categories_{$tenant_enabled}_{$include_default_file_categories}";
         if ($categories = $cache->get($key)) {
             return $categories;
         }
