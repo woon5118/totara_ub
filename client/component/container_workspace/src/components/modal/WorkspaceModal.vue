@@ -32,6 +32,7 @@
     >
       <WorkspaceForm
         class="tui-workspaceModal__form"
+        :context-id="categoryInteractor ? categoryInteractor.context_id : null"
         :submitting="submitting"
         :can-set-public="canPublic"
         :can-set-private="canPrivate"
