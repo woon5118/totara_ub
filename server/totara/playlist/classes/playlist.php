@@ -30,6 +30,7 @@ use totara_engage\access\accessible;
 use totara_engage\link\builder;
 use totara_engage\rating\rating_manager;
 use totara_engage\resource\resource_factory;
+use totara_engage\resource\resource_item;
 use totara_engage\share\manager as share_manager;
 use totara_engage\share\share as share_model;
 use totara_engage\share\shareable;
@@ -46,7 +47,6 @@ use totara_playlist\local\helper;
 use totara_playlist\local\image_processor;
 use totara_playlist\local\image_processor\contract as image_processor_contract;
 use totara_playlist\repository\playlist_resource_repository;
-use totara_engage\resource\resource_item;
 use totara_topic\provider\topic_provider;
 use totara_topic\topic_helper;
 
@@ -54,6 +54,13 @@ use totara_topic\topic_helper;
  * Model for playlist.
  */
 final class playlist implements accessible, shareable {
+
+    /**
+     * The area for the summary (aka description)
+     * @var string
+     */
+    public const SUMMARY_AREA = 'summary';
+
     /**
      * Playlist image file area
      * @var string

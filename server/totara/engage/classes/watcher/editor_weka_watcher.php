@@ -22,9 +22,13 @@
  */
 namespace totara_engage\watcher;
 
+use coding_exception;
+use context;
+use context_user;
+use core_user;
 use editor_weka\hook\search_users_by_pattern;
 use totara_comment\comment;
-use context;
+use totara_comment\comment_helper;
 use totara_core\advanced_feature;
 use totara_engage\engage_core;
 use totara_engage\loader\user_loader;
@@ -38,6 +42,8 @@ class editor_weka_watcher {
      * @return void
      */
     public static function on_search_users(search_users_by_pattern $hook): void {
+        global $CFG;
+
         if ($hook->is_db_run()) {
             return;
         }
@@ -51,6 +57,7 @@ class editor_weka_watcher {
             return;
         }
 
+        // This is only for new comments, we cannot have any id yet
         $comment_id = $hook->get_instance_id();
         if (!empty($comment_id)) {
             return;
@@ -61,15 +68,31 @@ class editor_weka_watcher {
 
         $context = context::instance_by_id($context_id);
 
+        if (CONTEXT_USER != $context->contextlevel) {
+            // We will skip this search.
+            return;
+        }
+
+        try {
+            comment_helper::validate_comment_area($hook->get_area());
+        } catch (coding_exception $e) {
+            return;
+        }
+
         if (!engage_core::allow_access_with_tenant_check($context, $actor_id)) {
             // Note that we are not marking DB run, it is because it could be
             // meant for different component using comment.
             return;
         }
 
-        $query = new user_query($context_id);
-        $query->set_search_term($hook->get_pattern());
+        // We don't want to expose other tenant's users to the user so fall back to the ones he can see
+        $actor = core_user::get_user($hook->get_actor_id());
+        if (!empty($CFG->tenantsenabled) && !empty($actor->tenantid) && empty($context->tenantid)) {
+            $context = context_user::instance($hook->get_actor_id());
+        }
 
+        $query = user_query::create_with_exclude_guest_user($context->id);
+        $query->set_search_term($hook->get_pattern());
 
         $paginator_result = user_loader::get_users($query);
         $users = $paginator_result->get_items()->all();

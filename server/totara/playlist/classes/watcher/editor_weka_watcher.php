@@ -22,16 +22,22 @@
  */
 namespace totara_playlist\watcher;
 
+use coding_exception;
+use context;
+use context_user;
 use core\entity\user;
-use editor_weka\hook\search_users_by_pattern;
+use core_user;
+use dml_exception;
 use editor_weka\hook\find_context;
+use editor_weka\hook\search_users_by_pattern;
+use totara_comment\comment;
 use totara_comment\comment_helper;
+use totara_core\advanced_feature;
+use totara_engage\access\access_manager;
 use totara_engage\engage_core;
 use totara_engage\loader\user_loader;
 use totara_engage\query\user_query;
 use totara_playlist\playlist;
-use totara_comment\comment;
-use context;
 
 /**
  * Watcher for editor weka
@@ -42,6 +48,10 @@ class editor_weka_watcher {
      * @return void
      */
     public static function on_search_users(search_users_by_pattern $hook): void {
+        if (advanced_feature::is_disabled('engage_resources')) {
+            return;
+        }
+
         static::on_search_users_for_playlist($hook);
         static::on_search_users_for_comment($hook);
     }
@@ -84,10 +94,18 @@ class editor_weka_watcher {
             return;
         }
 
-        $context_id = $hook->get_context_id();
-        $actor_id = $hook->get_actor_id();
+        // This one is only for the summary (description) field
+        if (playlist::SUMMARY_AREA !== $hook->get_area()) {
+            return;
+        }
 
-        $context = context::instance_by_id($context_id);
+        $actor_id = $hook->get_actor_id();
+        $context = context::instance_by_id($hook->get_context_id());
+        if (CONTEXT_USER != $context->contextlevel || $context->instanceid != $actor_id) {
+            // We only allow the user's own context
+            return;
+        }
+
         $users = self::search_for_users(
             $context,
             $actor_id,
@@ -103,6 +121,8 @@ class editor_weka_watcher {
      * @return void
      */
     private static function on_search_users_for_comment(search_users_by_pattern $hook): void {
+        global $CFG;
+
         if ($hook->is_db_run()) {
             return;
         }
@@ -126,13 +146,41 @@ class editor_weka_watcher {
             return;
         }
 
-        comment_helper::validate_comment_area($hook->get_area());
-        $comment = comment::from_id($comment_id);
+        try {
+            comment_helper::validate_comment_area($hook->get_area());
+        } catch (coding_exception $e) {
+            return;
+        }
+
+        try {
+            $comment = comment::from_id($comment_id);
+        } catch (dml_exception $e) {
+            // If the comment is not found, skip
+            return;
+        }
 
         if (playlist::get_resource_type() !== $comment->get_component()) {
             return;
         }
 
+        $playlist_id = $comment->get_instanceid();
+        $playlist = playlist::from_id($playlist_id);
+        if (!access_manager::can_access($playlist, $hook->get_actor_id())) {
+            return;
+        }
+
+        // The context should match the user's one from this playlist
+        if ($context->instanceid != $playlist->get_userid()) {
+            return;
+        }
+
+        // We don't want to expose other tenant's users to the user so fall back to the ones he can see
+        $actor = core_user::get_user($hook->get_actor_id());
+        if (!empty($CFG->tenantsenabled) && !empty($actor->tenantid) && empty($context->tenantid)) {
+            $context = context_user::instance($hook->get_actor_id());
+        }
+
+        // Now this comment is for this article - we will start find users.
         $users = static::search_for_users(
             $context,
             $hook->get_actor_id(),

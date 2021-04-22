@@ -22,24 +22,26 @@
  */
 namespace container_workspace\watcher;
 
+use coding_exception;
 use container_workspace\discussion\discussion;
+use container_workspace\loader\member\loader as member_loader;
 use container_workspace\member\member;
 use container_workspace\member\status;
+use container_workspace\query\member\query as member_query;
 use container_workspace\workspace;
+use context;
 use context_course;
+use context_user;
 use core\entity\user;
 use core_container\factory;
 use editor_weka\hook\find_context;
 use editor_weka\hook\search_users_by_pattern;
-use context;
-use container_workspace\loader\member\loader as member_loader;
-use container_workspace\query\member\query as member_query;
+use totara_comment\comment;
+use totara_comment\comment_helper;
 use totara_core\advanced_feature;
 use totara_engage\loader\user_loader;
 use totara_engage\query\user_query;
 use totara_engage\query\user_tenant_query;
-use totara_comment\comment;
-use totara_comment\comment_helper;
 
 /**
  * Watcher for editor weka.
@@ -174,7 +176,9 @@ final class editor_weka_watcher {
      * @return user[]
      */
     private static function search_users(context $context, int $actor_id, string $pattern): array {
-        global $CFG;
+        global $CFG, $USER;
+
+        $user_context = context_user::instance($USER->id);
 
         if (CONTEXT_COURSE == $context->contextlevel) {
             $workspace_id = $context->instanceid;
@@ -195,8 +199,11 @@ final class editor_weka_watcher {
                 return [];
             }
 
-            // Within hidden workspace, we are only allowing the target user to search for the user.
-            if ($workspace->is_hidden()) {
+            // Within hidden workspace, we are only searching within the workspace members.
+            // Same is true for system workspaces if the user is in a tenant
+            if (($CFG->tenantsenabled && $user_context->tenantid && empty($context->tenantid))
+                || $workspace->is_hidden()
+            ) {
                 $query = new member_query($workspace_id);
                 $query->set_search_term($pattern);
                 $query->set_member_status(status::get_active());
@@ -219,6 +226,8 @@ final class editor_weka_watcher {
                     $members
                 );
             }
+        } else if (!empty($user_context->tenantid) && $user_context->tenantid !== $context->tenantid) {
+            throw new coding_exception('User is not allowed to load users for the given context.');
         }
 
         // We are only including the system users when the course context is not within a tenant.

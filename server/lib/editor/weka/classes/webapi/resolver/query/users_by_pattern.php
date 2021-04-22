@@ -23,15 +23,17 @@
 namespace editor_weka\webapi\resolver\query;
 
 use coding_exception;
+use context;
+use context_user;
+use core\entity\user;
 use core\entity\user_repository;
+use core\record\tenant;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use context_user;
-use context;
-use core\entity\user;
 use editor_weka\hook\search_users_by_pattern;
+use totara_tenant\util;
 
 /**
  * Searching users by pattern.
@@ -44,12 +46,12 @@ final class users_by_pattern implements query_resolver, has_middleware {
      * @return user[]
      */
     public static function resolve(array $args, execution_context $ec): array {
-        global $USER;
+        global $USER, $CFG;
 
         // Fallback to the current user's in session. Note that we are not using system context here,
         // because context user can define who this user can see  and so on. Moreover, it is quite safe
         // to use context_user, user has to exist in the system in order to execute this query.
-        $context = context_user::instance($USER->id);
+        $user_context = $context = context_user::instance($USER->id);
         if (isset($args['contextid'])) {
             $context = context::instance_by_id($args['contextid']);
         }
@@ -83,6 +85,14 @@ final class users_by_pattern implements query_resolver, has_middleware {
                 // to the hook.
                 return $hook->get_users();
             }
+        }
+
+        // Make sure we don't expose users across tenant boundaries
+        if (!empty($CFG->tenantsenabled)
+            && (!empty($user_context->tenantid) || !empty($CFG->tenantsisolated))
+            && !util::do_contexts_share_same_tenant($user_context, $context)
+        ) {
+            throw new coding_exception('User is not allowed to load users for the given context.');
         }
 
         return user_repository::search($context, $pattern, 20)->all();

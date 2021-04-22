@@ -22,10 +22,10 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use totara_webapi\phpunit\webapi_phpunit_helper;
-use engage_article\totara_engage\resource\article;
-use editor_weka\webapi\resolver\query\users_by_pattern;
 use core\entity\user;
+use editor_weka\webapi\resolver\query\users_by_pattern;
+use engage_article\totara_engage\resource\article;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class engage_article_webapi_multi_tenancy_find_users_in_comment_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
@@ -285,10 +285,10 @@ class engage_article_webapi_multi_tenancy_find_users_in_comment_testcase extends
         self::assertEquals($user_one->id, $before_fetch_user->id);
 
         set_config('tenantsisolated', 1);
-        $after_result = $this->resolve_graphql_query($query_name, $parameters);
 
-        self::assertIsArray($after_result);
-        self::assertEmpty($after_result);
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('User is not allowed to load users for the given context');
+        $after_result = $this->resolve_graphql_query($query_name, $parameters);
     }
 
     /**

@@ -24,19 +24,19 @@
 namespace mod_perform;
 
 use container_perform\perform as perform_container;
+use context;
+use context_coursecat;
 use context_user;
 use core\collection;
 use core\orm\query\builder;
+use core_text;
 use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\entity\activity\activity_type;
-use context;
-use context_coursecat;
-use core_text;
 use mod_perform\entity\activity\element;
 use mod_perform\models\activity\activity;
 use totara_core\access;
 use totara_core\advanced_feature;
-use totara_tenant\local\util as tenant_util;
+use totara_tenant\util as tenant_util;
 
 class util {
 
@@ -348,10 +348,8 @@ class util {
         if (static::has_report_on_all_subjects_capability($viewing_user_id)) {
             if (!empty($CFG->tenantsenabled)) {
                 if ($viewing_user_context->tenantid) {
-                    $subject_tenant_ids = tenant_util::get_user_participation($subject_user_id);
-
                     // The current user and the subject users have to share a tenant
-                    return in_array($viewing_user_context->tenantid, $subject_tenant_ids);
+                    return tenant_util::do_contexts_share_same_tenant($viewing_user_context, $subject_user_context);
                 }
             }
             return true;

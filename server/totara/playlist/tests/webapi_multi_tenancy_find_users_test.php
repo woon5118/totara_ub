@@ -22,10 +22,10 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use totara_webapi\phpunit\webapi_phpunit_helper;
+use core\entity\user;
 use editor_weka\webapi\resolver\query\users_by_pattern;
 use totara_playlist\playlist;
-use core\entity\user;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class totara_playlist_webapi_multi_tenancy_find_users_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
@@ -94,7 +94,7 @@ class totara_playlist_webapi_multi_tenancy_find_users_testcase extends advanced_
             'pattern' => $user_two->firstname,
             'contextid' => $playlist->get_contextid(),
             'component' => playlist::get_resource_type(),
-            'area' => 'summary'
+            'area' => playlist::SUMMARY_AREA
         ];
 
         $before_result = $this->resolve_graphql_query($query_name, $parameters);
@@ -135,7 +135,7 @@ class totara_playlist_webapi_multi_tenancy_find_users_testcase extends advanced_
             'contextid' => $playlist->get_contextid(),
             'pattern' => $user_one->firstname,
             'component' => playlist::get_resource_type(),
-            'area' => 'summary'
+            'area' => playlist::SUMMARY_AREA
         ];
 
         $this->setUser($user_two);
@@ -151,10 +151,10 @@ class totara_playlist_webapi_multi_tenancy_find_users_testcase extends advanced_
         self::assertEquals($user_one->id, $before_fetch_user->id);
 
         set_config('tenantsisolated', 1);
-        $after_result = $this->resolve_graphql_query($query_name, $parameters);
 
-        self::assertIsArray($after_result);
-        self::assertEmpty($after_result);
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('User is not allowed to load users for the given context');
+        $this->resolve_graphql_query($query_name, $parameters);
     }
 
     /**
@@ -180,7 +180,7 @@ class totara_playlist_webapi_multi_tenancy_find_users_testcase extends advanced_
             'contextid' => $playlist->get_contextid(),
             'pattern' => $user_two->firstname,
             'component' => playlist::get_resource_type(),
-            'area' => 'summary'
+            'area' => playlist::SUMMARY_AREA
         ];
 
         $before_result = $this->resolve_graphql_query($query_name, $parameters);
@@ -228,7 +228,7 @@ class totara_playlist_webapi_multi_tenancy_find_users_testcase extends advanced_
             'contextid' => $playlist->get_contextid(),
             'pattern' => $user_one->firstname,
             'component' => playlist::get_resource_type(),
-            'area' => 'summary'
+            'area' => playlist::SUMMARY_AREA
         ];
 
         $this->setUser($user_two);
