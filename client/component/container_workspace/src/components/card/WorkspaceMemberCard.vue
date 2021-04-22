@@ -51,7 +51,7 @@
       @request-close="modal.confirm = false"
     >
       <WorkspaceWarningModal
-        :title="$str('delete_warning_title', 'container_workspace')"
+        :title="$str('remove_member_title_warning_msg', 'container_workspace')"
         :message-content="
           $str('remove_member_warning_msg', 'container_workspace', userFullName)
         "
@@ -169,7 +169,7 @@ export default {
     ],
     "container_workspace": [
       "error:remove_user",
-      "delete_warning_title",
+      "remove_member_title_warning_msg",
       "remove_member_warning_msg",
       "more_action_for_member",
       "owner"

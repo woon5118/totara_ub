@@ -164,6 +164,7 @@ $string['recent'] = 'Recent';
 $string['recent_joined'] = 'Recently joined';
 $string['recommended_spaces'] = 'Recommended workspaces';
 $string['remove_like_discussion'] = 'Remove like for discussion';
+$string['remove_member_title_warning_msg'] = 'Remove member?';
 $string['remove_member_warning_msg'] = 'Are you sure you want to remove {$a} from this workspace?';
 $string['removed_discussion'] = 'This discussion has been removed.';
 $string['report_discussion'] = 'Report';
