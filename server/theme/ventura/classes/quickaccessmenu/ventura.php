@@ -34,10 +34,15 @@ class ventura implements \totara_core\quickaccessmenu\provider {
      * @return item[]
      */
     public static function get_items(): array {
-        global $USER;
+        global $USER, $PAGE;
 
         // Do not show this for admin user.
         if (is_siteadmin($USER)) {
+            return [];
+        }
+
+        // Do not show this if theme is not ventura.
+        if ($PAGE->theme->name !== 'ventura') {
             return [];
         }
 

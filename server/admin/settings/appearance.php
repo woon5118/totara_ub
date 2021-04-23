@@ -5,6 +5,8 @@ use totara_core\advanced_feature;
 defined('MOODLE_INTERNAL') || die();
 /** @var admin_root $ADMIN */
 
+global $PAGE;
+
 // This file defines settingpages and externalpages under the "appearance" category
 
 // If user has access to theme settings for tenant.
@@ -12,17 +14,20 @@ if (!empty($USER->tenantid)) {
     $tenant = core\record\tenant::fetch($USER->tenantid);
     $categorycontext = context_coursecat::instance($tenant->categoryid);
     if (has_capability('totara/tui:themesettings', $categorycontext)) {
-        $ADMIN->add(
-            'appearance',
-            new admin_externalpage(
-                'ventura_editor',
-                new lang_string('pluginname','theme_ventura'),
-                "$CFG->wwwroot/totara/tui/theme_settings.php?theme_name=ventura&tenant_id=$tenant->id",
-                'totara/tui:themesettings',
-                false,
-                $categorycontext
-            )
-        );
+        // Get all themes this user can manage and include tenant settings.
+        $themedir = core_component::get_plugin_directory('theme', $PAGE->theme->name);
+        $settings_path = "$themedir/tenant_settings.php";
+        if (file_exists($settings_path)) {
+            $settings = null;
+            include($settings_path);
+            /** @var admin_externalpage $settings */
+            if (!empty($settings)) {
+                $ADMIN->add(
+                    'appearance',
+                    $settings
+                );
+            }
+        }
     }
 }
 
