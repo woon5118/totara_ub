@@ -1,0 +1,41 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD's customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   tui*/
+
+:root {
+  --font-size-1: 0.1rem;
+  --font-size-2: 0.2rem;
+  --font-size-4: 0.4rem;
+  --font-size-8: 0.8rem;
+  --font-size-10: 1rem;
+  --font-size-11: 1.1rem;
+  --font-size-12: 1.2rem;
+  --font-size-13: 1.3rem;
+  --font-size-14: 1.4rem;
+  --font-size-15: 1.5rem;
+  --font-size-16: 1.6rem;
+  --font-size-18: 1.8rem;
+  --font-size-20: 2rem;
+  --font-size-22: 2.2rem;
+  --font-size-24: 2.4rem;
+  --font-size-30: 3rem;
+  --font-size-32: 3.2rem;
+  --font-size-40: 4rem;
+  --font-size-48: 4.8rem;
+  --font-size-50: 5rem;
+}
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvY29tcG9uZW50L3R1aS9zcmMvZ2xvYmFsX3N0eWxlcy92YXJpYWJsZXMvdHVpX3NpemVzLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsImZpbGUiOiJjbGllbnQvY29tcG9uZW50L3R1aS9idWlsZC9nbG9iYWxfc3R5bGVzL3ZhcmlhYmxlcy90dWlfc2l6ZXMuZGV2ZWxvcG1lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi8qIFRoaXMgZmlsZSBpcyBwYXJ0IG9mIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMuKi9cbi8qKi9cbi8qIENvcHlyaWdodCAoQykgMjAyMCBvbndhcmRzIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMgTFREKi9cbi8qKi9cbi8qIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMgaXMgcHJvdmlkZWQgb25seSB0byBUb3RhcmEqL1xuLyogTGVhcm5pbmcgU29sdXRpb25zIExURCdzIGN1c3RvbWVycyBhbmQgcGFydG5lcnMsIHB1cnN1YW50IHRvKi9cbi8qIHRoZSB0ZXJtcyBhbmQgY29uZGl0aW9ucyBvZiBhIHNlcGFyYXRlIGFncmVlbWVudCB3aXRoIFRvdGFyYSovXG4vKiBMZWFybmluZyBTb2x1dGlvbnMgTFREIG9yIGl0cyBhZmZpbGlhdGUuKi9cbi8qKi9cbi8qIElmIHlvdSBkbyBub3QgaGF2ZSBhbiBhZ3JlZW1lbnQgd2l0aCBUb3RhcmEgTGVhcm5pbmcgU29sdXRpb25zKi9cbi8qIExURCwgeW91IG1heSBub3QgYWNjZXNzLCB1c2UsIG1vZGlmeSwgb3IgZGlzdHJpYnV0ZSB0aGlzIHNvZnR3YXJlLiovXG4vKiBQbGVhc2UgY29udGFjdCBbbGljZW5zaW5nQHRvdGFyYWxlYXJuaW5nLmNvbV0gZm9yIG1vcmUgaW5mb3JtYXRpb24uKi9cbi8qKi9cbi8qIEBhdXRob3IgICAgS2V2aW4gSG90dGluZ2VyIDxrZXZpbi5ob3R0aW5nZXJAdG90YXJhbGVhcm5pbmcuY29tPiovXG4vKiBAbW9kdWxlIHR1aWNrYWdlICAgdHVpKi9cblxuOnJvb3Qge1xuICAtLWZvbnQtc2l6ZS0xOiAwLjFyZW07XG4gIC0tZm9udC1zaXplLTI6IDAuMnJlbTtcbiAgLS1mb250LXNpemUtNDogMC40cmVtO1xuICAtLWZvbnQtc2l6ZS04OiAwLjhyZW07XG4gIC0tZm9udC1zaXplLTEwOiAxcmVtO1xuICAtLWZvbnQtc2l6ZS0xMTogMS4xcmVtO1xuICAtLWZvbnQtc2l6ZS0xMjogMS4ycmVtO1xuICAtLWZvbnQtc2l6ZS0xMzogMS4zcmVtO1xuICAtLWZvbnQtc2l6ZS0xNDogMS40cmVtO1xuICAtLWZvbnQtc2l6ZS0xNTogMS41cmVtO1xuICAtLWZvbnQtc2l6ZS0xNjogMS42cmVtO1xuICAtLWZvbnQtc2l6ZS0xODogMS44cmVtO1xuICAtLWZvbnQtc2l6ZS0yMDogMnJlbTtcbiAgLS1mb250LXNpemUtMjI6IDIuMnJlbTtcbiAgLS1mb250LXNpemUtMjQ6IDIuNHJlbTtcbiAgLS1mb250LXNpemUtMzA6IDNyZW07XG4gIC0tZm9udC1zaXplLTMyOiAzLjJyZW07XG4gIC0tZm9udC1zaXplLTQwOiA0cmVtO1xuICAtLWZvbnQtc2l6ZS00ODogNC44cmVtO1xuICAtLWZvbnQtc2l6ZS01MDogNXJlbTtcbn1cbiJdLCJzb3VyY2VSb290IjoiIn0=
