@@ -1,3 +1,215 @@
+Release 13.7 (28th April 2021):
+===============================
+
+
+Security issues:
+
+    TL-30567       Fixed XSS vulnerability exposed through the redirect_uri parameter LTI authentication
+    TL-30568       The mnet authentication keep alive method now follows standards and uses $DB->get_in_or_equal
+    TL-30570       Fixed "Protect user names" configuration not working as expected for unconfirmed users on forgot password page
+
+                   Prior to this patch, the form for forgotten passwords could display error
+                   messages revealing the unconfirmed state of self-registering users even
+                   though the 'Protect user names' security setting was activated. Also, when
+                   the 'Allow accounts with same email' setting was activated, the same form
+                   could reveal in an error message that an email was used by multiple users.
+
+                   This patch prevents these error messages from showing when the 'Protect
+                   user names' setting is activated.
+
+Performance improvements:
+
+    TL-29551       Improved the load times for the 'participants list' within the assignment activity
+
+                   We became aware of an issue within the assignment activity when appearing
+                   within a course with hundreds of thousands of enrolled users.
+                   It now better manages the situation by only loading required data.
+
+    TL-30329       Improved the load times for the user profile page by optimising the user profile block
+
+                   While load testing during the Totara 14 QA we became aware of a performance
+                   issue on the user profile page that affected all users. Blocks on the page
+                   were repeatedly hitting the database for excess information that was not
+                   always needed. In situations where the user had a large number of course
+                   enrolments the page may take several seconds to load.
+
+                   The poor performing block now makes full use of caching to optimise how it
+                   fetches data, and to ensure data is only fetched once regardless how many
+                   instances of the block are on the page.
+                   We also added page limiting to the enrolment information fetched for the
+                   user, limiting it to just the amount of data that is required to display
+                   the page.
+
+Improvements:
+
+    TL-10392       Improved how scheduled reports are handled when they do not contain any data
+
+                   Previously empty reports were still generated, saved to disk, and sent to
+                   users. They are now generated, and if the result is empty, no longer saved
+                   to disk or sent to users.
+
+    TL-29554       Rephrased the options for the 'email display' profile setting to better reflect actual behaviour
+    TL-29615       Allowed all theme images to be updated on a per tenant basis
+
+                   Added the following images to the tenant customisable theme settings:
+                    # Course image
+                    # Program image
+                    # Certification image
+                    # Resource image
+                    # Workspace image
+
+                   A breaking change was introduced with this work.
+                   Any customisation developer who has extended core\theme\file\theme_file and
+                   has defined or overridden the get_default_context() method should review
+                   their implementation. That function no longer needs to be defined unless
+                   something very custom is being done.
+                   If it had been inadvertently overridden or defined tenant files may not
+                   show correctly nor will they be configurable within tenants.
+                   If you are unsure please reach out to us via our help desk.
+
+    TL-29959       Added a new 'Currently enrolled?' column and filter to the 'Course membership' reportbuilder report
+    TL-30087       Sorted catalogue filter options by case insensitive natural order instead of binary comparison order
+    TL-30140       Fixed the display logic for ExpandCell of Table component to allow not-showing chevrons in non-header rows
+
+Bug fixes:
+
+    TL-29751       Removed the option to add blocks on the my appraisal page
+
+                   It is not possible to add blocks to this page but inadvertently, when
+                   editing was turned on via another page, the option to add blocks was being
+                   displayed. This has now been removed.
+
+    TL-29836       Reset seminar signup fields when signup is reused to prevent notifications from being sent to wrong user
+
+                   When a user signs up for a seminar that requires manager approval, and
+                   their request is denied (or they cancel), and then they sign up again
+                   later, the same database record is used. Previously, the manager and job
+                   assignment fields were not cleared when the signup was reused, which could
+                   result in manager request notifications being sent to the wrong
+                   manager. This condition only occurs when 'Users Select Manager' was
+                   enabled at the time the signup record was created or reused.
+
+                   These fields are now cleared whenever a signup is reused. However, there is
+                   no way to detect and remove the condition in existing seminar signups, so
+                   the problem could persist for signups that are currently in use.
+
+    TL-29844       Added an upgrade step to add missing link to contexts for some engage resources
+    TL-29993       Updated the create workspace button so it is hidden when a workspace cannot be created
+    TL-30009       Fixed some reportbuilder graph labels not being displayed as expected
+
+                   Previously when there were a small number of labels on the x-axis of a
+                   graph and at certain graph widths, some labels would disappear. Now the
+                   x-axis labels are always displayed.
+
+    TL-30011       Ensured trainer notifications in the feedback module correctly respect the 'Separate Groups' groups setting.
+
+                   This change ensures, when 'Separate Groups' is set, that trainers within a
+                   group are not sent notifications when learners who belong to no groups
+                   complete the feedback.
+
+    TL-30050       Allowed more than 20 items to be displayed when adding resources to a workspace by adding a "Load more" button
+    TL-30075       Fixed the "Email address" label on the forgotten password page so that it no longer splits across 2 lines
+    TL-30079       State is now preserved when resizing core re-usable Layout components
+
+                   The main regions of two layout components did not have unique keys
+                   assigned, causing non-managed state to be thrown away when the browser is
+                   resized and the layout is re-rendered. This no longer happens.
+
+    TL-30086       Fixed the display of seminar activity filters on the calendar view screen
+
+                   Previously seminar filters were horizontally aligned and overflowing making
+                   them appear unstyled. They are now vertically aligned and properly spaced.
+
+    TL-30089       Fixed loading of more than 20 items in other user's library view
+    TL-30090       Ensured date fields in Totara forms retain data correctly after a validation failure
+    TL-30104       Ensured duplicate Program or Certification assignment messages are not sent for a user
+    TL-30135       Fixed incorrect accessibility warning when seeing who liked a resource
+    TL-30144       Fixed competency achievement record migration running out of memory on larger sites
+    TL-30150       Declared a missing value in core_course_renderer::course_section_cm_availability()
+    TL-30151       Fixed a bug that prevented old SCORM activities from displaying in the Totara Mobile app
+    TL-30180       Fixed the formatting of program and certification summaries on the required leading page
+    TL-30186       Fixed some Atto button icons taking global button foreground colour
+    TL-30196       Fixed deleting users with pending subject instances or view-only participant instances
+
+                   Previously an exception got thrown if a user gets deleted who has pending
+                   subject instances or view-only participant instances in an activity. This
+                   patch fixes this and will delete instead of closing pending subject
+                   instances. View-only participant instances won't be touched as they do not
+                   have a closed state.
+
+    TL-30198       Fixed typo in URL causing error when using the 'Site policy records' embedded report
+    TL-30217       The correct context is now referred to in explanation text on the audience assign roles page
+
+                   Prior to this change when on the assign roles tab for an audience text on
+                   the page would refer to the system context when explaining what was
+                   happening regardless of whether it was a system audience or a category
+                   audience.
+                   This has now been fixed and the correct context is referred to in the
+                   explanation text.
+
+    TL-30222       Fixed the responsive display of SVG course icons on narrow screens
+    TL-30225       Fixed adding default coursesperpage configuration setting when catalogtype is set
+
+                   In the past when setting the catalogtype in config.php to anything but
+                   'moodle', the default configuration setting for 'coursesperpage' was not
+                   created. This resulted in errors on pages that rely on $CFG->coursesperpage
+                   to exist.
+
+                   This patch ensures that the 'coursesperpage' configuration setting will
+                   always exist regardless of the catalogtype setting.
+
+    TL-30249       Fixed the users' language not being explicitly set for request made by the Totara Mobile app
+
+                   Prior to this patch the session language was being set to default, leading
+                   to some unexpected behaviour in areas like access restrictions on course
+                   modules. This has been rectified so that mobile sessions are always created
+                   with the user's preferred language.
+
+    TL-30253       Ensured the correct context used in the Feedback activity edit_form for templates
+
+                   This has changed the context for the 'createpublictemplate' capability
+                   check when specifying if a template should be public from system to module.
+
+    TL-30262       Fixed alignment of text when viewing a single answer lesson page
+    TL-30273       Improved handling of modal outer clicks to prevent modal closure when a popup is closed
+    TL-30277       Fixed the meatball menu within Weka nodes that have children
+    TL-30280       Fixed an unknown field error in Perform when reporting on anonymous activity sections
+    TL-30281       Fixed the favicon resolver to resolve a protocol relative URL
+    TL-30292       Added missing language strings in the admin notification sent when OAuth2 tokens need to be refreshed
+    TL-30347       Fixed SQL error reporting for PostgreSQL
+
+                   Prior to this fix the last_error value within PostgreSQL would be
+                   inadvertently lost if a savepoint rollback was triggered.
+                   We now ensure that the last_error value persists through the triggered
+                   rollback.
+
+    TL-30483       Moved bot entry login page out of classes folder to not expose any entry file in classes folder because users do not have access to any files in class folder
+    TL-30489       Fixed error when upgrading completion evidence that do not have an evidence type
+    TL-30572       Broken PHP polyfills were replaced by Symfony PHP polyfills
+    TL-30575       Fix ventura appearance links and settings
+
+                   Ventura specific admin links are no longer available when current selected
+                   theme is not Ventura.
+
+    TL-30644       Fixed weka editor user mention query returning users from other tenants
+
+Tui front end framework:
+
+    TL-30336       Updated Tui NPM dependencies
+
+                   The NPM libraries Tui depends upon have all been updated to ensure we have
+                   the latest security and bug fixes.
+                   They were at the same time switched over the exact versions to ensure
+                   consistent builds across the many development, testing, and automation
+                   environments that we work with.
+
+Contributions:
+
+    * Alex Morris at Catalyst - TL-30281
+    * Brad Simpson at Kineo USA - TL-30186, TL-30262
+    * Julie Prescott at Innovate-Solutions - TL-30150
+
+
 Release 13.6 (24th March 2021):
 ===============================
 
