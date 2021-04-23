@@ -356,13 +356,19 @@ function default_exception_handler($ex) {
     abort_all_db_transactions();
 
     if (($ex instanceof required_capability_exception) && !CLI_SCRIPT && !AJAX_SCRIPT && !empty($CFG->autologinguests) && !empty($USER->autologinguest)) {
-        $SESSION->wantsurl = qualified_me();
-        redirect(get_login_url());
+        // The functions below are defined in weblib.php and moodlelib.php. While they should exist by now we check them regardless, as
+        // we don't want to ever mask exceptions due to undefined functions in the exception handler!
+        if (function_exists('qualified_me') && function_exists('get_login_url') && function_exists('redirect')) {
+            $SESSION->wantsurl = qualified_me();
+            redirect(get_login_url());
+        }
     }
 
     $info = get_exception_info($ex);
 
-    if (debugging('', DEBUG_MINIMAL)) {
+    // The debugging function is defined in weblib.php. While it should exist by now we check it regardless, as
+    // we don't want to ever mask exceptions due to undefined functions in the exception handler!
+    if (function_exists('debugging') && debugging('', DEBUG_MINIMAL)) {
         $logerrmsg = "Default exception handler: ".$info->message.' Debug: '.$info->debuginfo."\n".format_backtrace($info->backtrace, true);
         error_log($logerrmsg);
     }
@@ -2391,7 +2397,8 @@ width: 80%; -moz-border-radius: 20px; padding: 15px">
         $debug = $debug || (!empty($CFG->config_php_settings['debug'])  && $CFG->config_php_settings['debug'] >= DEBUG_DEVELOPER );
         if ($debug) {
             if (!empty($debuginfo)) {
-                $debuginfo = s($debuginfo); // removes all nasty JS
+                // Copied from s() ; we can't use s() as weblib.php may not have been included yet.
+                $debuginfo = preg_replace('/&amp;#(\d+|x[0-9a-f]+);/i', '&#$1;', htmlspecialchars($debuginfo, ENT_QUOTES, 'UTF-8')); // removes all nasty JS
                 $debuginfo = str_replace("\n", '<br />', $debuginfo); // keep newlines
                 $content .= '<div class="notifytiny">Debug info: ' . $debuginfo . '</div>';
             }
