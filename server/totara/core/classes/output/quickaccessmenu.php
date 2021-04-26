@@ -51,6 +51,9 @@ final class quickaccessmenu extends \core\output\template {
             $data['empty_message'] = get_string('quickaccessmenu:empty-message-noedit', 'totara_core');
         }
 
+        // Clean the empty message to make sure it's safe and won't be modified by the webservice layer
+        $data['empty_message'] = clean_text($data['empty_message'], PARAM_CLEANHTML);
+
         $allgroups = group::get_groups($USER->id);
 
         foreach (self::organise_items_by_group($menu->get_items(), $allgroups) as $group => $items) {
