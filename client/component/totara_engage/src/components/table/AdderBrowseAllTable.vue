@@ -44,7 +44,13 @@
     </template>
 
     <template v-slot:row="{ row }">
-      <Cell size="2" column-header="Img" valign="center">
+      <!-- Column header passes an empty space for now to make behat pass -->
+      <Cell
+        class="tui-engageAdderBrowseTable__imgHeader"
+        column-header=" "
+        size="2"
+        valign="center"
+      >
         <EngageCardImage
           class="tui-engageAdderBrowseTable__img"
           :card-attribute="row"
@@ -137,9 +143,13 @@ export default {
 <style lang="scss">
 .tui-engageAdderBrowseTable {
   &__img {
-    width: 100%;
+    width: 65px;
     height: 45px;
     overflow: hidden;
+
+    @media (min-width: $tui-screen-sm) {
+      width: 100%;
+    }
   }
 
   &__title {
