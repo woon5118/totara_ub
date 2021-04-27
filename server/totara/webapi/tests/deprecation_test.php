@@ -96,7 +96,14 @@ class totara_webapi_deprecation_testcase extends advanced_testcase {
             ->method('load')
             ->willReturn($schema_files);
 
-        $schema_builder = new schema_builder($schema_file_loader);
+        // Override the union classes loaded so it does not load php type definitions not available in the
+        // fixture schema files provided above.
+        $schema_builder = new class($schema_file_loader) extends schema_builder {
+            protected function load_union_classes(): array {
+                return [];
+            }
+        };
+
         $schema = $schema_builder->build();
 
         return new StandardServer([
