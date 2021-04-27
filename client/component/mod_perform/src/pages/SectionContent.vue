@@ -961,7 +961,6 @@ export default {
 
   &__draggableItem {
     position: relative;
-    user-select: none;
   }
 }
 </style>
