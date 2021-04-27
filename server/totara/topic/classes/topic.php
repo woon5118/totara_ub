@@ -377,9 +377,11 @@ final class topic {
     }
 
     /**
+     * @param bool $as_html if true will return htmlspecialchars encoded string.
+     *
      * @return string
      */
-    public function get_display_name(): string {
-        return $this->tag->get_display_name();
+    public function get_display_name($as_html = true): string {
+        return $this->tag->get_display_name($as_html);
     }
 }

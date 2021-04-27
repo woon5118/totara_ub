@@ -47,7 +47,7 @@ $query->set_area('owned');
 
 $topics = [['id' => null, 'label' => get_string('all', 'core')]];
 foreach (topic_provider::get_all() as $topic) {
-    $topics[] = ['id' => $topic->get_id(), 'value' => $topic->get_id(), 'label' => $topic->get_display_name()];
+    $topics[] = ['id' => $topic->get_id(), 'value' => $topic->get_id(), 'label' => $topic->get_display_name(false)];
 }
 
 $filters = [
