@@ -25,6 +25,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
+use core\json_editor\helper\document_helper;
+
 global $CFG;
 
 require_once('HTML/QuickForm/element.php');
@@ -472,31 +475,27 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
     /**
      * Validate the submitted value.
      *
-     * @param $value
-     *
-     * @return string
+     * @param mixed $value
+     * @return string|null
      */
-    public function validateSubmitValue(?array $value): ?string {
-        // Skip empty values.
-        if (empty($value) || empty($value['text'])) {
-            if ($this->isRequired()) {
-                return get_string('err_required', 'form');
-            }
-            return null;
-        }
-
-        $format = $this->getFormat();
-        switch ($format) {
-            case FORMAT_JSON_EDITOR:
-                // Check if we have valid json.
-                if (!\core\json_editor\helper\document_helper::is_valid_json_document($value['text'])) {
-                    if (\core\json_editor\helper\document_helper::looks_like_json($value['text'])) {
-                        return get_string('err_json_editor', 'form');
-                    } else {
-                        return get_string('error_mobile_friendly_conversion', 'core_editor');
-                    }
+    public function validateSubmitValue($value): ?string {
+        // Extra-validation is only necessary for Weka.
+        if ($this->getFormat() === FORMAT_JSON_EDITOR) {
+            // Skip empty values.
+            if (empty($value) || empty($value['text'])) {
+                if ($this->isRequired()) {
+                    return get_string('err_required', 'form');
                 }
-                break;
+                return null;
+            }
+
+            // Check if we have valid json.
+            if (!document_helper::is_valid_json_document($value['text'])) {
+                if (document_helper::looks_like_json($value['text'])) {
+                    return get_string('err_json_editor', 'form');
+                }
+                return get_string('error_mobile_friendly_conversion', 'core_editor');
+            }
         }
 
         return null;
@@ -510,27 +509,24 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
         if (null === $value) {
             $value = $this->getValue();
         }
-        $value['text'] = $this->clean_text($value['text']);
+
+        if ($this->getFormat() === FORMAT_JSON_EDITOR) {
+            $value['text'] = $this->clean_json_editor_text($value['text']);
+        }
         return $this->_prepareValue($value, $assoc);
     }
 
     /**
-     * @param string $text
-     * @return string
+     * @param string|null $text
+     * @return string|null
      */
-    private function clean_text(?string $text): ?string {
+    private function clean_json_editor_text(?string $text): ?string {
         // Skip empty values.
         if (empty($text)) {
             return $text;
         }
-
-        $format = $this->getFormat();
-        switch ($format) {
-            case FORMAT_JSON_EDITOR:
-                if (\core\json_editor\helper\document_helper::looks_like_json($text)) {
-                    $text = \core\json_editor\helper\document_helper::clean_json_document($text);
-                }
-                break;
+        if (document_helper::looks_like_json($text)) {
+            $text = document_helper::clean_json_document($text);
         }
         return $text;
     }
