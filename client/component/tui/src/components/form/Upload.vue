@@ -72,7 +72,6 @@ export default {
 
       file.progress = 0;
       file.done = false;
-      let index = this.files.push(file) - 1;
       const data = new FormData();
       const request = new XMLHttpRequest();
 
@@ -81,7 +80,6 @@ export default {
         e => {
           if (e.lengthComputable) {
             file.progress = (e.loaded * 100) / e.total;
-            this.$set(this.files, index, file);
             this.$emit('progress', {
               file: file,
               loaded: e.loaded,
@@ -96,7 +94,6 @@ export default {
         if (request.readyState == 4) {
           file.done = true;
           if (request.status == 200) {
-            this.$set(this.files, index, file);
             let result = {};
             try {
               result = JSON.parse(request.responseText);
@@ -122,6 +119,9 @@ export default {
                 this.$emit('load', {
                   file: file,
                 });
+
+                const index = this.files.push(file) - 1;
+                this.$set(this.files, index, file);
               }
             }
           } else {

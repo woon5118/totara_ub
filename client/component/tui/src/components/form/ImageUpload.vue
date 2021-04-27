@@ -192,7 +192,7 @@ export default {
     },
 
     handleError(e) {
-      this.clearUpload();
+      this.clearUpload(undefined, undefined, true);
       let errorMessage = this.$str('error:upload_failed', 'totara_core');
       if (typeof e.error == 'string') {
         errorMessage = e.error;
@@ -200,14 +200,16 @@ export default {
       this.errorMessage = errorMessage;
     },
 
-    clearUpload(deleteDraft, file) {
+    clearUpload(deleteDraft, file, error) {
+      this.errorMessage = '';
+
       if (deleteDraft && file) {
         deleteDraft(file);
       }
 
       this.$refs.inputFile.value = '';
 
-      if (file) {
+      if (file || error) {
         this.selectedImageUrl = this.currentUrl;
         this.$emit('delete', { draft: true });
       } else {
