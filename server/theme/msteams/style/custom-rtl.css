@@ -574,3 +574,28 @@ body.theme_msteams__theme--contrast .totara_msteams__spinner {
         transform: rotateZ(-360deg);
     }
 }
+
+.totaraMsteamsHelp__logoSection {
+    display: -webkit-box;
+    display: flex;
+}
+
+.totaraMsteamsHelp__logo {
+    width: 60px;
+    height: 60px;
+}
+
+.totaraMsteamsHelp__img {
+    margin: 10px 0;
+    width: 50%;
+    height: auto;
+}
+
+.totaraMsteamsHelp__head {
+    margin-top: 20px;
+}
+
+.totaraMsteamsHelp__subHead {
+    color: #434343;
+    margin-top: 30px;
+}

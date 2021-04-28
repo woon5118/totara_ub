@@ -33,10 +33,8 @@ $tabs = [
         'url' => '/totara/msteams/tabs/catalog.php',
         'redirectUrl' => '/totara/msteams/tabs/catalog.php?redirect=1',
         'externalUrl' => '/totara/catalog/index.php',
-        'dependencies' => [
-        ],
-        'features' => [
-        ],
+        'dependencies' => [],
+        'features' => [],
     ],
     'mylearning' => [
         'name' => new lang_string('tab:mylearning', 'totara_msteams'),
@@ -45,17 +43,22 @@ $tabs = [
         'dependencies' => [
             'block_current_learning' => 2019102300,
         ],
-        'features' => [
-        ],
+        'features' => [],
     ],
     'library' => [
         'name' => new lang_string('tab:library', 'totara_msteams'),
         'url' => '/totara/msteams/tabs/contributions.php',
         'redirectUrl' => '/totara/engage/your_resources.php',
-        'dependencies' => [
-        ],
+        'dependencies' => [],
         'features' => [
             'engage_resources'
         ],
+    ],
+    'help' => [
+        'name' => new lang_string('tab:help', 'totara_msteams'),
+        'url' => '/totara/msteams/tabs/help.php',
+        'redirectUrl' => '/totara/msteams/help.php',
+        'dependencies' => [],
+        'features' => [],
     ],
 ];

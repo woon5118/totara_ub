@@ -1,6 +1,9 @@
 This files describes API changes in /totara/msteams,
 information provided here is intended especially for developers.
 
+=== 13.9 ===
+* Added 'help tab' in totara/msteams/db/tabs.php" and new help template
+
 === 13.4 ===
 
 * The spinner template added id parameter to set HTML id

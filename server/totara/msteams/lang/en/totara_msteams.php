@@ -136,6 +136,72 @@ $string['error:oauth2_missingendpoint'] = 'The {$a->type}_endpoint is not found 
 $string['error:oauth2_noissuer'] = 'OAuth2 service is not set.';
 $string['error:sso_failure_desc'] = 'There is an error in the configuration and set up of your organisation\'s Totara app. Please contact your site administrator.';
 $string['error:sso_failure_title'] = 'Single sign-on authentication failure';
+$string['help_page_about'] = 'About';
+$string['help_page_about_info'] = 'Here you can find out more about the Totara app, such as the publisher, version number, and a
+description. This tab may also include links to the publisher’s website and important policies.';
+$string['help_page_accessing_app'] = 'Accessing the app';
+$string['help_page_accessing_app_adding_app'] = 'Click the app and select <strong>Add</strong> to access it.';
+$string['help_page_accessing_app_built_for_organisation'] = 'Select <strong>Built for [organisation name]</strong> to display a list of all available custom apps.';
+$string['help_page_accessing_app_more_app'] = 'Click on the icon of three dots in the side panel and select <strong>More apps.</strong> ';
+$string['help_page_accessing_app_signin'] = 'Sign in to Microsoft Teams.';
+$string['help_page_accessing_app_steps'] = 'Follow these steps to access the Totara app:';
+$string['help_page_accessing_app_uninstall'] = 'You can also uninstall the app by right-clicking it (if pinned to the left-hand navigation bar) 
+and selecting <strong>Uninstall.</strong>';
+$string['help_page_catalog_content'] = 'Simply click on resources or playlists to open them in Microsoft Teams. Now you can read, comment on and 
+like resources as you would on Totara. For courses, programs and certifications you may need to first enrol. Once you have opened your content 
+you can select the Microsoft Teams ‘globe’ icon for opening in the browser at any time, if you would prefer to complete some of the activities in a web browser instead.';
+$string['help_page_catalog_items'] = 'In this tab you can access the Totara catalogue, where you can browse a list of courses, resources and playlists.';
+$string['help_page_catalog_search'] = 'You can search for content or use the filters on the left-hand side to find the content you’re looking for.';
+$string['help_page_chat'] = 'Chat';
+$string['help_page_chat_commands'] = 'There are three commands for the chat bot:';
+$string['help_page_chat_help'] = '<strong>Help:</strong> Use this command to access any links to help documentation or contact details for support';
+$string['help_page_chat_notification'] = 'By signing in on this tab you can receive Totara notifications. You can configure which Totara notifications you want to be sent to Microsoft 
+Teams under the Notifications preferences when accessing Totara from your browser.';
+$string['help_page_chat_signin'] = '<strong>Sign in:</strong> You need to sign in to the bot in order to enable notifications';
+$string['help_page_chat_signout'] = '<strong>Sign out:</strong> You can use this to sign out and disable notifications from being sent to Microsoft Teams';
+$string['help_page_config'] = 'Configurable tabs';
+$string['help_page_config_add'] = 'Click <strong>Add</strong>.';
+$string['help_page_config_click'] = 'Click the + icon in the top panel within a Team.';
+$string['help_page_config_search'] = 'You will now be able to search the catalogue to find and select the item you would like to add in a tab. It is also possible to provide a name for this 
+new tab. Once it has been added, it will display to all users within that tab. You can also rename or remove the tab at any time by clicking the down arrow next to the tab name.';
+$string['help_page_config_select'] = 'Find and select the Totara app under the listed available apps.';
+$string['help_page_config_tab'] = 'In the Totara app you can also add configurable tabs to a Team, allowing you to share content in a different way. Microsoft Teams allows for the 
+tabs in Team channels to be added or removed by its members. In the Totara app users can add learning content within these tabs to \'pin\' content to certain channels. This could be 
+a course administrator or facilitator who wants to flag pre-course material for a team by adding this course as a new tab, or a manager who wants to pin a playlist with useful resources for their team to use. To add a configurable tab, follow these steps:';
+$string['help_page_current_learning'] = 'Current learning';
+$string['help_page_current_learning_course'] = 'Select a course to launch it within Microsoft Teams. You can then work through the course and its activities 
+as usual. All Totara Learn activities are fully functional in the Microsoft Teams app with a few exceptions. Due to the dynamic nature of the <strong>wiki</strong>
+and <strong>external tool</strong> activities, it is recommended that these activities are opened in the browser. This ensures that all functionality is available. The Microsoft 
+Teams ‘globe’ icon in the top panel allows you to open any page in a browser window at any time.';
+$string['help_page_current_learning_tab'] = 'On the <strong>Current learning tab</strong> you can view and access any of your assigned learning, such as courses, programs and certifications you are 
+enrolled on. If you are not enrolled on any learning, this tab will be empty.';
+$string['help_page_extension'] = 'Messaging extension';
+$string['help_page_extension_desc'] = 'With the messaging extension feature you can find and share any content from the catalogue <strong>(Find learning)</strong> 
+into your chats with other users.';
+$string['help_page_extension_instruction'] = 'As with any other MS Teams messaging extension, you can find the Totara messaging extension in the chat toolbar. 
+Click the Totara icon to share content, such as courses or resources, with other users. The recipient can then click the link to view the content in the Totara app.';
+$string['help_page_extension_pinning'] = 'You can also pin the messaging extension app to the side panel by right-clicking it and selecting <strong>Pin.</strong>';
+$string['help_page_library_playlist'] = '<strong>Your playlists:</strong> Any public or private playlists you have created';
+$string['help_page_library_resource'] = '<strong>Your resources:</strong> Any public or private resources you have created';
+$string['help_page_library_shared_with_you'] = '<strong>Shared with you:</strong> Any public resources that have been shared with you by other users';
+$string['help_page_library_saved_playlist'] = '<strong>Saved playlists:</strong>  View all of the playlists you have bookmarked';
+$string['help_page_library_saved_resource'] = '<strong>Saved resources:</strong> View all of the resources you have bookmarked';
+$string['help_page_library_createtab'] = 'Select the plus icon next to <strong>Your resources</strong> to create a new resource or survey, or the icon next to <strong>Your playlists</strong> 
+to create a new playlist.';
+$string['help_page_library_tab'] = 'If your site uses Totara Engage you will also have access to the <strong>Library</strong> tab. Using the left-hand navigation bar you can access the following:';
+$string['help_page_pinning_app'] = 'Pinning the app';
+$string['help_page_pinning_app_adding'] = 'On the left-hand navigation bar, click the ellipsis icon and search for the Totara app using the search bar. Once you have found the app, 
+right-click it and select Pin. This will ensure the Totara app is always available in the side-bar.';
+$string['help_page_pinning_app_viewing'] = 'You may find that the app has already been pinned to your navigation bar by an administrator.';
+$string['help_page_product_doc'] = 'Totara’s product documentation.';
+$string['help_page_title'] = 'Totara Help';
+$string['help_page_using_app'] = 'Using the app';
+$string['help_page_using_app_course'] = 'From within the application you can access a range of Totara content such as courses, 
+programs, certifications, resources and playlists. You can also share content with other users via the messaging extension, 
+and receive Totara notifications through Microsoft Teams.';
+$string['help_page_using_app_more_info'] = 'For more information on configuration visit ';
+$string['help_page_using_app_tabs'] = 'Here you can find out the basics of using the Totara app in Microsoft Teams. This includes 
+tabs for <strong> Find learning, Current learning, Your library</strong> and Totara notifications including tasks and alerts.';
 $string['howtouploadapp'] = '';
 $string['info:badsettings'] = 'One or more settings are not correctly set.';
 $string['info:goodsettings'] = 'All settings have been verified, you can download the manifest file.';
@@ -210,6 +276,7 @@ $string['settings:sso_scope_help'] = 'Format: api://<fully-qualified-your-domain
 $string['spinner_loading'] = "Loading\u{2026}";
 $string['spinner_signingin'] = "Signing in\u{2026}";
 $string['tab:catalog'] = 'Find learning';
+$string['tab:help'] = 'Help';
 $string['tab:library'] = 'Library';
 $string['tab:mylearning'] = 'Current learning';
 $string['userdataitemuser'] = 'MS Teams user records';
