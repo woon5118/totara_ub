@@ -202,6 +202,7 @@ export default {
         content: JSON.stringify(this.content.getDoc()),
         format: FORMAT_JSON_EDITOR,
         commentId: this.commentId,
+        itemId: this.draftId,
       });
 
       this.content = WekaValue.empty();
