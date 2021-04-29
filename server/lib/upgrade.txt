@@ -1,6 +1,10 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.8 ===
+
+* backported https://github.com/jquery/jquery/pull/4642 to prevent a minor security issue
+
 === 13.7 ===
 
 * core_login_process_password_reset_request() now prevents processing password reset requests by email addresses
