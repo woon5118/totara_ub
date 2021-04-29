@@ -140,7 +140,7 @@ if ($hassessions) {
 // Add selected users to attendees list.
 $userlist = $list->get_user_ids();
 if (!empty($userlist)) {
-    list($userlist_sql, $userlist_params) = $DB->get_in_or_equal($userlist);
+    list($userlist_sql, $userlist_params) = $DB->get_in_or_equal($userlist, SQL_PARAMS_NAMED, 'ulist', false);
     $userstoadd = $DB->get_records_sql("SELECT u.*, ss.statuscode
                                     FROM {user} u
                                     LEFT JOIN {facetoface_signups} su
@@ -177,7 +177,7 @@ if ($searchtext !== '') {   // Search for a subset of remaining users.
     $fields[] = 'idnumber';
     $fields[] = 'username';
     $keywords = totara_search_parse_keywords($searchtext);
-    list($searchwhere, $searchparams) = totara_search_get_keyword_where_clause($keywords, $fields);
+    list($searchwhere, $searchparams) = totara_search_get_keyword_where_clause($keywords, $fields, SQL_PARAMS_NAMED, 'srch');
 
     $where .= ' AND ' . $searchwhere;
     $params = array_merge($params, $searchparams);
@@ -185,7 +185,7 @@ if ($searchtext !== '') {   // Search for a subset of remaining users.
 
 // All non-signed up system users.
 if ($attendees) {
-    list($attendee_sql, $attendee_params) = $DB->get_in_or_equal(array_keys($attendees), SQL_PARAMS_QM, 'param', false);
+    list($attendee_sql, $attendee_params) = $DB->get_in_or_equal(array_keys($attendees), SQL_PARAMS_NAMED, 'attd', false);
     $where .= ' AND u.id ' . $attendee_sql;
     $params = array_merge($params, $attendee_params);
 }
@@ -194,8 +194,9 @@ $joininterest = '';
 if ($interested) {
     $joininterest = "
     JOIN {facetoface_interest} fit ON (fit.userid = u.id)
-    JOIN {facetoface_sessions} ssn ON (ssn.facetoface = fit.facetoface AND ssn.id = {$seminareventid})
+    JOIN {facetoface_sessions} ssn ON (ssn.facetoface = fit.facetoface AND ssn.id = :eventid)
     ";
+    $params['eventid'] = $seminareventid;
 }
 
 // Restrict to tenant participants
@@ -204,8 +205,8 @@ $tenantwhere = '';
 if (!empty($CFG->tenantsenabled)) {
     if ($context->tenantid) {
         $tenant = \core\record\tenant::fetch($context->tenantid);
-        $tenantjoin = "JOIN {cohort_members} tp ON tp.userid = u.id AND tp.cohortid = ?";
-        $params[] = $tenant->cohortid;
+        $tenantjoin = "JOIN {cohort_members} tp ON tp.userid = u.id AND tp.cohortid = :cohortid";
+        $params['cohortid'] = $tenant->cohortid;
     } else {
         if (!empty($CFG->tenantsisolated)) {
             $tenantwhere = 'AND u.tenantid IS NULL';
