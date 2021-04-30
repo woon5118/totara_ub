@@ -131,6 +131,26 @@ class user implements \core\webapi\type_resolver {
                 $value = $formatter->format($description);
                 break;
 
+            case 'fullname':
+                // This is a temporary fix for the encoding problem for a user's
+                // fullname. This section needs to be replaced by the solution
+                // from TL-30744.
+                $value = $field_resolver->get_field_value('fullname');
+                if (empty($value)) {
+                    break;
+                }
+
+                $format = $args['format'] ?? format::FORMAT_HTML;
+                if ($format === format::FORMAT_PLAIN) {
+                    // Note the get_field_value() call above indirectly calls
+                    // clean_string() as well. Which means the fullname might
+                    // have escaped HTML stuff. So need to remove all that when
+                    // a plain format is needed.
+                    $value = html_to_text($value, 0, false);
+                }
+
+                break;
+
             default:
                 if (!user_field_resolver::is_valid_field($field)) {
                     throw new \coding_exception('Unknown user field', $field);

@@ -98,7 +98,7 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
 
     public function test_resolver_fullname() {
         $args = ['format' => format::FORMAT_PLAIN];
-        $user = $this->getDataGenerator()->create_user(['firstname' => 'Joe', 'lastname' => 'Smith']);
+        $user = $this->getDataGenerator()->create_user(['firstname' => 'Joe', 'lastname' => "O'Malley"]);
 
         try {
             $this->resolve_graphql_type('core_user', 'fullname', $user, $args);
@@ -108,7 +108,10 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
         }
 
         $this->setAdminUser();
-        self::assertSame(fullname($user), $this->resolve_graphql_type('core_user', 'fullname', $user, $args));
+        self::assertSame(
+            html_to_text(fullname($user), 0, false),
+            $this->resolve_graphql_type('core_user', 'fullname', $user, $args)
+        );
     }
 
     public function test_resolver_firstname() {

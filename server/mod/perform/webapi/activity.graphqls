@@ -398,7 +398,7 @@ type mod_perform_participant {
   """
   User's fullname
   """
-  fullname: String
+  fullname(format: core_format = PLAIN): String
   """
   User's email address
   """

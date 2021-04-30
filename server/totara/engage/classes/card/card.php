@@ -398,22 +398,29 @@ abstract class card {
                         $share_recipient = new $share_recipient($recipient->instanceid);
                         $has_capability = $share_recipient->can_unshare_resources();
                     }
-                }
 
-                $component = $this->get_component();
-                $footnotes[] = [
-                    'component' => 'CardSharedByFootnote',
-                    'tuicomponent' => 'totara_engage/components/card/footnote/SharedByFootnote',
-                    'props' => json_encode([
-                        'instanceId' => $this->get_instanceid(),
-                        'component' => $component,
-                        'sharer' => $sharer,
-                        'recipientId' => (int)$recipient->id ?? null,
-                        'area' => $recipient->area ?? null,
-                        'showButton' => $has_capability ?? true,
-                        'name' => $this->get_name()
-                    ]),
-                ];
+                    // This is a temporary fix for the encoding problem for a user's
+                    // fullname. This section needs to be replaced by the solution
+                    // from TL-30744. However note the data returned here goes the UI
+                    // as a *json string* - which makes formatting stuff at the GraphQL
+                    // layer even more complicated.
+                    $sharer->fullname = html_to_text($sharer->fullname, 0, false);
+
+                    $component = $this->get_component();
+                    $footnotes[] = [
+                        'component' => 'CardSharedByFootnote',
+                        'tuicomponent' => 'totara_engage/components/card/footnote/SharedByFootnote',
+                        'props' => json_encode([
+                            'instanceId' => $this->get_instanceid(),
+                            'component' => $component,
+                            'sharer' => $sharer,
+                            'recipientId' => (int)$recipient->id ?? null,
+                            'area' => $recipient->area ?? null,
+                            'showButton' => $has_capability ?? true,
+                            'name' => $this->get_name()
+                        ]),
+                    ];
+                }
             } else if ($args['type'] === 'playlist') {
                 // Playlist owner card footnotes.
                 $footnotes[] = [
