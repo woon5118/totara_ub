@@ -38,7 +38,7 @@ class timecreated extends dataholder_factory {
         return [
             new dataholder(
                 'timecreated',
-                new \lang_string('field:name', 'engage_article'),
+                new \lang_string('field:timecreated', 'engage_article'),
                 [
                     formatter::TYPE_PLACEHOLDER_TEXT => new user_date(
                         'namesource.timecreated'
