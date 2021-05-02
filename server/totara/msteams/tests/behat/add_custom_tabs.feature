@@ -61,7 +61,7 @@ Feature: Add a tab to Teams Channel
     But I should not see "Working from home or office?"
     And I should not see "We couldn't find any matches"
 
-    When I set the field "Search learning catalogue" to "korenga"
+    When I set the field "Search the catalog and select an item to be added in a new tab" to "korenga"
     Then I should see "We couldn't find any matches"
     And I should not see "Course"
     And I should not see "Program"
@@ -75,14 +75,14 @@ Feature: Add a tab to Teams Channel
     And the save button should be "disabled" on Microsoft Teams "config" page
 
     When I take focus off "Tab name" "field"
-    And I set the field "Search learning catalogue" to ""
+    And I set the field "Search the catalog and select an item to be added in a new tab" to ""
     Then I should see "Name is required"
 
     # Split a scenario here to prevent the 'take focus off' step from messing up with further testing.
 
   Scenario: msteams403: Check the field validation part 2
     Given I am on Microsoft Teams "config" page
-    When I set the field "Search learning catalogue" to "arts"
+    When I set the field "Search the catalog and select an item to be added in a new tab" to "arts"
     Then I should see "Culinary arts 101"
     When I click on "Culinary arts 101" "list_item"
     Then I should not see "Name is required"
@@ -98,7 +98,7 @@ Feature: Add a tab to Teams Channel
 
   Scenario: msteams404: Add a custom tab to a teams channel
     Given I am on Microsoft Teams "config" page
-    When I set the field "Search learning catalogue" to "arts"
+    When I set the field "Search the catalog and select an item to be added in a new tab" to "arts"
     Then the field "Tab name" matches value ""
     And the save button should be "disabled" on Microsoft Teams "config" page
     And I should see "Culinary arts"
