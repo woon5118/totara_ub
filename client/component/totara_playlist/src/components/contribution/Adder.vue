@@ -32,7 +32,7 @@
 
     <EngageAdderModal
       :title="$str('selectcontent', 'totara_playlist')"
-      :open="showAdder"
+      :open="canAdd"
       :cards="contribution.cards"
       :filter-value="filterValue"
       filter-component="totara_playlist"
@@ -80,9 +80,15 @@ export default {
   data() {
     return {
       showWarningModal: this.openWarningModal,
-      privacyWarningMessage: null,
-      privacyWarningSelection: null,
+      privacyWarningMessage: '',
+      privacyWarningSelection: '',
     };
+  },
+
+  computed: {
+    canAdd() {
+      return !this.showWarningModal && this.showAdder;
+    },
   },
 
   watch: {
@@ -134,8 +140,6 @@ export default {
       let { warning, message } = await this.checkAccessSetting(items);
 
       if (warning) {
-        this.showAdder = false;
-
         // open warningmodal with the selection data
         this.privacyWarningMessage = message;
         this.privacyWarningSelection = selection;
@@ -201,7 +205,6 @@ export default {
 
     cancelPrivacyChange() {
       this.showWarningModal = false;
-      this.showAdder = true;
     },
   },
 };
