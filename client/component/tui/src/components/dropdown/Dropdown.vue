@@ -153,6 +153,7 @@ export default {
             true
           );
           document.addEventListener('click', this.$_clickedOutside);
+          document.addEventListener('contextmenu', this.$_clickedOutside);
         } else {
           document.removeEventListener('keydown', this.$_keyPress);
           document.removeEventListener(
@@ -161,6 +162,7 @@ export default {
             true
           );
           document.removeEventListener('click', this.$_clickedOutside);
+          document.removeEventListener('contextmenu', this.$_clickedOutside);
           this.activeNodeIndex = null;
         }
       },
@@ -173,6 +175,7 @@ export default {
       document.removeEventListener('click', this.$_clickedOutsideCapture, true);
       document.removeEventListener('click', this.$_clickedOutside);
       document.removeEventListener('keydown', this.$_keyPress);
+      document.removeEventListener('contextmenu', this.$_clickedOutside);
     }
   },
 
