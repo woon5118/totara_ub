@@ -65,6 +65,37 @@ class theme_settings extends admin_controller {
     /**
      * @inheritDoc
      */
+    protected function init_page_object() {
+        global $SITE;
+
+        parent::init_page_object();
+
+        if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+            // Don't set page options while under test as it will prevent
+            // creating the controller multiple times in tests.
+            return;
+        }
+
+        // Force current theme to be the theme we are editing. Only for the
+        // current request, it does not persist when you switch to other pages.
+        // This is neccesary as each theme's theme settings are implemented as
+        // *overrides* to the core theme settings views.
+        $theme = $this->get_optional_param('theme_name', null, PARAM_COMPONENT);
+        if ($theme) {
+            $page = $this->get_page();
+            // Must set course before theme.
+            // If we don't set it here, set_course() will throw an exception in
+            // $page->initialise_theme_and_output().
+            // We already set the context in the parent method, so calling this
+            // won't change the context.
+            $page->set_course($SITE);
+            $page->force_theme($theme);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function process(string $action = '') {
         global $CFG, $USER;
 
