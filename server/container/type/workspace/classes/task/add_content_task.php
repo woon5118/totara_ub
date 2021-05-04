@@ -24,6 +24,7 @@ namespace container_workspace\task;
 
 use container_workspace\member\member;
 use container_workspace\member\status;
+use container_workspace\notification\workspace_notification;
 use container_workspace\workspace;
 use core\message\message;
 use core\orm\query\builder;
@@ -58,12 +59,19 @@ final class add_content_task extends adhoc_task {
         );
 
         foreach ($members as $member) {
-            $recipient = core_user::get_user($member->get_member_user_id());
+            $member_userid = $member->get_member_user_id();
+            $recipient = core_user::get_user($member_userid);
             if (!$recipient) {
                 // Skip if user doesn't exist.
-                debugging('Skipped sending notification to non-existent user with id ' . $member->get_member_user_id());
+                debugging('Skipped sending notification to non-existent user with id ' . $member_userid);
                 continue;
             }
+
+            if (workspace_notification::is_off($workspace->get_id(), $member_userid)) {
+                // User had turned off the workspace notification. Skip the process of sending message out.
+                continue;
+            }
+
             cron_setup_user($recipient);
 
             $message = new message();

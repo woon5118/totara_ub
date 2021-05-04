@@ -27,6 +27,7 @@ require_once(__DIR__ . '/../../../../totara/core/tests/language_pack_faker_trait
 
 use container_workspace\task\add_content_task;
 use container_workspace\member\member;
+use container_workspace\notification\workspace_notification;
 use core\task\manager;
 
 class container_workspace_add_content_task_testcase extends advanced_testcase {
@@ -86,5 +87,53 @@ class container_workspace_add_content_task_testcase extends advanced_testcase {
         self::assertEquals('Fake language subject string', $message_data[$user_two->id]);
         // user_three should receive message in default (en).
         self::assertEquals('New resource has been shared to your workspace', $message_data[$user_three->id]);
+    }
+
+    public function test_muted_workspace_notifications(): void {
+        $generator = self::getDataGenerator();
+
+        $owner = $generator->create_user();
+        self::setUser($owner);
+        $workspace = $generator
+            ->get_plugin_generator('container_workspace')
+            ->create_workspace();
+
+        $user_one = $generator->create_user();
+        member::added_to_workspace($workspace, $user_one->id);
+
+        $user_two = $generator->create_user();
+        member::added_to_workspace($workspace, $user_two->id);
+
+        $this->executeAdhocTasks();
+
+        $component = 'resource';
+        $task = new add_content_task();
+        $task->set_component('totara_engage');
+        $task->set_custom_data([
+            'component' => $component,
+            'workspace_id' => $workspace->get_id(),
+            'sharer_id' => $owner->id,
+            'item_name' => 'Test resource name'
+        ]);
+
+        workspace_notification::off($workspace->id, $user_one->id);
+        manager::queue_adhoc_task($task);
+
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
+
+        $expected_subject = get_string('message_content_added_subject', 'container_workspace', $component);
+        $messages = array_filter(
+            $message_sink->get_messages(),
+            function ($message) use ($expected_subject): bool {
+                return $message->subject === $expected_subject;
+            }
+        );
+
+        $message_sink->close();
+        $this->assertCount(1, $messages);
+
+        $message = reset($messages);
+        $this->assertEquals($user_two->id, $message->useridto);
     }
 }
