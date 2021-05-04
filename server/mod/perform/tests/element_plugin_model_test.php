@@ -45,6 +45,49 @@ class mod_perform_element_plugin_model_testcase extends advanced_testcase {
      * @throws coding_exception
      */
     public function test_respondable_elements_require_title() {
+        $respondable_element_plugin = $this->get_mock_respondable_element_plugin();
+
+        $entity = new element_entity();
+        $entity->title = 'test title';
+
+        // No exception thrown.
+        $respondable_element_plugin->validate_element($entity);
+
+        $entity->title = null;
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Respondable elements must include a title');
+        $respondable_element_plugin->validate_element($entity);
+    }
+
+    /**
+     * Make sure that the respondable element plugin validation function fails if no title is provided
+     *
+     * @throws coding_exception
+     */
+    public function test_respondable_elements_validate_max_title() {
+        $respondable_element_plugin = $this->get_mock_respondable_element_plugin();
+
+        $entity = new element_entity();
+        $entity->title = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat accumsan ligula. 
+                          Curabitur ut euismod tellus, eget facilisis metus. Fusce eu hendrerit risus, non
+                          bibendum arcu. Donec iaculis porta arcu ut sollicitudin. Phasellus tempus elit nisi,
+                          at interdum odio convallis dictum. Sed aliquam ligula eu dui sagittis pellentesque.
+                          Nullam sodales ac quam condimentum vestibulum. Duis purus ligula, pharetra hendrerit felis
+                          vel, consectetur rhoncus erat. Nam arcu felis, lacinia eu rhoncus non, tristique a urna.
+                          Praesent ullamcorper dolor lorem, ut suscipit lectus malesuada nec. Interdum et malesuada
+                          fames ac ante ipsum primis in faucibus. Sed sed nunc tristique, tincidunt erat nec, auctor dui.
+                          Morbi eleifend felis nisi, facilisis vulputate sem lobortis ac. Praesent sit amet porttitor
+                          nisl. Quisque mauris magna, consectetur quis neque in, sollicitudin volutpat libero.
+                          Aenean metus leo, scelerisque sit amet fringilla eget, luctus vitae dui. Mauris gravida
+                          nisl eros, eget auctor erat rutrum quis. Fusce tellus test.';
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Respondable element title text exceeds the maximum length');
+        $respondable_element_plugin->validate_element($entity);
+    }
+
+    private function get_mock_respondable_element_plugin(): respondable_element_plugin {
         $respondable_element_plugin = new class extends respondable_element_plugin {
             public function __construct() {
             }
@@ -64,17 +107,6 @@ class mod_perform_element_plugin_model_testcase extends advanced_testcase {
                 return collection::new([]);
             }
         };
-
-        $entity = new element_entity();
-        $entity->title = 'test title';
-
-        // No exception thrown.
-        $respondable_element_plugin->validate_element($entity);
-
-        $entity->title = null;
-
-        $this->expectException('coding_exception');
-        $respondable_element_plugin->validate_element($entity);
+        return $respondable_element_plugin;
     }
-
 }

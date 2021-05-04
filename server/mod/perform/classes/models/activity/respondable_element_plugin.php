@@ -25,6 +25,7 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use core\collection;
+use core_text;
 use mod_perform\entity\activity\element as element_entity;
 use mod_perform\models\activity\helpers\element_response_has_files;
 use mod_perform\models\response\element_validation_error;
@@ -39,6 +40,8 @@ use mod_perform\models\response\section_element_response;
  * @package mod_perform\models\activity
  */
 abstract class respondable_element_plugin extends element_plugin {
+
+    public const MAX_TITLE_LENGTH = 1024;
 
     /**
      * Hook method to validate the response data.
@@ -80,6 +83,9 @@ abstract class respondable_element_plugin extends element_plugin {
         // All respondable elements require a title.
         if (empty(trim($element->title))) {
             throw new coding_exception('Respondable elements must include a title');
+        }
+        if (core_text::strlen($element->title) > self::MAX_TITLE_LENGTH) {
+            throw new coding_exception('Respondable element title text exceeds the maximum length');
         }
     }
 
