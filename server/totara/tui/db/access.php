@@ -41,7 +41,7 @@ $capabilities = array(
 
     // Allows users to access appearance settings for specific tenant.
     'totara/tui:themesettings' => array(
-        'riskbitmask' => RISK_CONFIG,
+        'riskbitmask' => RISK_CONFIG | RISK_XSS | RISK_ALLOWXSS,
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_COURSECAT,
         'archetypes' => array(
