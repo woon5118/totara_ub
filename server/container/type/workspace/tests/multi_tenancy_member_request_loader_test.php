@@ -46,6 +46,7 @@ class container_workspace_multi_tenancy_member_request_loader_testcase extends a
         $user_one = $generator->create_user();
 
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
         $this->setUser($user_one);
 
         // Create a workspace.

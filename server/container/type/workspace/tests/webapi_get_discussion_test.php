@@ -118,8 +118,11 @@ class container_workspace_webapi_get_discussion_testcase extends advanced_testca
         $tenant2 = $this->tenant_generator()->create_tenant();
 
         $this->tenant_generator()->migrate_user_to_tenant($owner->id, $tenant1->id);
+        $owner->tenantid = $tenant1->id;
         $this->tenant_generator()->migrate_user_to_tenant($user1->id, $tenant1->id);
+        $user1->tenantid = $tenant1->id;
         $this->tenant_generator()->migrate_user_to_tenant($user2->id, $tenant2->id);
+        $user2->tenantid = $tenant2->id;
 
         $this->setUser($owner);
         $generated = $this->make_workspaces();

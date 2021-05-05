@@ -34,5 +34,13 @@ $observers = array(
     array(
         'eventname' => '\totara_program\event\program_deleted',
         'callback' => '\totara_catalog\observer\program_search_metadata_observer::remove_search_metadata'
+    ),
+    array(
+        'eventname' => '\core\event\tenant_created',
+        'callback' => '\totara_catalog\observer\cache_update_observer::update_catalog_container_cache'
+    ),
+    array(
+        'eventname' => '\core\event\tenant_deleted',
+        'callback' => '\totara_catalog\observer\cache_update_observer::update_catalog_container_cache'
     )
 );

@@ -72,6 +72,7 @@ class container_workspace_webapi_shared_cards_testcase extends advanced_testcase
         $tenant_gen =  $this->getDataGenerator()->get_plugin_generator('totara_tenant');
         $tenant2 = $tenant_gen->create_tenant();
         $tenant_gen->migrate_user_to_tenant($member->id, $tenant2->id);
+        $member->tenantid = $tenant2->id;
 
         $this->setUser($member);
         $this->assert_negative($workspace);
@@ -148,7 +149,10 @@ class container_workspace_webapi_shared_cards_testcase extends advanced_testcase
 
             $tenant = $tenant_gen->create_tenant();
             $tenant_gen->migrate_user_to_tenant($owner->id, $tenant->id);
+            $owner->tenantid = $tenant->id;
+
             $tenant_gen->migrate_user_to_tenant($member->id, $tenant->id);
+            $member->tenantid = $tenant->id;
         }
 
         $this->setUser($owner);

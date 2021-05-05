@@ -42,6 +42,7 @@ class container_workspace_multi_tenancy_non_member_loader_testcase extends advan
         // Create this special users within a tenant.
         $user_one = $generator->create_user();
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
 
         // Create 5 users within tenant one and 7 users within tenant 2.
         $non_members_tenant_one = [];
@@ -98,6 +99,7 @@ class container_workspace_multi_tenancy_non_member_loader_testcase extends advan
         $tenant_two = $tenant_generator->create_tenant();
 
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
 
         // Create users participant of tenants
         $participant_users = [];

@@ -45,6 +45,7 @@ class container_workspace_multi_tenancy_member_request_testcase extends advanced
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_one->id);
 
         // Log in as user one and create a private workspace.
+        $user_one->tenantid = $tenant_one->id;
         $this->setUser($user_one);
 
         /** @var container_workspace_generator $workspace_generator */
@@ -82,7 +83,9 @@ class container_workspace_multi_tenancy_member_request_testcase extends advanced
         $user_two = $generator->create_user();
 
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
+        $user_two->tenantid = $tenant_two->id;
 
         // Log in as first user and create a private workspace
         $this->setUser($user_one);

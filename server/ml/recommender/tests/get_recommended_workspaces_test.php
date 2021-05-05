@@ -155,9 +155,16 @@ class ml_recommender_get_recommended_workspaces_testcase extends advanced_testca
         $user4 = $generator->create_user();
 
         $tenant_generator->migrate_user_to_tenant($user1->id, $tenant1->id);
+        $user1->tenantid = $tenant1->id;
+
         $tenant_generator->migrate_user_to_tenant($user2->id, $tenant1->id);
+        $user2->tenantid = $tenant1->id;
+
         $tenant_generator->migrate_user_to_tenant($user3->id, $tenant2->id);
+        $user3->tenantid = $tenant2->id;
+
         $tenant_generator->migrate_user_to_tenant($user4->id, $tenant2->id);
+        $user4->tenantid = $tenant2->id;
 
         $workspace_ids = [];
 

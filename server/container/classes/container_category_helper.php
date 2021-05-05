@@ -66,7 +66,7 @@ final class container_category_helper {
         }
 
         if (empty($tenant_id)) {
-            if ($user_id == $USER->id && !empty($USER->tenantid)) {
+            if ($user_id == $USER->id && property_exists($USER, 'tenantid')) {
                 $tenant_id = $USER->tenantid;
             } else {
                 $tenant_id = $DB->get_field('user', 'tenantid', ['id' => $user_id]);

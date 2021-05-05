@@ -110,6 +110,7 @@ class category_filters {
      * @return callable
      */
     private static function get_optionsloader(): callable {
+        \coursecat::prime_catalog_categories_caches();
         return function () {
             $topcat = \coursecat::get(0);
 

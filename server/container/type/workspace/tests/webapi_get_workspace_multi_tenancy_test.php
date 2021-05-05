@@ -46,7 +46,9 @@ class container_workspace_webapi_get_workspace_multi_tenancy_testcase extends ad
         $tenant_two = $tenant_generator->create_tenant();
 
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
+        $user_two->tenantid = $tenant_two->id;
 
         // Log in as first user and create a public workspace.
         $this->setUser($user_one);
@@ -84,7 +86,9 @@ class container_workspace_webapi_get_workspace_multi_tenancy_testcase extends ad
         $tenant_two = $tenant_generator->create_tenant();
 
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
+        $user_two->tenantid = $tenant_two->id;
 
         // Log in as first user and create a public workspace.
         $this->setUser($user_one);
@@ -121,6 +125,7 @@ class container_workspace_webapi_get_workspace_multi_tenancy_testcase extends ad
         $tenant = $tenant_generator->create_tenant();
 
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant->id);
+        $user_one->tenantid = $tenant->id;
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant->id);
 
         // Log in as first user and create a public workspace.

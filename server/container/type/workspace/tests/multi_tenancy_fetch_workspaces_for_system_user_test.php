@@ -237,6 +237,7 @@ class container_workspace_multi_tenancy_fetch_workspaces_for_system_users_testca
 
         $tenant = $tenant_generator->create_tenant();
         $tenant_generator->migrate_user_to_tenant($this->user_one->id, $tenant->id);
+        $this->user_one->tenantid = $tenant->id;
 
         // Log in as user one to create a tenant workspace.
         $this->setUser($this->user_one);

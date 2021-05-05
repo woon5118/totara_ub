@@ -82,6 +82,7 @@ class container_workspace_find_users_testcase extends advanced_testcase {
 
         $tenant = $tenant_generator->create_tenant();
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant->id);
+        $user_one->tenantid = $tenant->id;
 
         $this->setUser($user_one);
         $workspace_generator = $this->get_workspace_generator();
@@ -127,6 +128,7 @@ class container_workspace_find_users_testcase extends advanced_testcase {
 
         $tenant = $tenant_generator->create_tenant();
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant->id);
+        $user_two->tenantid = $tenant->id;
         $tenant_generator->set_user_participation($user_three->id, [$tenant->id]);
 
         // Log in as user to create a workspace within a tenant.

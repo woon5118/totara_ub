@@ -42,10 +42,11 @@ class container_workspace_multi_tenancy_add_member_testcase extends advanced_tes
         $tenant_one = $tenant_generator->create_tenant();
         $tenant_two = $tenant_generator->create_tenant();
 
-        $tenant_generator-> migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
 
         // Login as first user and create workspace then add user to the workspace.
+        $user_one->tenantid = $tenant_one->id;
         $this->setUser($user_one);
 
         /** @var container_workspace_generator $workspace_generator */

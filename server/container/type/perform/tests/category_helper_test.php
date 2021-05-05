@@ -92,7 +92,7 @@ class container_perform_category_helper_testcase extends advanced_testcase {
         $this->assertEquals($tenant_category_id, container_category_helper::get_default_category_id(perform::get_type()));
 
         self::setUser(null);
-        $tenant_user->tenantid = null;
+        unset($tenant_user->tenantid);
         self::setUser($tenant_user);
         // Logged in user doesn't have a tenantid in their $USER object, so fetch it from the DB.
         $this->assertEquals($tenant_category_id, container_category_helper::get_default_category_id(perform::get_type()));

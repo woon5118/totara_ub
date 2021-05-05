@@ -49,7 +49,9 @@ class container_workspace_multi_tenancy_testcase extends advanced_testcase {
 
         // Add user one to tenant one and user two to tenant two
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
+        $user_two->tenantid = $tenant_two->id;
 
         // Now start creating the several workspaces for user_one.
         /** @var container_workspace_generator $workspace_generator */

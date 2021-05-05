@@ -1145,9 +1145,14 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 }
             }
 
-            // We don't care about container categories.
-            $invisibleids = array_diff($invisibleids, \core_container\container_category_helper::get_container_category_ids());
+            $containers = $coursecatcache->get('containerids');
+            if ($containers  === false) {
+                $containers = \core_container\container_category_helper::get_container_category_ids();
+                $coursecatcache->set('containerids', $containers);
+            }
 
+            // We don't care about container categories.
+            $invisibleids = array_diff($invisibleids, $containers);
             $coursecatcache->set($cache_key, $invisibleids);
         }
         return $invisibleids;
@@ -1287,17 +1292,48 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         if ($offset || $limit) {
             $sortedids = array_slice($sortedids, $offset, $limit);
         }
+
+        $rv = array();
         if (isset($records)) {
             // Easy, we have already retrieved records.
             if ($offset || $limit) {
                 $records = array_slice($records, $offset, $limit, true);
             }
         } else {
-            list($sql, $params) = $DB->get_in_or_equal($sortedids, SQL_PARAMS_NAMED, 'id');
-            $records = self::get_records('cc.id '. $sql . " AND " . $where_system, array('parent' => $this->id) + $params + $where_system_param);
+            // First lets see if these are in the records cache.
+
+            $citems = self::get_many($sortedids);
+            if (!empty($citems)) {
+                // Now we'll have to manually remove any containers since we can't do it via sql like the queries.
+                $containers = $coursecatcache->get('containerids');
+                if ($containers  === false) {
+                    $containers = \core_container\container_category_helper::get_container_category_ids();
+                    $coursecatcache->set('containerids', $containers);
+                }
+
+                // Mimic the issystem checks in the sql.
+                if (empty($options['is_system'])) {
+                    foreach ($containers as $containerid) {
+                        unset($citems[$containerid]);
+                    }
+                }
+
+                // Restore the sort order from sortedids.
+                foreach ($sortedids as $id) {
+                    if (isset($citems[$id])) {
+                        $rv[$id] = $citems[$id];
+                    }
+                }
+            }
+
+            // We still need to check these ones.
+            $sortedids = array_diff($sortedids, array_keys($rv));
+            if (!empty($sortedids)) {
+                list($sql, $params) = $DB->get_in_or_equal($sortedids, SQL_PARAMS_NAMED, 'id');
+                $records = self::get_records('cc.id '. $sql . " AND " . $where_system, array('parent' => $this->id) + $params + $where_system_param);
+            }
         }
 
-        $rv = array();
         foreach ($sortedids as $id) {
             if (isset($records[$id])) {
                 $rv[$id] = new coursecat($records[$id]);
@@ -1722,6 +1758,56 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $cnt = count($courses);
         }
         return $cnt;
+    }
+
+    /**
+     * Preloads category records into the appropriate cache for easier retreval
+     * to speed up the initial catalog load.
+     *
+     * @return void
+     */
+    public static function prime_catalog_categories_caches() {
+        global $DB;
+
+        $catscache = cache::make('core', 'coursecat');
+        $catsrecordcache = cache::make('core', 'coursecatrecords');
+        if ($catscache->get('isprimed') === false) {
+            $sortfields = array('sortorder' => 1);
+
+            // Fetch and store container categories.
+            $containers = \core_container\container_category_helper::get_container_category_ids();
+            $catscache->set('containerids', $containers);
+            unset($containers); // Shouldn't be big, but why not free up the memory.
+
+            $children = [];
+            $cats = self::get_records('issystem = :sys', ['sys' => 0]);
+            foreach ($cats as $cat) {
+                // Format and store the categories in the records cache.
+                if ($catsrecordcache->get($cat->id) === false) {
+                    $catsrecordcache->set($cat->id, new coursecat($cat));
+                }
+
+                // Set up a flattened parent=>child array.
+                if (!isset($children[$cat->parent])) {
+                    $children[$cat->parent] = [];
+                }
+                $children[$cat->parent][$cat->id] = $cat;
+            }
+            unset($cats); // Free up the memory.
+
+            // Store the parent=>child arrays in the categories cache.
+            foreach ($children as $parentid => $kids) {
+                $cache_key = 'c'. $parentid . ':' .  serialize($sortfields) . ':0';
+
+                if ($catscache->get($cache_key) === false) {
+                    $catscache->set($cache_key, array_keys($kids));
+                }
+            }
+            unset($children); // Free up the memory.
+
+            // Finally set a flag so we only do this once.
+            $catscache->set('isprimed', true);
+        }
     }
 
     /**

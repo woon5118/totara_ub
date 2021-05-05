@@ -79,6 +79,7 @@ class container_workspace_webapi_non_member_users_testcase extends advanced_test
         $tenant_gen =  $this->getDataGenerator()->get_plugin_generator('totara_tenant');
         $tenant2 = $tenant_gen->create_tenant();
         $tenant_gen->migrate_user_to_tenant($nonmember->id, $tenant2->id);
+        $nonmember->tenantid = $tenant2->id;
 
         $tenant2_context = context_tenant::instance($tenant2->id);
         $roleid = $this->getDataGenerator()->create_role();
@@ -96,6 +97,7 @@ class container_workspace_webapi_non_member_users_testcase extends advanced_test
         $tenant_gen =  $this->getDataGenerator()->get_plugin_generator('totara_tenant');
         $tenant2 = $tenant_gen->create_tenant();
         $tenant_gen->migrate_user_to_tenant($member->id, $tenant2->id);
+        $member->tenantid = $tenant2->id;
 
         $this->setUser($member);
         $this->assert_negative($workspace);
@@ -108,6 +110,7 @@ class container_workspace_webapi_non_member_users_testcase extends advanced_test
         $tenant_gen =  $this->getDataGenerator()->get_plugin_generator('totara_tenant');
         $tenant2 = $tenant_gen->create_tenant();
         $tenant_gen->migrate_user_to_tenant($nonmember->id, $tenant2->id);
+        $nonmember->tenantid = $tenant2->id;
 
         $this->setUser($member);
         $result = $this->execute_graphql_operation(
@@ -147,9 +150,16 @@ class container_workspace_webapi_non_member_users_testcase extends advanced_test
 
             $tenant = $tenant_gen->create_tenant();
             $tenant_gen->migrate_user_to_tenant($owner->id, $tenant->id);
+            $owner->tenantid = $tenant->id;
+
             $tenant_gen->migrate_user_to_tenant($member->id, $tenant->id);
+            $member->tenantid = $tenant->id;
+
             $tenant_gen->migrate_user_to_tenant($nonmember->id, $tenant->id);
+            $nonmember->tenantid = $tenant->id;
+
             $tenant_gen->migrate_user_to_tenant($stranger->id, $tenant->id);
+            $stranger->tenantid = $tenant->id;
         }
 
         $this->setUser($owner);

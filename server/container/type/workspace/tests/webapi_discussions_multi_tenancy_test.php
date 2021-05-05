@@ -46,7 +46,9 @@ class container_workspace_webapi_discussions_multi_tenancy_testcase extends adva
         $tenant_two = $tenant_generator->create_tenant();
 
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
+        $user_two->tenantid = $tenant_two->id;
 
         // Create a workspace by user one.
         $this->setUser($user_one);
@@ -93,7 +95,9 @@ class container_workspace_webapi_discussions_multi_tenancy_testcase extends adva
         $tenant_one = $tenant_generator->create_tenant();
 
         $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $user_one->tenantid = $tenant_one->id;
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_one->id);
+        $user_two->tenantid = $tenant_one->id;
 
         // Create a workspace by user one.
         $this->setUser($user_one);
