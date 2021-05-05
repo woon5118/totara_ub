@@ -92,9 +92,16 @@ class item_evaluator_user_source {
         // the user is assigned to. Therefore using DISTINCT
         // DML generated an error if the integer values were passed via params. Thus using it directly in the SELECT
 
+        if ($criterion_met) {
+            $timeachieved_insert = ", timeachieved";
+            $timeachieved_value = ", {$timeevaluated}";
+        } else {
+            $timeachieved_insert = $timeachieved_value = '';
+        }
+
         $sql = "INSERT INTO {totara_criteria_item_record}
-                (user_id, criterion_item_id, criterion_met, timeevaluated)
-                SELECT DISTINCT tmp." . $temp_user_id_column . ", tci.id, {$criterion_met}, {$timeevaluated}
+                (user_id, criterion_item_id, criterion_met, timeevaluated {$timeachieved_insert})
+                SELECT DISTINCT tmp." . $temp_user_id_column . ", tci.id, {$criterion_met}, {$timeevaluated} {$timeachieved_value}
                      FROM {" . $temp_table_name . "} tmp
                      JOIN {totara_criteria_item} tci
                        ON tci.criterion_id = :criterionid

@@ -79,6 +79,11 @@ abstract class criterion {
     private $validated = false;
 
     /**
+     * @var null
+     */
+    private $last_achieved_date;
+
+    /**
      * Constructor.
      */
     public function __construct() {
@@ -440,6 +445,15 @@ abstract class criterion {
     public function set_last_evaluated(?int $last_evaluated): criterion {
         $this->last_evaluated = $last_evaluated;
         return $this;
+    }
+
+    /**
+     * Get the last achieved date
+     *
+     * @return int|null
+     */
+    public function get_last_achieved_date(): ?int {
+        return $this->last_achieved_date;
     }
 
     /**
@@ -929,25 +943,29 @@ abstract class criterion {
         $num_completed = 0;
 
         $item_results = $this->get_item_results($user_id);
+        $last_achieved_date = null;
 
         foreach ($item_results as $item_result) {
             // Aggregate this item completion result and previously evaluated results
             switch ($this->aggregation_method) {
                 case self::AGGREGATE_ALL:
-                    $overall = $overall && $item_result;
-                    // If any is false - we can stop testing
-                    if (!$overall) {
-                        break 2;
+                    if (!$item_result->criterion_met) {
+                        $overall = false;
+                    } else {
+                        if ($item_result->timeachieved && $item_result->timeachieved > $last_achieved_date) {
+                            $last_achieved_date = $item_result->timeachieved;
+                        }
                     }
                     break;
 
                 case self::AGGREGATE_ANY_N:
-                    if ($item_result) {
+                    if ($item_result->criterion_met) {
                         $num_completed += 1;
                         if ($num_completed >= (int)$this->aggregation_params['req_items']) {
                             $overall = true;
-                            // We can stop testing now - result has been determined
-                            break 2;
+                        }
+                        if ($item_result->timeachieved && $item_result->timeachieved > $last_achieved_date) {
+                            $last_achieved_date = $item_result->timeachieved;
                         }
                     }
                     break;
@@ -956,6 +974,8 @@ abstract class criterion {
                     break;
             }
         }
+
+        $this->last_achieved_date = $last_achieved_date;
 
         return $overall;
     }
@@ -979,13 +999,12 @@ abstract class criterion {
         $sql = "
             SELECT 
                 i.id, 
-                COALESCE((
-                    SELECT r.criterion_met 
-                    FROM {totara_criteria_item_record} r 
-                    WHERE i.id = r.criterion_item_id AND 
-                        r.user_id = :userid
-                ), 0) as criterion_met
+                COALESCE(r.criterion_met, 0) as criterion_met,
+                r.timeachieved
             FROM {totara_criteria_item} i
+            LEFT JOIN {totara_criteria_item_record} r ON 
+                i.id = r.criterion_item_id AND 
+                r.user_id = :userid
             WHERE i.criterion_id = :criterionid 
               AND i.item_type = :itemtype
         ";
@@ -996,7 +1015,7 @@ abstract class criterion {
             'itemtype' => $this->get_items_type()
         ];
 
-        $existing_records = $DB->get_records_sql_menu($sql, $params);
+        $existing_records = $DB->get_records_sql($sql, $params);
 
         return $existing_records;
     }

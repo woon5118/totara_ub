@@ -1,8 +1,8 @@
 <?php
-/*
- * This file is part of Totara LMS
+/**
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.dro
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Jonathan Newman <jonathan.newman@catalyst.net.nz>
- * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
- * @package totara
- * @subpackage totara_core
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package totara_competency
  */
 
 /**
@@ -32,6 +30,16 @@ function xmldb_totara_competency_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
+
+
+    if ($oldversion < 2020100102) {
+        require_once $CFG->dirroot . '/totara/competency/db/upgradelib.php';
+
+        totara_competency_upgrade_update_aggregation_method_setting();
+
+        // Criteria savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100102, 'totara', 'competency');
+    }
 
     return true;
 }

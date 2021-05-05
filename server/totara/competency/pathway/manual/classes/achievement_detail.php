@@ -62,6 +62,7 @@ class achievement_detail extends base_achievement_detail {
         if (!is_null($rating)) {
             $this->related_info['rating_id'] = $rating->id;
             $this->set_scale_value_id($rating->scale_value_id);
+            $this->set_achieved_at($rating->date_assigned);
         }
     }
 }

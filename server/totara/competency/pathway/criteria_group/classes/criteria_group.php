@@ -548,10 +548,14 @@ class criteria_group extends pathway {
         $achievement_detail = new achievement_detail();
 
         $result = true;
+        $last_achieved_date = null;
         foreach ($this->criteria as $criterion) {
             $crit_satisfied = $criterion->aggregate($user_id);
             if ($crit_satisfied) {
                 $achievement_detail->add_completed_criterion($criterion);
+                if ($criterion->get_last_achieved_date() > $last_achieved_date) {
+                    $last_achieved_date = $criterion->get_last_achieved_date();
+                }
             }
 
             $result = $result && $crit_satisfied;
@@ -562,7 +566,8 @@ class criteria_group extends pathway {
         }
 
         if ($result) {
-            $achievement_detail->set_scale_value_id($this->scale_value->id);
+            $achievement_detail->set_scale_value_id($this->scale_value->id)
+                ->set_achieved_at($last_achieved_date);
         } else {
             // Remove any achievement data if the user didn't actually achieve a value.
             $achievement_detail->set_related_info([]);

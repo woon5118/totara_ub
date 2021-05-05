@@ -21,12 +21,14 @@
  * @package criteria_childcompetency
  */
 
+use core\hook\admin_setting_changed;
 use core_user\hook\allow_view_profile_field;
 use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_competency\hook\competency_configuration_changed;
 use totara_competency\watcher\configuration as configuration_watcher;
 use totara_competency\watcher\core_user;
 use totara_competency\watcher\notify_users_of_proficiency_change;
+use totara_competency\watcher\settings;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -43,4 +45,8 @@ $watchers = [
         'hookname' => competency_achievement_updated_bulk::class,
         'callback' => [notify_users_of_proficiency_change::class, 'send_notification'],
     ],
+    [
+        'hookname' => admin_setting_changed::class,
+        'callback' => settings::class.'::admin_setting_changed',
+    ]
 ];

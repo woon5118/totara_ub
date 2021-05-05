@@ -21,7 +21,7 @@
  * @package totara_competency
  */
 
-use aggregation_latest_achieved\latest_achieved;
+use aggregation_highest\highest;
 use core\orm\collection;
 use core\orm\query\builder;
 use criteria_childcompetency\childcompetency;
@@ -490,7 +490,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
         $this->assertTrue($has_learning_plan, 'Learning plan pathway not found');
 
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertTrue($achievement_configuration->has_aggregation_type(latest_achieved::aggregation_type()));
+        $this->assertTrue($achievement_configuration->has_aggregation_type(highest::aggregation_type()));
     }
 
 }

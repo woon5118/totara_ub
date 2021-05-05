@@ -137,8 +137,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
             $this->assertTrue(in_array($record->user_id, $test_users));
             if ($record->user_id == $data->users[1]->id) {
                 $this->assertEquals(1, $record->criterion_met);
+                $this->assertEquals($completion->timecompleted, $record->timeachieved);
             } else {
                 $this->assertEquals(0, $record->criterion_met);
+                $this->assertNull($record->timeachieved);
             }
         }
 
@@ -191,6 +193,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         foreach ($item_records as $record) {
             $this->assertTrue(in_array($record->user_id, $test_users));
             $this->assertEquals(0, $record->criterion_met);
+            $this->assertNull($record->timeachieved);
         }
 
         // Similarly - user1's has_changes in the temp table should be set, but not user2's
@@ -252,8 +255,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
             $this->assertTrue(in_array($record->user_id, $test_users));
             if ($record->user_id == $data->users[1]->id) {
                 $this->assertEquals(1, $record->criterion_met);
+                $this->assertEquals($completion->timecompleted, $record->timeachieved);
             } else {
                 $this->assertEquals(0, $record->criterion_met);
+                $this->assertNull($record->timeachieved);
             }
         }
 

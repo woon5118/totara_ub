@@ -140,6 +140,7 @@ class totara_competency_userdata_testcase extends advanced_testcase {
             'criterion_id'          => $record->item->criterion->id,
             'criterion_plugin_type' => $record->item->criterion->plugin_type,
             'time_evaluated'        => $record->timeevaluated,
+            'time_achieved'         => $record->timeachieved,
         ]);
     }
 

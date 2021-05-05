@@ -27,7 +27,7 @@ use totara_competency\entity\pathway_achievement;
 use totara_competency\hook\competency_configuration_changed;
 
 global $CFG;
-require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.php');
+require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation_base_test.php');
 
 /**
  * This class contains integration tests with all pathways of the same type with multiple runs
@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
  *
  * @group totara_competency
  */
-class totara_competency_integration_multi_type_testcase extends totara_competency_integration_aggregation {
+class totara_competency_integration_multi_type_testcase extends totara_competency_integration_aggregation_base_testcase {
 
     /**
      * Test aggregation task with a typical legacy aggregation using latest_achieved aggregation
@@ -62,7 +62,7 @@ class totara_competency_integration_multi_type_testcase extends totara_competenc
 
         $this->othercompetency_manual_run_1($data, $task_to_execute);
         $this->othercompetency_manual_run_2($data, $task_to_execute);
-//        $this->othercompetency_manual_run_3($data, $task_to_execute);
+        // $this->othercompetency_manual_run_3($data, $task_to_execute);
     }
 
     /**

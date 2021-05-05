@@ -41,6 +41,7 @@
         <FIELD NAME="criterion_item_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the item instance"/>
         <FIELD NAME="criterion_met" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="true/false"/>
         <FIELD NAME="timeevaluated" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false" COMMENT="Last time this criterion has been evaluated for the user"/>
+        <FIELD NAME="timeachieved" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false" COMMENT="The time this criterion has been achieved"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

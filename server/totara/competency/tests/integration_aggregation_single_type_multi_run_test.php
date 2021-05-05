@@ -32,7 +32,7 @@ use totara_competency\linked_courses;
 use totara_criteria\criterion;
 
 global $CFG;
-require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.php');
+require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation_base_test.php');
 
 /**
  * This class contains integration tests with all pathways of the same type with multiple runs
@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
  *
  * @group totara_competency
  */
-class totara_competency_integration_aggregation_single_type_multi_run_testcase extends totara_competency_integration_aggregation {
+class totara_competency_integration_aggregation_single_type_multi_run_testcase extends totara_competency_integration_aggregation_base_testcase {
 
     /**
      * Test aggregation task with a combination of criteria_groups and multiple runs

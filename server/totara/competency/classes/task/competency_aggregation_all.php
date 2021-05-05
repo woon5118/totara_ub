@@ -27,6 +27,7 @@ use core\task\scheduled_task;
 use totara_competency\aggregation_helper;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
+use totara_competency\migration_helper;
 
 /**
  * Aggregates competency achievements for all users actively assigned to any competency in the system.
@@ -43,6 +44,19 @@ class competency_aggregation_all extends scheduled_task {
     private $aggregation_time = null;
 
     /**
+     * If set to true it runs the task even if the migration is running
+     * @var bool
+     */
+    private $is_run_forced = false;
+
+    /**
+     * Set the force flag
+     */
+    public function force_run() {
+        $this->is_run_forced = true;
+    }
+
+    /**
      * @param int $timestamp
      */
     public function set_aggregation_time(int $timestamp) {
@@ -54,6 +68,12 @@ class competency_aggregation_all extends scheduled_task {
     }
 
     public function execute() {
+        // While the migration script hasn't been run don't aggregate
+        // to make sure there's no interference
+        if (!$this->is_run_forced && !migration_helper::is_migration_finished()) {
+            return;
+        }
+
         $table = new aggregation_users_table('totara_competency_aggregation_temp', true);
 
         $this->fill_temp_table($table);

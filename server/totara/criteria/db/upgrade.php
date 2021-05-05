@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses);.
  *
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package torara_criterion
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package totara_criteria
  */
 
 /**
@@ -31,6 +32,30 @@ function xmldb_totara_criteria_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
+
+    if ($oldversion < 2020100102) {
+
+        // Define field timeachieved to be added to totara_criteria_item_record.
+        $table = new xmldb_table('totara_criteria_item_record');
+        $field = new xmldb_field('timeachieved', XMLDB_TYPE_INTEGER, '18', null, null, null, null, 'timeevaluated');
+
+        // Conditionally launch add field timeachieved.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Update existing records which do not have the timeachieved value yet
+        $sql = "
+            UPDATE {totara_criteria_item_record} 
+            SET timeachieved = timeevaluated 
+            WHERE timeevaluated > 0 AND criterion_met = 1
+        ";
+        $DB->execute($sql);
+
+        // Criteria savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100102, 'totara', 'criteria');
+    }
+
 
     return true;
 }

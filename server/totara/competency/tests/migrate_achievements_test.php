@@ -69,6 +69,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(0, $DB->count_records('comp_record'));
         $this->assertEquals(0, $DB->count_records('comp_record_history'));
 
+        migration_helper::queue_migration();
         migration_helper::migrate_achievements();
 
         // For the most part, we just need to make sure we've made it here without an exception.
@@ -77,12 +78,49 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(0, $DB->count_records('totara_competency_assignments'));
     }
 
+    public function test_single_current_comp_record_with_a_learning_plan_assignment() {
+        global $DB;
+
+        $this->setAdminUser();
+
+        $comp_record = $this->add_comp_record(100, 200, null, 300, 400);
+
+        // Now add the comp_record_history.
+        $this->add_comp_record_history(
+            $comp_record->competencyid,
+            $comp_record->userid,
+            null,
+            // Timemodified doesn't have to be the same. We expect there will be records where this is the case.
+            $comp_record->timemodified + 1
+        );
+
+        /** @var totara_plan_generator $plan_generator */
+        $plan_generator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
+
+        // Create a plan and add competency.
+        $plan1 = $plan_generator->create_learning_plan(['userid' => 200]);
+        $plan_generator->add_learning_plan_competency($plan1->id, 100);
+
+        $this->setCurrentTimeStart();
+
+        // Now remove the configuration setting allowing us to run migration again
+        migration_helper::queue_migration();
+        migration_helper::migrate_achievements();
+
+        $plan_values = $DB->get_records('dp_plan_competency_value');
+        $this->assertCount(1, $plan_values);
+
+        $achievements = $DB->get_records('totara_competency_achievement');
+        $this->assertCount(1, $achievements);
+    }
+
     public function test_single_current_comp_record() {
         global $DB;
 
         $comp_record = $this->add_comp_record(100, 200, null, 300, 400);
 
         // First off, try this without a comp_record_history.
+        migration_helper::queue_migration();
         migration_helper::migrate_achievements();
 
         // The comp_record did not get migrated. This is because it is already supposed to have an
@@ -115,8 +153,11 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertCount(0, $assignments);
 
         // Now remove the configuration setting allowing us to run migration again
-        unset_config('achievements_migrated', 'totara_competency');
+        migration_helper::queue_migration();
         migration_helper::migrate_achievements();
+
+        $plan_values = $DB->get_records('dp_plan_competency_value');
+        $this->assertCount(0, $plan_values);
 
         $achievements = $DB->get_records('totara_competency_achievement');
         $this->assertCount(1, $achievements);
@@ -155,6 +196,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
 
         $this->setCurrentTimeStart();
 
+        migration_helper::queue_migration();
         migration_helper::migrate_achievements();
 
         $achievements = $DB->get_records('totara_competency_achievement');
@@ -220,7 +262,11 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
 
         $this->setCurrentTimeStart();
 
+        migration_helper::queue_migration();
         migration_helper::migrate_achievements();
+
+        $plan_values = $DB->get_records('dp_plan_competency_value');
+        $this->assertCount(0, $plan_values);
 
         $achievements = $DB->get_records('totara_competency_achievement', null, 'time_created ASC');
         $this->assertCount(2, $achievements);
@@ -270,6 +316,8 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
 
     public function test_multiple_users_and_competencies() {
         global $DB;
+
+        $this->setAdminUser();
 
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
@@ -326,7 +374,22 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         // Eve only has a history record, but no comp_record. This could be invalid data, but let's be aware of what happens with it.
         $listening_eve = $this->add_comp_record_history($listening, $eve, $listening_proficient->id, 500);
 
+        /** @var totara_plan_generator $plan_generator */
+        $plan_generator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
+
+        // Create a plan and add competency.
+        $plan1 = $plan_generator->create_learning_plan(['userid' => $bob]);
+        $plan_generator->add_learning_plan_competency($plan1->id, $talking);
+
+        $plan2 = $plan_generator->create_learning_plan(['userid' => $alice]);
+        $plan_generator->add_learning_plan_competency($plan2->id, $talking);
+
+        migration_helper::queue_migration();
         migration_helper::migrate_achievements();
+
+        // Only two users have competencies in the learning plan
+        $plan_values = $DB->get_records('dp_plan_competency_value');
+        $this->assertCount(2, $plan_values);
 
         // There should be 1 record for each of the history records added above.
         $this->assertEquals(10, $DB->count_records('totara_competency_achievement'));
@@ -537,9 +600,10 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
 
         $this->setCurrentTimeStart();
 
+        migration_helper::queue_migration();
         migration_helper::migrate_achievements();
 
-        $achievements = $DB->get_records('totara_competency_achievement', null, 'time_created ASC');
+        $achievements = $DB->get_records('totara_competency_achievement', null, 'time_created ASC, id ASC');
         $this->assertCount(2, $achievements);
 
         // Let's check that only one assignment was created for the first record
@@ -554,7 +618,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($assignment->id, $achievement1->assignment_id);
         $this->assertEquals($comp_record_history1->proficiency, $achievement1->scale_value_id);
         $this->assertEquals(0, $achievement1->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement1->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement1->status);
         $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_created);
         $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_status);
         $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_scale_value);

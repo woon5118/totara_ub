@@ -66,20 +66,24 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
     /**
      * Create a totara_criteria_item_record row
      *
-     * @param  int $item_id
-     * @param  int $user_id
-     * @param  int $is_met
-     * @return int Id of inserted row
+     * @param int $item_id
+     * @param int $user_id
+     * @param int $is_met
+     * @return stdClass the created record
      */
-    private function create_item_record(int $item_id, int $user_id, int $is_met = 0): int {
+    private function create_item_record(int $item_id, int $user_id, int $is_met = 0): stdClass {
         global $DB;
 
         $record = new stdClass();
         $record->criterion_item_id = $item_id;
         $record->user_id = $user_id;
         $record->criterion_met = $is_met;
+        $record->timeachieved = $is_met ? time() : null;
         $record->timeevaluated = time();
-        return $DB->insert_record('totara_criteria_item_record', $record);
+
+        $id = $DB->insert_record('totara_criteria_item_record', $record);
+
+        return $DB->get_record('totara_criteria_item_record', ['id' => $id]);
     }
 
     /**
@@ -154,15 +158,16 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
             'id',
             ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]
         );
-        $record_id = $this->create_item_record($item_id, $user_id, $is_met);
+        $record = $this->create_item_record($item_id, $user_id, $is_met);
 
         $data->source_table->queue_for_aggregation($user_id, 1);
         $user_source = new item_evaluator_user_source($data->source_table);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
 
-        $record = $DB->get_record('totara_criteria_item_record', ['id' => $record_id]);
+        $record = $DB->get_record('totara_criteria_item_record', ['id' => $record->id]);
         $this->assertEquals(0, $record->criterion_met);
+        $this->assertNull($record->timeachieved);
     }
 
     /**
@@ -292,20 +297,27 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
             ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]
         );
 
-        if (is_null($assignment_id = $achievement['assignment'] ?? null)) {
-            $assignment = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
-            $assignment_id = $assignment->id;
-        }
+        $assignments = [];
+        $assignments[1] = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
+        $assignments[2] = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
 
         foreach ($achievements as $achievement) {
+            if (!empty($achievement['assignment'])) {
+                $assignment = $assignments[$achievement['assignment']];
+            } else {
+                $assignment = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
+            }
+
             $this->create_achievement(
                 $child_id,
                 $user_id,
-                $assignment_id,
+                $assignment->id,
                 $achievement['proficient'] ?? 0,
                 $achievement['status'] ?? null
             );
         }
+
+        $this->waitForSecond();
 
         $data->source_table->queue_for_aggregation($user_id, 1);
         $user_source = new item_evaluator_user_source($data->source_table);
@@ -314,6 +326,12 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
         $record = $DB->get_record('totara_criteria_item_record', ['criterion_item_id' => $item_id, 'user_id' => $user_id]);
         $this->assertEquals($expected_is_met, $record->criterion_met);
+        if ($expected_is_met) {
+            $this->assertNotNull($record->timeachieved);
+            $this->assertLessThan($record->timeevaluated, $record->timeachieved);
+        } else {
+            $this->assertNull($record->timeachieved);
+        }
     }
 
     /**
@@ -325,7 +343,10 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 'child_id' => 11,
                 'user_id' => 100,
                 'achievements' => [
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]
+                    [
+                        'proficient' => 0,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ]
                 ],
                 'criterion_met' => 0,
                 'expected_met' => 0,
@@ -334,7 +355,10 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 'child_id' => 11,
                 'user_id' => 101,
                 'achievements' => [
-                    ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]
+                    [
+                        'proficient' => 1,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ]
                 ],
                 'criterion_met' => 0,
                 'expected_met' => 1,
@@ -343,7 +367,10 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 'child_id' => 11,
                 'user_id' => 102,
                 'achievements' => [
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]
+                    [
+                        'proficient' => 0,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ]
                 ],
                 'criterion_met' => 1,
                 'expected_met' => 0,
@@ -352,8 +379,16 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 'child_id' => 11,
                 'user_id' => 103,
                 'achievements' => [
-                    ['proficient' => 1, 'status' => competency_achievement::SUPERSEDED],
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
+                    [
+                        'proficient' => 1,
+                        'assignment_id' => 1,
+                        'status' => competency_achievement::SUPERSEDED
+                    ],
+                    [
+                        'proficient' => 0,
+                        'assignment_id' => 1,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ],
                 ],
                 'criterion_met' => 1,
                 'expected_met' => 0,
@@ -362,8 +397,16 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 'child_id' => 11,
                 'user_id' => 104,
                 'achievements' => [
-                    ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
+                    [
+                        'proficient' => 1,
+                        'assignment_id' => 1,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ],
+                    [
+                        'proficient' => 0,
+                        'assignment_id' => 2,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT
+                    ],
                 ],
                 'criterion_met' => 1,
                 'expected_met' => 1,
@@ -397,21 +440,29 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
             'id',
             ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]
         );
-        $this->create_item_record($item_id, $user_id, $criterion_met);
+        $existing_item_record = $this->create_item_record($item_id, $user_id, $criterion_met);
 
-        if (is_null($assignment_id = $achievement['assignment'] ?? null)) {
-            $assignment = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
-            $assignment_id = $assignment->id;
-        }
+        $assignments = [];
+        $assignments[1] = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
+        $assignments[2] = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
 
         foreach ($achievements as $achievement) {
-            $this->create_achievement($child_id,
+            if (!empty($achievement['assignment'])) {
+                $assignment = $assignments[$achievement['assignment']];
+            } else {
+                $assignment = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
+            }
+
+            $this->create_achievement(
+                $child_id,
                 $user_id,
-                $assignment_id,
+                $assignment->id,
                 $achievement['proficient'] ?? 0,
                 $achievement['status'] ?? null
             );
         }
+
+        $this->waitForSecond();
 
         $data->source_table->queue_for_aggregation($user_id, 1);
         $user_source = new item_evaluator_user_source($data->source_table);
@@ -420,6 +471,16 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
         $record = $DB->get_record('totara_criteria_item_record', ['criterion_item_id' => $item_id, 'user_id' => $user_id]);
         $this->assertEquals($expected_is_met, $record->criterion_met);
+        if ($expected_is_met && $criterion_met) {
+            // Nothing changed, should still match the existing record
+            $this->assertEquals($existing_item_record->timeachieved, $record->timeachieved);
+            $this->assertEquals($existing_item_record->timeevaluated, $record->timeevaluated);
+        } else if ($expected_is_met) {
+            $this->assertNotNull($record->timeachieved);
+            $this->assertLessThan($record->timeevaluated, $record->timeachieved);
+        } else {
+            $this->assertNull($record->timeachieved);
+        }
     }
 
 

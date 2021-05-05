@@ -116,10 +116,12 @@ abstract class pathway_evaluator {
             $achievements_to_create = [];
             foreach ($to_reaggregate as $record) {
                 $aggregated_achievement_detail = $this->pathway->aggregate_current_value($record->user_id);
+                $achieved_at = $aggregated_achievement_detail->get_achieved_at() ?? $evaluation_time;
 
                 if (!is_null($record->achievement_id)) {
                     $achievement = new pathway_achievement($record->achievement_id);
                     if ($aggregated_achievement_detail->get_scale_value_id() == $record->scale_value_id) {
+                        // We do not update the achievement date deliberately as nothing else changed
                         $achievement->last_aggregated = $evaluation_time;
                         $achievement->save();
                     } else {
@@ -127,6 +129,7 @@ abstract class pathway_evaluator {
                         $achievements_to_create[] = $this->create_achievement(
                             $record->user_id,
                             $evaluation_time,
+                            $achieved_at,
                             $aggregated_achievement_detail
                         );
                     }
@@ -134,6 +137,7 @@ abstract class pathway_evaluator {
                     $achievements_to_create[] = $this->create_achievement(
                         $record->user_id,
                         $evaluation_time,
+                        $achieved_at,
                         $aggregated_achievement_detail
                     );
                 }
@@ -152,17 +156,18 @@ abstract class pathway_evaluator {
      *
      * @param int $user_id
      * @param int $evaluation_time
+     * @param int $achieved_at
      * @param base_achievement_detail $achievement_detail
      * @return stdClass
      */
-    private function create_achievement(int $user_id, int $evaluation_time, base_achievement_detail $achievement_detail): stdClass {
+    private function create_achievement(int $user_id, int $evaluation_time, int $achieved_at, base_achievement_detail $achievement_detail): stdClass {
         $new_achievement = new stdClass();
         $new_achievement->pathway_id = $this->pathway->get_id();
         $new_achievement->user_id = $user_id;
         $new_achievement->scale_value_id = $achievement_detail->get_scale_value_id();
         $new_achievement->status = pathway_achievement::STATUS_CURRENT;
         $new_achievement->last_aggregated = $evaluation_time;
-        $new_achievement->date_achieved = $evaluation_time;
+        $new_achievement->date_achieved = $achieved_at;
         $new_achievement->related_info = json_encode($achievement_detail->get_related_info());
         return $new_achievement;
     }

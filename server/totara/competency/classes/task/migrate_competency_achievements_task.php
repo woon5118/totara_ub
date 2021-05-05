@@ -25,7 +25,6 @@ namespace totara_competency\task;
 
 use core\task\adhoc_task;
 use totara_competency\migration_helper;
-use totara_core\advanced_feature;
 
 class migrate_competency_achievements_task extends adhoc_task {
 

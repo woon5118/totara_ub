@@ -68,7 +68,9 @@ class default_criteria_on_install extends adhoc_task {
         // Linked courses are synced through observers - no need for additional steps here
 
         // Run aggregation task right away
-        (new competency_aggregation_queue())->execute();
+        if (!empty($competencies)) {
+            (new competency_aggregation_queue())->execute();
+        }
     }
 
 

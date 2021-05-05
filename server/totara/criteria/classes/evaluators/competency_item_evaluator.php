@@ -40,17 +40,31 @@ class competency_item_evaluator extends item_evaluator {
          ******************************************************************************************/
         $criterion_id = $criterion->get_id();
 
+        $transcation = $DB->start_delegated_transaction();
+
         // Not linking with the users_source here as we've already ensured that there is a record in the parent function
 
-        // Due to MySQL not allowing the table being updated and MSSQL not allowing '(column1, column2) IN' in a where clause,
-        // first selecting items to update and then updating them
+        // Due to query restrictions we select the items to recreate first, then create new records, and at the end delete the old records
 
         // Find all item records where the currently indicated 'criterion_met' is wrong
         // Doing it in 2 sets as there can be a huge number of assigned users which may result in very large arrays
 
         // First users marked as not having met the criteria, but have satisfied all
         $select_sql = "
-            SELECT tcir.id
+            SELECT 
+                tcir.id, 
+                tcir.user_id,
+                tcir.criterion_item_id,
+                '1' as criterion_met,
+                '{$now}' as timeevaluated,
+                (
+                    SELECT MIN(tca2.time_created) 
+                    FROM {totara_competency_achievement} tca2 
+                    WHERE tca2.status = :achievementstatus2 
+                      AND tca2.proficient = :isproficient2
+                      AND tca2.competency_id = tci.item_id 
+                      AND tca2.user_id = tcir.user_id
+                ) as timeachieved
               FROM {totara_criteria_item_record} tcir
               JOIN {totara_criteria_item} tci
                 ON tcir.criterion_item_id = tci.id
@@ -65,30 +79,52 @@ class competency_item_evaluator extends item_evaluator {
                       AND tca.competency_id = tci.item_id 
                       AND tca.user_id = tcir.user_id
                )
+            ORDER BY tcir.id
                ";
 
         $select_params = [
             'achievementstatus' => competency_achievement::ACTIVE_ASSIGNMENT,
+            'achievementstatus2' => competency_achievement::ACTIVE_ASSIGNMENT,
             'isproficient' => 1,
+            'isproficient2' => 1,
             'criterionid' => $criterion_id,
             'itemtype' => 'competency',
             'currentmet' => 0,
         ];
 
-        $nowmet = $DB->get_fieldset_sql($select_sql, $select_params);
-        if (!empty($nowmet)) {
-            [$user_sql, $user_params] = $DB->get_in_or_equal($nowmet, SQL_PARAMS_NAMED);
+        // To not create memory issues make sure we batch this as we don't know how many records there are
+        $offset = 0;
+        $limit = 10000;
+        $has_items = true;
+        $ids_to_delete = [];
+        while ($has_items) {
+            $item_records = $DB->get_recordset_sql($select_sql, $select_params, $offset, $limit);
+            $has_items = $item_records->valid();
+            $offset += $limit;
 
-            // Now update item_records with the correct proficient value
-            $update_sql =
-                "UPDATE {totara_criteria_item_record}
-                   SET criterion_met = :newmet, 
-                       timeevaluated = :now
-                 WHERE id {$user_sql}";
+            $items_to_create = [];
+            foreach ($item_records as $item_record) {
+                $ids_to_delete[] = $item_record->id;
+                unset($item_record->id);
+                $items_to_create[] = $item_record;
+            }
 
-            $update_params = array_merge($user_params, ['newmet' => 1, 'now' => $now]);
-            $DB->execute($update_sql, $update_params);
+            // Then recreate the new records in the most efficient way
+            if (!empty($items_to_create)) {
+                $DB->insert_records_via_batch('totara_criteria_item_record', $items_to_create);
+            }
         }
+
+        // Now delete the existing records at the end otherwise the resultset would change along the way
+        if (!empty($ids_to_delete)) {
+            $ids_chunked = array_chunk($ids_to_delete, $DB->get_max_in_params());
+            foreach ($ids_chunked as $ids_chunk) {
+                [$ids_sql, $ids_params] = $DB->get_in_or_equal($ids_chunk, SQL_PARAMS_NAMED);
+                $DB->delete_records_select('totara_criteria_item_record', "id {$ids_sql}", $ids_params);
+            }
+        }
+
+        $transcation->allow_commit();
 
         // Now users marked as 'criterion_met' but doesn't actually satisfy the criteria
         // (only difference in select_sql is the use of left join to handle cases where the user doesn't have an achievement record anymore)
@@ -128,17 +164,20 @@ class competency_item_evaluator extends item_evaluator {
 
             $notmet = $DB->get_fieldset_sql($select_sql, $select_params);
             if (!empty($notmet)) {
-                [$user_sql, $user_params] = $DB->get_in_or_equal($notmet, SQL_PARAMS_NAMED);
-
                 // Now update item_records with the correct proficient value
                 $update_sql =
                     "UPDATE {totara_criteria_item_record}
                        SET criterion_met = :newmet, 
-                           timeevaluated = :now
-                     WHERE id {$user_sql}";
+                           timeevaluated = :now,
+                           timeachieved = NULL
+                     WHERE id ";
+                $update_params = ['newmet' => 0, 'now' => $now];
 
-                $update_params = array_merge($user_params, ['newmet' => 0, 'now' => $now]);
-                $DB->execute($update_sql, $update_params);
+                $ids_chunked = array_chunk($notmet, $DB->get_max_in_params());
+                foreach ($ids_chunked as $ids_chunk) {
+                    [$ids_sql, $ids_params] = $DB->get_in_or_equal($ids_chunk, SQL_PARAMS_NAMED);
+                    $DB->execute($update_sql . $ids_sql, array_merge($update_params, $ids_params));
+                }
             }
         }
     }

@@ -46,6 +46,12 @@ abstract class base_achievement_detail {
     protected $scale_value_id = null;
 
     /**
+     * The timestamp when this got achieved
+     * @var int|null
+     */
+    protected $achieved_at = null;
+
+    /**
      * Get the array of information required that would in turn allow us to provide more
      * information about how a value was achieved.
      *
@@ -82,6 +88,22 @@ abstract class base_achievement_detail {
      */
     public function set_scale_value_id(?int $scale_value_id): self {
         $this->scale_value_id = $scale_value_id;
+        return $this;
+    }
+
+    /**
+     * @return int|null The timestamp when this got achieved
+     */
+    public function get_achieved_at(): ?int {
+        return $this->achieved_at;
+    }
+
+    /**
+     * @param int|null $achieved_at
+     * @return $this
+     */
+    public function set_achieved_at(?int $achieved_at): self {
+        $this->achieved_at = $achieved_at;
         return $this;
     }
 

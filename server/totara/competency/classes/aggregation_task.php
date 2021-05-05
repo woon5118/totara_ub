@@ -84,8 +84,8 @@ class aggregation_task {
         // We want to combine both results to go only once through it
         $competency_ids = array_unique(
             array_merge(
-                $competencies_with_archived_pws->pluck('id'),
-                $competencies_with_active_pws->pluck('id')
+                array_keys($competencies_with_archived_pws),
+                array_keys($competencies_with_active_pws)
             )
         );
 
@@ -95,7 +95,7 @@ class aggregation_task {
 
             // Aggregate each archived pathway which still has active pathway achievements
             // before aggregating the competency itself
-            $competency = $competencies_with_archived_pws->find('id', $competency_id);
+            $competency = $competencies_with_archived_pws[$competency_id] ?? null;
             if ($competency) {
                 $competency_to_aggregate = $competency;
                 foreach ($competency->pathways as $pathway_entity) {
@@ -111,7 +111,7 @@ class aggregation_task {
             }
 
             // Aggregate each active pathway before aggregating the competency itself
-            $competency = $competencies_with_active_pws->find('id', $competency_id);
+            $competency = $competencies_with_active_pws[$competency_id] ?? null;
             if ($competency) {
                 $competency_to_aggregate = $competency;
                 foreach ($competency->active_pathways as $pathway_entity) {
@@ -129,9 +129,9 @@ class aggregation_task {
     }
 
     /**
-     * @return collection|competency[]
+     * @return competency[]
      */
-    private function get_competency_with_active_pathways_for_assigned_users(): collection {
+    private function get_competency_with_active_pathways_for_assigned_users(): array {
         $pathway_types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
 
         $uses_process_key = $this->table->get_process_key_column() && $this->table->get_process_key_value();
@@ -163,13 +163,13 @@ class aggregation_task {
             ])
             ->get();
 
-        return $result;
+        return $result->key_by('id')->all(true);
     }
 
     /**
-     * @return collection|competency[]
+     * @return competency[]
      */
-    private function get_competency_with_archived_pathways(): collection {
+    private function get_competency_with_archived_pathways(): array {
         // We are looking for competencies with archived pathways which have still active pathway_achievements
         $pathway_builder = builder::table(pathway_entity::TABLE)
             ->join([pathway_achievement::TABLE, 'pwa'], 'id', 'pathway_id')
@@ -177,7 +177,7 @@ class aggregation_task {
             ->where('pwa.status', pathway_achievement::STATUS_CURRENT)
             ->where('status', pathway::PATHWAY_STATUS_ARCHIVED);
 
-        return competency::repository()
+        $result = competency::repository()
             ->as('c')
             ->where_exists($pathway_builder)
             ->order_by('depthlevel', 'desc')
@@ -197,6 +197,8 @@ class aggregation_task {
                 }
             ])
             ->get();
+
+        return $result->key_by('id')->all(true);
     }
 
     /**

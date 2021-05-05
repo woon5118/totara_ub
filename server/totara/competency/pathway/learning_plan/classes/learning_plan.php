@@ -104,15 +104,15 @@ class learning_plan extends pathway {
     public function aggregate_current_value(int $user_id): base_achievement_detail {
         global $DB;
 
-        $scale_value_id = $DB->get_field(
+        $value = $DB->get_record(
             'dp_plan_competency_value',
-            'scale_value_id',
             ['competency_id' => $this->get_competency()->id, 'user_id' => $user_id]
         );
 
         $achievement_detail = new achievement_detail();
-        if ($scale_value_id) {
-            $achievement_detail->set_scale_value_id($scale_value_id);
+        if ($value) {
+            $achievement_detail->set_scale_value_id($value->scale_value_id)
+                ->set_achieved_at($value->date_assigned);
         }
 
         return $achievement_detail;

@@ -23,6 +23,7 @@
 
 namespace totara_competency;
 
+use aggregation_highest\highest;
 use aggregation_latest_achieved\latest_achieved;
 use coding_exception;
 use core\orm\collection;
@@ -216,7 +217,15 @@ class legacy_aggregation {
             return;
         }
 
-        $configuration->set_aggregation_type(latest_achieved::aggregation_type());
+        // Use the default site setting for the legacy aggregation method for new pathways
+        $default_aggregation = get_config('totara_competency', 'legacy_aggregation_method');
+        if ($default_aggregation == 1) {
+            $aggregation_type = latest_achieved::aggregation_type();
+        } else {
+            $aggregation_type = highest::aggregation_type();
+        }
+
+        $configuration->set_aggregation_type($aggregation_type);
         $configuration->save_aggregation();
 
         if ($this->should_add_learning_plans()) {

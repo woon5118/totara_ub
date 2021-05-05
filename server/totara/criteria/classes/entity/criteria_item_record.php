@@ -33,6 +33,7 @@ use core\orm\entity\relations\belongs_to;
  * @property int $criterion_item_id
  * @property int $criterion_met true/false
  * @property int $timeevaluated
+ * @property int $timeachieved
  *
  * @property-read criteria_item $item
  */

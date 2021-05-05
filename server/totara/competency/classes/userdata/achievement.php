@@ -140,6 +140,7 @@ class achievement extends item {
                 'criterion_item_id'     => (int) $record->criterion_item_id,
                 'criterion_met'         => (bool) $record->criterion_met,
                 'time_evaluated'        => (int) $record->timeevaluated,
+                'time_achieved'         => (int) $record->timeachieved,
                 'item_type'             => \core_text::entities_to_utf8(format_string($record->item->item_type)),
                 'item_id'               => (int) $record->item->id,
                 'criterion_id'          => (int) $record->item->criterion->id,

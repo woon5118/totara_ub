@@ -26,6 +26,7 @@ namespace totara_competency\task;
 use core\task\scheduled_task;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
+use totara_competency\migration_helper;
 
 /**
  * Aggregates competency achievements for all users and competencies
@@ -42,6 +43,12 @@ class competency_aggregation_queue extends scheduled_task {
     }
 
     public function execute() {
+        // While the migration script hasn't been run don't aggregate
+        // to make sure there's no interference
+        if (!migration_helper::is_migration_finished()) {
+            return;
+        }
+
         // Make sure our process key is unique in case we run it in parallel
         $process_key = md5(uniqid(rand(), true));
 

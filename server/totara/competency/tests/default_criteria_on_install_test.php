@@ -23,16 +23,15 @@
  */
 
 use aggregation_highest\highest;
-use aggregation_latest_achieved\latest_achieved;
 use criteria_childcompetency\childcompetency;
 use criteria_linkedcourses\linkedcourses;
 use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
 use totara_competency\achievement_configuration;
 use totara_competency\entity\competency;
-use totara_criteria\criterion;
 use totara_competency\task\default_criteria_on_install;
 use totara_core\advanced_feature;
+use totara_criteria\criterion;
 
 /**
  * @group totara_competency
@@ -100,7 +99,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         // Ensure this is also valid via the API.
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(3, $active_pathways);
@@ -164,7 +163,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(3, $active_pathways);
@@ -177,7 +176,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(3, $active_pathways);
@@ -190,7 +189,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(3, $active_pathways);
@@ -278,7 +277,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assert_pathways_were_created($active_pathways, $scale->minproficiencyid, criterion::AGGREGATE_ALL);
@@ -301,7 +300,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assert_pathways_were_created($active_pathways, $scale->minproficiencyid, criterion::AGGREGATE_ALL);
@@ -323,7 +322,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assert_pathways_were_created($active_pathways, $scale->minproficiencyid, criterion::AGGREGATE_ALL);
@@ -345,7 +344,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(3, $active_pathways);
@@ -381,7 +380,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         $this->assertCount(1, $aggregation);
 
         $aggregation = array_shift($aggregation);
-        $this->assertEquals(latest_achieved::aggregation_type(), $aggregation->type);
+        $this->assertEquals(highest::aggregation_type(), $aggregation->type);
         $this->assertEquals($comp->id, $aggregation->competency_id);
 
         $pathways = $DB->get_records('totara_competency_pathway', ['competency_id' => $comp->id], 'sortorder ASC');
@@ -414,7 +413,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assert_pathways_were_created($active_pathways, $scale->minproficiencyid, criterion::AGGREGATE_ALL);
@@ -433,7 +432,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assert_pathways_were_created($active_pathways, $scale->minproficiencyid, criterion::AGGREGATE_ANY_N);
@@ -453,7 +452,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency = new competency($comp);
         $achievement_configuration = new achievement_configuration($competency);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(1, $active_pathways);
@@ -506,7 +505,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         // before the install task could be run.
         $competency5 = new competency($comp5);
         $achievement_configuration = new achievement_configuration($competency5);
-        $achievement_configuration->set_aggregation_type(latest_achieved::aggregation_type());
+        $achievement_configuration->set_aggregation_type(highest::aggregation_type());
         $achievement_configuration->save_aggregation();
 
         // There just needs to be one learning plan with one of the competencies
@@ -532,7 +531,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency1 = new competency($comp1);
         $achievement_configuration = new achievement_configuration($competency1);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assert_pathways_were_created($active_pathways, $scale1->minproficiencyid, criterion::AGGREGATE_ALL);
@@ -545,7 +544,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency2 = new competency($comp2);
         $achievement_configuration = new achievement_configuration($competency2);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assert_pathways_were_created($active_pathways, $scale1->minproficiencyid, criterion::AGGREGATE_ALL);
@@ -558,7 +557,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency3 = new competency($comp3);
         $achievement_configuration = new achievement_configuration($competency3);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(1, $active_pathways);
@@ -573,7 +572,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency4 = new competency($comp4);
         $achievement_configuration = new achievement_configuration($competency4);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
 
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assert_pathways_were_created($active_pathways, $scale2->minproficiencyid, criterion::AGGREGATE_ANY_N);
@@ -588,7 +587,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $competency5 = new competency($comp5);
         $achievement_configuration = new achievement_configuration($competency5);
-        $this->assertEquals(latest_achieved::aggregation_type(), $achievement_configuration->get_aggregation_type());
+        $this->assertEquals(highest::aggregation_type(), $achievement_configuration->get_aggregation_type());
         $active_pathways = $achievement_configuration->get_active_pathways();
         $this->assertCount(0, $active_pathways);
     }

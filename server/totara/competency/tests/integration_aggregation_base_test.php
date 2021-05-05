@@ -38,9 +38,8 @@ use totara_job\job_assignment;
  *
  * @group totara_competency
  */
-class totara_competency_integration_aggregation extends advanced_testcase {
+abstract class totara_competency_integration_aggregation_base_testcase extends advanced_testcase {
 
-    private $num_competencies = 5;
     private $num_users = 10;
     private $num_courses = 10;
 
@@ -55,10 +54,6 @@ class totara_competency_integration_aggregation extends advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         advanced_feature::enable('competency_assignment');
-
-        // if (!PHPUNIT_LONGTEST) {
-        //     $this->markTestSkipped('PHPUNIT_LONGTEST is not defined');
-        // }
     }
 
     protected function tearDown(): void {
@@ -219,40 +214,6 @@ class totara_competency_integration_aggregation extends advanced_testcase {
             ['totara_competency\task\competency_aggregation_queue'],
         ];
     }
-
-    /**
-     * Test competency_aggregation_all task with no criteria
-     * @dataProvider task_to_execute_data_provider
-     */
-    public function test_aggregation_all_task_no_criteria(string $task_to_execute) {
-        $data = $this->setup_data();
-
-        $this->verify_item_records([]);
-        $this->verify_pathway_achievements([]);
-        $this->verify_competency_achievements([]);
-
-        (new $task_to_execute())->execute();
-        $this->verify_item_records([]);
-        $this->verify_pathway_achievements([]);
-        $this->verify_competency_achievements([]);
-
-        // Now assign users to the competencies and test again
-
-        $to_assign = [];
-        foreach ($data->users as $user) {
-            foreach ($data->competencies as $competency) {
-                $to_assign[] = ['user_id' => $user->id, 'competency_id' => $competency->id];
-            }
-        }
-        $this->assign_users_to_competencies($to_assign);
-        $this->waitForSecond();
-
-        (new $task_to_execute())->execute();
-        $this->verify_item_records([]);
-        $this->verify_pathway_achievements([]);
-        $this->verify_competency_achievements([]);
-    }
-
 
     /**
      * @param array $expected_rows
