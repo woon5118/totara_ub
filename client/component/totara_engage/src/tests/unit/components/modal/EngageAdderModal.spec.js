@@ -39,6 +39,7 @@ const propsData = {
 
 describe('AdderModal', () => {
   beforeAll(() => {
+    let counter = 0;
     wrapper = mount(component, {
       propsData,
       mocks: {
@@ -48,8 +49,8 @@ describe('AdderModal', () => {
         $apollo: {
           loading: false,
         },
-        $id: function() {
-          return 'id';
+        $id: function(id) {
+          return `id-${id || counter++}`;
         },
       },
       stubs: ['CloseButton', 'ContributionFilter'],

@@ -17,51 +17,41 @@
 -->
 
 <template>
-  <div>
-    <div
-      ref="backdrop"
-      class="tui-modalBackdrop tui-modalBackdrop--animated"
-      :class="{
-        'tui-modalBackdrop--shade': shade,
-        'tui-modalBackdrop--in': modalIn,
-        ['tui-modalBackdrop--size-' + size]: true,
-      }"
+  <div
+    ref="modal"
+    role="dialog"
+    :aria-labelledby="ariaLabelledby"
+    :aria-label="ariaLabel"
+    class="tui-modal tui-modal--animated"
+    :class="{
+      'tui-modal--shade': shade,
+      'tui-modal--in': modalIn,
+      'tui-modal--always-scroll': forceScroll,
+      ['tui-modal--size-' + size]: true,
+    }"
+    tabindex="-1"
+    @click="handleModalOuterClick"
+  >
+    <CloseButton
+      v-if="dismissableSources.overlayClose"
+      :aria-label="$str('closebuttontitle', 'core')"
+      :class="'tui-modal__outsideClose'"
+      :size="300"
+      @click="dismiss()"
     />
-    <div
-      ref="modal"
-      role="dialog"
-      :aria-labelledby="ariaLabelledby"
-      :aria-label="ariaLabel"
-      class="tui-modal tui-modal--animated"
-      :class="{
-        'tui-modal--in': modalIn,
-        'tui-modal--always-scroll': forceScroll,
-        ['tui-modal--size-' + size]: true,
-      }"
-      tabindex="-1"
-      @click="handleModalOuterClick"
-    >
-      <CloseButton
-        v-if="dismissableSources.overlayClose"
-        :aria-label="$str('closebuttontitle', 'core')"
-        :class="'tui-modal__outsideClose'"
-        :size="300"
-        @click="dismiss()"
-      />
 
-      <div class="tui-modal__pad">
-        <div ref="inner" class="tui-modal__inner">
-          <CloseButton
-            v-if="dismissableSources.overlayClose"
-            :aria-label="$str('closebuttontitle', 'core')"
-            :class="'tui-modal__close'"
-            :size="300"
-            @click="dismiss()"
-          />
-          <PropsProvider :provide="provideSlot">
-            <slot />
-          </PropsProvider>
-        </div>
+    <div class="tui-modal__pad">
+      <div ref="inner" class="tui-modal__inner">
+        <CloseButton
+          v-if="dismissableSources.overlayClose"
+          :aria-label="$str('closebuttontitle', 'core')"
+          :class="'tui-modal__close'"
+          :size="300"
+          @click="dismiss()"
+        />
+        <PropsProvider :provide="provideSlot">
+          <slot />
+        </PropsProvider>
       </div>
     </div>
   </div>
@@ -220,7 +210,6 @@ export default {
 
     $_animateOpen() {
       return new Promise(resolve => {
-        document.body.appendChild(this.$refs.backdrop);
         document.body.appendChild(this.$refs.modal);
 
         // force reflow
@@ -259,11 +248,9 @@ export default {
     async $_animateClose() {
       this.modalIn = false;
 
-      const transitionEls = [
-        this.$refs.modal,
-        this.$refs.inner,
-        this.$refs.backdrop,
-      ].filter(Boolean);
+      const transitionEls = [this.$refs.modal, this.$refs.inner].filter(
+        Boolean
+      );
 
       await waitForTransitionEnd(transitionEls);
 
@@ -328,7 +315,6 @@ export default {
     },
 
     $_removeElements() {
-      this.$refs.backdrop.remove();
       this.$refs.modal.remove();
     },
   },
@@ -361,13 +347,26 @@ $tui-modal-sheetBreakpoint: 768px !default;
   overflow: hidden;
   outline: none;
 
+  &--shade {
+    background-color: var(--color-backdrop-standard);
+    &.tui-modal--size-sheet {
+      background-color: var(--color-backdrop-heavy);
+    }
+  }
+
   &--animated {
+    opacity: 0;
+    transition: opacity var(--transition-modal-function)
+      var(--transition-modal-duration);
+
     .tui-modal__inner {
       transform: translateY(100vh);
       transition: transform var(--transition-modal-function)
-          var(--transition-modal-duration),
-        opacity var(--transition-modal-function)
-          var(--transition-modal-duration);
+        var(--transition-modal-duration);
+    }
+
+    &.tui-modal--in {
+      opacity: 1;
     }
 
     &.tui-modal--in .tui-modal__inner {
@@ -430,42 +429,12 @@ $tui-modal-sheetBreakpoint: 768px !default;
   overflow: hidden;
 }
 
-.tui-modalBackdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: var(--zindex-modal-backdrop);
-  width: 100%;
-  height: 100%;
-
-  &--shade {
-    background-color: var(--color-backdrop-standard);
-    &.tui-modalBackdrop--size-sheet {
-      background-color: var(--color-backdrop-heavy);
-    }
-  }
-
-  &--animated {
-    opacity: 0;
-    transition: opacity var(--transition-modal-function)
-      var(--transition-modal-duration);
-
-    &.tui-modalBackdrop--in {
-      opacity: 1;
-    }
-  }
-}
-
 @media (min-width: $tui-modal-sheetBreakpoint) {
   .tui-modal.tui-modal--size-sheet {
     &.tui-modal--animated {
       .tui-modal__inner {
         transform: scale(0.9);
         opacity: 0;
-        transition: transform var(--transition-modal-function)
-            var(--transition-modal-duration),
-          opacity var(--transition-modal-function)
-            var(--transition-modal-duration);
       }
 
       &.tui-modal--in .tui-modal__inner {
@@ -522,10 +491,6 @@ $tui-modal-sheetBreakpoint: 768px !default;
         .tui-modal__inner {
           transform: scale(0.9);
           opacity: 0;
-          transition: transform var(--transition-modal-function)
-              var(--transition-modal-duration),
-            opacity var(--transition-modal-function)
-              var(--transition-modal-duration);
         }
 
         &.tui-modal--in .tui-modal__inner {

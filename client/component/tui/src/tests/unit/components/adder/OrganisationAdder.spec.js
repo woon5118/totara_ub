@@ -30,6 +30,7 @@ const propsData = {
 
 describe('OrganisationAdder', () => {
   beforeAll(() => {
+    let counter = 0;
     wrapper = mount(OrganisationAdder, {
       propsData,
       mocks: {
@@ -39,6 +40,9 @@ describe('OrganisationAdder', () => {
         },
         hierarchyData: function() {
           return { items: [] };
+        },
+        $id: function(id) {
+          return `id-${id || counter++}`;
         },
       },
       stubs: ['CloseButton', 'FilterBar'],

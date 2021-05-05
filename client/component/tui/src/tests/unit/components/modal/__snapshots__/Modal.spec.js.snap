@@ -2,9 +2,10 @@
 
 exports[`Modal checks snapshot 1`] = `
 <div
-  class="tui-modal tui-modal--animated tui-modal--size-normal"
+  class="tui-modal tui-modal--animated tui-modal--shade tui-modal--size-normal"
   role="dialog"
   tabindex="-1"
+  title="Title"
 >
   <!---->
    

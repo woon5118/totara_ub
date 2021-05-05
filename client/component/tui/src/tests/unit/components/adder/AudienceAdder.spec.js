@@ -30,6 +30,7 @@ const propsData = {
 
 describe('AudienceAdder', () => {
   beforeAll(() => {
+    let counter = 0;
     wrapper = mount(AudienceAdder, {
       propsData,
       mocks: {
@@ -39,6 +40,9 @@ describe('AudienceAdder', () => {
         },
         audiences: function() {
           return { items: [] };
+        },
+        $id: function(id) {
+          return `id-${id || counter++}`;
         },
       },
       stubs: ['CloseButton', 'FilterBar'],
