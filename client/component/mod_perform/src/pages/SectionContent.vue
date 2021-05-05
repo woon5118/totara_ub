@@ -810,8 +810,10 @@ export default {
         return Object.assign({}, item, {
           element: Object.assign({}, item.element, {
             type: item.element.element_plugin,
-            data: JSON.parse(item.element.data),
-            raw_data: JSON.parse(item.element.raw_data),
+            data: item.element.data ? JSON.parse(item.element.data) : {},
+            raw_data: item.element.raw_data
+              ? JSON.parse(item.element.raw_data)
+              : {},
           }),
         });
       });
