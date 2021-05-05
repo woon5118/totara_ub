@@ -179,7 +179,7 @@ export default {
      */
     scrollToCommentForm() {
       if (this.formElement) {
-        this.formElement.scrollIntoView();
+        this.formElement.scrollIntoView(false);
       }
     },
 

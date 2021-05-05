@@ -211,7 +211,7 @@ export default {
 
       if (this.formElement) {
         // Now we can scrolling.
-        this.formElement.scrollIntoView();
+        this.formElement.scrollIntoView(false);
       }
     },
   },
