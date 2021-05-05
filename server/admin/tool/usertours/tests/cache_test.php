@@ -158,6 +158,18 @@ class tool_usertours_cache_testcase extends advanced_testcase {
                 'name' => 'frontpage_match',
                 'pathmatch' => '/?%'
             ],
+            (object) [
+                'name' => 'dash_exact_1',
+                'pathmatch' => '/totara/dashboard/index.php?id=1',
+            ],
+            (object) [
+                'name' => 'dash_exact_2',
+                'pathmatch' => '/totara/dashboard/index.php?id=11',
+            ],
+            (object) [
+                'name' => 'dash_glob',
+                'pathmatch' => '/totara/dashboard/index.php?id=1%',
+            ],
         ];
 
         return [
@@ -185,6 +197,21 @@ class tool_usertours_cache_testcase extends advanced_testcase {
                 $tourconfigs,
                 '/?redirect=0',
                 ['frontpage_only', 'frontpage_match'],
+            ],
+            'Matches exact dashboard' => [
+                $tourconfigs,
+                '/totara/dashboard/index.php?id=11',
+                ['dash_exact_2', 'dash_glob'],
+            ],
+            'Matches glob dashboard' => [
+                $tourconfigs,
+                '/totara/dashboard/index.php?id=1',
+                ['dash_exact_1', 'dash_glob'],
+            ],
+            'Matches glob dashboard 1' => [
+                $tourconfigs,
+                '/totara/dashboard/index.php?id=111',
+                ['dash_glob'],
             ],
         ];
     }

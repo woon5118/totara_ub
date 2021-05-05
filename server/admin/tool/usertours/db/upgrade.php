@@ -34,6 +34,7 @@ use tool_usertours\manager;
  */
 function xmldb_tool_usertours_upgrade($oldversion) {
     global $CFG, $DB;
+    require_once(__DIR__ .'/upgradelib.php');
 
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
@@ -43,6 +44,14 @@ function xmldb_tool_usertours_upgrade($oldversion) {
 
     // Automatically generated Moodle v3.4.0 release upgrade line.
     // Put any upgrade step following this.
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2017111301) {
+        tool_usertours_upgrade_addsuffixwildcard();
+        // Assign savepoint reached.
+        upgrade_plugin_savepoint(true, 2017111301, 'tool', 'usertours');
+    }
 
     return true;
 }

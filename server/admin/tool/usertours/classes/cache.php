@@ -91,7 +91,7 @@ EOF;
             }
             $pattern = preg_quote($tour->pathmatch, '@');
             $pattern = str_replace('%', '.*', $pattern);
-            return !!preg_match("@{$pattern}@", $target);
+            return !!preg_match("@{$pattern}$@", $target);
         });
     }
 
