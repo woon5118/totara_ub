@@ -83,6 +83,9 @@ class mssql_sql_generator extends sql_generator {
     /** @var string SQL sentence to rename one index where 'TABLENAME', 'OLDINDEXNAME' and 'NEWINDEXNAME' are dynamically replaced.*/
     public $rename_index_sql = "sp_rename 'TABLENAME.OLDINDEXNAME', 'NEWINDEXNAME', 'INDEX'";
 
+    /** @var string Template to finding if FKs exist. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
+    public $exists_foreign_key = "SELECT 'x' FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'TABLENAME' AND CONSTRAINT_NAME = 'KEYNAME'";
+
     /**
      * Reset a sequence to the id field of a table.
      *
