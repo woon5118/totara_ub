@@ -267,4 +267,27 @@ class container_workspace_webapi_update_workspace_testcase extends advanced_test
         $sql_result = $DB->get_field_select('tag', 'name', $where, null, MUST_EXIST);
         $this->assertEquals('testme', $sql_result);
     }
+
+    public function test_update_workspace_with_long_name(): void {
+
+        $this->setAdminUser();
+        $generator = $this->getDataGenerator();
+
+        /** @var \container_workspace\testing\generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace('oookokokokoko');
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('The workspace name exceeds the maximum length');
+
+        $this->resolve_graphql_mutation(
+            'container_workspace_update',
+            [
+                'id' => $workspace->get_id(),
+                'name' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat accumsan ligula.
+                          Curabitur ut euismod tellus, eget facilisis metus. Fusce eu hendrerit risus, non
+                          bibendum arcu. Donec iaculis porta arcu ut sollicitudin. Phasellus tempus elit nisi',
+            ]
+        );
+    }
 }

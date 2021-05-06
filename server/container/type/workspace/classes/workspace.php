@@ -33,12 +33,16 @@ use core_container\container_helper;
 use core_container\facade\category_name_provider;
 use container_workspace\entity\workspace as workspace_entity;
 use theme_config;
+use core_text;
 
 /**
  * Class workspace
  * @package container_workspace
  */
 final class workspace extends container implements category_name_provider {
+
+    private const MAX_NAME_LENGTH = 75 ;
+
     /**
      * @var string
      */
@@ -152,6 +156,10 @@ final class workspace extends container implements category_name_provider {
                     "the visibility should be set to zero when workspace is a hidden type"
                 );
             }
+        }
+
+        if (core_text::strlen($data->fullname) > self::MAX_NAME_LENGTH) {
+            throw new \coding_exception('workspace name exceeds the maximum length');
         }
     }
 
@@ -369,6 +377,10 @@ final class workspace extends container implements category_name_provider {
             if ($new_private != $old_private) {
                 throw new \coding_exception("The workspace cannot move between visibility");
             }
+        }
+
+        if (core_text::strlen($data->fullname) > self::MAX_NAME_LENGTH) {
+            throw new \coding_exception('The workspace name exceeds the maximum length');
         }
     }
 
