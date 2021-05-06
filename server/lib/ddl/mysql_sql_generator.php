@@ -62,6 +62,9 @@ class mysql_sql_generator extends sql_generator {
     /** @var string Template to drop FKs. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
     public $drop_foreign_key = 'ALTER TABLE TABLENAME DROP FOREIGN KEY KEYNAME';
 
+    /** @var string Template to finding if FKs exist. 'TABLENAME' and 'KEYNAME' will be replaced from this template.*/
+    public $exists_foreign_key = "SELECT 'x' FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'TABLENAME' AND CONSTRAINT_NAME = 'KEYNAME'";
+
     /** @var bool True if the generator needs to add extra code to generate the sequence fields.*/
     public $sequence_extra_code = false;
 
@@ -568,8 +571,14 @@ class mysql_sql_generator extends sql_generator {
 
         $sql = "SELECT 1
                   FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                 WHERE CONSTRAINT_NAME = :constraintname";
-        $params = ['constraintname' => $constraintname];
+                 WHERE 
+                       TABLE_SCHEMA = DATABASE()
+                       AND CONSTRAINT_NAME = :constraintname
+                       AND TABLE_NAME = :tablename";
+        $params = [
+            'tablename' => $this->getTableName($xmldb_table),
+            'constraintname' => $constraintname
+        ];
 
         return new core\dml\sql($sql, $params);
     }
