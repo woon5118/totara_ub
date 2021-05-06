@@ -32,7 +32,6 @@ namespace totara_tui\local\scss;
 
 use core\topological_sorter;
 use totara_tui\local\locator\bundle;
-use totara_tui\local\theme_config;
 
 /**
  * Encapsulates logic for compiling TUI SCSS
@@ -330,6 +329,7 @@ class scss {
         $compiler = $this->options->get_compiler();
         $compiler->set_import_paths($this->import_paths);
         $compiler->set_sourcemap_enabled($sourcemap);
+        $compiler->set_minify($this->options->get_minify());
         return $compiler->compile($scss);
     }
 

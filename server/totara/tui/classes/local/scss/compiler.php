@@ -52,6 +52,11 @@ class compiler {
      */
     private $import_paths;
 
+    /**
+     * @var bool
+     */
+    private $minify;
+
     public function __construct() {
         $this->compiler = new scss_compiler_implementation();
 
@@ -96,6 +101,15 @@ class compiler {
     }
 
     /**
+     * Indicate that the CSS should be minified or not.
+     *
+     * @param bool $minify
+     */
+    public function set_minify(bool $minify): void {
+        $this->minify = $minify;
+    }
+
+    /**
      * Compile the provided SCSS
      *
      * @param string $scss
@@ -121,6 +135,12 @@ class compiler {
         } else {
             $this->compiler->setSourceMap(scss_compiler_implementation::SOURCE_MAP_NONE);
         }
+
+        $this->compiler->setFormatter(
+            $this->minify
+                ? 'ScssPhp\ScssPhp\Formatter\Compressed'
+                : 'ScssPhp\ScssPhp\Formatter\Nested'
+        );
 
         $compiled = $this->compiler->compile($scss);
 

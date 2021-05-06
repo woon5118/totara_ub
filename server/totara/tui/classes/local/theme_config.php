@@ -117,6 +117,7 @@ final class theme_config extends \theme_config {
 
     /**
      * Return an scss instance for this theme.
+     * @param int|null $tenant_id
      * @return scss
      */
     private function get_tui_scss_instance(int $tenant_id = null): scss {
@@ -124,7 +125,6 @@ final class theme_config extends \theme_config {
 
         $scss_options->set_themes($this->get_tui_theme_chain());
         $scss_options->set_legacy($this->legacybrowser);
-        $scss_options->set_sourcemap_enabled(false);
 
         if (!during_initial_install() && isset($tenant_id)) {
             $scss_options->set_theme_settings(new \core\theme\settings($this, $tenant_id));
@@ -132,6 +132,14 @@ final class theme_config extends \theme_config {
 
         if ($this->skip_scss_compilation) {
             $scss_options->set_skip_compile(true);
+        }
+
+        if (get_config('totara_tui', 'development_mode')) {
+            $scss_options->set_minify(false);
+            $scss_options->set_sourcemap_enabled(true);
+        } else {
+            $scss_options->set_minify(true);
+            $scss_options->set_sourcemap_enabled(false);
         }
 
         return new scss($scss_options);

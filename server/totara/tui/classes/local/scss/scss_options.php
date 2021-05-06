@@ -71,6 +71,11 @@ class scss_options {
      */
     private $theme_settings;
 
+    /**
+     * @var bool Minify CSS.
+     */
+    private $minify = false;
+
     public function __construct() {
         $this->compiler = new compiler();
         $this->cssvars = new cssvars();
@@ -194,5 +199,19 @@ class scss_options {
      */
     public function get_theme_settings(): ?\core\theme\settings {
         return $this->theme_settings;
+    }
+
+    /**
+     * @param bool $minify
+     */
+    public function set_minify(bool $minify) {
+        $this->minify = $minify;
+    }
+
+    /**
+     * @return bool
+     */
+    public function get_minify(): bool {
+        return $this->minify;
     }
 }
