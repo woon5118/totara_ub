@@ -21,9 +21,14 @@
  * @package engage_survey
  */
 
+use totara_engage\entity\answer_option;
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
 defined('MOODLE_INTERNAL') || die();
 
 class engage_survey_answer_question_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
+
     /**
      * @return void
      */
@@ -62,5 +67,36 @@ class engage_survey_answer_question_testcase extends advanced_testcase {
         $this->assertTrue(
             $DB->record_exists_sql($sql, $params)
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_answers_return_ordered(): void {
+        $gen = $this->getDataGenerator();
+
+        $user = $gen->create_user();
+        $this->setUser($user);
+
+        $expected_options = [
+            'Last',
+            'First',
+            'Second',
+            'Third',
+            '99',
+            '22'
+        ];
+
+        /** @var engage_survey_generator $survey_gen */
+        $survey_gen = $gen->get_plugin_generator('engage_survey');
+        $survey = $survey_gen->create_survey(null, $expected_options);
+        $question = current($survey->get_questions());
+
+        // Pluck the option name in order provided
+        $option_values = array_map(function (answer_option $answer_option): string {
+            return $answer_option->value;
+        }, $question->get_answer_options());
+
+        self::assertEqualsCanonicalizing($expected_options, $option_values);
     }
 }

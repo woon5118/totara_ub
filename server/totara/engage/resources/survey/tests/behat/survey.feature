@@ -76,3 +76,31 @@ Feature: Vote survey
     When I view survey "Test Survey 1?"
     And I click on "Reshare survey" "button"
     Then I should see "Reshare" in the ".tui-modalContent__header-title" "css_element"
+
+  Scenario: Survey votes are saved in the order they're entered
+    Given I log in as "admin"
+    And I click on "Your Library" in the totara menu
+    And I press "Contribute"
+    And I wait for pending js
+    And I switch to "Survey" tui tab
+    And I set the field "Enter survey question" to "Creating a survey"
+    And I set the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageSurveyForm__repeater ')]//input[@name='options[0][text]']" to "A"
+    And I set the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageSurveyForm__repeater ')]//input[@name='options[1][text]']" to "B"
+    And I press "Next"
+    And I press "Done"
+    And I wait for the next second
+    Then I should see "Creating a survey"
+
+    When I view survey "Creating a survey"
+    Then the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageSurveyForm__repeater ')]//input[@name='options[0][text]']" matches value "A"
+    And the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageSurveyForm__repeater ')]//input[@name='options[1][text]']" matches value "B"
+
+    # Add a new option and check it's in the third position
+    When I press "Add"
+    And I set the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageSurveyForm__repeater ')]//input[@name='options[2][text]']" to "C"
+    And I press "Save"
+    And I wait for the next second
+    And I view survey "Creating a survey"
+    Then the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageSurveyForm__repeater ')]//input[@name='options[0][text]']" matches value "A"
+    And the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageSurveyForm__repeater ')]//input[@name='options[1][text]']" matches value "B"
+    And the field with xpath "//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageSurveyForm__repeater ')]//input[@name='options[2][text]']" matches value "C"

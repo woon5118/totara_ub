@@ -35,6 +35,7 @@ final class answer_option_repository extends repository {
         $builder = builder::table(static::get_table());
         $builder->map_to(answer_option::class);
         $builder->where('questionid', $questionid);
+        $builder->order_by('timecreated');
 
         return $builder->fetch();
     }
