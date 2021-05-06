@@ -141,7 +141,7 @@ export default {
   }
 
   &__related {
-    max-height: 71vh;
+    height: 100%;
     overflow-y: auto;
   }
 }
