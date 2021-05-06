@@ -26,6 +26,7 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
+use core_text;
 use mod_perform\entity\activity\element_identifier as element_identifier_entity;
 
 /**
@@ -40,6 +41,8 @@ use mod_perform\entity\activity\element_identifier as element_identifier_entity;
  * @package mod_perform\models\element_identifier
  */
 class element_identifier extends model {
+
+    public const MAX_LENGTH = 255;
 
     protected $entity_attribute_whitelist = [
         'id',
@@ -72,6 +75,10 @@ class element_identifier extends model {
     public static function create(string $identifier): self {
         if (empty($identifier)) {
             throw new coding_exception('Cannot create empty identifier');
+        }
+
+        if (core_text::strlen($identifier) > self::MAX_LENGTH) {
+            throw new coding_exception('Identifier string exceeds maximum length');
         }
 
         $entity = new element_identifier_entity();

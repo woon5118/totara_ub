@@ -91,4 +91,30 @@ class mod_perform_element_identifier_model_testcase extends advanced_testcase {
         $this->assertEqualsCanonicalizing([$element2->id, $element3->id], $identifier2->elements->pluck('id'));
     }
 
+    public function test_create_with_empty_string(): void {
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Cannot create empty identifier');
+        element_identifier::create('');
+    }
+
+    public function test_create_max_length(): void {
+        $element_identifier = element_identifier::create($this->get_string_with_length(255));
+        self::assertEquals(255, strlen($element_identifier->identifier));
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Identifier string exceeds maximum length');
+        element_identifier::create($this->get_string_with_length(256));
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    private function get_string_with_length(int $length): string {
+        $string = '';
+        while (strlen($string) < $length) {
+            $string .= 'x';
+        }
+        return $string;
+    }
 }

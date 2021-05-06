@@ -50,7 +50,7 @@
       >
         <FormText
           name="identifier"
-          :validations="v => [v.maxLength(1024)]"
+          :validations="v => [v.maxLength(255)]"
           char-length="20"
         />
       </FormRow>
