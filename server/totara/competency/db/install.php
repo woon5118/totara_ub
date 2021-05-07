@@ -39,19 +39,17 @@ function xmldb_totara_competency_install() {
     $has_competency_records = $dbman->table_exists($history_table) && $DB->count_records('comp_record_history') > 0;
     $has_competencies = $dbman->table_exists($comp_table) && $DB->count_records('comp') > 0;
 
-    if (!advanced_feature::is_enabled('competency_assignment')) {
-        // If this is a new install of the plugin with existing previous competency records
-        // Make sure we set the legacy aggregation method to highest to match the exact previous behaviour.
-        // It can be change later on in the settings.
-        if ($has_competencies || $has_competency_records) {
-            set_config('legacy_aggregation_method', admin_setting_legacy_aggregation_method::HIGHEST_ACHIEVEMENT, 'totara_competency');
-        }
+    // If this is a new install of the plugin with existing previous competency records
+    // Make sure we set the legacy aggregation method to highest to match the exact previous behaviour.
+    // It can be change later on in the settings.
+    if ($has_competencies || $has_competency_records) {
+        set_config('legacy_aggregation_method', admin_setting_legacy_aggregation_method::HIGHEST_ACHIEVEMENT, 'totara_competency');
+    }
 
-        // Only queue the task to set the defaults if there are actually competencies
-        if ($has_competencies) {
-            $task = new default_criteria_on_install();
-            manager::queue_adhoc_task($task);
-        }
+    // Only queue the task to set the defaults if there are actually competencies
+    if ($has_competencies) {
+        $task = new default_criteria_on_install();
+        manager::queue_adhoc_task($task);
     }
 
     // Only queue the migration tasks if there's anything to migrate

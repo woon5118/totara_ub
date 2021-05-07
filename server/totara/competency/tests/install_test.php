@@ -139,13 +139,13 @@ class totara_competency_install_testcase extends advanced_testcase {
         xmldb_totara_competency_install();
 
         $config_value = get_config('totara_competency', 'legacy_aggregation_method');
-        $this->assertFalse($config_value);
+        $this->assertEquals(admin_setting_legacy_aggregation_method::HIGHEST_ACHIEVEMENT, $config_value);
 
         $task_queued = $DB->record_exists_select('task_adhoc', "classname LIKE '%migrate_competency_achievements_task%'");
         $this->assertFalse($task_queued);
 
         $task_queued = $DB->record_exists_select('task_adhoc', "classname LIKE '%default_criteria_on_install%'");
-        $this->assertFalse($task_queued);
+        $this->assertTrue($task_queued);
     }
 
     public function test_learn_installation_with_preexisting_competency_records() {
@@ -219,13 +219,13 @@ class totara_competency_install_testcase extends advanced_testcase {
         xmldb_totara_competency_install();
 
         $config_value = get_config('totara_competency', 'legacy_aggregation_method');
-        $this->assertFalse($config_value);
+        $this->assertEquals(admin_setting_legacy_aggregation_method::HIGHEST_ACHIEVEMENT, $config_value);
 
         $task_queued = $DB->record_exists_select('task_adhoc', "classname LIKE '%migrate_competency_achievements_task%'");
         $this->assertTrue($task_queued);
 
         $task_queued = $DB->record_exists_select('task_adhoc', "classname LIKE '%default_criteria_on_install%'");
-        $this->assertFalse($task_queued);
+        $this->assertTrue($task_queued);
     }
 
     private function add_comp_record(int $competency_id, int $user_id, int $proficiency, int $timecreated = null, int $timemodified = null): stdClass {
