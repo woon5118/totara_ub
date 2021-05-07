@@ -41,7 +41,7 @@ function totara_competency_upgrade_update_aggregation_method_setting() {
     // previously or created with the wrong aggregation method.
     // To avoid changing behaviour in this case we set the aggregation method to latest.
     // Otherwise we use highest, to make sure the behaviour matches the pre-13 behaviour
-    if (advanced_feature::is_disabled('competency_assignment')
+    if (!advanced_feature::is_enabled('competency_assignment')
         && $dbman->table_exists($table)
         && $DB->count_records('totara_competency_achievement') > 0
     ) {
@@ -56,7 +56,7 @@ function totara_competency_upgrade_update_aggregation_method_setting() {
     if ($existing_value === false) {
         set_config('legacy_aggregation_method', $default_aggregation_type, 'totara_competency');
 
-        if (advanced_feature::is_disabled('competency_assignment')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             // Now just make sure all existing competencies have the right type set
             $sql = "
                 UPDATE {totara_competency_scale_aggregation}

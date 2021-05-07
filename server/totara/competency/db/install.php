@@ -39,7 +39,7 @@ function xmldb_totara_competency_install() {
     $has_competency_records = $dbman->table_exists($history_table) && $DB->count_records('comp_record_history') > 0;
     $has_competencies = $dbman->table_exists($comp_table) && $DB->count_records('comp') > 0;
 
-    if (advanced_feature::is_disabled('competency_assignment')) {
+    if (!advanced_feature::is_enabled('competency_assignment')) {
         // If this is a new install of the plugin with existing previous competency records
         // Make sure we set the legacy aggregation method to highest to match the exact previous behaviour.
         // It can be change later on in the settings.

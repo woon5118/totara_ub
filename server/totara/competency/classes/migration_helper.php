@@ -220,7 +220,7 @@ class migration_helper {
                     if ($first) {
                         // If you migrate to learn-only we want all achievement marked as active
                         $status = competency_achievement::ARCHIVED_ASSIGNMENT;
-                        if (advanced_feature::is_disabled('competency_assignment')) {
+                        if (!advanced_feature::is_enabled('competency_assignment')) {
                             $status = competency_achievement::ACTIVE_ASSIGNMENT;
                         }
 
