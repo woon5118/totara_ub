@@ -18,11 +18,20 @@
 
 <template>
   <div>
-    ChartJs library wrapper for embedding charts. For data\options prop
-    references please refer to
-    <a href="https://www.chartjs.org/docs/latest/charts/"
-      >ChartJs documentation</a
-    >, these have different structure depending on the chart type.
+    <p>
+      Chart.js library wrapper for embedding charts. For data/options prop
+      references please refer to the
+      <a href="https://www.chartjs.org/docs/latest/charts/"
+        >Chart.js documentation </a
+      >, these have different structure depending on the chart type.
+    </p>
+    <p>
+      <b>Note</b>: Our intention is to deprecate this component at some point in
+      the future and replace it with components that do not expose the Chart.js
+      API directly. This will allow us to update Chart.js in the future or
+      replace it with another library without it being a breaking change. Please
+      be aware of this when using this component.
+    </p>
     <SamplesExample>
       <div v-if="appliedProps.type !== ''" class="tui-exampleChartJs">
         <ChartJs v-bind="appliedProps" class="tui-exampleChartJs__chart" />

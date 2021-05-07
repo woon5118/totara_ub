@@ -18,11 +18,6 @@
 
 <template>
   <div>
-    ChartJs library wrapper for embedding charts. For data\options prop
-    references please refer to
-    <a href="https://www.chartjs.org/docs/latest/charts/"
-      >ChartJs documentation</a
-    >, these have different structure depending on the chart type.
     <SamplesExample>
       <div v-if="display" class="tui-exampleChartJs">
         <PercentageDoughnut
