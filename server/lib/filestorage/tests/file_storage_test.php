@@ -246,6 +246,33 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $helper->get_file_preview($file, 'amodewhichdoesntexist');
     }
 
+    /**
+     * Local images can be added to the filepool and their preview can be obtained
+     */
+    public function test_get_file_preview_svg() {
+        global $CFG;
+
+        $filepath = $CFG->dirroot.'/lib/filestorage/tests/fixtures/logo.svg';
+        $syscontext = context_system::instance();
+        $filerecord = array(
+            'contextid' => $syscontext->id,
+            'component' => 'core',
+            'filearea'  => 'unittest',
+            'itemid'    => 0,
+            'filepath'  => '/images/',
+            'filename'  => 'logo.svg',
+        );
+
+        $fs = get_file_storage();
+        $file = $fs->create_file_from_pathname($filerecord, $filepath);
+
+        $helper = \core\image\preview_helper::instance();
+        $svg_image = $helper->get_file_preview($file, 'thumb');
+
+        $this->assertInstanceOf('stored_file', $svg_image);
+        $this->assertEquals('logo.svg', $svg_image->get_filename());
+    }
+
     public function test_get_file_preview_nonimage() {
         $this->resetAfterTest(true);
         $syscontext = context_system::instance();

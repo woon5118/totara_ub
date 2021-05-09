@@ -199,11 +199,7 @@ final class preview_helper {
     }
 
     /**
-     * Returns an image file that represent the given stored file as a preview
-     *
-     * At the moment, only GIF, JPEG and PNG files are supported to have previews. In the
-     * future, the support for other mimetypes can be added, too (eg. generate an image
-     * preview of PDF, text documents etc).
+     * Returns an image file that represent the given stored file as a preview.
      *
      * @param \stored_file $file
      * @param string $name Size name
@@ -230,6 +226,12 @@ final class preview_helper {
     }
 
     /**
+     * Creates a preview for the requested file when it does not yet exist.
+     *
+     * At the moment, only GIF, JPEG, PNG and SVG files are supported to have previews.
+     * In the future, the support for other mimetypes can be added, too (eg. generate
+     * an image preview of PDF, text documents etc).
+     *
      * @param \stored_file $file
      * @param string $name Size name
      *
@@ -239,12 +241,19 @@ final class preview_helper {
         $mime_type = $file->get_mimetype();
         $data = null;
 
-        if ($mime_type === 'image/jpeg' || $mime_type === 'image/png') {
-            // make a preview of the image
-            $data = $this->get_preview_content($file, $name);
-        } else {
-            // unable to create the preview of this mimetype yet
-            return null;
+        switch ($mime_type) {
+            case 'image/jpeg':
+            case 'image/png':
+                // make a preview of the image
+                $data = $this->get_preview_content($file, $name);
+                break;
+            case 'image/svg+xml':
+                // return the file as is as svg image size is automatically calculated
+                // based on the viewbox it needs to display in.
+                return $file;
+            default:
+                // unable to create the preview of this mimetype yet
+                return null;
         }
 
         if ($data === null) {
