@@ -1,6 +1,9 @@
 This files describes API changes in /mod/perform/*,
 information provided here is intended especially for developers.
 
+=== 13.8 ===
+* QuestionElementPreviewModal.vue has switched to using the admin preview components instead of the participant form components
+
 === 13.2 ===
 
 * respondable_element_plugin::validate_response() function now includes new parameter 'is_draft_validation'

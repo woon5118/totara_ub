@@ -36,7 +36,17 @@
               :is-required="element.is_required"
             />
           </p>
-          <component :is="component" path="" :element="element" />
+
+          <component
+            :is="component"
+            :data="element.data"
+            :report-preview="true"
+            :section-element="{
+              element: element,
+              id: elementId,
+              other_responder_groups: [],
+            }"
+          />
         </Uniform>
       </Loader>
       <template v-slot:buttons>
@@ -86,7 +96,7 @@ export default {
       }
 
       return tui.asyncComponent(
-        this.element.element_plugin.participant_form_component
+        this.element.element_plugin.admin_view_component
       );
     },
   },

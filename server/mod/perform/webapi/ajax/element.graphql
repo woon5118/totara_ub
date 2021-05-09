@@ -5,6 +5,7 @@ query mod_perform_element($element_id: core_id) {
     is_required
     is_respondable
     element_plugin {
+      admin_view_component
       participant_form_component
     }
   }
