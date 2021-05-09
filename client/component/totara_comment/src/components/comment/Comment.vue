@@ -91,7 +91,7 @@
       @update-show-reply-form="showForm.reply = $event"
       @create-reply="$emit('add-reply', commentId)"
       @update-submitting="$emit('update-submitting', $event)"
-      @form-ready="replyForm = $event"
+      @form-ready="replyFormReady"
       @update-reply-to="replyTo = $event"
       @scroll-to-reply-form="scrollToReplyForm"
       @fetch-replies="fetchingReplies = $event"
@@ -442,6 +442,18 @@ export default {
     },
 
     /**
+     * Takes the user to the reply form once loaded
+     *
+     * @param {Object} event The reply-form event object
+     */
+    replyFormReady(event) {
+      let replyBox = this.$refs['reply-box'];
+      this.replyForm = event;
+
+      replyBox.$el.scrollIntoView(false);
+    },
+
+    /**
      *
      * This function is only being called in here. Therefore, we will set the showForm to true
      * and reset the replyTo to null if it has value.
@@ -473,9 +485,7 @@ export default {
         await replyBox.$nextTick();
       }
 
-      if (this.replyForm) {
-        this.replyForm.scrollIntoView(false);
-      }
+      replyBox.$el.scrollIntoView(false);
     },
   },
 };
