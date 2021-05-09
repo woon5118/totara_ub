@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['alert:opennew'] = 'This page is not fully compatible with Microsoft Teams. Click \'open in new window\'.';
+$string['alert:opennew'] = 'This page is not fully compatible with Microsoft Teams. Click \'Open in browser\'.';
 
 // Bot framework
 $string['botfw:cmd_help'] = 'help';

@@ -27,5 +27,5 @@ $string['cachedef_postprocessedcode'] = 'Cache JS and CSS';
 $string['choosereadme'] = 'Microsoft Teams theme for Totara. (For internal use only)';
 $string['goback'] = 'Back';
 $string['loggedinasuser'] = 'Logged in as {$a}.';
-$string['openexternally'] = 'Open in new window';
+$string['openexternally'] = 'Open in browser';
 $string['pluginname'] = 'Microsoft Teams';
