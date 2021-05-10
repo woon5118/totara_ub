@@ -24,6 +24,7 @@
 namespace totara_competency\watcher;
 
 use totara_competency\aggregation_users_table;
+use totara_competency\entity\configuration_change;
 use totara_competency\hook\competency_configuration_changed;
 
 class configuration {
@@ -34,7 +35,13 @@ class configuration {
      */
     public static function configuration_changed(competency_configuration_changed $hook) {
         $competency_id = $hook->get_competency_id();
-        (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);
+        $has_changed = null;
+        // A change in the aggregation type has to trigger the competency reaggregation
+        if ($hook->get_change_type() === configuration_change::CHANGED_AGGREGATION) {
+            $has_changed = 1;
+        }
+
+        (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id, $has_changed);
     }
 
 }

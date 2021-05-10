@@ -29,12 +29,18 @@ class competency_configuration_changed extends base {
 
     /** @var int */
     protected $competency_id;
+    /**
+     * @var string|null
+     */
+    protected $change_type;
 
     /**
-     * @param int $competency_id;
+     * @param int $competency_id ;
+     * @param string|null $change_type
      */
-    public function __construct(int $competency_id) {
+    public function __construct(int $competency_id, ?string $change_type = null) {
         $this->competency_id = $competency_id;
+        $this->change_type = $change_type;
     }
 
     /**
@@ -42,6 +48,13 @@ class competency_configuration_changed extends base {
      */
     public function get_competency_id(): int {
         return $this->competency_id;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function get_change_type(): ?string {
+        return $this->change_type;
     }
 
 }

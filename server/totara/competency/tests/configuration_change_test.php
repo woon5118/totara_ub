@@ -21,8 +21,11 @@
  * @package totara_competency
  */
 
+use core\orm\query\builder;
 use totara_competency\entity\configuration_change;
 use totara_competency\entity\scale_value;
+use totara_competency\expand_task;
+use totara_competency\task\competency_aggregation_queue;
 use totara_core\advanced_feature;
 
 /**
@@ -95,6 +98,65 @@ class totara_competency_configuration_change_testcase extends advanced_testcase 
         $this->assertEquals($test_time, $configuration_change->time_changed);
     }
 
+    public function test_add_competency_entry_with_assignments_queues_aggregation() {
+        $scale1 = $this->create_scale();
+        $comp1 = $this->create_competency($scale1->id);
+        $user = $this->getDataGenerator()->create_user();
+
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        $assign_generator = $competency_generator->assignment_generator();
+        $assign_generator->create_user_assignment($comp1->id, $user->id);
+
+        (new expand_task(builder::get_db()))->expand_all();
+
+        (new competency_aggregation_queue())->execute();
+
+        $this->assertEquals(0, builder::table('totara_competency_aggregation_queue')->count());
+
+        $this->assertEquals(0, configuration_change::repository()->count());
+
+        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_COMPETENCY_AGGREGATION, time());
+
+        $queued_record = builder::table('totara_competency_aggregation_queue')->order_by('id')->first();
+        $this->assertEquals(0, $queued_record->has_changed);
+        $this->assertEquals($comp1->id, $queued_record->competency_id);
+        $this->assertEquals($user->id, $queued_record->user_id);
+
+        builder::table('totara_competency_aggregation_queue')->delete();
+        $this->assertEquals(0, builder::table('totara_competency_aggregation_queue')->count());
+
+        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_CRITERIA, time());
+
+        $queued_record = builder::table('totara_competency_aggregation_queue')->order_by('id')->first();
+        $this->assertEquals(0, $queued_record->has_changed);
+        $this->assertEquals($comp1->id, $queued_record->competency_id);
+        $this->assertEquals($user->id, $queued_record->user_id);
+
+        builder::table('totara_competency_aggregation_queue')->delete();
+        $this->assertEquals(0, builder::table('totara_competency_aggregation_queue')->count());
+
+        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_MIN_PROFICIENCY, time());
+
+        $queued_record = builder::table('totara_competency_aggregation_queue')->order_by('id')->first();
+        $this->assertEquals(0, $queued_record->has_changed);
+        $this->assertEquals($comp1->id, $queued_record->competency_id);
+        $this->assertEquals($user->id, $queued_record->user_id);
+
+        builder::table('totara_competency_aggregation_queue')->delete();
+        $this->assertEquals(0, builder::table('totara_competency_aggregation_queue')->count());
+
+        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_AGGREGATION, time());
+
+        $queued_record = builder::table('totara_competency_aggregation_queue')->order_by('id')->first();
+        $this->assertEquals(1, $queued_record->has_changed);
+        $this->assertEquals($comp1->id, $queued_record->competency_id);
+        $this->assertEquals($user->id, $queued_record->user_id);
+
+        builder::table('totara_competency_aggregation_queue')->delete();
+        $this->assertEquals(0, builder::table('totara_competency_aggregation_queue')->count());
+    }
 
     protected function create_scale() {
         /** @var totara_hierarchy_generator $hierarchy_generator */

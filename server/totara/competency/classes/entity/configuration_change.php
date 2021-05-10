@@ -82,7 +82,7 @@ class configuration_change extends entity {
         $entry->time_changed = $action_time ?? time();
         $entry->save();
 
-        $hook = new competency_configuration_changed($competency_id);
+        $hook = new competency_configuration_changed($competency_id, $change_type);
         $hook->execute();
 
         return $entry;
