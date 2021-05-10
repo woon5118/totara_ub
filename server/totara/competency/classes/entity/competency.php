@@ -60,7 +60,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  * @property int $evidencecount Evidence count
  *
  * @property-read array $assigned_user_groups
- * @property-read int $children_count
+ * @property-read int $children_count this property does only exist if \totara_hierarchy\entity\hierarchy_item_repository::with_children_count() got used
  * @property-read int $assignments_count
  * @property-read int[] $assign_availability
  * @property-read object[] $display_custom_fields

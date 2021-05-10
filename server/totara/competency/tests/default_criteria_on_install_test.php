@@ -29,6 +29,7 @@ use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
 use totara_competency\achievement_configuration;
 use totara_competency\entity\competency;
+use totara_competency\linked_courses;
 use totara_competency\task\default_criteria_on_install;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
@@ -243,7 +244,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
 
         $this->assertCount(2, $pathways);
 
-        /** @var criteria_group $group_pathway */
+        /** @var criteria_group $group1_pathway */
         $group1_pathway = array_shift($pathways);
         $this->assertInstanceOf(criteria_group::class, $group1_pathway);
         $this->assertEquals($min_proficient_id, $group1_pathway->get_scale_value()->id);
@@ -254,7 +255,16 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         $this->assertInstanceOf(linkedcourses::class, $criterion);
         $this->assertEquals($criterion_aggregation, $criterion->get_aggregation_method());
 
-        /** @var criteria_group $group_pathway */
+        $competency = $group1_pathway->get_competency();
+
+        $linked_courses = linked_courses::get_linked_courses($competency->id);
+        if (!empty($linked_courses)) {
+            $this->assertTrue($group1_pathway->is_valid());
+        } else {
+            $this->assertFalse($group1_pathway->is_valid());
+        }
+
+        /** @var criteria_group $group2_pathway */
         $group2_pathway = array_shift($pathways);
         $this->assertInstanceOf(criteria_group::class, $group2_pathway);
         $this->assertEquals($min_proficient_id, $group2_pathway->get_scale_value()->id);
@@ -264,6 +274,13 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         $criterion = array_shift($criteria);
         $this->assertInstanceOf(childcompetency::class, $criterion);
         $this->assertEquals($criterion_aggregation, $criterion->get_aggregation_method());
+
+        $children = $competency->children;
+        if ($children->count() > 0) {
+            $this->assertTrue($group2_pathway->is_valid());
+        } else {
+            $this->assertFalse($group2_pathway->is_valid());
+        }
     }
 
     public function test_one_competency_with_lps_disabled() {
@@ -485,6 +502,22 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
             ['frameworkid' => $compfw1->id, 'aggregationmethod' => \competency::AGGREGATION_METHOD_ALL]
         );
 
+        $comp21 = $totara_hierarchy_generator->create_comp(
+            [
+                'frameworkid' => $compfw1->id,
+                'parentid' => $comp2->id,
+                'aggregationmethod' => \competency::AGGREGATION_METHOD_ANY
+            ]
+        );
+
+        $comp22 = $totara_hierarchy_generator->create_comp(
+            [
+                'frameworkid' => $compfw1->id,
+                'parentid' => $comp2->id,
+                'aggregationmethod' => \competency::AGGREGATION_METHOD_ANY
+            ]
+        );
+
         $compfw2 = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale2->id]);
 
         $comp3 = $totara_hierarchy_generator->create_comp(
@@ -512,13 +545,22 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         // and we should be seeing learning plan pathways on all competencies.
         $this->add_learning_plan($comp3->id);
 
-        $this->assertEquals(5, $DB->count_records('comp'));
+        $this->assertEquals(7, $DB->count_records('comp'));
 
         // The point is to test the adhoc task adds this data. If the hierarchy generator starts adding it, we'd want
         // to be able to give it the option to say don't do that.
         // There is one scale aggregation record because of comp5, but that should be all.
         $this->assertEquals(1, $DB->count_records('totara_competency_scale_aggregation'));
         $this->assertEquals(0, $DB->count_records('totara_competency_pathway'));
+
+        $course1 = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
+        linked_courses::add_linked_courses(
+            $comp4->id,
+            [[
+                'id' => $course1->id,
+                'linktype' => linked_courses::LINKTYPE_OPTIONAL,
+            ]]
+        );
 
         $task = new default_criteria_on_install();
         $task->execute();
