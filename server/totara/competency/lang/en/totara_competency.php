@@ -334,12 +334,10 @@ $string['settings_continuous_tracking'] = 'Continuous achievement tracking';
 $string['settings_continuous_tracking_description'] = 'Users\' achievement progress, rating and proficiency status are only tracked while they are assigned to a competency, and tracking ceases once they are unassigned. Enabling continuous achievement tracking will ensure that unassigned users who have no other active assignments to the competency can continue to be tracked after unassignment via a new individual assignment generated for them by the system.';
 $string['settings_continuous_tracking_disabled'] = 'Disabled';
 $string['settings_continuous_tracking_enabled'] = 'Enabled';
-
-$string['settings_legacy_aggregation_method'] = 'Default aggregation method for competencies';
-$string['settings_legacy_aggregation_method_description'] = 'Default aggregation method for competencies (description)';
-$string['settings_legacy_aggregation_method_latest'] = 'Latest';
-$string['settings_legacy_aggregation_method_highest'] = 'Highest';
-
+$string['settings_legacy_aggregation_method'] = 'Competency status behaviour';
+$string['settings_legacy_aggregation_method_description'] = 'When \'Highest value\' is selected, if proficiency has been achieved through course completion or proficiency in child competencies, any subsequent manual ratings awarding a lower scale value will be overruled, returning competency status to the minimum proficient value on the next cron run.<br /><br />When \'Latest value\' is selected, the user\'s competency status will always reflect the latest change – equal to the minimum proficient value if triggered by course completion or proficiency in child competencies, or the specific scale value selected by a manual rater.<br /><br />Changes to this setting will be applied to existing competency statuses, which could result in updated values and proficiency statuses.';
+$string['settings_legacy_aggregation_method_latest'] = 'Latest value';
+$string['settings_legacy_aggregation_method_highest'] = 'Highest value';
 $string['settings_unassign_behaviour'] = 'User assignment and record';
 $string['settings_unassign_behaviour_delete'] = 'Delete always (regardless of whether user has achieved a rating or not)';
 $string['settings_unassign_behaviour_description'] = '<p><strong>"Archive"</strong> means that a record that the user was assigned to the competency will be kept, as well as any achievement, rating and proficiency status recorded for them while assigned. Once archived, achievement progress on the competency will no longer be tracked.</p><p><strong>"Delete"</strong> means that all data about their assignment, and related achievement, rating and proficiency status will be deleted permanently.</p>';
