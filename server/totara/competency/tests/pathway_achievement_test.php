@@ -52,7 +52,7 @@ class totara_competency_pathway_achievement_testcase extends advanced_testcase {
         $this->assertEquals(pathway_achievement::STATUS_CURRENT, $current->status);
         // It has not been aggregated yet.
         $this->assertNull($current->last_aggregated);
-        $this->assertTimeCurrent($current->date_achieved);
+        $this->assertNull($current->date_achieved);
 
         // Just test that this will save.
         $current->save();

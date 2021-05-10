@@ -47,7 +47,7 @@ class latest_achieved extends overall_aggregation {
             return $this->get_or_create_current_pathway_achievement($current_achievements, $pathway, $user_id);
         });
         $achievements = $achievements->filter(function (pathway_achievement $achievement) {
-            return $achievement->last_aggregated !== null;
+            return $achievement->last_aggregated !== null && $achievement->date_achieved > 0;
         });
 
         $sorted_achievements = $achievements->sort(function (pathway_achievement $a, pathway_achievement $b) {

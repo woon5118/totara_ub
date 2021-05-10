@@ -173,7 +173,7 @@ type totara_competency_pathway_achievement {
   """
   Time the pathway was achieved
   """
-  date_achieved(format: core_date_format = TIMESTAMP): core_date!
+  date_achieved(format: core_date_format = TIMESTAMP): core_date
   """
   Time the pathway was last aggregated
   """

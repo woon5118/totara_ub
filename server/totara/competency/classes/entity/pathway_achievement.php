@@ -79,7 +79,7 @@ class pathway_achievement extends entity {
                 $achievement->user_id = $user_id;
                 $achievement->scale_value_id = null;
                 $achievement->status = static::STATUS_CURRENT;
-                $achievement->date_achieved = time();
+                $achievement->date_achieved = null;
                 // It has not been aggregated yet. If we set this to now, we might miss anything that would have
                 // prompted aggregation in the recent past, but maybe cron hasn't run since then.
                 $achievement->last_aggregated = null;

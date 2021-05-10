@@ -41,5 +41,18 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020100102, 'totara', 'competency');
     }
 
+    if ($oldversion < 2020100103) {
+        // Changing nullability of field date_achieved on table totara_competency_pathway_achievement to null.
+        $table = new xmldb_table('totara_competency_pathway_achievement');
+        $field = new xmldb_field('date_achieved', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'scale_value_id');
+
+        // Launch change of nullability for field date_achieved.
+        $dbman->change_field_notnull($table, $field);
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100103, 'totara', 'competency');
+    }
+
+
     return true;
 }

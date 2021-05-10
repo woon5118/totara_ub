@@ -71,7 +71,7 @@
         <FIELD NAME="pathway_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the pathway through which the user achieved the scale value"/>
         <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the user that achieved this scale value"/>
         <FIELD NAME="scale_value_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Scale value achieved"/>
-        <FIELD NAME="date_achieved" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Date when the user achieved this value"/>
+        <FIELD NAME="date_achieved" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Date when the user achieved this value"/>
         <FIELD NAME="last_aggregated" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false" COMMENT="Last time this was aggregated"/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Pathway achievement status"/>
         <FIELD NAME="related_info" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Other related information"/>

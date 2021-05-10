@@ -196,7 +196,7 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
         $this->assertCount(1, $first_result['items']);
         $item = $first_result['items'][0];
         $this->assertEquals(false, $item['achieved']);
-        $this->assertGreaterThan(0, $item['date_achieved']);
+        $this->assertNull($item['date_achieved']);
         $this->assertArrayHasKey('pathway', $item);
         $this->assertEquals($pathway_data->cg1->get_path_instance_id(), $item['pathway']['instance_id']);
         $this->assertEquals('criteria_group', $item['pathway']['pathway_type']);
@@ -230,7 +230,7 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
         $this->assertCount(1, $third_result['items']);
         $item = $third_result['items'][0];
         $this->assertEquals(false, $item['achieved']);
-        $this->assertGreaterThan(0, $item['date_achieved']);
+        $this->assertNull($item['date_achieved']);
         $this->assertArrayHasKey('pathway', $item);
         $this->assertEquals($cg3->get_path_instance_id(), $item['pathway']['instance_id']);
         $this->assertEquals('criteria_group', $item['pathway']['pathway_type']);
