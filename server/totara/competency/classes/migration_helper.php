@@ -218,14 +218,8 @@ class migration_helper {
                     $comp_achievement->proficient = $all_scale_values[$history->proficiency]->proficient ?? 0;
 
                     if ($first) {
-                        // If you migrate to learn-only we want all achievement marked as active
-                        $status = competency_achievement::ARCHIVED_ASSIGNMENT;
-                        if (!advanced_feature::is_enabled('competency_assignment')) {
-                            $status = competency_achievement::ACTIVE_ASSIGNMENT;
-                        }
-
                         // Represents an achievement from an archived assignment.
-                        $comp_achievement->status = $status;
+                        $comp_achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
                         // This makes sure we don't try to add another current record.
                         $first = false;
                     } else {

@@ -166,7 +166,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($comp_record_history->competencyid, $achievement->competency_id);
         $this->assertNull($achievement->scale_value_id);
         $this->assertEquals(0, $achievement->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
         $this->assertEquals($comp_record_history->timemodified, $achievement->time_created);
         $this->assertEquals($comp_record_history->timemodified, $achievement->time_status);
         $this->assertEquals($comp_record_history->timemodified, $achievement->time_scale_value);
@@ -206,7 +206,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($comp_record_history->competencyid, $achievement->competency_id);
         $this->assertEquals(10, $achievement->scale_value_id);
         $this->assertEquals(0, $achievement->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
         $this->assertEquals($comp_record_history->timemodified, $achievement->time_created);
         $this->assertEquals($comp_record_history->timemodified, $achievement->time_status);
         $this->assertEquals($comp_record_history->timemodified, $achievement->time_scale_value);
@@ -283,7 +283,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($assignment->id, $achievement1->assignment_id);
         $this->assertEquals($comp_record_history1->proficiency, $achievement1->scale_value_id);
         $this->assertEquals(0, $achievement1->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement1->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement1->status);
         $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_created);
         $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_status);
         $this->assertEquals($comp_record_history1->timemodified, $achievement1->time_scale_value);
@@ -407,7 +407,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($talking_bob_latest->timemodified, $achievement->time_created);
         $this->assertEquals($talking_bob_latest->proficiency, $achievement->scale_value_id);
         $this->assertEquals(1, $achievement->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
         $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
@@ -447,7 +447,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($listening_bob_latest->timemodified, $achievement->time_created);
         $this->assertEquals($listening_bob_latest->proficiency, $achievement->scale_value_id);
         $this->assertEquals(1, $achievement->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
         $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
@@ -471,7 +471,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($talking_alice_latest->timemodified, $achievement->time_created);
         $this->assertEquals($talking_alice_latest->proficiency, $achievement->scale_value_id);
         $this->assertEquals(1, $achievement->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
         $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
@@ -502,7 +502,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($listening_alice_latest->timemodified, $achievement->time_created);
         //$this->assertEquals($listening_alice_latest->proficiency, $achievement->scale_value_id);
         $this->assertEquals(1, $achievement->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
         $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
@@ -542,7 +542,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals($listening_eve->timemodified, $achievement->time_created);
         $this->assertEquals($listening_eve->proficiency, $achievement->scale_value_id);
         $this->assertEquals(1, $achievement->proficient);
-        $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
         $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
