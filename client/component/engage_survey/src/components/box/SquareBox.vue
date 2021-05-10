@@ -125,7 +125,6 @@ export default {
   }
   .tui-checkbox {
     min-height: var(--gap-4);
-    overflow: auto;
     @include tui-wordbreak--hyphens;
   }
   .tui-checkboxGroup > * + * {
