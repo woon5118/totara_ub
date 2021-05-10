@@ -96,8 +96,10 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    width: 100%;
     margin: 0 auto;
     padding: 0 0 var(--gap-12) 0;
+
     @media (max-width: $tui-screen-sm) {
       width: 70vw;
       margin-left: var(--gap-8);
