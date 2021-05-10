@@ -58,6 +58,8 @@ class default_criteria_on_install extends adhoc_task {
             ->with('scale')
             ->left_join([scale_aggregation::TABLE, 'sa'], 'id', 'competency_id')
             ->where('sa.id', null)
+            ->order_by('depthlevel', 'desc')
+            ->order_by('id', 'asc')
             ->get();
 
         foreach ($competencies as $competency) {
