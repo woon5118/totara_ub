@@ -311,6 +311,7 @@ export default {
     position: sticky;
     top: 0;
     max-height: 100vh;
+    overflow: hidden;
 
     .ie &,
     .msedge & {
