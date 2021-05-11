@@ -91,6 +91,68 @@ Feature: Archive user assignments on competency details page and view archived a
     And I click on "OK" "button"
     Then I should not see "Directly assigned by Admin User (Manager)"
 
+  Scenario: Archiving is possible even with archived assignments
+    Given I log in as "student"
+
+    When I navigate to the competency profile of user "student"
+    And I change the competency profile to list view
+    And I click on "Comp 1" "link"
+    And I select "Self-assigned" from the "select_assignment" singleselect
+    Then I should see "Archive this assignment"
+    When I select "Directly assigned by Admin User (Manager)" from the "select_assignment" singleselect
+    Then I should not see "Archive this assignment"
+
+    Given I log out
+    And I log in as "teacher"
+    When I navigate to the competency profile of user "student"
+    And I change the competency profile to list view
+    And I click on "Comp 1" "link"
+    And I select "Self-assigned" from the "select_assignment" singleselect
+    Then I should see "Archive this assignment"
+    And I click on "Archive this assignment" "button"
+    Then I should see "Confirm archiving of assignment"
+    And I click on "OK" "button"
+    Then I should not see "Self-assigned"
+    When I select "Directly assigned by Admin User (Manager)" from the "select_assignment" singleselect
+    Then I should see "Archive this assignment"
+    And I click on "Archive this assignment" "button"
+    Then I should see "Confirm archiving of assignment"
+    And I click on "OK" "button"
+    Then I should not see "Directly assigned by Admin User (Manager)"
+
+    Given the following "assignments" exist in "totara_competency" plugin:
+      | competency | user_group_type | user_group | type  |
+      | comp1      | user            | student    | other |
+      | comp1      | user            | student    | self  |
+      | comp2      | user            | student    | self  |
+    And I run the scheduled task "totara_competency\task\expand_assignments_task"
+
+    Given I log out
+    And I log in as "student"
+    When I navigate to the competency profile of user "student"
+    And I change the competency profile to list view
+    And I click on "Comp 1" "link"
+    And I click on "Archived assignments" "button"
+    Then I should see the tui datatable contains:
+      | Assignment        | Date archived      | Proficiency status |
+      | Directly assigned | ## today ##j F Y## |                    |
+      | Self-assigned     | ## today ##j F Y## |                    |
+    When I close the tui modal
+    And I select "Self-assigned" from the "select_assignment" singleselect
+    Then I should see "Archive this assignment"
+    When I select "Directly assigned by Admin User (Manager)" from the "select_assignment" singleselect
+    Then I should not see "Archive this assignment"
+
+    Given I log out
+    And I log in as "teacher"
+    When I navigate to the competency profile of user "student"
+    And I change the competency profile to list view
+    And I click on "Comp 1" "link"
+    And I select "Self-assigned" from the "select_assignment" singleselect
+    Then I should see "Archive this assignment"
+    When I select "Directly assigned by Admin User (Manager)" from the "select_assignment" singleselect
+    Then I should see "Archive this assignment"
+
   Scenario: Hide Archive directly-assigned competency button for User profile
     Given I log in as "student"
     When I navigate to the competency profile of user "student"

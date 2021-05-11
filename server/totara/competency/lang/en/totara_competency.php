@@ -48,7 +48,6 @@ $string['action_activate_individual_modal'] = '<p>A competency record will be cr
 $string['action_activate_individual_modal_header'] = 'Confirm assignment activation';
 $string['action_add_user_groups'] = 'Add user groups';
 $string['action_archive'] = 'Archive assignment';
-$string['action_archive_this'] = 'Archive this assignment';
 $string['action_archive_bulk_modal_1'] = 'All assigned users will be unassigned, and their assignments and records archived. Their progress against the achievement criteria for these competencies will no longer be tracked.';
 $string['action_archive_bulk_modal_2'] = 'Only active assignments will be archived (draft and archived assignments will be ignored).';
 $string['action_archive_bulk_modal_confirm'] = 'Enable continuous achievement tracking for <strong>users in group-based</strong> assignments who have no other active assignments to the competency from which they are being unassigned';

@@ -174,10 +174,12 @@ export default {
       }
     },
     showCanArchiveButton() {
-      return (
-        this.activeAssignmentList[this.selectedAssignment] &&
-        this.activeAssignmentList[this.selectedAssignment].can_archive
+      // Check whether we can archive this assignment
+      let activeAssignment = this.activeAssignmentList.find(
+        assignment => assignment.id === this.selectedAssignment
       );
+
+      return activeAssignment && activeAssignment.can_archive;
     },
   },
 
