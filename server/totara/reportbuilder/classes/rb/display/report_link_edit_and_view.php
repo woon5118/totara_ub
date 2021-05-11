@@ -39,6 +39,8 @@ class report_link_edit_and_view extends base {
         // Retrieve the extra row data.
         $extra = self::get_extrafields_row($row, $column);
 
+        $value = format_string::display($value, $format, $row, $column, $report);
+
         if ($format == 'html') {
             // Build minimal object needed to get URL.
             $report = new \stdClass();
