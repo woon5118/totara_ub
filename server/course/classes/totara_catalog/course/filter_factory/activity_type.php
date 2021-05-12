@@ -26,6 +26,7 @@ namespace core_course\totara_catalog\course\filter_factory;
 
 defined('MOODLE_INTERNAL') || die();
 
+use container_course\course;
 use totara_catalog\datasearch\equal;
 use totara_catalog\datasearch\in_or_equal;
 use totara_catalog\filter;
@@ -60,11 +61,18 @@ class activity_type extends filter_factory {
             $options = [];
 
             // All in-use visible modules.
-            $sql = "SELECT DISTINCT m.id, m.name
-                      FROM {course_modules} cm
-                      JOIN {modules} m ON m.id = cm.module
-                     WHERE m.visible = 1";
-            $modules = $DB->get_records_sql($sql);
+            $sql = "
+                SELECT m.id, m.name
+                FROM {modules} m
+                WHERE EXISTS (
+                    SELECT cm.id
+                    FROM {course_modules} cm
+                    JOIN {course} c ON cm.course = c.id
+                    WHERE cm.module = m.id 
+                      AND c.containertype = :container_type
+                ) AND m.visible = 1
+            ";
+            $modules = $DB->get_records_sql($sql, ['container_type' => course::get_type()]);
 
             foreach ($modules as $module) {
                 if (get_string_manager()->string_exists('pluginname', $module->name)) {
@@ -112,11 +120,18 @@ class activity_type extends filter_factory {
             $options = [];
 
             // All in-use visible modules.
-            $sql = "SELECT DISTINCT m.id, m.name
-                      FROM {course_modules} cm
-                      JOIN {modules} m ON m.id = cm.module
-                     WHERE m.visible = 1";
-            $modules = $DB->get_records_sql($sql);
+            $sql = "
+                SELECT m.id, m.name
+                FROM {modules} m
+                WHERE EXISTS (
+                    SELECT cm.id
+                    FROM {course_modules} cm
+                    JOIN {course} c ON cm.course = c.id
+                    WHERE cm.module = m.id 
+                      AND c.containertype = :container_type
+                ) AND m.visible = 1
+            ";
+            $modules = $DB->get_records_sql($sql, ['container_type' => course::get_type()]);
 
             foreach ($modules as $module) {
                 $option = new \stdClass();
