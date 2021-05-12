@@ -29,8 +29,11 @@ use container_workspace\query\discussion\sort;
 use core\orm\pagination\offset_cursor_paginator;
 use core\orm\query\builder;
 use core\orm\query\order;
+use core\orm\query\subquery;
+use totara_comment\entity\comment as comment_entity;
 use totara_comment\comment;
 use container_workspace\workspace;
+use totara_reaction\entity\reaction as reaction_entity;
 
 /**
  * Loader class for discussions within a workspace
@@ -54,8 +57,8 @@ final class loader {
         $builder->join(['user', 'u'], 'wd.user_id', 'u.id');
 
         // Make sure that the discussion's id is distinct.
-        $builder->select_raw("DISTINCT wd.id AS discussion_id");
-        $builder->add_select([
+        $builder->select([
+            "wd.id AS discussion_id",
             "wd.course_id AS discussion_workspace_id",
             "wd.user_id AS discussion_user_id",
             "wd.content AS discussion_content",
@@ -77,8 +80,27 @@ final class loader {
         $user_fields_sql = get_all_user_name_fields(true, 'u', null, 'user_');
         $builder->add_select_raw($user_fields_sql);
 
+        // Include counts for comments
+        $builder->add_select((new subquery(function (builder $builder) {
+            $builder->from(comment_entity::TABLE, 'c')
+                ->select_raw('COUNT(*)')
+                ->where_field('instanceid', 'wd.id')
+                ->where('c.component', workspace::get_type())
+                ->where('c.area', discussion::AREA)
+                ->where_null('c.parentid');
+        }))->as('discussion_total_comments'));
+
+        // Include counts for reactions
+        $builder->add_select((new subquery(function (builder $builder) {
+            $builder->from(reaction_entity::TABLE, 'r')
+                ->select_raw('COUNT(*)')
+                ->where_field('instanceid', 'wd.id')
+                ->where('r.component', workspace::get_type())
+                ->where('r.area', discussion::AREA);
+        }))->as('discussion_total_reactions'));
+
         $builder->results_as_arrays();
-        $builder->map_to([static::class, 'create_discussion']);
+        $builder->map_to([self::class, 'create_discussion']);
 
         $workspace_id = $query->get_workspace_id();
         $builder->where('wd.course_id', $workspace_id);
@@ -86,25 +108,34 @@ final class loader {
         // Check for search term.
         $search_term = $query->get_search_term();
         if (null !== $search_term && '' !== $search_term) {
-            // Where like for workspace discussion and the comment that related to the workspace.
-            $builder->left_join(
-                [comment::get_entity_table(), 'tc'],
-                function (builder $join): void {
-                    $join->where_field('tc.instanceid', 'wd.id');
-                    $join->where('tc.component', workspace::get_type());
-                    $join->where('tc.area', discussion::AREA);
-                }
-            );
-
+            // Filter results by the discussion content, or any comment/reply underneath the discussion
             require_once("{$CFG->dirroot}/totara/core/searchlib.php");
-            $keywords = totara_search_parse_keywords($search_term);
-            [$search_sql, $search_params] = totara_search_get_keyword_where_clause(
-                $keywords,
-                ['wd.content_text', 'tc.contenttext'],
-                SQL_PARAMS_NAMED
-            );
 
-            $builder->where_raw($search_sql, $search_params);
+            $builder->where(function (builder $builder) use ($search_term) {
+                $keywords = totara_search_parse_keywords($search_term);
+                [$search_sql, $search_params] = totara_search_get_keyword_where_clause(
+                    $keywords,
+                    ['wd.content_text'],
+                    SQL_PARAMS_NAMED
+                );
+
+                // Comment checks can be expensive so we lookup with an exists check instead
+                [$search2_sql, $search2_params] = totara_search_get_keyword_where_clause(
+                    $keywords,
+                    ['contenttext'],
+                    SQL_PARAMS_NAMED
+                );
+                $exists_builder = comment_entity::repository()
+                    ->select('instanceid')
+                    ->where_field('instanceid', 'wd.id')
+                    ->where('component', workspace::get_type())
+                    ->where('area', discussion::AREA)
+                    ->where_raw($search2_sql, $search2_params)
+                    ->get_builder();
+
+                $builder->or_where_raw($search_sql, $search_params)
+                    ->or_where_exists($exists_builder);
+            });
         }
 
         // Check for pinned discussion
@@ -193,6 +224,11 @@ final class loader {
         }
 
         $user = (object) $user;
-        return discussion::from_entity($entity, $user);
+        $discussion = discussion::from_entity($entity, $user);
+
+        $discussion->set_total_comments((int) $record['discussion_total_comments']);
+        $discussion->set_total_reactions((int) $record['discussion_total_reactions']);
+
+        return $discussion;
     }
 }

@@ -191,10 +191,22 @@ class container_workspace_discussion_loader_testcase extends advanced_testcase {
         // Create two discussions, and fetch with the recently updated before adding comment to one and another.
         $workspace_id = $workspace->get_id();
         $discussion_one = $workspace_generator->create_discussion($workspace_id);
-
-        // Just to make sure that race condition is not happening, for the discussion two.
-        $this->waitForSecond();
         $discussion_two = $workspace_generator->create_discussion($workspace_id);
+
+        // Both discussions need to have different timestamps, so we can test the sorting.
+        // We set a past time here so when the comment below is created the timestamp will absolutely be different
+        discussion::get_entity_repository()->update_record([
+            'id' => $discussion_one->get_id(),
+            'timestamp' => 584217720,
+            'time_created' => 584217720,
+            'time_modified' => 584217720,
+        ]);
+        discussion::get_entity_repository()->update_record([
+            'id' => $discussion_two->get_id(),
+            'timestamp' => 584217800,
+            'time_created' => 584217800,
+            'time_modified' => 584217800,
+        ]);
 
         // Load the discussion base on the recently updated which the second discussion should be there.
         $query = new discussion_query($workspace_id);
@@ -210,7 +222,7 @@ class container_workspace_discussion_loader_testcase extends advanced_testcase {
         $first_before_result_discussion = reset($before_result_discussions);
         self::assertEquals($discussion_two->get_id(), $first_before_result_discussion->get_id());
 
-        // The discusison one will be at the bottom.
+        // The discussion one will be at the bottom.
         $second_before_result_discussion = end($before_result_discussions);
         self::assertEquals($discussion_one->get_id(), $second_before_result_discussion->get_id());
 

@@ -579,12 +579,11 @@ final class discussion {
      * @return int
      */
     public function get_total_comments(): int {
-        if (null === $this->total_comments || 0 === $this->total_comments) {
-            // Give zero a chance to reload from DB.
+        if (null === $this->total_comments) {
             $this->total_comments = comment_loader::count_comments(
                 $this->entity->id,
                 workspace::get_type(),
-                static::AREA
+                self::AREA
             );
         }
 
@@ -595,12 +594,11 @@ final class discussion {
      * @return int
      */
     public function get_total_reactions(): int {
-        if (null === $this->total_reactions || 0 === $this->total_reactions) {
-            // Give zero a chance to reload from DB.
+        if (null === $this->total_reactions) {
             $this->total_reactions = reaction_loader::count(
                 $this->entity->id,
                 workspace::get_type(),
-                static::AREA
+                self::AREA
             );
         }
 
