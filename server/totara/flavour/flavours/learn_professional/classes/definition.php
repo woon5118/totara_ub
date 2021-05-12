@@ -55,7 +55,7 @@ class definition extends \totara_flavour\definition {
                 'enableplagiarism' => 1,
                 'enablecontentmarketplaces' => 1,
                 'enableprogramextensionrequests' => 1,
-                'enablecertifications' => advanced_feature::ENABLED,
+                'enableprograms' => advanced_feature::ENABLED,
                 'enableprogramcompletioneditor' => 1,
                 'enablerecordoflearning' => advanced_feature::ENABLED,
                 'enablelegacyprogramassignments' => 0,
@@ -75,7 +75,8 @@ class definition extends \totara_flavour\definition {
                 'enablewebservices' => 0,
                 'mnet_dispatcher_mode' => 'off',
                 'enablelearningplans' => advanced_feature::DISABLED,
-                'enableprograms' => advanced_feature::DISABLED,
+                'enablecertifications' => advanced_feature::DISABLED,
+                'enablepositions' => advanced_feature::DISABLED,
                 // Disable Engage only features
                 'enableengage_resources' => advanced_feature::DISABLED,
                 'enablecontainer_workspace' => advanced_feature::DISABLED,
