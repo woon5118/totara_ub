@@ -50,7 +50,7 @@ class restore_totara_report_graph_block_structure_step extends restore_structure
 
         $configdata = $DB->get_field('block_instances', 'configdata', array('id' => $this->task->get_blockid()));
 
-        $config = unserialize(base64_decode($configdata));
+        $config = unserialize(base64_decode($configdata), ['allowed_classes' => [stdClass::class]]);
         if (empty($config)) {
             $config = new stdClass();
         }

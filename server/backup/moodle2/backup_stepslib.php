@@ -1540,7 +1540,7 @@ class backup_block_instance_structure_step extends backup_structure_step {
         // Transform configdata information if needed (process links and friends)
         $blockrec = $DB->get_record('block_instances', array('id' => $this->task->get_blockid()));
         if ($attrstotransform = $this->task->get_configdata_encoded_attributes()) {
-            $configdata = (array)unserialize(base64_decode($blockrec->configdata));
+            $configdata = (array)unserialize(base64_decode($blockrec->configdata), ['allowed_classes' => [stdClass::class]]);
             foreach ($configdata as $attribute => $value) {
                 if (in_array($attribute, $attrstotransform)) {
                     $configdata[$attribute] = $this->contenttransformer->process($value);
