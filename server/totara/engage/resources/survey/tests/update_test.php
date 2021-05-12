@@ -55,6 +55,10 @@ class engage_survey_update_testcase extends advanced_testcase {
         $question = reset($questions);
         $this->assertEquals('Hello world ?', $question->get_value());
 
+        // Confirm that the resource name is the same as the question.
+        $resource = totara_engage\resource\resource_factory::create_instance_from_id($survey->get_id());
+        $this->assertEquals('Hello world ?', $resource->get_name());
+
         $survey->update([
             'questions' => [
                 [
@@ -72,6 +76,10 @@ class engage_survey_update_testcase extends advanced_testcase {
 
         $this->assertEquals('Is this not a hello world', $question->get_value());
         $this->assertEquals( access::PUBLIC, $survey->get_access());
+
+        // Also confirm that the resource name changed.
+        $resource = totara_engage\resource\resource_factory::create_instance_from_id($survey->get_id());
+        $this->assertEquals('Is this not a hello world', $resource->get_name());
     }
 
     /**

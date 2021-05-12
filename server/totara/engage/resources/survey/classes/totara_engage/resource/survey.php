@@ -307,6 +307,10 @@ final class survey extends resource_item {
 
             $question->update($userid);
             $question->update_answer_options($question_datum['options'], $userid);
+
+            // Also set the resource name to new question.
+            $this->resource->name = $question_datum['value'];
+            $this->resource->save();
         }
 
         return true;
