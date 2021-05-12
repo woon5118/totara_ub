@@ -23,6 +23,8 @@
 namespace container_workspace\output;
 
 use container_workspace\discussion\discussion;
+use container_workspace\discussion\discussion as model_discussion;
+use container_workspace\workspace;
 use core\output\template;
 use coding_exception;
 use core_text;
@@ -37,11 +39,23 @@ final class create_new_discussion extends template {
      * @return create_new_discussion
      */
     public static function create(discussion $discussion, string $workspace_name): create_new_discussion {
+        global $CFG;
+
         if (!defined('CLI_SCRIPT') || !CLI_SCRIPT) {
             throw new coding_exception("Cannot instantiate the template for web page usage");
         }
 
-        $text = $discussion->get_content_text();
+        require_once($CFG->dirroot . '/lib/filelib.php');
+
+        $text = \file_rewrite_pluginfile_urls(
+            $discussion->get_content_text(),
+            'pluginfile.php',
+            $discussion->get_context()->id,
+            workspace::get_type(),
+            model_discussion::AREA,
+            $discussion->get_id()
+        );
+
         if (core_text::strlen($text) > 75) {
             $array = explode("\n", $text);
             $len = 0;
