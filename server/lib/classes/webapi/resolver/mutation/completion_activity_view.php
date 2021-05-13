@@ -23,10 +23,16 @@
 
 namespace core\webapi\resolver\mutation;
 
+use coding_exception;
+use completion_info;
+use container_course\course;
+use context_module;
+use core\event\course_module_viewed;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login_course_via_coursemodule;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use moodle_exception;
 
 final class completion_activity_view implements mutation_resolver, has_middleware {
 
@@ -36,13 +42,13 @@ final class completion_activity_view implements mutation_resolver, has_middlewar
     public static function resolve(array $args, execution_context $ec) {
         global $DB;
 
-        // Unsupported activites, some of activities still has the {module_name}_view function
-        // but it accept the different params, be careful.
+        // Unsupported activities. Some activities still have the {module_name}_view function
+        // but accept different params, be careful.
         $unsupported = [
             'assign', 'book', 'glossary', 'label', 'perform', 'survey', 'workshop'
         ];
         /**
-         * Supported activites:
+         * Supported activities:
          * $supported = [
          *  'certificate', 'chat', 'choice', 'data', 'facetoface', 'feedback', 'folder', 'forum', 'imscp',
          *  'lesson', 'lti', 'page', 'quiz', 'resource', 'scorm', 'url', 'wiki'
@@ -54,9 +60,9 @@ final class completion_activity_view implements mutation_resolver, has_middlewar
         $course = $args['course'];
         $module_name = $args['activity'];
 
-        $modules = \container_course\course::get_module_types_supported();
+        $modules = course::get_module_types_supported();
         if (!isset($modules[$module_name])) {
-            throw new \moodle_exception('moduledoesnotexist', 'error');
+            throw new moodle_exception('moduledoesnotexist', 'error');
         }
 
         if (in_array($module_name, $unsupported)) {
@@ -68,14 +74,14 @@ final class completion_activity_view implements mutation_resolver, has_middlewar
             return false;
         }
 
-        $module = $DB->get_record($module_name, ['id' => $cm->instance], '*', MUST_EXIST);
-        $context = \context_module::instance($cm->id);
-        try {
-            // Trigger events.
-            self::module_viewed($module_name, $module, $course, $cm, $context);
-        } catch (Exception $e) {
-            throw new \Exception($e->getMessage());
+        $module = $DB->get_record($module_name, ['id' => $cm->instance]);
+        if (!$module) {
+            throw new coding_exception('Specified module could not be found.');
         }
+        $context = context_module::instance($cm->id);
+
+        // Trigger events.
+        self::module_viewed($module_name, $module, $course, $cm, $context);
 
         return true;
     }
@@ -86,7 +92,8 @@ final class completion_activity_view implements mutation_resolver, has_middlewar
         ];
     }
 
-    private static function module_viewed($module_name, $module, $course, $cm, $context) {
+    private static function module_viewed($module_name, $module, $course, $cm, $context): void {
+        /** @var course_module_viewed $class */
         $class = "\\mod_{$module_name}\\event\\course_module_viewed";
 
         // Trigger course_module_viewed event.
@@ -94,7 +101,7 @@ final class completion_activity_view implements mutation_resolver, has_middlewar
             'context' => $context,
             'objectid' => $module->id
         ];
-        if ($module_name == 'feedback') {
+        if ($module_name === 'feedback') {
             $params['other'] = ['anonymous' => $module->anonymous];
             $params['anonymous'] = ($module->anonymous == 1);
         }
@@ -106,7 +113,7 @@ final class completion_activity_view implements mutation_resolver, has_middlewar
         $event->trigger();
 
         // Completion.
-        $completion = new \completion_info($course);
+        $completion = new completion_info($course);
         $completion->set_module_viewed($cm);
     }
 }

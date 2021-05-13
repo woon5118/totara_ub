@@ -29,6 +29,8 @@ require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria_self.php');
 
+use core\event\course_module_viewed;
+use core_phpunit\testcase;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class webapi_resolver_mutation_activity_view_testcase extends advanced_testcase {
@@ -44,11 +46,7 @@ class webapi_resolver_mutation_activity_view_testcase extends advanced_testcase 
         $CFG->enablecompletion = true;
     }
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
-
-    private function create_completion_activity($activity) {
+    private function create_completion_activity($activity): array {
 
         $coursedefaults = array(
             'enablecompletion' => COMPLETION_ENABLED,
@@ -56,14 +54,14 @@ class webapi_resolver_mutation_activity_view_testcase extends advanced_testcase 
             'completionprogressonview' => 1,
         );
 
-        $course = $this->getDataGenerator()->create_course($coursedefaults, array('createsections' => true));
+        $course = self::getDataGenerator()->create_course($coursedefaults, array('createsections' => true));
 
         // Enrol user if present.
-        $user = $this->getDataGenerator()->create_user();
-        $this->setUser($user);
-        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+        $user = self::getDataGenerator()->create_user();
+        self::setUser($user);
+        self::getDataGenerator()->enrol_user($user->id, $course->id);
 
-        $module = $this->getDataGenerator()->create_module(
+        $module = self::getDataGenerator()->create_module(
             $activity,
             ['course' => $course->id],
             ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => COMPLETION_VIEW_REQUIRED]
@@ -76,7 +74,7 @@ class webapi_resolver_mutation_activity_view_testcase extends advanced_testcase 
      * Provider for test_resolve_activity_view
      * @return array
      */
-    public function module_provider() {
+    public function module_provider(): array {
         return [
             ['certificate'], ['chat'], ['choice'], ['data'], ['facetoface'], ['feedback'], ['folder'], ['forum'], ['imscp'],
             ['lesson'], ['lti'], ['page'], ['quiz'], ['resource'], ['scorm'], ['url'], ['wiki']
@@ -87,32 +85,60 @@ class webapi_resolver_mutation_activity_view_testcase extends advanced_testcase 
      * @dataProvider module_provider
      * @throws coding_exception
      */
-    public function test_resolve_activity_view($activity) {
+    public function test_resolve_activity_view($activity): void {
         [$module, $course] = $this->create_completion_activity($activity);
-        try {
-            $args = ['cmid' => $module->cmid, 'activity' => $activity];
-            $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
-            self::assertTrue($result);
-        } catch (\moodle_exception $ex) {
-            self::fail($ex->getMessage());
-        }
+        $cm = get_coursemodule_from_instance($activity, $module->id);
+        $completion = new completion_info($course);
+        $completion_data = $completion->get_data($cm);
+        self::assertEquals(0, $completion_data->viewed);
+
+        $sink = $this->redirectEvents();
+
+        $args = ['cmid' => $module->cmid, 'activity' => $activity];
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
+        self::assertTrue($result);
+
+        // This triggers several events. Make sure there is a course_module_viewed event among them.
+        $viewed_events = array_filter($sink->get_events(), static function (core\event\base $event) {
+            return $event instanceof course_module_viewed;
+        });
+        self::assertCount(1, $viewed_events);
 
         // Check completion status.
-        $cm = get_coursemodule_from_instance($activity, $module->id);
-        $completion = new \completion_info($course);
-        $completiondata = $completion->get_data($cm);
-        $this->assertEquals(1, $completiondata->viewed);
+        $completion_data = $completion->get_data($cm);
+        self::assertEquals(1, $completion_data->viewed);
     }
 
-    public function test_resolve_activity_view_no_support() {
+    public function test_resolve_activity_view_no_support(): void {
         $activity = 'book';
+        [$module, ] = $this->create_completion_activity($activity);
+        $args = ['cmid' => $module->cmid, 'activity' => $activity];
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
+        self::assertFalse($result);
+    }
+
+    public function test_resolve_activity_view_with_mismatching_name_and_module(): void {
+        $activity = 'book';
+        [$module, ] = $this->create_completion_activity($activity);
+        $args = ['cmid' => $module->cmid, 'activity' => 'lesson'];
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Specified module could not be found.');
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
+    }
+
+    public function test_resolve_activity_view_is_using_require_login_course_middleware() {
+        $activity = 'lesson';
         [$module, $course] = $this->create_completion_activity($activity);
-        try {
-            $args = ['cmid' => $module->cmid, 'activity' => $activity];
-            $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
-            self::assertFalse($result);
-        } catch (\moodle_exception $ex) {
-            self::fail("This '{$activity}' module does not support course_module_viewed event.");
-        }
+        $cm = get_coursemodule_from_instance($activity, $module->id);
+
+        // Switch to a user that is not enrolled.
+        $user = self::getDataGenerator()->create_user();
+        self::setUser($user);
+        $args = ['cmid' => $module->cmid, 'activity' => $activity];
+
+        $this->expectException(require_login_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (Not enrolled)');
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 }
