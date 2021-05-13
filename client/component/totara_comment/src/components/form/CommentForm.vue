@@ -238,17 +238,16 @@ export default {
   &__editor {
     flex: 1;
     max-width: 100%;
+
+    .tui-weka__editorHost {
+      max-height: 200px;
+    }
   }
 
   &__buttonGroup {
     display: flex;
     justify-content: flex-end;
     margin-top: var(--gap-4);
-  }
-
-  &__input {
-    max-height: 200px;
-    overflow: auto;
   }
 }
 </style>
