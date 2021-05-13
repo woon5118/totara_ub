@@ -116,7 +116,7 @@ export default {
         },
         {
           label: this.$str('remove', 'core'),
-          action: () => this.$_removeNode,
+          action: this.$_removeNode,
         },
         {
           label: this.$str('download', 'core'),
