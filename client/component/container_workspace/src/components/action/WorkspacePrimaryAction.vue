@@ -339,6 +339,7 @@ export default {
   apollo: {
     interactor: {
       query: getWorkspaceInteractor,
+      context: { batch: true },
       variables() {
         return {
           workspace_id: this.workspaceId,

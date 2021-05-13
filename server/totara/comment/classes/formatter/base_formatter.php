@@ -33,6 +33,10 @@ use totara_comment\formatter\field\time_description_formatter;
  * @package totara_comment\formatter
  */
 abstract class base_formatter extends formatter {
+
+    /** @var comment */
+    protected $object;
+
     /**
      * base_formatter constructor.
      * @param comment $comment
@@ -44,39 +48,7 @@ abstract class base_formatter extends formatter {
         $context_id = $resolver->get_context_id($comment->get_instanceid(), $area);
         $context = \context::instance_by_id($context_id);
 
-        $record = static::to_record($comment);
-        parent::__construct($record, $context);
-    }
-
-    /**
-     * Extract the comment to be a dummy data object.
-     *
-     * @param comment $comment
-     * @return \stdClass
-     */
-    protected static function to_record(comment $comment): \stdClass {
-        $record = new \stdClass();
-
-        $record->user = $comment->get_user();
-        $record->id = $comment->get_id();
-        $record->content = $comment->get_content();
-        $record->format = $comment->get_format();
-        $record->timemodified = $comment->get_timemodified();
-        $record->timecreated = $comment->get_timecreated();
-        $record->deleted = $comment->is_soft_deleted();
-        $record->reasondeleted = $comment->get_reason_deleted();
-
-        $record->component = $comment->get_component();
-        $record->area = $comment->get_area();
-
-        $record->comment_area = comment::COMMENT_AREA;
-        if ($comment->is_reply()) {
-            $record->comment_area = comment::REPLY_AREA;
-        }
-
-        $record->edited = (null !== $record->timemodified);
-        $record->totalreactions = $comment->get_total_reactions();
-        return $record;
+        parent::__construct($comment, $context);
     }
 
     /**
@@ -84,11 +56,26 @@ abstract class base_formatter extends formatter {
      * @return mixed|null
      */
     protected function get_field(string $field) {
-        if ('timedescription' == $field) {
-            return $this->object->timecreated;
+        $field = $this->get_field_name($field);
+
+        switch ($field) {
+            case 'edited':
+                $value = $this->object->is_edited();
+                break;
+            case 'deleted':
+                $value = $this->object->is_soft_deleted();
+                break;
+            default:
+                $method_name = 'get_'.$field;
+                if (method_exists($this->object, $method_name)) {
+                    $value = $this->object->{$method_name}();
+                } else {
+                    throw new \coding_exception('Unknown field name ' . $field);
+                }
+                break;
         }
 
-        return parent::get_field($field);
+        return $value;
     }
 
     /**
@@ -96,19 +83,29 @@ abstract class base_formatter extends formatter {
      * @return bool
      */
     protected function has_field(string $field): bool {
-        if ('timedescription' == $field) {
-            return true;
+        $has_field = false;
+        $field = $this->get_field_name($field);
+
+        switch ($field) {
+            case 'edited':
+            case 'deleted':
+                $has_field = true;
+                break;
+            default:
+                $method_name = 'get_'.$field;
+                if (method_exists($this->object, $method_name)) {
+                    $has_field = true;
+                }
+                break;
         }
 
-        return parent::has_field($field);
+        return $has_field;
     }
 
     /**
      * @return array
      */
     protected function get_map(): array {
-        $that = $this;
-
         return [
             'user' => null,
             'id' => null,
@@ -118,9 +115,9 @@ abstract class base_formatter extends formatter {
             'deleted' => null,
             'reportable' => null,
             'totalreactions' => null,
-            'content' => function(?string $content, text_field_formatter $formatter) use ($that): string {
-                if (empty($content) && $that->object->deleted) {
-                    $reason = $that->object->reasondeleted;
+            'content' => function (?string $content, text_field_formatter $formatter): string {
+                if (empty($content) && $this->object->is_soft_deleted()) {
+                    $reason = $this->object->get_reason_deleted();
                     // Different phrasing for removed versus user deleted comments
                     if (null !== $reason && comment::REASON_DELETED_REPORTED == $reason) {
                         return get_string('removedcomment', 'totara_comment');
@@ -130,14 +127,14 @@ abstract class base_formatter extends formatter {
                     debugging("Content is empty, even though the comment was not deleted yet", DEBUG_DEVELOPER);
                     return '';
                 }
-                $textformat = $that->object->format;
+                $textformat = $this->object->get_format();
 
                 $formatter->set_additional_options(['formatter' => 'totara_tui']);
                 $formatter->set_pluginfile_url_options(
-                    $that->context,
+                    $this->context,
                     'totara_comment',
-                    $that->object->comment_area,
-                    $that->object->id
+                    $this->object->get_comment_area(),
+                    $this->object->get_id()
                 );
 
                 $formatter->set_text_format($textformat);
@@ -147,5 +144,28 @@ abstract class base_formatter extends formatter {
             'timedescription' => time_description_formatter::class,
             'reasondeleted' => null,
         ];
+    }
+
+    /**
+     * Some fields have different names on the model
+     *
+     * @param string $field
+     * @return string
+     */
+    protected function get_field_name(string $field): string {
+        // Some fields go under a different name
+        switch ($field) {
+            case 'timedescription':
+                $field = 'timecreated';
+                break;
+            case 'reasondeleted':
+                $field = 'reason_deleted';
+                break;
+            case 'totalreactions':
+                $field = 'total_reactions';
+                break;
+        }
+
+        return $field;
     }
 }

@@ -218,6 +218,7 @@ export default {
   apollo: {
     workspace: {
       query: getWorkspace,
+      context: { batch: true },
       variables() {
         return {
           id: this.workspaceId,
@@ -228,6 +229,7 @@ export default {
 
     notifications: {
       query: notifications,
+      context: { batch: true },
       update() {
         return [];
       },

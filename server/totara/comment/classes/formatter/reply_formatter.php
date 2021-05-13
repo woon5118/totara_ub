@@ -28,19 +28,16 @@ use totara_comment\comment;
  * Formatter for the reply.
  */
 final class reply_formatter extends base_formatter {
+
     /**
-     * @param comment $comment
-     * @return \stdClass
+     * @inheritDoc
      */
-    protected static function to_record(comment $comment): \stdClass {
+    public function __construct(comment $comment) {
         if (!$comment->is_reply()) {
             throw new \coding_exception("Cannot use a comment within a reply formatter");
         }
 
-        $record = parent::to_record($comment);
-        $record->commentid = $comment->get_parent_id();
-
-        return $record;
+        parent::__construct($comment);
     }
 
     /**
@@ -51,5 +48,16 @@ final class reply_formatter extends base_formatter {
         $map['commentid'] = null;
 
         return $map;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_field_name(string $field): string {
+        if ($field == 'commentid') {
+            $field = 'parent_id';
+        }
+
+        return parent::get_field_name($field);
     }
 }

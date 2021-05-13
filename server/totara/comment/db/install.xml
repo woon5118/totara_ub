@@ -26,6 +26,8 @@
       <INDEXES>
         <INDEX NAME="component_index" UNIQUE="false" FIELDS="component"/>
         <INDEX NAME="area_idx" UNIQUE="false" FIELDS="area"/>
+        <INDEX NAME="parentid_idx" UNIQUE="false" FIELDS="parentid"/>
+        <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
         <INDEX NAME="instanceid_idx" UNIQUE="false" FIELDS="instanceid"/>
         <INDEX NAME="timecreated_idx" UNIQUE="false" FIELDS="timecreated"/>
       </INDEXES>

@@ -423,6 +423,13 @@ final class comment {
     }
 
     /**
+     * @return bool
+     */
+    public function is_edited(): bool {
+        return (null !== $this->entity->timemodified);
+    }
+
+    /**
      * @return int|null
      */
     public function get_reason_deleted(): ?int {

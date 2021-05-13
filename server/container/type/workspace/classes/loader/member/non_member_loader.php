@@ -58,7 +58,7 @@ final class non_member_loader {
 
         // Select all users excluding those who have a membership
         $builder = builder::table('user', 'u');
-        $builder->select_raw('DISTINCT u.*');
+        $builder->select_raw('u.*');
         $builder->where_not_exists($members_query);
 
         $search_term = $query->get_search_term();

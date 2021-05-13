@@ -86,10 +86,12 @@ export default {
   apollo: {
     workspaces: {
       query: getWorkspaces,
+      context: { batch: true },
     },
 
     categoryInteractor: {
       query: getCategoryInteractor,
+      context: { batch: true },
       variables() {
         return {
           workspace_id: null,

@@ -149,6 +149,7 @@ export default {
   apollo: {
     thread: {
       query: getComments,
+      context: { batch: true },
       /**
        * A callback to let the parent know that this component is fetching the comments.
        * Note that if the parent is already fetching this query, then this callback will never be triggered.

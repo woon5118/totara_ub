@@ -80,6 +80,7 @@ export default {
   apollo: {
     sortOptions: {
       query: getDiscussionOptions,
+      context: { batch: true },
       update({ sorts }) {
         return Array.prototype.map.call(sorts, ({ value, label }) => {
           return {

@@ -48,7 +48,7 @@
     />
 
     <CommentBox
-      v-show="showComments || showCommentForm"
+      v-if="showComments || showCommentForm"
       ref="comment-box"
       :instance-id="discussionId"
       component="container_workspace"

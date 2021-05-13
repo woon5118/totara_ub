@@ -190,12 +190,17 @@ export default {
     users: {
       query: nonMemberUsers,
       fetchPolicy: 'network-only',
+      context: { batch: true },
       variables() {
         return {
           workspace_id: this.workspaceId,
           search_term: this.searchTerm,
           cursor: null,
         };
+      },
+
+      skip() {
+        return !this.open;
       },
 
       update({ cursor, users }) {

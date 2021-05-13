@@ -29,6 +29,18 @@ use totara_comment\comment;
  * @package totara_comment\formatter
  */
 final class comment_formatter extends base_formatter {
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct(comment $comment) {
+        if ($comment->is_reply()) {
+            throw new \coding_exception("Comment is a reply, and it cannot be used for comment formatter");
+        }
+
+        parent::__construct($comment);
+    }
+
     /**
      * @return array
      */
@@ -40,17 +52,14 @@ final class comment_formatter extends base_formatter {
     }
 
     /**
-     * @param comment $comment
-     * @return \stdClass
+     * @inheritDoc
      */
-    protected static function to_record(comment $comment): \stdClass {
-        if ($comment->is_reply()) {
-            throw new \coding_exception("Comment is a reply, and it cannot be used for comment formatter");
+    protected function get_field_name(string $field): string {
+        if ($field == 'totalreplies') {
+            $field = 'total_replies';
         }
 
-        $record = parent::to_record($comment);
-        $record->totalreplies = $comment->get_total_replies();
-
-        return $record;
+        return parent::get_field_name($field);
     }
+
 }

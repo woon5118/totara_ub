@@ -45,7 +45,7 @@
     <template v-if="commentAble">
       <!-- Only start constructing the form after all the comments are loaded. -->
       <CommentForm
-        v-show="!$apollo.queries.totalComments.loading && showCommentForm"
+        v-if="!$apollo.queries.totalComments.loading && showCommentForm"
         ref="comment-form"
         :size="size"
         :editor="editor"
@@ -79,6 +79,7 @@ export default {
   apollo: {
     totalComments: {
       query: getComments,
+      context: { batch: true },
       /**
        * A callback that will be used for emitting an event up to the parent.
        * @param {Boolean} isLoading
