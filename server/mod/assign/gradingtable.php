@@ -120,6 +120,12 @@ class assign_grading_table extends table_sql implements renderable {
             $this->rownum = $rowoffset - 1;
         }
 
+        $users = array_keys($assignment->list_participants($currentgroup, true));
+        if (count($users) == 0) {
+            // Insert a record that will never match to the sql is still valid.
+            $users[] = -1;
+        }
+
         $params = array();
         $params['assignmentid1'] = (int)$this->assignment->get_instance()->id;
         $params['assignmentid2'] = (int)$this->assignment->get_instance()->id;
@@ -237,10 +243,9 @@ class assign_grading_table extends table_sql implements renderable {
             $fields .= ', um.id as recordid ';
         }
 
-        list($enrolleduserssql, $enrolledusersparams) = get_enrolled_sql($this->assignment->get_context(), 'mod/assign:submit', $currentgroup,
-            $this->assignment->show_only_active_users());
-        $where = "u.id IN ($enrolleduserssql)";
-        $params = array_merge($params, $enrolledusersparams);
+        list($userwhere, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
+        $where = 'u.id ' . $userwhere;
+        $params = array_merge($params, $userparams);
 
         // The filters do not make sense when there are no submissions, so do not apply them.
         if ($this->assignment->is_any_submission_plugin_enabled()) {
