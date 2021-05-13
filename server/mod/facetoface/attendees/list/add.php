@@ -140,7 +140,7 @@ if ($hassessions) {
 // Add selected users to attendees list.
 $userlist = $list->get_user_ids();
 if (!empty($userlist)) {
-    list($userlist_sql, $userlist_params) = $DB->get_in_or_equal($userlist, SQL_PARAMS_NAMED, 'ulist', false);
+    list($userlist_sql, $userlist_params) = $DB->get_in_or_equal($userlist, SQL_PARAMS_NAMED, 'ulist');
     $userstoadd = $DB->get_records_sql("SELECT u.*, ss.statuscode
                                     FROM {user} u
                                     LEFT JOIN {facetoface_signups} su
