@@ -24,6 +24,7 @@
 namespace mod_perform\models\activity;
 
 use coding_exception;
+use core_text;
 use core\orm\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
@@ -71,6 +72,8 @@ class section extends model {
         'respondable_element_count'
     ];
 
+    public const TITLE_MAX_LENGTH = 1024;
+
     /**
      * @var section_entity
      */
@@ -99,6 +102,9 @@ class section extends model {
         if (empty($sort_order) || $sort_order > $new_sort_order) {
             $sort_order = $new_sort_order;
         }
+
+        // Validate section title
+        self::validate_title($title);
 
         $entity = new section_entity();
         $entity->activity_id = $activity->id;
@@ -257,6 +263,9 @@ class section extends model {
      * @return $this
      */
     public function update_title(string $title): self {
+        // Validate section title
+        self::validate_title($title);
+
         $this->entity->title = $title;
         $this->entity->save();
         return $this;
@@ -586,5 +595,17 @@ class section extends model {
         }
 
         return is_null($this->entity->respondable_element_count) ? 0 : $this->entity->respondable_element_count;
+    }
+
+    /**
+     * Validate the section title
+     * @param string $title
+     *
+     * @throws coding_exception
+     */
+    protected static function validate_title(string $title): void {
+        if (core_text::strlen($title) > self::TITLE_MAX_LENGTH) {
+            throw new coding_exception("Section title text exceeds the maximum length");
+        }
     }
 }

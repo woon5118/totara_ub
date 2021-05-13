@@ -418,6 +418,43 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->assertEquals(0, $activity_section2->get_highest_sort_order());
     }
 
+    public function test_update_title(): void {
+        $this->setAdminUser();
+        $activity = $this->perform_generator()->create_activity_in_container();
+        $section = section::create($activity, 'section name');
+
+        $new_section_name = 'Updated section name';
+        $section->update_title($new_section_name);
+        $this->assertSame($new_section_name, $section->title);
+
+        $new_section_name = $this->get_string_with_length(1025);
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Section title text exceeds the maximum length');
+        $section->update_title($new_section_name);
+    }
+
+    public function test_create_section_with_lengthy_title(): void {
+        $this->setAdminUser();
+        $activity = $this->perform_generator()->create_activity_in_container();
+        $lengthy_section_name = $this->get_string_with_length(1025);
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage('Section title text exceeds the maximum length');
+        section::create($activity, $lengthy_section_name);
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    private function get_string_with_length(int $length): string {
+        $string = '';
+        while (strlen($string) < $length) {
+            $string .= 'x';
+        }
+        return $string;
+    }
+
     /**
      * @return array
      */
