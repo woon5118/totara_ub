@@ -201,6 +201,28 @@ class LinkExtension extends BaseExtension {
     ];
   }
 
+  loadSerializedVisitor() {
+    return {
+      link_media: node => {
+        // older saved nodes could have the loading field
+        delete node.attrs.loading;
+        // TL-30663: older versions of the backend validation may have
+        // corrupted the resolution field by converting it to an empty array
+        if (Array.isArray(node.attrs.resolution)) {
+          delete node.attrs.resolution;
+        }
+      },
+    };
+  }
+
+  saveSerializedVisitor() {
+    return {
+      link_media: node => {
+        delete node.attrs.loading;
+      },
+    };
+  }
+
   /**
    * Insert or edit a link at the current selection.
    */

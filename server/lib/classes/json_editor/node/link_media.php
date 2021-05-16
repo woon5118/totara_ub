@@ -59,7 +59,7 @@ final class link_media extends base_link implements block_node {
         $block->title = null;
         $block->image = null;
         $block->description = null;
-        $block->resolution = [];
+        $block->resolution = null;
 
         $attrs = $node['attrs'];
 
@@ -73,6 +73,11 @@ final class link_media extends base_link implements block_node {
 
         if (array_key_exists('resolution', $attrs)) {
             $block->resolution = (array) $attrs['resolution'];
+            if (count($block->resolution) === 0) {
+                // if it was an empty object, set it to null otherwise PHP
+                // will convert it to an empty array
+                $block->resolution = null;
+            }
         }
 
         if (array_key_exists('image', $attrs)) {
@@ -154,7 +159,7 @@ final class link_media extends base_link implements block_node {
 
         if (array_key_exists('resolution', $attrs)) {
             if (!is_array($attrs['resolution'])) {
-                $attrs['resolution'] = [];
+                unset($attrs['resolution']);
             } else {
                 $attrs['resolution']['width'] = clean_param($attrs['resolution']['width'], PARAM_INT);
                 $attrs['resolution']['height'] = clean_param($attrs['resolution']['height'], PARAM_INT);
@@ -312,9 +317,9 @@ final class link_media extends base_link implements block_node {
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function get_resolution(): array {
+    public function get_resolution(): ?array {
         return $this->resolution;
     }
 

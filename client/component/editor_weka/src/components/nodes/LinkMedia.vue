@@ -25,8 +25,8 @@
     :data-url="attrs.url"
   >
     <div class="tui-wekaLinkMedia__inner">
-      <div v-if="attrs.loading">
-        Loading...
+      <div v-if="attrs.loading" class="tui-wekaLinkMedia__loading">
+        <Loading :alt="$str('loading', 'core')" />
       </div>
       <div v-else-if="iframeUrl" class="tui-wekaLinkMedia__embed">
         <ResponsiveEmbedIframe
@@ -57,12 +57,14 @@ import BaseNode from 'editor_weka/components/nodes/BaseNode';
 import NodeBar from 'editor_weka/components/toolbar/NodeBar';
 import ResponsiveEmbedIframe from 'tui/components/embeds/ResponsiveEmbedIframe';
 import ResponsiveImage from 'tui/components/images/ResponsiveImage';
+import Loading from 'tui/components/icons/Loading';
 
 export default {
   components: {
     NodeBar,
     ResponsiveEmbedIframe,
     ResponsiveImage,
+    Loading,
   },
 
   extends: BaseNode,
@@ -141,7 +143,8 @@ export default {
 {
   "core": [
     "edit",
-    "remove"
+    "remove",
+    "loading"
   ],
   "editor_weka": [
     "actions_menu_for",
@@ -175,6 +178,14 @@ export default {
     & > .tui-wekaNodeBar {
       margin-top: var(--gap-2);
     }
+  }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--gap-6);
+    color: var(--color-neutral-6);
   }
 }
 </style>
