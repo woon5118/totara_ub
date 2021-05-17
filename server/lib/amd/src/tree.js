@@ -551,6 +551,11 @@ define(['jquery'], function($) {
         // for dynamically loaded parts of the tree.
         this.treeRoot.on({
             click: function(e) {
+              if (e.target.closest('a')) {
+                  // this has targeted a link
+                  e.stopPropagation();
+                  return null;
+              }
               return thisObj.handleClick($(this), e);
             },
             keydown: function(e) {
