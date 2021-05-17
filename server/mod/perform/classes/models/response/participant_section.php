@@ -221,6 +221,7 @@ class participant_section extends model implements section_response_interface {
                 ->join('perform_section_element', 'section_element_id', 'id')
                 ->where('perform_section_element.section_id', $this->section_id)
                 ->where('perform_element_response.participant_instance_id', $this->participant_instance_id)
+                ->order_by('id')
                 ->get();
 
             $section_element_responses = [];
