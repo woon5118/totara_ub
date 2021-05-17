@@ -34,7 +34,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     And I set the following fields to these values:
       | Type full name         | Personal Goal Type 1             |
       | Goal type ID number    | PGT1                             |
-      | Goal Type Description  | Personal Goal Type 1 description |
+      | Goal type description  | Personal Goal Type 1 description |
       | Goal type availability | Available to all users           |
     When I press "Save changes"
     Then I should see "The goal type \"Personal Goal Type 1\" has been created"
@@ -44,7 +44,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     And I set the following fields to these values:
       | Type full name         | Personal Goal Type 1a               |
       | Goal type ID number    | PGT1a                               |
-      | Goal Type Description  | Personal Goal Type 1a description   |
+      | Goal type description  | Personal Goal Type 1a description   |
       | Goal type availability | Available only to certain audiences |
     And I press "Add audience(s)"
     And I click on "Audience 1" "link"
@@ -69,7 +69,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     And I set the following fields to these values:
       | Type full name         | Personal Goal Type 1                |
       | Goal type ID number    | PGT1                                |
-      | Goal Type Description  | Personal Goal Type 1 description    |
+      | Goal type description  | Personal Goal Type 1 description    |
       | Goal type availability | Available only to certain audiences |
     # Add some audiences.
     And I press "Add audience(s)"

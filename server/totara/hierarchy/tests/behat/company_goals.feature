@@ -23,7 +23,7 @@ Feature: Verify creation and use of company goal types and custom fields.
     And I set the following fields to these values:
       | Type full name         | Company Goal Type 1             |
       | Goal type ID number    | CGT1                            |
-      | Goal Type Description  | Company Goal Type 1 description |
+      | Goal type description  | Company Goal Type 1 description |
     When I press "Save changes"
     Then I should see "The goal type \"Company Goal Type 1\" has been created"
 
@@ -32,7 +32,7 @@ Feature: Verify creation and use of company goal types and custom fields.
     And I set the following fields to these values:
       | Type full name         | Company Goal Type 1a               |
       | Goal type ID number    | CGT1a                              |
-      | Goal Type Description  | Company Goal Type 1a description   |
+      | Goal type description  | Company Goal Type 1a description   |
     And I press "Save changes"
     Then I should see "The goal type \"Company Goal Type 1a\" has been updated"
 
