@@ -22,6 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use core\json_editor\formatter\default_formatter;
 use core\json_editor\node\emoji;
 
 class core_json_editor_emoji_testcase extends advanced_testcase {
@@ -95,5 +96,27 @@ class core_json_editor_emoji_testcase extends advanced_testcase {
 
         $cleaned = emoji::clean_raw_node($data);
         $this->assertSame($data, $cleaned);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_convert_to_html_text(): void {
+        $node = [
+            'type' => emoji::get_type(),
+            'attrs' => [
+                'shortcode' => '1F60A'
+            ]
+        ];
+
+        $emoji = emoji::from_node($node);
+
+        $formatter = new default_formatter();
+
+        $this->assertEquals('😊', $emoji->to_text($formatter));
+        $this->assertEquals('<span>&#x1F60A;</span>', $emoji->to_html($formatter));
+
+        $converted_again = mb_convert_encoding($emoji->to_html($formatter), 'UTF-8', 'HTML-ENTITIES');
+        $this->assertEquals('<span>😊</span>', $converted_again);
     }
 }

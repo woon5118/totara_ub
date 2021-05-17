@@ -48,13 +48,10 @@ class editor_weka_emoji_testcase extends advanced_testcase {
         $editor = json_editor::default();
         // Test that we can convert to HTML.
         $html = $editor->to_html($json);
-        $this->assertStringContainsString(
-            mb_convert_encoding("&#x1F60D;", 'UTF-8', 'HTML-ENTITIES'),
-            $html
-        );
+        $this->assertStringContainsString("&#x1F60D;", $html);
 
         // Test that we can convert to TEXT.
         $text = $editor->to_text($json);
-        $this->assertStringContainsString('&#1F60D;', $text);
+        $this->assertStringContainsString('😍', $text);
     }
 }

@@ -61,7 +61,7 @@ final class emoji extends node implements inline_node {
     public function to_html(formatter $formatter): string {
         return html_writer::tag(
             'span',
-            mb_convert_encoding("&#x{$this->shortcode};", 'UTF-8', 'HTML-ENTITIES')
+            "&#x{$this->shortcode};"
         );
     }
 
@@ -70,7 +70,7 @@ final class emoji extends node implements inline_node {
      * @return string
      */
     public function to_text(formatter $formatter): string {
-        return mb_convert_encoding("&#{$this->shortcode};", 'UTF-8', 'HTML-ENTITIES');
+        return mb_convert_encoding("&#x{$this->shortcode};", 'UTF-8', 'HTML-ENTITIES');
     }
 
     /**

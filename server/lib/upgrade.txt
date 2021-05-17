@@ -8,6 +8,7 @@ information provided here is intended especially for developers.
   allowing a custom button image to be specified with the buttonimageurl and issuertype template variables.
   The example context JSON for this template has also been updated.
 * Added new method set_url() to \cm_info to allow modules to set and override their own URL.
+* Fixed broken emoji support only for future conversions. Already existing records in the database are not affected and would need to be manually updated
 
 === 13.8 ===
 
