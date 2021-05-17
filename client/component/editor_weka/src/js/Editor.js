@@ -52,6 +52,7 @@ export default class Editor {
     this._parent = options.parent;
     this.viewExtrasEl = options.viewExtrasEl;
     this.viewExtrasLiveEl = options.viewExtrasLiveEl;
+    this.destroyed = false;
 
     /** @type {EditorView} */
     this.view = null;
@@ -273,7 +274,9 @@ export default class Editor {
    */
   dispatch(transaction) {
     const newState = this.state.apply(transaction);
-    this.view.updateState(newState);
+    if (this.view && !this.destroyed) {
+      this.view.updateState(newState);
+    }
     this.state = newState;
     this._value = WekaValue.fromState(newState, this);
 
@@ -375,6 +378,7 @@ export default class Editor {
     if (this.view) {
       this.view.destroy();
     }
+    this.destroyed = true;
   }
 
   /**

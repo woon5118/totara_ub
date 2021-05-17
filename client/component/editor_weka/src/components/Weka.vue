@@ -354,7 +354,9 @@ export default {
     },
 
     updateToolbar() {
-      this.toolbarItems = this.editor.getToolbarItems();
+      if (!this.editor.destroyed) {
+        this.toolbarItems = this.editor.getToolbarItems();
+      }
     },
 
     /**
