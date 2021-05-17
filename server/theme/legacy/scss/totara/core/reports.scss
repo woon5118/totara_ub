@@ -48,7 +48,7 @@
       &:hover,
       &:active,
       &:focus {
-        box-shadow: var(--shadow-1);
+        box-shadow: var(--shadow-2);
         text-decoration: none;
         color: var(--color-neutral-7);
         position: relative; // this lifts the shadow above the image
