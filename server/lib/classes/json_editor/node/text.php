@@ -119,9 +119,6 @@ final class text extends node implements inline_node {
             return null;
         }
 
-        $text = $cleaned_raw_node['text'] ?? '';
-        $cleaned_raw_node['text'] = clean_param($text, PARAM_TEXT);
-
         if (array_key_exists('marks', $cleaned_raw_node) && !is_array($cleaned_raw_node['marks'])) {
             $cleaned_raw_node['marks'] = [];
         }

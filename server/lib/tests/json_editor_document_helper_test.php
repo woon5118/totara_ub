@@ -143,7 +143,6 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
             ]
         ];
 
-        // There is some xss node inside.
         $json_document = json_encode($proper_document);
         $cleaned = document_helper::clean_json_document($json_document);
         $this->assertNotSame($json_document, $cleaned);
@@ -182,7 +181,8 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
         $this->assertArrayHasKey('id', $mention_node['attrs']);
 
         $this->assertSame(15, $mention_node['attrs']['id']);
-        $this->assertSame("alert('hello world');", $mention_node['attrs']['display']);
+        // this is text, not html, so it should not be cleaned
+        $this->assertSame("<script>alert('hello world');</script>", $mention_node['attrs']['display']);
     }
 
     /**

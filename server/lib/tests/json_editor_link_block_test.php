@@ -83,34 +83,4 @@ class core_json_editor_link_block_testcase extends advanced_testcase {
         $cleaned = link_block::clean_raw_node($data);
         $this->assertSame($cleaned, $data);
     }
-
-    /**
-     * @return void
-     */
-    public function test_clean_raw_node_with_xss(): void {
-        $data = [
-            'type' => link_block::get_type(),
-            'attrs' => [
-                'url' => 'http://example.com',
-                'title' => "<script type='text/javascript'>alert('hello world');</script>",
-                'description' => "<script type='text/javascript'>const x = 15;</script>"
-            ]
-        ];
-
-        $cleaned = link_block::clean_raw_node($data);
-        $this->assertNotSame($data, $cleaned);
-
-        $this->assertArrayHasKey('attrs', $cleaned);
-        $this->assertArrayHasKey('url', $cleaned['attrs']);
-
-        $this->assertSame($data['attrs']['url'], $cleaned['attrs']['url']);
-
-        $this->assertArrayHasKey('title', $cleaned['attrs']);
-        $this->assertNotSame($data['attrs']['title'], $cleaned['attrs']['title']);
-        $this->assertEquals("alert('hello world');", $cleaned['attrs']['title']);
-
-        $this->assertArrayHasKey('description', $cleaned['attrs']);
-        $this->assertNotSame($data['attrs']['description'], $cleaned['attrs']['description']);
-        $this->assertEquals("const x = 15;", $cleaned['attrs']['description']);
-    }
 }

@@ -156,7 +156,6 @@ final class mention extends node implements inline_node {
         }
 
         $cleaned_raw_node['attrs']['id'] = clean_param($cleaned_raw_node['attrs']['id'], PARAM_INT);
-        $cleaned_raw_node['attrs']['display'] = clean_param($cleaned_raw_node['attrs']['display'], PARAM_TEXT);
 
         return $cleaned_raw_node;
     }

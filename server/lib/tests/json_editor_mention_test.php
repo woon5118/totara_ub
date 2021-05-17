@@ -111,28 +111,6 @@ class core_json_editor_mention_testcase extends advanced_testcase {
     /**
      * @return void
      */
-    public function test_clean_xss_node(): void {
-        $data = [
-            'type' => mention::get_type(),
-            'attrs' => [
-                'id' => '42',
-                'display' => '<script type="text/javascript">alert(\'hello world\');</script>'
-            ]
-        ];
-
-        $cleaned = mention::clean_raw_node($data);
-        $this->assertNotSame($data, $cleaned);
-
-        $this->assertArrayHasKey('attrs', $cleaned);
-        $this->assertArrayHasKey('id', $cleaned['attrs']);
-        $this->assertSame(42, $cleaned['attrs']['id']);
-        $this->assertArrayHasKey('display', $cleaned['attrs']);
-        $this->assertEquals("alert('hello world');", $cleaned['attrs']['display']);
-    }
-
-    /**
-     * @return void
-     */
     public function test_sanitizing_node(): void {
         $text = '<script>alert("hello world");</script>';
         $result = mention::sanitize_raw_node([

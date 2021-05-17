@@ -104,16 +104,8 @@ final class link_block extends base_link implements block_node {
 
         $attrs = $cleaned_raw_node['attrs'];
 
-        if (isset($attrs['title'])) {
-            $attrs['title'] = clean_param($attrs['title'], PARAM_TEXT);
-        }
-
         if (isset($attrs['image'])) {
             $attrs['image'] = clean_param($attrs['image'], PARAM_URL);
-        }
-
-        if (isset($attrs['description'])) {
-            $attrs['description'] = clean_param($attrs['description'], PARAM_TEXT);
         }
 
         $cleaned_raw_node['attrs'] = $attrs;

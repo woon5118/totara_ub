@@ -102,9 +102,6 @@ final class attachment extends base_file {
 
         if (array_key_exists('option', $attrs)) {
             $option = $attrs['option'];
-            if (array_key_exists('alttext', $option)) {
-                $option['alttext'] = clean_param($option['alttext'], PARAM_TEXT);
-            }
 
             if (array_key_exists('subtitle', $option) && is_array($option['subtitle'])) {
                 $subtitle = $option['subtitle'];

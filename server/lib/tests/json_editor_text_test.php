@@ -138,23 +138,6 @@ class core_json_editor_text_testcase extends advanced_testcase {
     /**
      * @return void
      */
-    public function test_clean_xss_node(): void {
-        $data = [
-            'type' => text::get_type(),
-            'text' => '<script>alert(\'hello world\');</script>',
-        ];
-
-        $cleaned = text::clean_raw_node($data);
-        $this->assertArrayHasKey('type', $cleaned);
-        $this->assertArrayHasKey('text', $cleaned);
-
-        $this->assertSame('alert(\'hello world\');', $cleaned['text']);
-        $this->assertNotEquals($data, $cleaned);
-    }
-
-    /**
-     * @return void
-     */
     public function test_sanitize_node(): void {
         $result = text::sanitize_raw_node([
             'type' => text::get_type(),

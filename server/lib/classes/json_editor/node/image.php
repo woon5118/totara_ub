@@ -92,23 +92,6 @@ final class image extends base_file implements block_node {
     }
 
     /**
-     * @param array $raw_node
-     * @return array|null
-     */
-    public static function clean_raw_node(array $raw_node): ?array {
-        $cleaned_raw_node = parent::clean_raw_node($raw_node);
-        if (null === $cleaned_raw_node) {
-            return null;
-        }
-
-        $attrs = $cleaned_raw_node['attrs'];
-        $attrs['alttext'] = clean_param($attrs['alttext'], PARAM_TEXT);
-
-        $cleaned_raw_node['attrs'] = $attrs;
-        return $cleaned_raw_node;
-    }
-
-    /**
      * @param formatter $formatter
      * @return string
      */
