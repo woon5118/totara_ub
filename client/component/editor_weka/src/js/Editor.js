@@ -169,8 +169,12 @@ export default class Editor {
         );
         value.inflate(this, state);
       } else {
+        let doc = value.getDoc(false);
+        if (doc) {
+          doc = this._execSerializedVisitors(doc, 'load');
+        }
         const state = EditorState.fromJSON(this._editorConfig(), {
-          doc: value.getDoc(false),
+          doc,
           selection: { anchor: 0, head: 0, type: 'text' },
         });
         value.inflate(this, state);
@@ -401,5 +405,43 @@ export default class Editor {
     return this._extensions.map(extension => {
       return extension.applyFormatters.bind(extension);
     });
+  }
+
+  /*
+   * Execute visitors defined by extensions on the provided serialized doc.
+   *
+   * @param {object} doc
+   * @param {string} type
+   * @returns {object}
+   */
+  _execSerializedVisitors(doc, type) {
+    const extensionVisitors = [];
+    this._extensions.forEach(ext => {
+      const key = type + 'SerializedVisitor';
+      if (ext[key]) {
+        extensionVisitors.push(ext[key]());
+      }
+    });
+    if (extensionVisitors.length > 0) {
+      // clone doc to avoid modifying the original object we were passed
+      doc = JSON.parse(JSON.stringify(doc));
+      extensionVisitors.forEach(visitor => this._traverseNode(doc, visitor));
+    }
+    return doc;
+  }
+
+  /**
+   * Execute visitor on the provided serialized node, and its children recursively.
+   *
+   * @param {object} doc
+   * @param {((node: object) => void)[]} visitor
+   */
+  _traverseNode(node, visitor) {
+    if (visitor[node.type]) {
+      visitor[node.type](node);
+    }
+    if (Array.isArray(node.content)) {
+      node.content.forEach(child => this._traverseNode(child, visitor));
+    }
   }
 }

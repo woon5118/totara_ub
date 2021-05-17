@@ -147,6 +147,9 @@ export default class WekaValue {
     }
 
     this._doc = this._state.toJSON().doc;
+    if (this._doc && this._editor) {
+      this._doc = this._editor._execSerializedVisitors(this._doc, 'save');
+    }
     return this._doc;
   }
 
