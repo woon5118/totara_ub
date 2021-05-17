@@ -263,20 +263,18 @@ export default {
 
   &--circle {
     width: 3.6rem;
-    min-height: 3.6rem;
+    height: 3.6rem;
     padding: 0;
     border-radius: 50%;
 
     &.tui-iconBtn--small {
       width: 3rem;
       height: 3rem;
-      min-height: 0;
     }
 
     &.tui-iconBtn--xsmall {
       width: 2rem;
       height: 2rem;
-      min-height: 0;
     }
   }
 
