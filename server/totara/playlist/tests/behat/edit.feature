@@ -32,8 +32,8 @@ Feature: Edit playlist instance
     And I click on "Side panel" "button"
     And I click on "//button[@title='Add a description (optional)']/parent::*" "xpath_element"
     And I activate the weka editor with css ".tui-playlistSummary__editor"
-    And I type "Best playlist ever" in the weka editor
+    And I type "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff" in the weka editor
     And I wait for the next second
     And I click on "Done" "button"
-    And I should see "Best playlist ever"
+    And I should see "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff"
     And I should not see "paragraph" in the ".tui-playlistSummary__content" "css_element"

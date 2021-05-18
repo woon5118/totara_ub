@@ -279,7 +279,7 @@ extend type Mutation {
   """
   container_workspace_create(
     name: param_text!
-    description: param_text
+    description: String
     description_format: param_integer
     """
     Whether to tell if the workspace is the private workspace or not.
@@ -305,7 +305,7 @@ extend type Mutation {
     If it is null, then most likely the user wants to set it null.
     Only if the mutation does not specify the field then nothing will be updated.
     """
-    description: param_text
+    description: String
     """
     This field is null-able. If it is null, it will fallback to the latest format value set in the
     database's record.

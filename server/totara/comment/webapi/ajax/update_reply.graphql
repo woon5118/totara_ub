@@ -1,6 +1,6 @@
 mutation totara_comment_update_reply(
   $id: param_integer!
-  $content: param_text!
+  $content: String!
   $format: param_integer
   $draft_id: param_integer
 ) {

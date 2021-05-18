@@ -7,7 +7,7 @@ Feature: Create playlist
       | username | firstname | lastname | email           |
       | user_one | User      | One      | one@example.com |
 
-  @javascript
+  @javascript @editor_weka
   Scenario: User create a playlist
     Given I log in as "user_one"
     And I click on "Your Library" in the totara menu
@@ -15,7 +15,7 @@ Feature: Create playlist
     Then the "Next" "button" should be disabled
     And I set the field "Enter playlist title" to "Playlist1"
     And I activate the weka editor with css ".tui-playlistForm__description-textArea"
-    And I type "Some description" in the weka editor
+    And I type "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff" in the weka editor
     Then the "Next" "button" should be enabled
     And I click on "Next" "button"
     And I wait for the next second
@@ -24,6 +24,7 @@ Feature: Create playlist
     And I click on "Only you" "text" in the ".tui-accessSelector" "css_element"
     And the "Done" "button" should be enabled
     And I click on "Done" "button"
+    And I should see "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff"
 
   @javascript
   Scenario: User create a playlist with hashtag

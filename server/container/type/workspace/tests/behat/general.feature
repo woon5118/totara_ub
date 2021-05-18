@@ -16,8 +16,12 @@ Feature: Workspace general feature
     Then I should see "You don't currently belong to any workspaces"
     And I click on "Create a workspace" "button"
     And I set the field "Workspace name" to "Workspace 101"
+    And I activate the weka editor with css ".tui-workspaceForm__editor"
+    And I type "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff" in the weka editor
+    And I wait for the next second
     When I click on "Submit" "button"
     Then I should see "Workspace 101"
+    And I should see "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff"
     And I should see "Members (1)"
     And I should see "Discuss"
     And I should see "Library"
@@ -72,6 +76,10 @@ Feature: Workspace general feature
     And I click on "Edit workspace" "link"
     Then I should see "Workspace 101"
     And I set the field "Workspace name" to "Workspace 102"
+    And I activate the weka editor with css ".tui-workspaceForm__editor"
+    And I type "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff" in the weka editor
+    And I wait for the next second
     When I click on "Submit" "button"
     Then I should see "Workspace 102"
     And I should not see "Workspace 101"
+    And I should see "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff"

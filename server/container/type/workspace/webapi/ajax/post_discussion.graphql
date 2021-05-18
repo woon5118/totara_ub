@@ -1,6 +1,6 @@
 mutation container_workspace_post_discussion(
   $workspace_id: param_integer!
-  $content: param_text!
+  $content: String!
   $content_format: param_integer
   $draft_id: param_integer
 ) {

@@ -185,7 +185,7 @@ extend type Mutation {
     """
     id: param_integer!
     content_format: param_integer
-    content: param_text!
+    content: String!
     """
     The file storage item's id which it is used to save the files.
     """
@@ -200,7 +200,7 @@ extend type Mutation {
     Workspace's id where this discussion belongs to.
     """
     workspace_id: param_integer!
-    content: param_text!
+    content: String!
     """
     If this field is null, it will use the FORMAT_JSON_EDITOR
     """

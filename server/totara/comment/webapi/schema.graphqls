@@ -227,7 +227,7 @@ extend type Mutation {
   totara_comment_update_comment(
     id: param_integer!
     format: param_integer
-    content: param_text!
+    content: String!
     """
     For handling the saving of files. If this is left empty then there are no files to save.
     """
@@ -237,7 +237,7 @@ extend type Mutation {
   totara_comment_update_reply(
     id: param_integer!
     format: param_integer
-    content: param_text!
+    content: String!
     """
     For handling the saving of files. If this is left empty then there are no files to save.
     """

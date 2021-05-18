@@ -32,7 +32,7 @@ Feature: General behat test for discussion feature within a workspace
     And I follow "Workspace 101"
     And I click on "Join workspace Workspace 101" "button"
     And I activate the weka editor with css ".tui-workspaceDiscussionForm__editor"
-    And I type "This is the discussion" in the weka editor
+    And I type "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff" in the weka editor
     And I wait for the next second
     When I click on "Post" "button"
     And I wait for the next second
@@ -40,7 +40,7 @@ Feature: General behat test for discussion feature within a workspace
     And the "Post" "button" should be disabled
 
     # Seeing the discussion within the page, but not in the editor
-    And I should see "This is the discussion"
+    And I should see "Some description with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff"
 
   Scenario: Member likes the discussion
     Given I log in as "user_one"
@@ -84,11 +84,11 @@ Feature: General behat test for discussion feature within a workspace
     When I click on "Comment on discussion" "button"
     Then ".tui-commentForm__form" "css_element" should exist
     And I activate the weka editor with css ".tui-commentForm__editor"
-    And I type "this is reply 100" in the weka editor
+    And I type "Some comment with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff" in the weka editor
     And I wait for the next second
     When I click on "Comment" "button" in the ".tui-commentForm__form" "css_element"
-    Then I should not see "Comment 100" in the weka editor
-    And I should see "this is reply 100"
+    Then I should not see "Some comment with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff" in the weka editor
+    And I should see "Some comment with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff"
 
   Scenario: Discussion's author can edit the discussion in a discussion tab
     Given I log in as "user_one"
@@ -107,12 +107,12 @@ Feature: General behat test for discussion feature within a workspace
     And ".tui-workspaceEditPostDiscussionForm" "css_element" should exist
     And I activate the weka editor with css ".tui-workspaceEditPostDiscussionForm .tui-workspaceDiscussionForm__editor"
     And I should see "Discussion 100" in the weka editor
-    And I set the weka editor to "Discussion 101"
+    And I set the weka editor to "Some comment with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff"
     And I wait for the next second
     When I click on "Done" "button" in the ".tui-workspaceEditPostDiscussionForm" "css_element"
     Then ".tui-workspaceEditPostDiscussionForm" "css_element" should not exist
     And I should not see "Discussion 100"
-    And I should see "Discussion 101"
+    And I should see "Some comment with \"quotes\". Tag <example@example.com> and test icon tag: <i class=\"fab fa-accessible-icon\"></i> stuff"
 
   Scenario: Owner deletes the discussion
     Given I log in as "user_one"
