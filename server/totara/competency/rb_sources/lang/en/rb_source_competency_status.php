@@ -27,6 +27,7 @@ $string['sourcesummary'] = 'Learners progress on their assigned competencies.';
 $string['sourcetitle'] = 'Competency Status';
 
 $string['achievement_level_related_id'] = 'Achievement level related ID (Scale value ID number)';
+$string['achievement_status'] = 'Achievement status';
 $string['activity_log_link_text'] = 'Assignment activity log link';
 $string['assignment_status'] = 'Assignment status';
 $string['competency_id'] = 'Competency ID';
