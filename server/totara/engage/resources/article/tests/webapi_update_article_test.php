@@ -23,7 +23,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\json_editor\node\paragraph;
+use core_user\totara_engage\share\recipient\user as user_recipient;
 use engage_article\totara_engage\resource\article;
+use totara_core\advanced_feature;
+use totara_engage\entity\engage_resource;
+use totara_engage\share\recipient\helper as recipient_helper;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class engage_article_webapi_update_article_testcase extends advanced_testcase {
@@ -103,5 +107,99 @@ class engage_article_webapi_update_article_testcase extends advanced_testcase {
 
         self::assertInstanceOf(article::class, $updated_article);
         self::assertEquals($article->get_id(), $updated_article->get_id());
+    }
+
+    public function test_successful_ajax_call(): void {
+        $generator = $this->getDataGenerator();
+        $owner = $generator->create_user();
+        $this->setUser($owner);
+
+        $article = $generator
+            ->get_plugin_generator('engage_article')
+            ->create_article();
+        $this->assertEquals(
+            1, engage_resource::repository()->get()->count(), 'wrong article count'
+        );
+
+        $new_name = 'zzz';
+        $result = $this->parsed_graphql_operation(
+            'engage_article_update_article',
+            [
+                'resourceid' => $article->get_id(),
+                'name' => $new_name
+            ]
+        );
+        $this->assert_webapi_operation_successful($result);
+
+        $retrieved = engage_resource::repository()
+            ->where('name', $new_name)
+            ->get();
+        $this->assertEquals(1, $retrieved->count(), 'wrong article count');
+
+        $saved = $retrieved->first();
+        $resource = $this->get_webapi_operation_data($result);
+
+        $this->assertEquals($saved->instanceid, $resource['id'], 'wrong instance id');
+        $this->assertEquals($saved->id, $resource['resource']['id'], 'wrong resource id');
+        $this->assertEquals($saved->name, $resource['resource']['name'], 'wrong name');
+        $this->assertEquals($owner->id, $resource['resource']['user']['id'], 'wrong user');
+    }
+
+    public function test_failed_ajax_call(): void {
+        $generator = $this->getDataGenerator();
+        $owner = $generator->create_user();
+        $this->setUser($owner);
+
+        $article = $generator
+            ->get_plugin_generator('engage_article')
+            ->create_article();
+
+        $mutation = 'engage_article_update_article';
+        $args = [
+            'resourceid' => $article->get_id(),
+            'name' => $article->get_name(),
+            'content' => json_encode([
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text('Hello world')]
+            ]),
+            'format' => FORMAT_JSON_EDITOR,
+            'shares' => [
+                [
+                    'instanceid' => $generator->create_user()->id,
+                    'component' => recipient_helper::get_component(user_recipient::class),
+                    'area' => user_recipient::AREA
+                ]
+            ]
+        ];
+
+        $feature = 'engage_resources';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation($mutation, $args);
+        $this->assert_webapi_operation_failed($result, 'Feature engage_resources is not available.');
+        advanced_feature::enable($feature);
+
+        $new_args = $args;
+        unset($new_args['resourceid']);
+        $result = $this->parsed_graphql_operation($mutation, $new_args);
+        $this->assert_webapi_operation_failed($result, 'Variable "$resourceid" of required type "param_integer!" was not provided.');
+
+        $new_args = $args;
+        $new_args['format'] = FORMAT_PLAIN;
+        $result = $this->parsed_graphql_operation($mutation, $new_args);
+        $this->assert_webapi_operation_failed($result, 'The format value is invalid');
+
+        $new_args = $args;
+        $area = 'unknown_share_area';
+        $new_args['shares'][0]['area'] = $area;
+        $result = $this->parsed_graphql_operation($mutation, $new_args);
+        $this->assert_webapi_operation_failed($result, "No recipient handler found for '$area'");
+
+        self::setGuestUser();
+        $result = $this->parsed_graphql_operation($mutation, $args);
+        $this->assert_webapi_operation_failed($result, 'Cannot update the resource');
+
+        self::setUser(null);
+        $result = $this->parsed_graphql_operation($mutation, $args);
+        $this->assert_webapi_operation_failed($result, 'You are not logged in');
     }
 }
