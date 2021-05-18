@@ -1,0 +1,53 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD's customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   tui*/
+
+:root {
+  /**/
+  /* Toggle colours*/
+  /**/
+
+  /* toggle buttons*/
+  --toggle-bg-color: var(--color-neutral-6);
+
+  /* Button background*/
+  --toggle-btn-bg-color: transparent;
+  --toggle-btn-bg-color-active: transparent;
+  --toggle-btn-bg-color-disabled: transparent;
+  --toggle-btn-bg-color-focus: transparent;
+  --toggle-btn-bg-color-selected: var(--color-neutral-1);
+
+  /* Button text colour*/
+  --toggle-btn-text-color: var(--color-neutral-1);
+  --toggle-btn-text-color-active: var(--color-neutral-1);
+  --toggle-btn-text-color-disabled: var(--color-neutral-1);
+  --toggle-btn-text-color-focus: var(--color-neutral-1);
+  --toggle-btn-text-color-selected: var(--color-neutral-7);
+
+  /**/
+  /* Toggle switch*/
+  /**/
+  --form-toggle-dot-color: var(--color-neutral-1);
+  --form-toggle-off-bg-color: var(--color-neutral-4);
+  --form-toggle-off-bg-color-hover-focus: var(--color-neutral-5);
+  --form-toggle-on-bg-color: var(--color-state);
+  --form-toggle-on-bg-color-hover-focus: var(--color-state-hover);
+  --form-toggle-on-border-color: var(--color-state);
+  --form-toggle-on-border-color-hover-focus: var(--color-state-hover);
+  --form-toggle-border-color: var(--color-neutral-6);
+}
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvY29tcG9uZW50L3R1aS9zcmMvZ2xvYmFsX3N0eWxlcy92YXJpYWJsZXMvY29sb3JzL3RvZ2dsZS5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EiLCJmaWxlIjoiY2xpZW50L2NvbXBvbmVudC90dWkvYnVpbGQvZ2xvYmFsX3N0eWxlcy92YXJpYWJsZXMvY29sb3JzL3RvZ2dsZS5kZXZlbG9wbWVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLyogVGhpcyBmaWxlIGlzIHBhcnQgb2YgVG90YXJhIEVudGVycHJpc2UgRXh0ZW5zaW9ucy4qL1xuLyoqL1xuLyogQ29weXJpZ2h0IChDKSAyMDIwIG9ud2FyZHMgVG90YXJhIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQqL1xuLyoqL1xuLyogVG90YXJhIEVudGVycHJpc2UgRXh0ZW5zaW9ucyBpcyBwcm92aWRlZCBvbmx5IHRvIFRvdGFyYSovXG4vKiBMZWFybmluZyBTb2x1dGlvbnMgTFREJ3MgY3VzdG9tZXJzIGFuZCBwYXJ0bmVycywgcHVyc3VhbnQgdG8qL1xuLyogdGhlIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIGEgc2VwYXJhdGUgYWdyZWVtZW50IHdpdGggVG90YXJhKi9cbi8qIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQgb3IgaXRzIGFmZmlsaWF0ZS4qL1xuLyoqL1xuLyogSWYgeW91IGRvIG5vdCBoYXZlIGFuIGFncmVlbWVudCB3aXRoIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMqL1xuLyogTFRELCB5b3UgbWF5IG5vdCBhY2Nlc3MsIHVzZSwgbW9kaWZ5LCBvciBkaXN0cmlidXRlIHRoaXMgc29mdHdhcmUuKi9cbi8qIFBsZWFzZSBjb250YWN0IFtsaWNlbnNpbmdAdG90YXJhbGVhcm5pbmcuY29tXSBmb3IgbW9yZSBpbmZvcm1hdGlvbi4qL1xuLyoqL1xuLyogQGF1dGhvciAgICBLZXZpbiBIb3R0aW5nZXIgPGtldmluLmhvdHRpbmdlckB0b3RhcmFsZWFybmluZy5jb20+Ki9cbi8qIEBtb2R1bGUgdHVpY2thZ2UgICB0dWkqL1xuXG46cm9vdCB7XG4gIC8qKi9cbiAgLyogVG9nZ2xlIGNvbG91cnMqL1xuICAvKiovXG5cbiAgLyogdG9nZ2xlIGJ1dHRvbnMqL1xuICAtLXRvZ2dsZS1iZy1jb2xvcjogdmFyKC0tY29sb3ItbmV1dHJhbC02KTtcblxuICAvKiBCdXR0b24gYmFja2dyb3VuZCovXG4gIC0tdG9nZ2xlLWJ0bi1iZy1jb2xvcjogdHJhbnNwYXJlbnQ7XG4gIC0tdG9nZ2xlLWJ0bi1iZy1jb2xvci1hY3RpdmU6IHRyYW5zcGFyZW50O1xuICAtLXRvZ2dsZS1idG4tYmctY29sb3ItZGlzYWJsZWQ6IHRyYW5zcGFyZW50O1xuICAtLXRvZ2dsZS1idG4tYmctY29sb3ItZm9jdXM6IHRyYW5zcGFyZW50O1xuICAtLXRvZ2dsZS1idG4tYmctY29sb3Itc2VsZWN0ZWQ6IHZhcigtLWNvbG9yLW5ldXRyYWwtMSk7XG5cbiAgLyogQnV0dG9uIHRleHQgY29sb3VyKi9cbiAgLS10b2dnbGUtYnRuLXRleHQtY29sb3I6IHZhcigtLWNvbG9yLW5ldXRyYWwtMSk7XG4gIC0tdG9nZ2xlLWJ0bi10ZXh0LWNvbG9yLWFjdGl2ZTogdmFyKC0tY29sb3ItbmV1dHJhbC0xKTtcbiAgLS10b2dnbGUtYnRuLXRleHQtY29sb3ItZGlzYWJsZWQ6IHZhcigtLWNvbG9yLW5ldXRyYWwtMSk7XG4gIC0tdG9nZ2xlLWJ0bi10ZXh0LWNvbG9yLWZvY3VzOiB2YXIoLS1jb2xvci1uZXV0cmFsLTEpO1xuICAtLXRvZ2dsZS1idG4tdGV4dC1jb2xvci1zZWxlY3RlZDogdmFyKC0tY29sb3ItbmV1dHJhbC03KTtcblxuICAvKiovXG4gIC8qIFRvZ2dsZSBzd2l0Y2gqL1xuICAvKiovXG4gIC0tZm9ybS10b2dnbGUtZG90LWNvbG9yOiB2YXIoLS1jb2xvci1uZXV0cmFsLTEpO1xuICAtLWZvcm0tdG9nZ2xlLW9mZi1iZy1jb2xvcjogdmFyKC0tY29sb3ItbmV1dHJhbC00KTtcbiAgLS1mb3JtLXRvZ2dsZS1vZmYtYmctY29sb3ItaG92ZXItZm9jdXM6IHZhcigtLWNvbG9yLW5ldXRyYWwtNSk7XG4gIC0tZm9ybS10b2dnbGUtb24tYmctY29sb3I6IHZhcigtLWNvbG9yLXN0YXRlKTtcbiAgLS1mb3JtLXRvZ2dsZS1vbi1iZy1jb2xvci1ob3Zlci1mb2N1czogdmFyKC0tY29sb3Itc3RhdGUtaG92ZXIpO1xuICAtLWZvcm0tdG9nZ2xlLW9uLWJvcmRlci1jb2xvcjogdmFyKC0tY29sb3Itc3RhdGUpO1xuICAtLWZvcm0tdG9nZ2xlLW9uLWJvcmRlci1jb2xvci1ob3Zlci1mb2N1czogdmFyKC0tY29sb3Itc3RhdGUtaG92ZXIpO1xuICAtLWZvcm0tdG9nZ2xlLWJvcmRlci1jb2xvcjogdmFyKC0tY29sb3ItbmV1dHJhbC02KTtcbn1cbiJdLCJzb3VyY2VSb290IjoiIn0=
