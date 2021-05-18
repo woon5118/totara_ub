@@ -1,3 +1,229 @@
+Release 13.8 (19th May 2021):
+=============================
+
+Important:
+
+    TL-30681       Fixed several issues in the migration of competencies
+
+                   During the upgrade to Totara 13 existing competencies and the values users
+                   achieved in those are migrated to the new competency achievement system. If a
+                   competency was assigned to a Learning Plan prior to this patch, the migration
+                   would not have created the necessary records in the new tables and as such it
+                   would appear to users that they do not have any values for their competencies in
+                   their Learning Plans set anymore. Furthermore, the Record of Learning did not
+                   show the previously achieved values due to the new achievements being set to an
+                   archived state.
+
+                   This patch fixes this migration issue and all future migrations will create the
+                   data in the new tables correctly and thus the Learning Plans and Record of
+                   Learning will show the right values for users.
+
+                   If Perform is not enabled, this patch also changes the aggregation method used
+                   for competencies in Totara 13 to "Highest". Previously the default method was
+                   "Latest achieved". It turned out that "Latest achieved" does not match the
+                   behaviour of Totara 12 and earlier versions exactly. With "Highest" as
+                   aggregation method the behaviour to achieve values in competencies now matches
+                   the previous behaviour. The main difference to "Latest achieved" is that once
+                   users completed a course linked to the competency or achieved proficiency via
+                   proficiency in child competencies they cannot be given a value lower than the
+                   minimum proficiency value. The aggregation will always set it back to the higher
+                   value.
+
+                   Another issue fixed in this patch is that the aggregation now considers the
+                   actual achievement date of pathways and criteria rather than using the time the
+                   task was run. This only affects the "Latest achieved" aggregation method. For
+                   example, if a user completed a linked course first and then the value gets
+                   changed in a Learning Plan, they will now correctly been given the Learning Plan
+                   value whereas before, it depended completely on the order in which the
+                   competency pathways were processed.
+
+                   If a site has already been upgraded to Totara 13 without this patch, this patch
+                   will leave the aggregation method on "Latest achieved". This patch introduces a
+                   setting "legacy_aggregation_method" to change the method for all existing and
+                   new competencies. Admins can change this setting to "Highest" but should
+                   consider that depending on the amount of competencies and achievements in the
+                   system the aggregation task on the next cron run might take some time to
+                   reaggregate all existing competencies. Modifying the aggregation method can lead
+                   to changes to already achieved values for users.
+
+Security issues:
+
+    TL-30569       Hardened security around block config data retrieval to prevent object injection
+
+                   This change hardens the unserializing of block config data in the backup and
+                   restore code and when instantiating block instances in order to protect against
+                   unknown and potentially dangerous classes being injected.
+
+    TL-30682       Backported two minor jQuery security fixes
+
+                   The following two security fixes have been backported from jQuery 3.5.0:
+                   * https://github.com/jquery/jquery/security/advisories/GHSA-jpcq-cgw6-v4j6
+                   * https://github.com/jquery/jquery/security/advisories/GHSA-gxr4-xjj5-5px2
+
+Improvements:
+
+    TL-27036       Added setting to use X-Accel-Redirect for NGINX to server content files directly from S3 cloud
+    TL-30509       Hyphenation applied to Engage user-generated text
+
+                   Before this change, no hyphenation was applied when words were broken into
+                   pieces to wrap onto new lines. This can be difficult to read for some people,
+                   and so hyphenation has been added when the browser cannot safely force a whole
+                   word onto a new line.
+
+    TL-30729       Adjusted some settings for the Learn Professional flavour
+
+                   These changes were made for the Learn Professional flavour:
+                    - Added Programs to the enabled features.
+                    - Removed Certifications from the enabled features.
+                    - Removed Position hierarchies from the enabled features.
+
+Performance improvements:
+
+    TL-30540       Improved the performance of the workspace page when loading discussions
+
+                   This patch adds missing indexes on the totara_comment table and drastically
+                   reduces the amount of unnecessary queries being triggered. In addition, where
+                   possible, GraphQL queries on the workspace page are now requested in batch to
+                   reduce the amount of Ajax requests on that page. Overall, this will improve the
+                   performance on this page significantly, especially if there are a lot of
+                   discussions and comments in the database tables.
+
+    TL-30547       Improved the initial load times for the grid catalogue on sites with large numbers of categories
+
+                   We identified that one of the main culprits slowing down the initial page load
+                   on larger sites was the default category filter. This patch updates the
+                   catalogue caches so that the first time you visit the page they will prime via
+                   bulk queries rather than running several queries per category in the system. For
+                   any sites with a large number of categories that still experience performance
+                   issues after upgrading, we recommend turning off the category filter. Simply by
+                   viewing the catalogue, clicking the "Configure catalogue" button, navigating to
+                   the "General" tab, and setting "Browse menu" to none.
+
+Bug fixes:
+
+    TL-28867       Fixed modal backdrop issue caused by overlapping modals
+    TL-29284       Weka editor ImageBlock node context menu is no longer cut off
+
+                   Incorrect CSS positioning was applied to the ImageBlock, by wrapping the desired
+                   elements and setting position on that wrapper, we can avoid working against how
+                   Weka and overflow/positioning techniques work.
+
+    TL-30013       Fixed 'Lock after final attempt' setting not working properly
+    TL-30023       Updated two MSTeams bot command strings
+    TL-30037       Updated help text for MSTeams messaging extension
+    TL-30047       Fixed theme settings being rendered with the UI for the currently active theme instead of the theme being edited
+    TL-30236       Fixed incorrect URL saved when images are used in workspace replies
+
+                   Previously, when images are used in replies in Engage workspaces, an incorrect
+                   URL was saved, resulting in errors being shown when trying to edit these
+                   replies.
+
+                   This has now been fixed. New discussion replies that include images will now
+                   result in a valid image URL being saved. However, replies created previously
+                   might still have an invalid URL. 
+
+    TL-30403       Fixed JavaScript error when uploading files into a course using drag-and-drop
+    TL-30411       Fixed a bug preventing the reordering of playlist cards via drag-and-drop
+    TL-30412       Fixed username encoding in Engage and Perform
+
+                   Previously, in several places throughout Engage and Perform special characters
+                   in the fullname for users were displayed in an encoded form. This has been fixed
+                   in the core user resolver and will affect all places where the core_user GraphQL
+                   type is used and the requested field is 'fullname'.
+
+    TL-30424       Fixed an issue where the Weka editor was not clickable in Safari when editing static content in a performance activity 
+    TL-30435       The Perform module is no longer displayed in the "activity type" filter in the Grid catalogue
+    TL-30437       Fixed accessibility issues on Engage survey cards
+    TL-30438       Changed theme settings controller to admin controller
+    TL-30458       Fixed wrong encoding in filter options on 'Your resources' page
+    TL-30469       Fixed archive assignment button not showing on the competency details page for active assignment when the user also has archived assignments
+    TL-30472       Fixed multilang filter in report titles not being applied
+    TL-30473       Fixed inconsistencies for type description labels in all hierarchy items
+    TL-30475       Updated the user search SQL used when adding seminar attendees to use named parameters
+
+                   Previously there was an issue when multitenancy was enabled where the wrong
+                   parameters would be used for the wrong arguments in the SQL. Changing these to
+                   explicitly named parameters makes sure this no longer happens.
+
+    TL-30495       After opening a tui dropdown menu, right clicking outside of it now closes it
+    TL-30503       Removed excessive filtering of Weka editor content in playlists, workspaces, and comments
+
+                   Fixed bug with removing content between < and > brackets when using the Weka
+                   editor in playlist summaries, workspace descriptions, workspace discussions, and
+                   comments across Engage.
+
+    TL-30518       Fixed Engage survey options sometimes appearing in a random order
+    TL-30522       Prevented the sending of notifications in a muted workspace
+    TL-30523       Deleting a custom tenant logo now correctly reverts the logo the custom site logo rather than the default Totara logo
+    TL-30526       Fixed image URL showing incorrectly in new discussion notifications
+    TL-30538       Fixed mislabelling of time created resource field when configuring the Grid catalogue
+    TL-30543       The comment entry box now scrolls to the correct location after clicking the Comments link
+    TL-30545       Replying to a comment now scrolls to the Weka editor window
+    TL-30548       Fixed the Tui style resolver to format content based on dev/prod mode
+    TL-30550       Fixed the accessibility of the dialogue used when adding a private resource to a public playlist
+
+                   When adding a private resource to a public playlist, a modal appears warning the
+                   user that the resource is to be made public. This modal now has an appropriate
+                   ARIA label.
+
+    TL-30552       Fixed display of preview images for resources, workspaces, course, programs, and certifications uploaded as SVG images
+    TL-30556       Fixed invalid upload issue resetting theme image back to its default
+    TL-30557       Fixed an overflow issue with the at-mention popover within the comment area in Weka editor
+    TL-30573       Fixed theme inheritance for custom theme images
+
+                   A theme should not inherit any custom theme settings applied to any of its
+                   parents. This functionality has been removed.
+
+    TL-30579       Added XSS risk to theme settings capability
+    TL-30581       Fixed cleaning content when updating an article
+    TL-30583       Share and like buttons on a resource are now circular in IE11
+    TL-30585       Fixed updating resource name when updating question
+    TL-30600       Added a maximum length validation for perform section title in the GraphQL mutation
+    TL-30601       Added a maximum length validation for performance activity respondable element title in the GraphQL mutation
+    TL-30611       Fixed JSON parsing with an empty string in the performance activity section content Vue page
+    TL-30613       Added a maximum length validation for perform element identifier in the UI and in the GraphQL mutation
+    TL-30621       Added a maximum length validation for workspace name on the update GraphQL mutation
+    TL-30626       Fixed Vue warning when adding a private resource to a public playlist
+    TL-30639       Fixed an error when reviewing a lesson activity with an essay page
+    TL-30642       Fixed HTML cleaning issue when returning the empty message for the quick access menu 
+
+                   The quick access menu webservice triggered an error during the validation of the
+                   return values for some languages due to clean_text modifying the HTML in the
+                   message.
+
+    TL-30655       Engage survey title now takes up the full width when answers are short
+    TL-30663       Fixed Weka editor console error when saved embedded video were still loading
+    TL-30668       Fixed undefined functions within the exception handler on early exceptions
+    TL-30695       Fixed display of survey answers at narrow widths in IE11
+    TL-30761       Embedded audio files in the Weka editor can now be deleted
+    TL-30764       User tours URL matching changed to anchor to the end of string
+
+                   Previously, URL matching in user tours was done as a substring search. This
+                   resulted in URL pattern "index.php?id=1" to be matched to "index.php?id=11".
+
+                   The fix anchors patterns to the end of the string, so pattern "index.php?id=1"
+                   will match only URLs ending on "index.php?id=1" but not "index.php?id=11". To
+                   allow that specifically, the pattern should have wildcard "%" in the end
+                   (index.php?id=1%).
+
+                   To maintain the old behaviour for existing user tours, "%" will be added to the
+                   end of the existing patterns during upgrade.
+
+    TL-30777       Fixed an issue where DDL queries were missing table name and database name conditions
+
+                   On MySQL some DDL queries to determine the existing constraints on a table did
+                   not include the table name and the database name. This could have led to issues
+                   on upgrades when there are multiple sites on the same database server with
+                   different versions.
+
+    TL-30828       Fixed an error showing when opening the long text question preview in performance response reporting
+    TL-30848       Removed additional spacing under the footer when there are a lot of related items associated with a resource
+    TL-30856       Fixed text containing HTML elements being stripped from Weka content
+    TL-30857       Fixed quotation marks in Weka editor in Learn being converted to HTML entities
+    TL-30871       Fixed reaggregation of assigned users not being triggered if aggregation method of competency changes
+    TL-30882       Fixed visibility checks for allocated users when viewing submissions in assignments
+
+
 Release 13.7 (28th April 2021):
 ===============================
 
