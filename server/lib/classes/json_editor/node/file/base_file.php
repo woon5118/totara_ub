@@ -192,20 +192,4 @@ abstract class base_file extends node {
 
         return $cleaned_raw_node;
     }
-
-    /**
-     * @param array $raw_node
-     * @return array
-     */
-    public static function sanitize_raw_node(array $raw_node): array {
-        $sanitzed_node = parent::sanitize_raw_node($raw_node);
-        if (!isset($sanitzed_node['attrs'])) {
-            throw new \coding_exception("Invalid node structure", static::get_type());
-        }
-
-        $attrs = $sanitzed_node['attrs'];
-        $sanitzed_node['attrs']['filename'] = s($attrs['filename']);
-
-        return $sanitzed_node;
-    }
 }

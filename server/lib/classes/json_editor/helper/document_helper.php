@@ -144,11 +144,6 @@ final class document_helper {
      *
      * If the json document is invalid, empty string will be return.
      *
-     * Note that this function is for the INPUT - when the system is receiving any data from the user - who
-     * is interacting with the system.
-     *
-     * If you want to use cleaning for output, then please use {@see document_helper::sanitize_json_document()}
-     *
      * @param string $json_document
      * @return string
      */
@@ -304,12 +299,13 @@ final class document_helper {
     }
 
     /**
-     * Take in a string, and parse it to a proper json document, then sanitize it - which is making almost
-     * every node to run pass thru {@see s()} and {@see clean_string()}.
+     * Take in a string, and parse it to a proper JSON document, then sanitize it.
      *
-     * Note that this is for the OUTPUTTING to the raw json document to user facing interface.
-     * If you are looking for the way in - INPUTTING, please use {@see document_helper::clean_json_document()} instead
+     * This was previously used before outputting a JSON document to HTML, but
+     * this is no longer recommended. In order to output a JSON document to
+     * HTML, you only need to escape the encoded JSON.
      *
+     * @deprecated since Totara 13.8
      * @param string $json_document
      * @return string
      */
@@ -327,6 +323,7 @@ final class document_helper {
     /**
      * @see document_helper::sanitize_json_document() for more detail.
      *
+     * @deprecated since Totara 13.8
      * @param array $document
      * @return array
      */

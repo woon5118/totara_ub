@@ -159,18 +159,4 @@ final class mention extends node implements inline_node {
 
         return $cleaned_raw_node;
     }
-
-    /**
-     * @param array $raw_node
-     * @return array
-     */
-    public static function sanitize_raw_node(array $raw_node): array {
-        $sanitized_node = parent::sanitize_raw_node($raw_node);
-        if (!array_key_exists('attrs', $sanitized_node)) {
-            throw new \coding_exception("Invalid node structure", static::get_type());
-        }
-
-        $sanitized_node['attrs']['display'] = s($sanitized_node['attrs']['display']);
-        return $sanitized_node;
-    }
 }

@@ -182,6 +182,7 @@ abstract class node {
     }
 
     /**
+     * @deprecated since Totara 13.8
      * @param array $raw_node
      * @return array
      */

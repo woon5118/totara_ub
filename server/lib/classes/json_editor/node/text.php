@@ -151,18 +151,6 @@ final class text extends node implements inline_node {
     }
 
     /**
-     * @param array $raw_node
-     * @return array
-     */
-    public static function sanitize_raw_node(array $raw_node): array {
-        $sanitized_node = parent::sanitize_raw_node($raw_node);
-        $text = $sanitized_node['text'] ?? '';
-
-        $sanitized_node['text'] = s($text);
-        return $sanitized_node;
-    }
-
-    /**
      * @param formatter $formatter
      * @return string
      */

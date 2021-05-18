@@ -26,7 +26,7 @@ use core\json_editor\node\paragraph;
 use core\json_editor\node\text;
 use core\json_editor\node\attachment;
 
-class core_json_editor_paragraphq_testcase extends advanced_testcase {
+class core_json_editor_paragraph_testcase extends advanced_testcase {
     /**
      * @return void
      */
@@ -142,31 +142,5 @@ class core_json_editor_paragraphq_testcase extends advanced_testcase {
         $this->assertArrayHasKey('type', $text);
         $this->assertArrayHasKey('text', $text);
         $this->assertSame('gelllo world', $text['text']);
-    }
-
-    /**
-     * @return void
-     */
-    public function test_sanitize_node(): void {
-        $text = '<script>alert("hello world");</script>';
-        $result = paragraph::sanitize_raw_node(
-            paragraph::create_json_node_from_text($text)
-        );
-
-        $this->assertArrayHasKey('type', $result);
-        $this->assertArrayHasKey('content', $result);
-
-        $this->assertEquals(paragraph::get_type(), $result['type']);
-        $this->assertIsArray($result['content']);
-        $this->assertNotEmpty($result['content']);
-
-        $this->assertCount(1, $result['content']);
-
-        $text_node = reset($result['content']);
-        $this->assertArrayHasKey('type', $text_node);
-        $this->assertArrayHasKey('text', $text_node);
-
-        $this->assertEquals(text::get_type(), $text_node['type']);
-        $this->assertEquals(s($text), $text_node['text']);
     }
 }

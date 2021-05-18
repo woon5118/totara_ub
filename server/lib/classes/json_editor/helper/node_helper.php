@@ -103,6 +103,7 @@ final class node_helper {
      * This function will try to invoke {@see node::sanitize_raw_node()} to sanitize the content
      * on the output.
      *
+     * @deprecated since Totara 13.8
      * @param array $raw_nodes
      * @return array
      */

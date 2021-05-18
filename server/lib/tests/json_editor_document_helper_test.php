@@ -317,7 +317,7 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
 
         $this->assertEquals(text::get_type(), $text['type']);
         $this->assertSame(
-            s($html),
+            $html,
             $text['text']
         );
     }

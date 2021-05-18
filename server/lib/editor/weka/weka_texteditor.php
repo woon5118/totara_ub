@@ -218,19 +218,6 @@ final class weka_texteditor extends texteditor implements context_aware_editor {
             $options = [];
         }
 
-        // Cleaning text on the way out.
-        // If your content is JSON but not a json_editor compatible - empty string will be given.
-        // Any other content is probably HTML for conversion by the editor.
-        if (!empty($options['noclean']) && !empty($this->text)) {
-            if (document_helper::looks_like_json($this->text)) {
-                $this->text = document_helper::sanitize_json_document($this->text);
-            } else {
-                // Strip out anything dodgy before passing to the editor.
-                // This doesn't need to be fancy; markup for conversion should be simple and XSS-free.
-                $this->text = clean_text($this->text);
-            }
-        }
-
         if (array_key_exists('show_toolbar', $options)) {
             $this->set_show_toolbar($options['show_toolbar']);
         }

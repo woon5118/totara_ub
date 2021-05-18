@@ -4,6 +4,8 @@ information provided here is intended especially for developers.
 === 13.8 ===
 
 * backported https://github.com/jquery/jquery/pull/4642 to prevent a minor security issue
+* Deprecated core\json_editor\helper\document_helper::sanitize_json_document() and node::sanitize_raw_node().
+  If outputting raw JSON documents in HTML, they should be escaped at output.
 
 === 13.7 ===
 
