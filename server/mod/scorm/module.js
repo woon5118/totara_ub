@@ -304,6 +304,8 @@ M.mod_scorm.init = function(Y, nav_display, navposition_left, navposition_top, h
             if (window_name) {
                 return;
             }
+            // Clear old height
+            Y.one('#scorm_layout').setStyle('height', null);
 
             // make sure that the max width of the TOC doesn't go to far
 
@@ -325,9 +327,10 @@ M.mod_scorm.init = function(Y, nav_display, navposition_left, navposition_top, h
                 // Calculate the rough new height from the viewport height.
                 var margintop = Y.one('#scormpage').getY();
                 var newheight = Y.one('body').get('winHeight') - margintop - marginbottom - 10;
+                var minHeight = Math.min(680, window.innerHeight) - marginbottom;
 
-                if (newheight < 680) {
-                    newheight = 680;
+                if (newheight < minHeight) {
+                    newheight = minHeight;
                 }
                 Y.one('#scorm_layout').setStyle('height', newheight);
             }
