@@ -134,12 +134,15 @@ final class theme_config extends \theme_config {
             $scss_options->set_skip_compile(true);
         }
 
-        if (get_config('totara_tui', 'development_mode')) {
+        if (!during_initial_install() && get_config('totara_tui', 'development_mode')) {
             $scss_options->set_minify(false);
             $scss_options->set_sourcemap_enabled(true);
         } else {
+            // Impossible to get here during PHPUnit tests.
+            // @codeCoverageIgnoreStart
             $scss_options->set_minify(true);
             $scss_options->set_sourcemap_enabled(false);
+            // @codeCoverageIgnoreEnd
         }
 
         return new scss($scss_options);
