@@ -246,8 +246,8 @@ class feature_factory {
     private static function get_checkbox_options_loader() {
         return function () {
             return [
-                1 => 'Yes',
-                0 => 'No',
+                1 => get_string('yes'),
+                0 => get_string('no')
             ];
         };
     }
