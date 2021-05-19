@@ -214,7 +214,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         /** @var mod_perform_generator $generator */
         $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
-        $generator->create_subject_instance([
+        $subject_instance = $generator->create_subject_instance([
             'subject_is_participating' => true,
             'subject_user_id' => $subject->id,
             'other_participant_id' => user::logged_in()->id,
@@ -225,8 +225,10 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         $participant_section = new participant_section(
             participant_section_entity::repository()
                 ->with(['section_elements', 'participant_instance'])
-                ->get()
-                ->first()
+                ->join([participant_instance_entity::TABLE, 'pi'], 'participant_instance_id', 'id')
+                ->where('pi.participant_id', $subject->id)
+                ->where('pi.subject_instance_id', $subject_instance->id)
+                ->one()
         );
 
         $data_provider = new participant_section_with_responses($participant_section);
