@@ -134,12 +134,13 @@ define(['jquery'], function($) {
     /**
      * Unmasks the password.
      */
-    PasswordUnmask.prototype.unmask = function() {
+    PasswordUnmask.prototype.unmask = function(ev) {
         if (this.unmaskinput.is(":checked")) {
             this.input.parents('.totara_passwordunmask').addClass('unmask-password');
         } else {
             this.input.parents('.totara_passwordunmask').removeClass('unmask-password');
         }
+        ev.stopPropagation();
     };
 
     return PasswordUnmask;
