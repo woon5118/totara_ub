@@ -28,12 +28,11 @@ use core_text;
 use core\orm\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
-use mod_perform\entity\activity\element as element_entity;
 use mod_perform\entity\activity\section as section_entity;
-use mod_perform\entity\activity\section_element as section_element_entity;
 use mod_perform\models\response\participant_section;
 use  mod_perform\models\activity\element as model_element;
 use stdClass;
+use totara_core\entity\relationship;
 
 /**
  * Class section
@@ -284,10 +283,18 @@ class section extends model {
             throw new coding_exception('Section has been deleted, can not update relationships');
         }
 
-        builder::get_db()->transaction(function () use ($relationship_updates) {
+        $valid_relationship_ids = relationship::repository()
+            ->select('id')
+            ->get()
+            ->pluck('id');
+
+        builder::get_db()->transaction(function () use ($relationship_updates, $valid_relationship_ids) {
             $existing_section_relationships = $this->get_section_relationships();
             foreach ($relationship_updates as $relationship_update) {
                 $core_relationship_id = $relationship_update['core_relationship_id'];
+                if (!in_array($core_relationship_id, $valid_relationship_ids)) {
+                    throw new coding_exception("Invalid relationship id: $core_relationship_id");
+                }
 
                 /** @var section_relationship $section_relationship */
                 $section_relationship = $existing_section_relationships->find('core_relationship_id', $core_relationship_id);

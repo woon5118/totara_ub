@@ -218,6 +218,21 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $section2->update_relationships([]);
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
+
+        // Invalid relation ids are not accepted.
+        $invalid = 31443;
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Invalid relationship id: $invalid");
+        $section1->update_relationships(
+            [
+                [
+                    'core_relationship_id' => $invalid,
+                    'can_view' => true,
+                    'can_answer' => true,
+                ]
+            ]
+        );
     }
 
     public function test_get_section_element_stats() {
