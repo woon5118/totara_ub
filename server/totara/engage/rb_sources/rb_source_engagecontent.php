@@ -317,11 +317,6 @@ class rb_source_engagecontent extends rb_base_source {
             ],
             [
                 'type' => 'engagecontent',
-                'value' => 'views',
-                'heading' => get_string('views', 'rb_source_engagecontent')
-            ],
-            [
-                'type' => 'engagecontent',
                 'value' => 'visibility',
                 'heading' => get_string('visibility', 'rb_source_engagecontent')
             ],
@@ -336,6 +331,14 @@ class rb_source_engagecontent extends rb_base_source {
                 'heading' => get_string('topics', 'rb_source_engagecontent')
             ],
         ];
+
+        if (advanced_feature::is_enabled('ml_recommender')) {
+            $cols[] =             [
+                'type' => 'engagecontent',
+                'value' => 'views',
+                'heading' => get_string('views', 'rb_source_engagecontent')
+            ];
+        }
 
         if (advanced_feature::is_enabled('container_workspace')) {
             $cols[] = [

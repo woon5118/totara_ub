@@ -28,6 +28,7 @@ use totara_engage\answer\answer_type;
 use totara_reaction\resolver\resolver_factory as reaction_resolver_factory;
 use totara_reaction\reaction_helper;
 use totara_engage\resource\resource_factory;
+use totara_reportbuilder\report_helper;
 
 /**
  * @group totara_reportbuilder
@@ -403,8 +404,19 @@ class totara_engage_rb_engagecontent_report_testcase extends advanced_testcase {
 
         advanced_feature::enable('engage_resources');
         advanced_feature::disable('container_workspace');
+        advanced_feature::disable('ml_recommender');
         $this->assertFalse($report_source_class::is_source_ignored());
         $this->assertFalse($report_embedded_class::is_report_ignored());
+    }
+
+    /**
+     * Make sure the report can be created with ml_recommender disabled.
+     * There used to be a bug where this resulted in an exception.
+     */
+    public function test_engagecontent_report_create_with_disabled_ml_recommender(): void {
+        self::setAdminUser();
+        advanced_feature::disable('ml_recommender');
+        report_helper::create('engagecontent');
     }
 
     /**
