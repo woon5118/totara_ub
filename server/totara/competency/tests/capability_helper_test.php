@@ -162,4 +162,30 @@ class totara_competency_capability_helper_testcase extends advanced_testcase {
         $require_method = 'require_' . $method;
         capability_helper::$require_method($user2->id);
     }
+
+    /**
+     * Test whether can_view_profile does still work even if user got deleted
+     */
+    public function test_can_view_profile_for_deleted_users() {
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $managerja = job_assignment::create(['userid' => $user1->id, 'idnumber' => 1]);
+        job_assignment::create(['userid' => $user2->id, 'managerjaid' => $managerja->id, 'idnumber' => 2]);
+
+        $this->setUser($user1);
+
+        $can_view = capability_helper::can_view_profile($user2->id);
+        $this->assertTrue($can_view);
+
+        $this->setAdminUser();
+
+        delete_user($user2);
+
+        $this->setUser($user1);
+
+        $can_view = capability_helper::can_view_profile($user2->id);
+        $this->assertFalse($can_view);
+    }
+
 }

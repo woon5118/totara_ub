@@ -70,7 +70,11 @@ class capability_helper {
         }
         $for_user_id = intval($for_user_id);
         if (is_null($context)) {
-            $context = context_user::instance($for_user_id);
+            // Take into consideration that subject user may be deleted.
+            $context = context_user::instance($for_user_id, IGNORE_MISSING);
+            if (!$context) {
+                return false;
+            }
         }
         if ($for_user_id == user::logged_in()->id) {
             return has_capability('totara/competency:view_own_profile', $context);
