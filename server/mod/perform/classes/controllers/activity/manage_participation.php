@@ -106,7 +106,7 @@ class manage_participation extends perform_controller {
         ]);
 
         $new_heading = get_string("manage_participation_{$this->current_tab}_number_shown",
-            'mod_perform', $this->activity->name
+            'mod_perform', format_string($this->activity->name)
         );
 
         /** @var embedded_report_view $report_view */
@@ -144,7 +144,7 @@ class manage_participation extends perform_controller {
             'backurl' => $backurl,
             'banner' => $this->get_info_card_component(),
             'tabs' => self::get_participation_tabs($this->activity->id, $this->current_tab),
-            'page_heading' => get_string('manage_participation_heading', 'mod_perform', $this->activity->name),
+            'page_heading' => get_string('manage_participation_heading', 'mod_perform', format_string($this->activity->name)),
             'toasts' => $this->get_toasts_component(),
         ];
     }

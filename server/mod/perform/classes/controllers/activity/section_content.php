@@ -105,7 +105,7 @@ class section_content extends perform_controller {
         ];
 
         return self::create_tui_view('mod_perform/pages/SectionContent', $props)
-            ->set_title(get_string('manage_section_content_page_title', 'mod_perform', $title));
+            ->set_title(get_string('manage_section_content_page_title', 'mod_perform', format_string($title)));
     }
 
     public static function get_base_url(): string {

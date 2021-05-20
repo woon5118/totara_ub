@@ -25,6 +25,8 @@ namespace mod_perform\controllers\activity;
 
 use coding_exception;
 use context;
+use core\format;
+use core\webapi\formatter\field\string_field_formatter;
 use mod_perform\controllers\perform_controller;
 use mod_perform\controllers\requires_activity;
 use mod_perform\models\activity\activity;
@@ -46,11 +48,13 @@ class edit_activity extends perform_controller {
      * @return tui_view
      */
     public function action(): tui_view {
+        $activity = $this->get_activity_from_param();
+
         $this->require_capability('mod/perform:manage_activity', $this->get_context());
-        $this->set_url(self::get_url(['activity_id' => $this->get_activity_id_param()]));
+        $this->set_url(self::get_url(['activity_id' => $activity->id]));
 
         $props = [
-            'activity-id' => $this->get_activity_id_param(),
+            'activity-id' => $activity->id,
             'go-back-link' => (string) new moodle_url(manage_activities::URL),
         ];
         $activity_was_cloned = (bool) $this->get_optional_param('activity_cloned', false, PARAM_BOOL);
@@ -59,8 +63,16 @@ class edit_activity extends perform_controller {
             $props = $this->include_cloned_props($props);
         }
 
+        $formatter = new string_field_formatter(format::FORMAT_HTML, $activity->get_context());
+
         return self::create_tui_view('mod_perform/pages/ManageActivity', $props)
-            ->set_title(get_string('manage_activity_for_page_title', 'mod_perform', $this->get_activity_from_param()->name));
+            ->set_title(
+                get_string(
+                    'manage_activity_for_page_title',
+                    'mod_perform',
+                    $formatter->format($activity->name)
+                )
+            );
     }
 
     /**
@@ -77,8 +89,10 @@ class edit_activity extends perform_controller {
         }
         $cloned_activity = activity::load_by_id($cloned_activity_id);
 
+        $formatter = new string_field_formatter(format::FORMAT_PLAIN, $cloned_activity->get_context());
+
         $props['activity-cloned-success'] = true;
-        $props['cloned-activity-name'] = $cloned_activity->name;
+        $props['cloned-activity-name'] = $formatter->format($cloned_activity->name);
 
         return $props;
     }

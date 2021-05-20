@@ -75,7 +75,7 @@ class activity extends perform_controller {
             throw new moodle_exception('error_activity_unavailable', 'mod_perform');
         }
 
-        $activity_name = $this->get_activity()->name;
+        $activity_name = format_string($this->get_activity()->name);
 
         $extra_data = [
             'activity_id' => $activity_id,

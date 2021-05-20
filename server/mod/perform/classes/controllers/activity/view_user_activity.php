@@ -99,9 +99,10 @@ class view_user_activity extends perform_controller {
 
         $section = $this->get_section();
         $activity = $section->get_activity();
+        $name = format_string($activity->name);
         $title = $activity->get_multisection_setting()
-            ? $activity->name .' - '. $section->get_display_title()
-            : $activity->name;
+            ? $name .' - '. format_string($section->get_display_title())
+            : $name;
 
         return self::create_tui_view('mod_perform/pages/UserActivity', $props)
             ->set_title($title);

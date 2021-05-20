@@ -60,7 +60,7 @@ class subject_instances extends perform_controller {
             $this->set_url(static::get_url(['activity_id' => $this->get_activity()->id]));
 
             return self::create_report_view($report, $debug)
-                ->set_title(get_string('participation_reporting_with_activity', 'mod_perform', $this->get_activity()->name))
+                ->set_title(get_string('participation_reporting_with_activity', 'mod_perform', format_string($this->get_activity()->name)))
                 ->set_back_to(
                     new moodle_url('/mod/perform/manage/activity/index.php'),
                     get_string('back_to_all_activities', 'mod_perform')

@@ -58,7 +58,7 @@ class participant_instances extends perform_controller {
             ]);
 
             $page_title = get_string('participant_instances_title', 'mod_perform', [
-                'activity_name' => $this->get_subject_instance()->get_activity()->name,
+                'activity_name' => format_string($this->get_subject_instance()->get_activity()->name),
                 'fullname' => $this->subject_instance->subject_user->fullname
             ]);
 

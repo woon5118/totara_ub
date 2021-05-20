@@ -118,7 +118,7 @@ class placeholder {
 
         $new = new placeholder();
         $new->recipient_fullname = $participant->fullname;
-        $new->activity_name = $activity->name;
+        $new->activity_name = format_string($activity->name);
         $new->activity_type = $activity->get_type()->get_display_name();
         $new->subject_fullname = $subject_instance->subject_user->fullname;
         $new->participant_fullname = $participant->fullname;
@@ -169,7 +169,7 @@ class placeholder {
 
         $new = new placeholder();
         $new->recipient_fullname = $subject->fullname;
-        $new->activity_name = $activity->name;
+        $new->activity_name = format_string($activity->name);
         $new->activity_type = $activity->get_type()->get_display_name();
         $new->subject_fullname = $subject->fullname;
         $new->participant_fullname = $subject->fullname;

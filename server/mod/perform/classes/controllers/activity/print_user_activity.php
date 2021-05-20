@@ -87,7 +87,7 @@ class print_user_activity extends perform_controller {
         $activity_name = (string)$this->participant_instance->subject_instance->activity->name;
 
         return self::create_tui_view('mod_perform/pages/UserActivity', $props)
-            ->set_title(get_string('user_activities_page_print', 'mod_perform', $activity_name));
+            ->set_title(get_string('user_activities_page_print', 'mod_perform', format_string($activity_name)));
     }
 
     /**
