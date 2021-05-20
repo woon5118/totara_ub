@@ -113,7 +113,7 @@ $pagination-active-bg: var(--btn-prim-accent-color);
 @mixin tui-font-body-small {
   font-weight: normal;
   font-size: var(--font-size-13);
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 @mixin tui-font-body-x-small {
@@ -125,7 +125,7 @@ $pagination-active-bg: var(--btn-prim-accent-color);
 @mixin tui-font-body-xx-small {
   font-weight: normal;
   font-size: var(--font-size-11);
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 @mixin tui-font-body-disabled {
