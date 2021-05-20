@@ -70,7 +70,7 @@ class card implements base_card {
      * @return string|null
      */
     public function get_title(): ?string {
-        return $this->course->fullname;
+        return format_string($this->course->fullname);
     }
 
     /**

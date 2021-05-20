@@ -73,7 +73,7 @@ class card implements base_card {
     public function get_title(): ?string {
         // this will have to be updated later when
         // multiple questions are added to surveys
-        return $this->survey->get_name();
+        return format_string($this->survey->get_name());
     }
 
     /**
