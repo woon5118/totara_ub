@@ -2059,6 +2059,8 @@ function purify_html($text, $options = array()) {
 
         // Allow safe CSS extensions - http://htmlpurifier.org/live/configdoc/plain.html#CSS.Proprietary
         $config->set('CSS.Proprietary', true);
+        // Allow tags which can be used for deceptive practices but do not directly constitute a security risk
+        $config->set('CSS.AllowTricky', true);
         if ($def = $config->maybeGetRawHTMLDefinition()) {
             $def->addElement('nolink', 'Block', 'Flow', array());                       // Skip our filters inside.
             $def->addElement('tex', 'Inline', 'Inline', array());                       // Tex syntax, equivalent to $$xx$$.

@@ -484,4 +484,13 @@ class core_htmlpurifier_testcase extends basic_testcase {
                 '</div>'
             ]];
     }
+
+    /**
+     * Verify display is allowed in CSS
+     */
+    public function test_display_in_css() {
+        $text = '<div style="color:#FF0000;display:none;">HELLO</div>';
+        $result = purify_html($text, array());
+        $this->assertSame($text, $result);
+    }
 }
