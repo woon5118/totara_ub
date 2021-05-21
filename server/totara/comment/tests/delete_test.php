@@ -43,6 +43,7 @@ class totara_comment_delete_testcase extends advanced_testcase {
 
         $this->assertTrue($DB->record_exists('totara_comment', ['id' => $comment->get_id()]));
         $this->assertEmpty($comment->get_content());
+        $this->assertEmpty($comment->get_content_text());
         $this->assertEquals(FORMAT_PLAIN, $comment->get_format());
     }
 
@@ -69,6 +70,7 @@ class totara_comment_delete_testcase extends advanced_testcase {
 
         $this->assertEquals($reply->get_parent_id(), $comment->get_id());
         $this->assertEmpty($reply->get_content());
+        $this->assertEmpty($reply->get_content_text());
         $this->assertEquals(FORMAT_PLAIN, $reply->get_format());
     }
 
