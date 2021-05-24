@@ -266,6 +266,7 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $this->assertEquals('0&ndash;100', $studentgrades['usergrades'][0]['gradeitems'][0]['rangeformatted']);
         $this->assertEquals('80.00 %', $studentgrades['usergrades'][0]['gradeitems'][0]['percentageformatted']);
         $this->assertEmpty($studentgrades['usergrades'][0]['gradeitems'][0]['feedback']);
+        $this->assertEquals(0, $studentgrades['usergrades'][0]['gradeitems'][0]['feedbackformat']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradehiddenbydate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeneedsupdate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeishidden']);
@@ -283,6 +284,7 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $this->assertEquals('0&ndash;100', $studentgrades['usergrades'][0]['gradeitems'][1]['rangeformatted']);
         $this->assertEquals('80.00 %', $studentgrades['usergrades'][0]['gradeitems'][1]['percentageformatted']);
         $this->assertEmpty($studentgrades['usergrades'][0]['gradeitems'][1]['feedback']);
+        $this->assertEquals(0, $studentgrades['usergrades'][0]['gradeitems'][1]['feedbackformat']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['gradehiddenbydate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['gradeneedsupdate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['gradeishidden']);
@@ -341,6 +343,7 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $this->assertEquals('0&ndash;100', $studentgrades['usergrades'][0]['gradeitems'][0]['rangeformatted']);
         $this->assertEquals('80.00 %', $studentgrades['usergrades'][0]['gradeitems'][0]['percentageformatted']);
         $this->assertEmpty($studentgrades['usergrades'][0]['gradeitems'][0]['feedback']);
+        $this->assertEquals(0, $studentgrades['usergrades'][0]['gradeitems'][0]['feedbackformat']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradehiddenbydate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeneedsupdate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeishidden']);
@@ -354,6 +357,8 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
                                         'itemid' => $studentgrades['usergrades'][0]['gradeitems'][0]['id']), true);
         $gradegrade->set_hidden(1);
         $studentgrades = gradereport_user_external::get_grade_items($course->id, $student1->id);
+        // Make sure feedback format is optional (this used to be a bug)
+        unset($studentgrades['usergrades'][0]['gradeitems'][0]['feedbackformat']);
         $studentgrades = external_api::clean_returnvalue(gradereport_user_external::get_grade_items_returns(), $studentgrades);
 
         // Check we get only the course final grade.
