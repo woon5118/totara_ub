@@ -50,6 +50,7 @@ require_once(__DIR__ . '/notification_testcase.php');
 
 /**
  * @group perform
+ * @group perform_notifications
  */
 class mod_perform_notification_watcher_testcase extends mod_perform_notification_testcase {
     /** @var stdClass */

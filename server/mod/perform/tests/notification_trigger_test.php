@@ -29,6 +29,7 @@ require_once(__DIR__ . '/notification_testcase.php');
 /**
  * @coversDefaultClass \mod_perform\notification\trigger
  * @group perform
+ * @group perform_notifications
  */
 class mod_perform_notification_trigger_testcase extends mod_perform_notification_testcase {
     public function setUp(): void {

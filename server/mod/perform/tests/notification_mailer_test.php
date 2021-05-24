@@ -46,6 +46,7 @@ require_once(__DIR__ . '/notification_testcase.php');
 /**
  * @coversDefaultClass \mod_perform\notification\mailer
  * @group perform
+ * @group perform_notifications
  */
 class mod_perform_notification_mailer_testcase extends mod_perform_notification_testcase {
     public function setUp(): void {

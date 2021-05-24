@@ -33,6 +33,7 @@ require_once(__DIR__ . '/notification_testcase.php');
 /**
  * @covers \mod_perform\models\activity\notification
  * @group perform
+ * @group perform_notifications
  */
 class mod_perform_notification_model_testcase extends mod_perform_notification_testcase {
     /**

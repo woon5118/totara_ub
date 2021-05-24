@@ -31,6 +31,7 @@ require_once(__DIR__ . '/notification_testcase.php');
 
 /**
  * @group perform
+ * @group perform_notifications
  */
 class mod_perform_notification_condition_testcase extends mod_perform_notification_testcase {
     public function data_days_before_after(): array {

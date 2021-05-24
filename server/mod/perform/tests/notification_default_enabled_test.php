@@ -43,6 +43,7 @@ require_once(__DIR__ . '/notification_testcase.php');
 /**
  * @covers \mod_perform\observers\notification::create_notifications
  * @group perform
+ * @group perform_notifications
  */
 class mod_perform_notification_default_enabled_testcase extends mod_perform_notification_testcase {
 
