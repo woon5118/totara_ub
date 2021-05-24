@@ -299,7 +299,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
             }
         )->to_array();
 
-        $section_title = $section->activity->name . ' section ';
+        $section_title = 'activity ' . $section->activity_id . ' section ';
 
         $expected_section_values = [
             [

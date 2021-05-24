@@ -600,6 +600,9 @@ class mod_perform_generator extends component_generator_base {
      * @return collection|activity[]
      */
     public function create_full_activities(mod_perform_activity_generator_configuration $configuration = null) {
+        global $CFG;
+        require_once $CFG->dirroot.'/mod/perform/tests/generator/util.php';
+
         // For the activity generation we need to make sure the admin user is set
         if (!is_siteadmin()) {
             throw new coding_exception('perform generator requires active user to be an administrator');
@@ -624,6 +627,9 @@ class mod_perform_generator extends component_generator_base {
         $activities = [];
         for ($i = 0; $i < $configuration->get_number_of_activities(); $i++) {
             [$name, $type] = $activity_name_generator->generate();
+            if ($configuration->should_use_multilang_filter()) {
+                $name = mod_perform_generator_util::generate_multilang_string($name);
+            }
 
             $data = [
                 'activity_name' => $name,
@@ -667,7 +673,11 @@ class mod_perform_generator extends component_generator_base {
             $view_only_relationships = $configuration->get_view_only_relationships();
 
             for ($k = 0; $k < $configuration->get_number_of_sections_per_activity(); $k++) {
-                $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
+                $section_title = 'activity '.$activity->id . ' section ' . $k;
+                if ($configuration->should_use_multilang_filter()) {
+                    $section_title = mod_perform_generator_util::generate_multilang_string($section_title);
+                }
+                $section = $this->create_section($activity, ['title' => $section_title]);
                 foreach ($relationships as $relationship_idnumber) {
                     if (in_array($relationship_idnumber, $manual_idnumbers, true)) {
                         $manual_relationships[] = $relationship_idnumber;
@@ -682,8 +692,11 @@ class mod_perform_generator extends component_generator_base {
                     $this->create_section_relationship($section, ['relationship' => $relationship_idnumber], $can_view, $can_answer);
                 }
                 for ($j = 1; $j <= $configuration->get_number_of_elements_per_section(); $j++) {
-                    $title = $section->title . " element$j";
-                    $element = $this->create_element(['title' => $title]);
+                    $element_title = "Section {$section->id} element{$j}";
+                    if ($configuration->should_use_multilang_filter()) {
+                        $element_title = mod_perform_generator_util::generate_multilang_string($element_title);
+                    }
+                    $element = $this->create_element(['title' => $element_title]);
 
                     section_element::create($section, $element, $j);
                 }
@@ -701,16 +714,21 @@ class mod_perform_generator extends component_generator_base {
             $user_data['tenantid'] = $tenant_id;
         }
 
+        $current_language = current_language();
+        $language_per_relationship = $configuration->get_language_per_relationship();
+
         foreach ($activities as $activity) {
             $cohorts = [];
             for ($i = 0; $i < $configuration->get_cohort_assignments_per_activity(); $i++) {
                 $cohort = $this->datagenerator->create_cohort(['contextid' => $context->id]);
                 $cohorts[] = $cohort->id;
                 for ($k = 0; $k < $configuration->get_number_of_users_per_user_group_type(); $k++) {
+                    $user_data['lang'] = $language_per_relationship[constants::RELATIONSHIP_SUBJECT] ?? $current_language;
                     $user = $this->datagenerator->create_user($user_data);
                     cohort_add_member($cohort->id, $user->id);
 
                     if ($configuration->should_create_appraiser_for_each_subject_user()) {
+                        $user_data['lang'] = $language_per_relationship[constants::RELATIONSHIP_APPRAISER] ?? $current_language;
                         $appraiser = $this->datagenerator->create_user($user_data);
                         job_assignment::create([
                             'userid' => $user->id,
@@ -719,6 +737,7 @@ class mod_perform_generator extends component_generator_base {
                         ]);
                     }
                     if ($configuration->should_create_manager_for_each_subject_user()) {
+                        $user_data['lang'] = $language_per_relationship[constants::RELATIONSHIP_MANAGER] ?? $current_language;
                         $manager = $this->datagenerator->create_user($user_data);
                         job_assignment::create([
                             'userid' => $user->id,
