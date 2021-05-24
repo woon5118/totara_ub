@@ -41,6 +41,8 @@ trait language_pack_faker_trait {
      * @param array $customised_translations Array structured like this: [component => [translation_key => translation]]
      */
     protected function add_fake_language_pack(string $language_key, array $customised_translations): void {
+        global $SESSION;
+
         // Make the cache include our fake language, so the string manager methods will find it.
         $sm = get_string_manager();
         $rc = new ReflectionClass('core_string_manager_standard');
@@ -50,13 +52,23 @@ trait language_pack_faker_trait {
         $rccache->setAccessible(true);
         $cachekey = 'list_'.$get_key_suffix->invokeArgs($sm, array());
         $cache = $rccache->getValue($sm);
-        $cache->set($cachekey, [
-            'en' => get_string('thislanguage', 'langconfig').' (en)',
-            $language_key => 'Fake language (' . $language_key . ')'
-        ]);
-        self::assertCount(2, get_string_manager()->get_list_of_translations(true));
+        $value = $cache->get($cachekey);
+        if (!$value) {
+            $value = [
+                'en' => get_string('thislanguage', 'langconfig').' (en)',
+                $language_key => 'Fake language (' . $language_key . ')'
+            ];
+        } else {
+            $value[$language_key] = 'Fake language (' . $language_key . ')';
+        }
+
+        $cache->set($cachekey, $value);
+
+        self::assertCount(count($value), get_string_manager()->get_list_of_translations(true));
 
         // Set the customised translations for our fake language.
+        $old_lang = $SESSION->forcelang ?? null;
+
         force_current_language($language_key);
         foreach ($customised_translations as $component => $translations) {
             foreach ($translations as $key => $value) {
@@ -64,6 +76,6 @@ trait language_pack_faker_trait {
             }
         }
         // Empty string disables the current language forcing from above.
-        force_current_language('');
+        force_current_language($old_lang);
     }
 }
