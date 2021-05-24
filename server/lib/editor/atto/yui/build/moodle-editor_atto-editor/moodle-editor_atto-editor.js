@@ -1034,6 +1034,7 @@ EditorAutosave.prototype = {
 
         var undo, langstring;
 
+        text = this._cleanHTML(text);
         this.editor.setHTML(text);
         this.saveSelection();
         this.updateOriginal();
