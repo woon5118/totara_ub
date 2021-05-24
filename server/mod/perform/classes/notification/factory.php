@@ -166,6 +166,13 @@ abstract class factory {
     }
 
     /**
+     * Reset loader cache
+     */
+    public static function reset_loader(): void {
+        self::$loader = null;
+    }
+
+    /**
      * Return the master clock.
      *
      * @return clock
@@ -175,6 +182,13 @@ abstract class factory {
             self::$clock = new clock();
         }
         return self::$clock;
+    }
+
+    /**
+     * Reset clock
+     */
+    public static function reset_clock(): void {
+        self::$clock = null;
     }
 
     /**
@@ -206,5 +220,12 @@ abstract class factory {
             }
         }
         return self::$sink;
+    }
+
+    /**
+     * Reset sink;
+     */
+    public static function reset_sink(): void {
+        self::$sink = false;
     }
 }

@@ -65,23 +65,18 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     public function setUp(): void {
         $this->setAdminUser();
         $this->perfgen = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        // Unfortunately, there's no way to reset static properties across test functions.
-        // We need to capture initial values and set them back on tearDown.
-        $class = new ReflectionClass(factory::class);
-        foreach ($class->getProperties(ReflectionProperty::IS_STATIC) as $prop) {
-            $prop->setAccessible(true);
-            $this->factory_values[$prop->getName()] = $prop->getValue(null);
-        }
+
+        factory::reset_loader();
+        factory::reset_clock();
+        factory::reset_sink();
     }
 
     public function tearDown(): void {
         $this->perfgen = null;
-        // Reset the internal bookkeeping of the factory class.
-        foreach ($this->factory_values as $name => $value) {
-            $prop = new ReflectionProperty(factory::class, $name);
-            $prop->setAccessible(true);
-            $prop->setValue(null, $value);
-        }
+        factory::reset_loader();
+        factory::reset_clock();
+        factory::reset_sink();
+
         $this->factory_values = [];
     }
 
@@ -129,9 +124,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      * Nullify factory::loader.
      */
     protected function reset_loader(): void {
-        $rp = new ReflectionProperty(factory::class, 'loader');
-        $rp->setAccessible(true);
-        $rp->setValue(null, null);
+        factory::reset_loader();
         $this->loader_mocked = false;
     }
 
