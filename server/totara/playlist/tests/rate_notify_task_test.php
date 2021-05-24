@@ -23,7 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../../../totara/core/tests/language_pack_faker_trait.php');
+global $CFG;
+require_once($CFG->dirroot . '/totara/core/tests/language_pack_faker_trait.php');
 
 use core\task\manager;
 use totara_playlist\task\rate_notify_task;

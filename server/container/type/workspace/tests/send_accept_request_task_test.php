@@ -22,7 +22,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../../../../totara/core/tests/language_pack_faker_trait.php');
+global $CFG;
+require_once($CFG->dirroot . '/totara/core/tests/language_pack_faker_trait.php');
 
 use core\orm\query\exceptions\record_not_found_exception;
 use container_workspace\task\send_accept_request_task;

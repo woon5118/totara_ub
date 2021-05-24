@@ -22,8 +22,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../../../totara/core/tests/language_pack_faker_trait.php');
-require_once(__DIR__ . '/fixtures/topic_resolver.php');
+global $CFG;
+require_once($CFG->dirroot . '/totara/core/tests/language_pack_faker_trait.php');
+require_once($CFG->dirroot . '/totara/topic/tests/fixtures/topic_resolver.php');
 
 use core\task\manager;
 use core_tag\entity\tag_instance;

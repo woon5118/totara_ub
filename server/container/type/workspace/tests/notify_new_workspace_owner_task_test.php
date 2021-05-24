@@ -22,7 +22,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../../../../totara/core/tests/language_pack_faker_trait.php');
+global $CFG;
+require_once($CFG->dirroot . '/totara/core/tests/language_pack_faker_trait.php');
 
 use container_workspace\task\notify_new_workspace_owner_task;
 use container_workspace\output\transfer_ownership_notification;
