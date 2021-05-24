@@ -490,12 +490,10 @@ $tui-modal-sheetBreakpoint: 768px !default;
       &.tui-modal--animated {
         .tui-modal__inner {
           transform: scale(0.9);
-          opacity: 0;
         }
 
         &.tui-modal--in .tui-modal__inner {
           transform: none;
-          opacity: 1;
         }
       }
 
