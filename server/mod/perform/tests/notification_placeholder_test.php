@@ -21,13 +21,17 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\controllers\activity\user_activities_select_participants;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\dates\date_offset;
+use mod_perform\entity\activity\activity_type;
 use mod_perform\expand_task;
+use mod_perform\models\activity\activity_type as activity_type_model;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\notification\factory;
 use mod_perform\notification\placeholder;
+use totara_core\relationship\relationship;
 use totara_job\job_assignment;
 
 require_once(__DIR__ . '/notification_testcase.php');
@@ -82,43 +86,70 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
      * @covers ::from_data
      */
     public function test_from_data() {
+        $activity_type = activity_type::repository()->where('name', 'appraisal')->one();
+        $relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_SUBJECT);
+
         $placeholders = placeholder::from_data([
             'recipient_fullname' => 'User One',
             'activity_name' => 'My activity',
-            'activity_type' => 'Beer',
+            'activity_type' => activity_type_model::load_by_entity($activity_type),
             'subject_fullname' => 'Any One',
             'participant_fullname' => 'Some One',
-            'participant_relationship' => 'Mom',
-            'instance_duedate' => '01-01-1111',
-            'conditional_duedate' => 'Just complete now!',
-            'instance_created_at' => '02-02-2222',
+            'participant_relationship' => $relationship,
+            'instance_duedate' => 1672484400,
+            'instance_created_at' => 1640948400,
             'instance_days_active' => 3,
             'instance_days_remaining' => 1,
             'instance_days_overdue' => 4,
             'activity_url' => 'http://example.com/kia/ora.php',
             'participant_selection_url' => 'http://example.com/haere/mai.php',
+            'conditional_duedate' => placeholder::DUE_DATE_PARTICIPANT,
         ]);
         $this->assertEquals('User One', $placeholders->recipient_fullname);
         $this->assertEquals('My activity', $placeholders->activity_name);
-        $this->assertEquals('Beer', $placeholders->activity_type);
+        $this->assertEquals('Appraisal', $placeholders->activity_type);
         $this->assertEquals('Any One', $placeholders->subject_fullname);
         $this->assertEquals('Some One', $placeholders->participant_fullname);
-        $this->assertEquals('Mom', $placeholders->participant_relationship);
-        $this->assertEquals('01-01-1111', $placeholders->instance_duedate);
-        $this->assertEquals('Just complete now!', $placeholders->conditional_duedate);
-        $this->assertEquals('02-02-2222', $placeholders->instance_created_at);
+        $this->assertEquals('Subject', $placeholders->participant_relationship);
+        $this->assertEquals('31 December 2022', $placeholders->instance_duedate);
+        $this->assertStringContainsString('This needs to be completed by 31 December 2022.', $placeholders->conditional_duedate);
+        $this->assertEquals(1640948400, $placeholders->instance_created_at);
         $this->assertEquals(3, $placeholders->instance_days_active);
         $this->assertEquals(1, $placeholders->instance_days_remaining);
         $this->assertEquals(4, $placeholders->instance_days_overdue);
         $this->assertEquals('http://example.com/kia/ora.php', $placeholders->activity_url);
         $this->assertEquals('http://example.com/haere/mai.php', $placeholders->participant_selection_url);
 
-        try {
-            placeholder::from_data(['i_do_not_exist' => 'what?']);
-            $this->fail('coding_exception expected');
-        } catch (coding_exception $ex) {
-            $this->assertStringContainsString('i_do_not_exist is not a valid placeholder name', $ex->getMessage());
-        }
+        // Tes converting into record
+        $record = $placeholders->to_record();
+        $this->assertEquals(
+            [
+                'recipient_fullname' => 'User One',
+                'activity_name' => 'My activity',
+                'activity_type' => 'Appraisal',
+                'subject_fullname' => 'Any One',
+                'participant_fullname' => 'Some One',
+                'participant_relationship' => 'Subject',
+                'instance_duedate' => '31 December 2022',
+                'conditional_duedate' => '
+This needs to be completed by 31 December 2022.
+',
+                'instance_created_at' => 1640948400,
+                'instance_days_active' => 3,
+                'instance_days_remaining' => 1,
+                'instance_days_overdue' => 4,
+                'activity_url' => 'http://example.com/kia/ora.php',
+                'participant_selection_url' => 'http://example.com/haere/mai.php',
+                'activity_link' => '<a href="http://example.com/kia/ora.php">My activity</a>',
+                'participant_selection_link' => '<a href="http://example.com/haere/mai.php">Select participants</a>',
+            ],
+            (array) $record
+        );
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('i_do_not_exist is not a valid placeholder name');
+
+        placeholder::from_data(['i_do_not_exist' => 'what?']);
     }
 
     /**
@@ -217,7 +248,7 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
         $this->assertEquals($activity->get_type()->get_display_name(), $placeholders->activity_type);
         $this->assertEquals($subject_instance->subject_user->fullname, $placeholders->subject_fullname);
         $this->assertEquals(fullname($subject), $placeholders->participant_fullname);
-        $this->assertEquals('subject', $placeholders->participant_relationship);
+        $this->assertEquals('Subject', $placeholders->participant_relationship);
         $this->assertEquals(0, $placeholders->instance_duedate);
         $this->assertEquals('', $placeholders->conditional_duedate);
         $this->assertEquals($subject_instance->created_at, $placeholders->instance_created_at);

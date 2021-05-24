@@ -24,7 +24,9 @@
 
 use core\entity\user as user_entity;
 use mod_perform\constants;
+use mod_perform\entity\activity\activity_type;
 use mod_perform\entity\activity\external_participant as external_participant_entity;
+use mod_perform\models\activity\activity_type as activity_type_model;
 use mod_perform\models\activity\external_participant as external_participant_model;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
@@ -61,9 +63,23 @@ class mod_perform_notification_mailer_testcase extends mod_perform_notification_
      * @param integer|string $recipient internal user id or external user's full name
      */
     private function placeholders(stdClass $subject, $recipient) {
+        $activity_type = activity_type::repository()->where('name', 'appraisal')->one();
+        $relationship = relationship_model::load_by_idnumber(constants::RELATIONSHIP_SUBJECT);
+
         return placeholder::from_data([
             'recipient_fullname' => is_number($recipient) ? core_user::get_user($recipient, 'username', MUST_EXIST)->username : $recipient,
+            'activity_name' => 'My activity',
+            'activity_type' => activity_type_model::load_by_entity($activity_type),
             'subject_fullname' => $subject->username,
+            'participant_fullname' => 'Some One',
+            'participant_relationship' => $relationship,
+            'instance_duedate' => 1672484400,
+            'instance_created_at' => 1640948400,
+            'instance_days_active' => 3,
+            'instance_days_remaining' => 1,
+            'instance_days_overdue' => 4,
+            'activity_url' => 'http://example.com/kia/ora.php',
+            'participant_selection_url' => 'http://example.com/haere/mai.php',
         ]);
     }
 
@@ -108,6 +124,7 @@ class mod_perform_notification_mailer_testcase extends mod_perform_notification_
             constants::RELATIONSHIP_MENTOR => true,
             constants::RELATIONSHIP_REVIEWER => true,
         ]);
+
         $recipients = notification_recipient_model::load_by_notification($notification, true);
         $this->assertCount(6, $recipients);
 

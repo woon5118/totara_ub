@@ -108,6 +108,9 @@ class composer {
      * @throws coding_exception
      */
     public function get_subject_lang_string(placeholder $placeholders): lang_string {
+        // Make sure we have a record which can be used in lang strings
+        $placeholders = $placeholders->to_record();
+
         return new lang_string($this->get_subject_lang_key(), 'mod_perform', $placeholders);
     }
 
@@ -119,6 +122,9 @@ class composer {
      * @throws coding_exception
      */
     public function get_body_lang_string(placeholder $placeholders): lang_string {
+        // Make sure we have a record which can be used in lang strings
+        $placeholders = $placeholders->to_record();
+
         return new lang_string($this->get_body_lang_key(), 'mod_perform', $placeholders);
     }
 

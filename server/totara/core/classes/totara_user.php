@@ -60,15 +60,16 @@ class totara_user extends \core_user {
             self::$externaluser = parent::get_dummy_user_record();
             self::$externaluser->id = self::EXTERNAL_USER;
             self::$externaluser->username = "external";
-            self::$externaluser->lang = $CFG->lang;
             self::$externaluser->maildisplay = 1;
             self::$externaluser->emailstop = 0;
             self::$externaluser->mailformat = 1;
         }
 
         // Set some fields for this external user object.
+        self::$externaluser->lang = $CFG->lang;
         self::$externaluser->email = $emailaddress;
         self::$externaluser->firstname = $emailaddress;
         return self::$externaluser;
     }
+
 }

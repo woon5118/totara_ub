@@ -25,10 +25,13 @@ namespace mod_perform\notification;
 
 use coding_exception;
 use core\entity\user;
+use mod_perform\constants;
 use mod_perform\controllers\activity\user_activities_select_participants;
 use mod_perform\controllers\activity\view_user_activity;
+use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\subject_instance;
+use stdClass;
 use totara_core\relationship\relationship as relationship_model;
 use html_writer;
 
@@ -36,53 +39,70 @@ use html_writer;
  * The placeholder class, to provide a well-defined, public set of placeholders for notifications.
  */
 class placeholder {
-    /** @var string */
-    public $recipient_fullname;
+
+    const DUE_DATE_SUBJECT = 1;
+    const DUE_DATE_PARTICIPANT = 2;
 
     /** @var string */
-    public $activity_name;
+    private $recipient_fullname;
 
     /** @var string */
-    public $activity_type;
+    private $activity_name;
+
+    /** @var activity_type */
+    private $activity_type;
 
     /** @var string */
-    public $subject_fullname;
+    private $subject_fullname;
 
     /** @var string */
-    public $participant_fullname;
+    private $participant_fullname;
+
+    /** @var relationship_model */
+    private $participant_relationship;
 
     /** @var string */
-    public $participant_relationship;
+    private $instance_duedate;
 
     /** @var string */
-    public $instance_duedate;
+    private $conditional_duedate;
 
     /** @var string */
-    public $conditional_duedate;
-
-    /** @var string */
-    public $instance_created_at;
+    private $instance_created_at;
 
     /** @var int */
-    public $instance_days_active;
+    private $instance_days_active;
 
     /** @var int */
-    public $instance_days_remaining;
+    private $instance_days_remaining;
 
     /** @var int */
-    public $instance_days_overdue;
+    private $instance_days_overdue;
 
     /** @var string */
-    public $activity_url;
+    private $activity_url;
 
     /** @var string HTML link */
-    public $activity_link;
+    private $activity_link;
 
     /** @var string */
-    public $participant_selection_url;
+    private $participant_selection_url;
 
     /** @var string HTML link */
-    public $participant_selection_link;
+    private $participant_selection_link;
+
+    /**
+     * @param string $name
+     */
+    public function __get(string $name) {
+        $method_name = "get_{$name}";
+        if (method_exists($this, $method_name)) {
+            return $this->{$method_name}();
+        } else if (property_exists($this, $name)) {
+            return $this->{$name};
+        }
+        throw new coding_exception('Unknown property '.$name);
+    }
 
     /**
      * Factory method to initialise placeholder values from an array of [key => value].
@@ -105,6 +125,107 @@ class placeholder {
     }
 
     /**
+     * Returns human readable due date
+     *
+     * @return string|null
+     */
+    public function get_instance_duedate(): ?string {
+        if (!empty($this->instance_duedate)) {
+            // Format the due date
+            $strftimedate = get_string('strftimedate');
+            return userdate($this->instance_duedate, $strftimedate);
+        }
+        return $this->instance_duedate;
+    }
+
+    /**
+     * If there's a due date return the string which should be inserted into the notification
+     *
+     * @return string
+     */
+    public function get_conditional_duedate(): string {
+        $string = '';
+        if (!empty($this->instance_duedate)) {
+            $a = new stdClass();
+            $a->duedate = $this->get_instance_duedate();
+            switch ($this->conditional_duedate) {
+                case self::DUE_DATE_PARTICIPANT:
+                    $string = get_string('conditional_duedate_participant_placeholder', 'mod_perform', $a);
+                    break;
+                case self::DUE_DATE_SUBJECT:
+                    $string = get_string('conditional_duedate_subject_placeholder', 'mod_perform', $a);
+                    break;
+                default:
+                    $string = '';
+                    break;
+            }
+        }
+        return $string;
+    }
+
+    /**
+     * Returns the html link for the participant selection
+     *
+     * @return string
+     */
+    public function get_participant_selection_link(): string {
+        if (!empty($this->participant_selection_url)) {
+            return html_writer::link(
+                $this->participant_selection_url,
+                get_string('user_activities_select_participants_page_title', 'mod_perform')
+            );
+        }
+
+        return '';
+    }
+
+    /**
+     * Returns the html link for the activity
+     *
+     * @return string
+     */
+    public function get_activity_link(): string {
+        if (!empty($this->activity_url) && !empty($this->activity_name)) {
+            return html_writer::link($this->activity_url, $this->get_activity_name());
+        }
+        return '';
+    }
+
+    /**
+     * Returns the human readable string of the participant relationship
+     *
+     * @return string
+     */
+    public function get_participant_relationship(): string {
+        if (!empty($this->participant_relationship)) {
+            return $this->participant_relationship->get_name();
+        }
+        return '';
+    }
+
+    /**
+     * Returns the human readable string of the activity type
+     *
+     * @return string
+     */
+    public function get_activity_type(): string {
+        if (!empty($this->activity_type)) {
+            return $this->activity_type->get_display_name();
+        }
+        return '';
+    }
+
+    /**
+     * Returns the human readable string of the activity name
+     */
+    public function get_activity_name(): string {
+        if (!empty($this->activity_name)) {
+            return format_string($this->activity_name);
+        }
+        return '';
+    }
+
+    /**
      * Factory method to initialise placeholder values from a participant instance.
      *
      * @param participant_instance $participant_instance
@@ -118,16 +239,16 @@ class placeholder {
 
         $new = new placeholder();
         $new->recipient_fullname = $participant->fullname;
-        $new->activity_name = format_string($activity->name);
-        $new->activity_type = $activity->get_type()->get_display_name();
+        $new->activity_name = $activity->name;
+        $new->activity_type = $activity->get_type();
         $new->subject_fullname = $subject_instance->subject_user->fullname;
         $new->participant_fullname = $participant->fullname;
-        $new->participant_relationship = $participant_instance->get_core_relationship()->get_name();
+        $new->participant_relationship = $participant_instance->get_core_relationship();
         $new->instance_duedate = $subject_instance->due_date ?? 0;
         $new->instance_created_at = $subject_instance->created_at;
-        $new->instance_days_active = $new->format_duration($new->instance_created_at, $time);
+        $new->instance_days_active = $new::format_duration($new->instance_created_at, $time);
         if ($new->instance_duedate) {
-            $due_delta = $new->format_duration($time, $new->instance_duedate);
+            $due_delta = $new::format_duration($time, $new->instance_duedate);
             if ($time >= $new->instance_duedate) {
                 // Due date is here or has passed.
                 $new->instance_days_remaining = 0;
@@ -137,22 +258,13 @@ class placeholder {
                 $new->instance_days_remaining = $due_delta;
                 $new->instance_days_overdue = 0;
             }
-            // Format the due date
-            $strftimedate = get_string('strftimedate');
-            $new->instance_duedate = userdate($new->instance_duedate, $strftimedate);
-            $a = new \stdClass();
-            $a->duedate = $new->instance_duedate;
-            $new->conditional_duedate = get_string('conditional_duedate_participant_placeholder', 'mod_perform', $a);
-        } else {
-            $new->conditional_duedate = '';
+
+            $new->conditional_duedate = self::DUE_DATE_PARTICIPANT;
         }
+
         $new->activity_url = $participant_instance->get_participation_url();
-        $new->activity_link = html_writer::link($new->activity_url, $new->activity_name);
         $new->participant_selection_url = user_activities_select_participants::get_url();
-        $new->participant_selection_link = html_writer::link(
-            $new->participant_selection_url,
-            get_string('user_activities_select_participants_page_title', 'mod_perform')
-        );
+
         return $new;
     }
 
@@ -169,16 +281,16 @@ class placeholder {
 
         $new = new placeholder();
         $new->recipient_fullname = $subject->fullname;
-        $new->activity_name = format_string($activity->name);
-        $new->activity_type = $activity->get_type()->get_display_name();
+        $new->activity_name = $activity->name;
+        $new->activity_type = $activity->get_type();
         $new->subject_fullname = $subject->fullname;
         $new->participant_fullname = $subject->fullname;
-        $new->participant_relationship = 'subject';
+        $new->participant_relationship = relationship_model::load_by_idnumber(constants::RELATIONSHIP_SUBJECT);
         $new->instance_duedate = $subject_instance->due_date ?? 0;
         $new->instance_created_at = $subject_instance->created_at;
-        $new->instance_days_active = $new->format_duration($new->instance_created_at, $time);
+        $new->instance_days_active = $new::format_duration($new->instance_created_at, $time);
         if ($new->instance_duedate) {
-            $due_delta = $new->format_duration($time, $new->instance_duedate);
+            $due_delta = $new::format_duration($time, $new->instance_duedate);
             if ($time >= $new->instance_duedate) {
                 // Due date is here or has passed.
                 $new->instance_days_remaining = 0;
@@ -188,22 +300,13 @@ class placeholder {
                 $new->instance_days_remaining = $due_delta;
                 $new->instance_days_overdue = 0;
             }
-            // Format the due date
-            $strftimedate = get_string('strftimedate');
-            $new->instance_duedate = userdate($new->instance_duedate, $strftimedate);
-            $a = new \stdClass();
-            $a->duedate = $new->instance_duedate;
-            $new->conditional_duedate = get_string('conditional_duedate_subject_placeholder', 'mod_perform', $a);
-        } else {
-            $new->conditional_duedate = '';
+
+            $new->conditional_duedate = self::DUE_DATE_SUBJECT;
         }
+
         $new->activity_url = view_user_activity::get_url();
-        $new->activity_link = html_writer::link($new->activity_url, $new->activity_name);
         $new->participant_selection_url = user_activities_select_participants::get_url();
-        $new->participant_selection_link = html_writer::link(
-            $new->participant_selection_url,
-            get_string('user_activities_select_participants_page_title', 'mod_perform')
-        );
+
         return $new;
     }
 
@@ -239,7 +342,25 @@ class placeholder {
     public function set_participant(user $participant, relationship_model $relationship) {
         $this->recipient_fullname = $participant->fullname;
         $this->participant_fullname = $participant->fullname;
-        $this->participant_relationship = $relationship->get_name();
+        $this->participant_relationship = $relationship;
+    }
+
+    /**
+     * Convert this to an oject we can use in a lang string
+     *
+     * @return stdClass
+     */
+    public function to_record(): stdClass {
+        $record = new stdClass();
+        foreach ($this as $name => $value) {
+            $method_name = "get_{$name}";
+            if (method_exists($this, $method_name)) {
+                $value = $this->{$method_name}();
+            }
+            $record->{$name} = $value;
+        }
+
+        return $record;
     }
 
 }
