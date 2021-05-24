@@ -203,6 +203,8 @@ class rb_source_dp_course extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'grade_items'
         );
+        // Join course_completion_history is deprecated and should be no longer used.
+        // Check the course_completion_previous_completion column to see how to fetch this information instead.
         $joinlist[] = new rb_join(
                 'course_completion_history',
                 'LEFT',
@@ -495,30 +497,30 @@ class rb_source_dp_course extends rb_base_source {
                 )
             );
         $columnoptions[] = new rb_column_option(
-                'course_completion_history',
-                'course_completion_previous_completion',
-                get_string('course_completion_previous_completion', 'rb_source_dp_course'),
-                'course_completion_history.historycount',
-                array(
-                    'joins' => 'course_completion_history',
-                    'defaultheading' => get_string('course_completion_previous_completion', 'rb_source_dp_course'),
-                    'displayfunc' => 'plan_course_completion_previous_completion',
-                    'extrafields' => array(
-                        'courseid' => 'base.courseid',
-                        'userid' => 'base.userid',
-                    ),
-                )
-            );
+            'course_completion_history',
+            'course_completion_previous_completion',
+            get_string('course_completion_previous_completion', 'rb_source_dp_course'),
+            '(SELECT COUNT(*) FROM {course_completion_history} cch1 
+                        WHERE cch1.userid = base.userid AND cch1.courseid = base.courseid)',
+            array(
+                'defaultheading' => get_string('course_completion_previous_completion', 'rb_source_dp_course'),
+                'displayfunc' => 'plan_course_completion_previous_completion',
+                'extrafields' => array(
+                    'courseid' => 'base.courseid',
+                    'userid' => 'base.userid',
+                ),
+            )
+        );
         $columnoptions[] = new rb_column_option(
-                'course_completion_history',
-                'course_completion_history_count',
-                get_string('course_completion_history_count', 'rb_source_dp_course'),
-                'course_completion_history.historycount',
-                array(
-                    'joins' => 'course_completion_history',
-                    'displayfunc' => 'integer'
-                )
-             );
+            'course_completion_history',
+            'course_completion_history_count',
+            get_string('course_completion_history_count', 'rb_source_dp_course'),
+            '(SELECT COUNT(*) FROM {course_completion_history} cch2
+                        WHERE cch2.userid = base.userid AND cch2.courseid = base.courseid)',
+            array(
+                'displayfunc' => 'integer',
+            )
+        );
 
         $this->add_core_user_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
@@ -715,7 +717,10 @@ class rb_source_dp_course extends rb_base_source {
             $this->sourcejoins = ['ctx', 'course_completion'];
 
             // Replace course_completion_history join after we know if we a looking at one user RoL or not.
+            // This override will be removed when the join course_completion_history is removed.
             foreach ($this->joinlist as $key => $join) {
+                // Join course_completion_history is deprecated and should be no longer used.
+                // Check the course_completion_previous_completion column to see how to fetch this information instead.
                 if ($join->name === 'course_completion_history') {
                     $this->joinlist[$key] = new rb_join(
                         'course_completion_history',

@@ -1,6 +1,10 @@
 This files describes API changes in Learning plans,
 information provided here is intended especially for developers.
 
+=== 13.9 ===
+
+* Deprecated rb_source_db_course join course_completion_history, please check the course_completion_previous_completion column to see how to fetch this information.
+
 === 13.2 ===
 
 * totara_plan\entities\plan_evidence_relation has been moved to totara_plan\entity\plan_evidence_relation
