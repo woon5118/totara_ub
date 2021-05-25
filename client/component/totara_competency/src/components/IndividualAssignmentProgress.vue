@@ -336,14 +336,25 @@ export default {
     },
   },
 
+  data() {
+    let labels = this.assignmentProgress.items.map(
+      item => item.competency.fullname
+    );
+
+    return {
+      labels: labels,
+    };
+  },
+
   computed: {
     options: function() {
+      let that = this;
       let options = {
         tooltips: {
           filter(tooltipItem, data) {
             // We are filtering out
             let label = data.labels[tooltipItem.index];
-            return [''].indexOf(label.trim());
+            return [''].indexOf(label.join(' ').trim());
           },
         },
 
@@ -415,10 +426,19 @@ export default {
       }
 
       options.tooltips.callbacks = {
-        title(tooltipItems, data) {
+        /**
+         * Generates the Competency part of the tooltip
+         *
+         * @param {Object} tooltipItems the items to be shown on the tooltip
+         * @returns {Array} An array of strings representing lines in the tooltip
+         */
+        title(tooltipItems) {
           return unique(tooltipItems.map(x => x.index))
-            .map(x => data.labels[x])
-            .join(', ');
+            .map(x => that.shorten(that.labels[x], 60))
+            .reduce((returnVal, item) => {
+              item.map(title => returnVal.push(title));
+              return returnVal;
+            }, []);
         },
 
         label(tooltipItem, data) {
@@ -478,7 +498,7 @@ export default {
       this.assignmentProgress.items.forEach(
         function(item) {
           data.competencies.push(item.competency.id);
-          data.labels.push(this.shorten(item.competency.fullname, 50));
+          data.labels.push(this.shorten(item.competency.fullname, 35));
           data.datasets[0].data.push(item.my_value.percentage);
           data.datasets[1].data.push(item.min_value.percentage);
           data.datasets[0].values.push(item.my_value.name);
@@ -570,9 +590,40 @@ export default {
       }
     },
 
+    /**
+     * Prepares a string to be used by chart JS as tooltips and labels
+     *
+     * @param {String} str The string to be manipulated
+     * @param {Number} maxLen The max length of string to be manipulated
+     * @param {String} separator The word separator
+     *
+     * @returns {Array} An array of up to 2 strings containing the string supplied
+     */
     shorten: function(str, maxLen, separator = ' ') {
-      if (str.length <= maxLen) return str;
-      return str.substr(0, str.lastIndexOf(separator, maxLen));
+      const maxLines = 2;
+      let returnVal = [];
+      let start = 0;
+      let end;
+
+      if (str.length <= maxLen) return [str.trim()];
+
+      for (let line = 0; line < maxLines; line++) {
+        if (start + maxLen >= str.length) {
+          returnVal.push(str.substr(start).trim());
+          break;
+        } else {
+          end = str.lastIndexOf(separator, start + maxLen);
+          let string = str.substr(start, end - start).trim();
+          start = end + 1;
+
+          if (line === maxLines - 1) {
+            string += String.fromCharCode(8230);
+          }
+          returnVal.push(string);
+        }
+      }
+
+      return returnVal;
     },
   },
 };
