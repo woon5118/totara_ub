@@ -57,7 +57,7 @@ class writer extends \core\dataformat\spout_base {
         }
 
         // Replace any characters in the name that Excel cannot cope with.
-        $title = strtr(trim($title, "'"), '[]*/\?:', '       ');
+        $title = strtr(trim($title, "'"), '[]"*/\?:', '        ');
         // Shorten the title if necessary.
         $title = \core_text::substr($title, 0, 31);
         // After the substr, we might now have a single quote on the end.
