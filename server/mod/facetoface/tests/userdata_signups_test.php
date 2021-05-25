@@ -237,9 +237,9 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->create_file_customfield($signups[21], 'signup', 'testfile4.txt', 4);
         $f2fgenerator->create_file_customfield($signups[22], 'cancellation', 'testfile5.txt', 5);
 
-        $student1 = $this->handle_user_status($student1, $userstatus);
-
         $this->executeAdhocTasks();
+
+        $student1 = $this->handle_user_status($student1, $userstatus);
 
         // Purge data in module context.
         $coursemodule = get_coursemodule_from_instance('facetoface', $seminarevent2->get_facetoface());
@@ -361,9 +361,9 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->create_file_customfield($signups[21], 'signup', 'testfile4.txt', 4);
         $f2fgenerator->create_file_customfield($signups[22], 'cancellation', 'testfile5.txt', 5);
 
-        $student1 = $this->handle_user_status($student1, $userstatus);
-
         $this->executeAdhocTasks();
+
+        $student1 = $this->handle_user_status($student1, $userstatus);
 
         // Purge data in course context.
         $targetuser = new target_user($student1);
@@ -385,12 +385,18 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id, 'sessionid' => $seminarevent3->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_signups', ['userid' => $student2->id]));
 
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $seminarevent3->get_id()]));
+        $expect_num = 1;
+        if ($userstatus == 'deleted') {
+            // Deletion also cancel the session.
+            $expect_num = 2;
+        }
+
+        $this->assertEquals($expect_num, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id]));
+        $this->assertEquals($expect_num, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $seminarevent3->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_notification_sent', ['userid' => $student2->id]));
 
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $seminarevent3->get_id()]));
+        $this->assertEquals($expect_num, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id]));
+        $this->assertEquals($expect_num, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $seminarevent3->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_notification_hist', ['userid' => $student2->id]));
 
         $this->assertFalse($DB->record_exists('facetoface_signups_status', ['signupid' => $signups[11]->id]));
@@ -500,9 +506,9 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $f2fgenerator->create_file_customfield($signups[21], 'signup', 'testfile4.txt', 4);
         $f2fgenerator->create_file_customfield($signups[22], 'cancellation', 'testfile5.txt', 5);
 
-        $student1 = $this->handle_user_status($student1, $userstatus);
-
         $this->executeAdhocTasks();
+
+        $student1 = $this->handle_user_status($student1, $userstatus);
 
         // Purge data in category context.
         $targetuser = new target_user($student1);
@@ -524,12 +530,18 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_signups', ['userid' => $student2->id]));
 
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
+        $expect_num = 1;
+        if ($userstatus == 'deleted') {
+            // Deletion also cancel the session.
+            $expect_num = 2;
+        }
+
+        $this->assertEquals($expect_num, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id]));
+        $this->assertEquals($expect_num, $DB->count_records('facetoface_notification_sent', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_notification_sent', ['userid' => $student2->id]));
 
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id]));
-        $this->assertEquals(1, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
+        $this->assertEquals($expect_num, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id]));
+        $this->assertEquals($expect_num, $DB->count_records('facetoface_notification_hist', ['userid' => $student1->id, 'sessionid' => $seminarevent1->get_id()]));
         $this->assertEquals(3, $DB->count_records('facetoface_notification_hist', ['userid' => $student2->id]));
 
         $this->assertFalse($DB->record_exists('facetoface_signups_status', ['signupid' => $signups[12]->id]));

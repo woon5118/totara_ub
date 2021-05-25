@@ -184,6 +184,55 @@ class mod_facetoface_booking_cancellation_testcase extends advanced_testcase {
     }
 
     /**
+     * Test that unenrolment will cancel the session and user will receive notification
+     */
+    public function test_cancel_due_unenrolment() {
+        /**
+         * @var signup $signup1
+         * @var signup $signup2
+         * @var seminar_event $seminarevent
+         * @var seminar_session $seminarsession
+         */
+        ['learner1' => $learner1, 'course' => $course, 'signup1' => $signup1, 'signup2' => $signup2] = $this->prepare_data();
+
+        $sink = phpunit_util::start_message_redirection();
+        self::executeAdhocTasks();
+        $sink->clear();
+
+        // Unenrol learner1
+        ['enrol' => $enrol, 'instance' => $instance] = $this->get_manual_enrol($course);
+        $enrol->unenrol_user($instance, $learner1->id);
+
+
+        self::executeAdhocTasks();
+        $messages = $sink->get_messages();
+        $this->assertCount(1, $messages);
+        $message = reset($messages);
+        $this->assertEquals($learner1->id, $message->useridto);
+        $this->assertStringContainsString('cancel', $message->subject);
+
+        $signup1 = new signup($signup1->get_id());
+        $this->assertInstanceOf(user_cancelled::class, $signup1->get_state());
+
+        $signup2 = new signup($signup2->get_id());
+        $this->assertInstanceOf(booked::class, $signup2->get_state());
+    }
+
+    /**
+     * Get enrol plugin and course enrolment instance
+     * @param stdClass $course
+     * @return array
+     */
+    private function get_manual_enrol(stdClass $course) {
+        global $DB;
+        $enrol = enrol_get_plugin('manual');
+        $instances = $DB->get_records('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
+        $this->assertCount(1, $instances);
+        $instance = reset($instances);
+        return ['enrol' => $enrol, 'instance' => $instance];
+    }
+
+    /**
      * Prepare users, course, seminar, and book users on seminar.
      * @return array of instances
      */

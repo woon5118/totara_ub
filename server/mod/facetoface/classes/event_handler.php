@@ -150,6 +150,7 @@ class event_handler {
                     $signup->set_actorid($signup->get_userid());
                     if (signup_helper::can_user_cancel($signup)) {
                         signup_helper::user_cancel($signup);
+                        notice_sender::signup_cancellation($signup);
                     }
                 }
             }
