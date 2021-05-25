@@ -137,25 +137,33 @@ M.course_dndupload = {
             if (handlelink) {
                 $msgident += 'link';
             }
-            strLib.get_string($msgident, 'moodle').then(function (string) {
+            strLib.get_string($msgident, 'moodle').then(function(string) {
                 var context = {message: string};
                 return templateLib.render('core/notification_info', context);
-            }).then(function (html) {
+            }).then(function(html) {
                 var div = Y.Node.create(html)
                     .set('id', 'dndupload-status');
 
-                var styletop = div.getStyle('top') || '0px';
-                var styletopunit = styletop.replace(/^\d+/, '');
-                var styletop = parseInt(styletop.replace(/\D*$/, ''), 10);
                 coursecontents.insert(div, 0);
 
                 // Do this so that there is a nice fade in effect
                 div.removeClass('in');
-                setTimeout(function () {div.addClass('in');}, 1);
+                setTimeout(function() {
+                    div.addClass('in');
+                }, 1);
 
-                setTimeout(function () {div.removeClass('in');}, 3000);
-            })
-        })
+                setTimeout(function() {
+                    div.removeClass('in');
+                    div.getDOMNode().addEventListener('transitionend', function() {
+                        div.remove();
+                    });
+                }, 3000);
+            }).catch(function(exception) {
+                require(['core/notification'], function(notificationLib) {
+                    notificationLib.exception(exception);
+                });
+            });
+        });
     },
 
     /**
