@@ -273,7 +273,7 @@ class container_workspace_webapi_update_workspace_testcase extends advanced_test
         $this->setAdminUser();
         $generator = $this->getDataGenerator();
 
-        /** @var \container_workspace\testing\generator $workspace_generator */
+        /** @var container_workspace_generator $workspace_generator */
         $workspace_generator = $generator->get_plugin_generator('container_workspace');
         $workspace = $workspace_generator->create_workspace('oookokokokoko');
 

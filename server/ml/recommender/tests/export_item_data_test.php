@@ -343,7 +343,7 @@ class ml_recommender_export_item_data_testcase extends advanced_testcase {
     public function test_export_tenant_with_no_items(): void {
         $generator = self::getDataGenerator();
 
-        /** @var \totara_tenant\testing\generator $tenant_generator */
+        /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
 

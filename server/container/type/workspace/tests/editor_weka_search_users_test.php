@@ -84,11 +84,11 @@ class container_workspace_editor_weka_search_users_testcase extends advanced_tes
     public function test_search_for_users_with_multitenancy(): void {
         $generator = $this->getDataGenerator();
 
-        /** @var \totara_tenant\testing\generator $tenant_generator */
+        /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
 
-        /** @var \container_workspace\testing\generator $workspace_generator */
+        /** @var container_workspace_generator $workspace_generator */
         $workspace_generator = $generator->get_plugin_generator('container_workspace');
 
         $tenant_one = $tenant_generator->create_tenant();
@@ -403,13 +403,13 @@ class container_workspace_editor_weka_search_users_testcase extends advanced_tes
     public function test_search_for_users_with_multitenancy_with_isolation(): void {
         $generator = $this->getDataGenerator();
 
-        /** @var \totara_tenant\testing\generator $tenant_generator */
+        /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
 
         set_config('tenantsisolated', 1);
 
-        /** @var \container_workspace\testing\generator $workspace_generator */
+        /** @var container_workspace_generator $workspace_generator */
         $workspace_generator = $generator->get_plugin_generator('container_workspace');
 
         $tenant_one = $tenant_generator->create_tenant();

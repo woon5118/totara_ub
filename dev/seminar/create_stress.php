@@ -107,8 +107,9 @@ if (!$catid) {
     cli_error('Cannot find a usable category. Make sure $CFG->defaultrequestcategory points to a valid category ID.');
 }
 
-$gen = \core\testing\generator::instance();
-$f2fgen = \mod_facetoface\testing\generator::instance();
+require_once($CFG->libdir.'/phpunit/classes/util.php');
+$gen = phpunit_util::get_data_generator();
+$f2fgen = $gen->get_plugin_generator('mod_facetoface');
 
 if (empty($options['direct'])) {
     $tx = $DB->start_delegated_transaction();

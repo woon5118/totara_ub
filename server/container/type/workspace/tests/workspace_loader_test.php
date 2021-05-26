@@ -27,7 +27,6 @@ use container_workspace\query\workspace\source;
 use container_workspace\query\workspace\access;
 use container_workspace\loader\workspace\loader;
 use container_workspace\workspace;
-use container_workspace\testing\generator as workspace_generator;
 
 class container_workspace_workspace_loader_testcase extends advanced_testcase {
     /**

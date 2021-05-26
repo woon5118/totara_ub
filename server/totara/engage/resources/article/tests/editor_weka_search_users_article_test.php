@@ -43,7 +43,7 @@ class engage_article_editor_weka_search_users_article_testcase extends advanced_
 
         $this->setUser($user1);
 
-        /** @var \engage_article\testing\generator $article_generator */
+        /** @var engage_article_generator $article_generator */
         $article_generator = $generator->get_plugin_generator('engage_article');
         $article = $article_generator->create_article([
             'userid' => $user1->id,
@@ -152,10 +152,10 @@ class engage_article_editor_weka_search_users_article_testcase extends advanced_
     public function test_search_for_users_with_multitenancy(): void {
         $generator = $this->getDataGenerator();
 
-        /** @var \engage_article\testing\generator $article_generator */
+        /** @var engage_article_generator $article_generator */
         $article_generator = $generator->get_plugin_generator('engage_article');
 
-        /** @var \totara_tenant\testing\generator $tenant_generator */
+        /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
 
@@ -346,13 +346,13 @@ class engage_article_editor_weka_search_users_article_testcase extends advanced_
     public function test_search_for_users_with_multitenancy_with_isolation(): void {
         $generator = $this->getDataGenerator();
 
-        /** @var \totara_tenant\testing\generator $tenant_generator */
+        /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
 
         set_config('tenantsisolated', 1);
 
-        /** @var \engage_article\testing\generator $article_generator */
+        /** @var engage_article_generator $article_generator */
         $article_generator = $generator->get_plugin_generator('engage_article');
 
         $tenant_one = $tenant_generator->create_tenant();

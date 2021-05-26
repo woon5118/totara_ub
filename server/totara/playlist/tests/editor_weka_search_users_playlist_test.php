@@ -42,7 +42,7 @@ class totara_playlist_editor_weka_search_users_playlist_testcase extends advance
 
         $this->setUser($user1);
 
-        /** @var \totara_playlist\testing\generator $playlist_generator */
+        /** @var totara_playlist_generator $playlist_generator */
         $playlist_generator = $generator->get_plugin_generator('totara_playlist');
 
         $public_playlist = $playlist_generator->create_public_playlist(['userid' => $user1->id]);
@@ -150,7 +150,7 @@ class totara_playlist_editor_weka_search_users_playlist_testcase extends advance
     public function test_search_for_users_with_multitenancy(): void {
         $generator = $this->getDataGenerator();
 
-        /** @var \totara_tenant\testing\generator $tenant_generator */
+        /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
 
@@ -322,7 +322,7 @@ class totara_playlist_editor_weka_search_users_playlist_testcase extends advance
     public function test_search_for_users_with_multitenancy_with_isolation(): void {
         $generator = $this->getDataGenerator();
 
-        /** @var \totara_tenant\testing\generator $tenant_generator */
+        /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
 
