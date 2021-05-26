@@ -1503,5 +1503,12 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020100112, 'totara', 'core');
     }
 
+    if ($oldversion < 2020100118) {
+        totara_core_init_setting_disableconsistentcleaning();
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100118, 'totara', 'core');
+    }
+
     return true;
 }

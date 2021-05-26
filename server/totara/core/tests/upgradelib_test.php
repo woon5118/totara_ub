@@ -414,4 +414,21 @@ class totara_core_upgradelib_testcase extends advanced_testcase {
 
         return $course;
     }
+
+    public function test_totara_core_init_setting_disableconsistentcleaning() {
+        global $CFG;
+        require_once("{$CFG->dirroot}/totara/core/db/upgradelib.php");
+
+        $CFG->disableconsistentcleaning = 1;
+        totara_core_init_setting_disableconsistentcleaning();
+        self::assertEquals(1, $CFG->disableconsistentcleaning);
+
+        $CFG->disableconsistentcleaning = 0;
+        totara_core_init_setting_disableconsistentcleaning();
+        self::assertEquals(0, $CFG->disableconsistentcleaning);
+
+        unset($CFG->disableconsistentcleaning);
+        totara_core_init_setting_disableconsistentcleaning();
+        self::assertEquals(1, $CFG->disableconsistentcleaning);
+    }
 }

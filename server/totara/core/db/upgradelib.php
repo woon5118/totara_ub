@@ -1597,3 +1597,14 @@ function totara_core_fix_category_sortorder($categories, &$sortorder, $parent, $
 
     return true;
 }
+
+/**
+ * Activate setting "Disable consistent cleaning" if it is not set to something else yet.
+ */
+function totara_core_init_setting_disableconsistentcleaning() {
+    global $CFG;
+
+    if (!property_exists($CFG, 'disableconsistentcleaning')) {
+        set_config('disableconsistentcleaning', '1');
+    }
+}
