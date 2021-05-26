@@ -1517,5 +1517,25 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020100119, 'totara', 'core');
     }
 
+    if ($oldversion < 2020100120) {
+        // Reset default scheduled 'send_registration_data_task' task as the times have now been randomised.
+        $taskname = '\totara_core\task\send_registration_data_task';
+        $defaulttask = \core\task\manager::get_default_scheduled_task($taskname);
+
+        $task = \core\task\manager::get_scheduled_task($taskname);
+        $task->set_minute($defaulttask->get_minute());
+        $task->set_hour($defaulttask->get_hour());
+        $task->set_month($defaulttask->get_month());
+        $task->set_day_of_week($defaulttask->get_day_of_week());
+        $task->set_day($defaulttask->get_day());
+        $task->set_disabled($defaulttask->get_disabled());
+        $task->set_customised(false);
+
+        \core\task\manager::configure_scheduled_task($task);
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100120, 'totara', 'core');
+    }
+
     return true;
 }

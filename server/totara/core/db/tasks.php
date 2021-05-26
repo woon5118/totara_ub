@@ -38,10 +38,10 @@ $tasks = array(
     array(
         'classname' => 'totara_core\task\send_registration_data_task',
         'blocking' => 0,
-        'minute' => '0',
-        'hour' => '0',
+        'minute' => 'R',
+        'hour' => 'R',
         'day' => '*',
-        'dayofweek' => '1',
+        'dayofweek' => 'R',
         'month' => '*'
     ),
     array(
