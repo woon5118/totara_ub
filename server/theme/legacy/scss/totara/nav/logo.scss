@@ -22,13 +22,12 @@
 // @package   theme_legacy
 
 .totaraNav_prim .masthead_logo {
-  flex-basis: 80%;
   flex-grow: 1;
   margin: auto 0;
-  vertical-align: top;
+  height: 100%;
 
   &--header {
-    margin: var(--gap-2);
+    margin: 0;
     font-size: var(--font-size-14);
 
     &_img {
@@ -39,8 +38,6 @@
 
 @media (min-width: $tui-screen-sm) {
   .totaraNav_prim .masthead_logo {
-    flex-basis: auto;
-    flex-grow: 0;
     height: 100%;
 
     &--header {
@@ -55,15 +52,22 @@
 
 @media (min-width: $tui-screen-md) {
   .totaraNav_prim .masthead_logo {
+    flex-grow: 0;
+
     &--header {
       margin: 0 var(--gap-4) 0 0;
     }
   }
 }
 
-// IE11 on Windows 7 & 8 has issues with flex-basis: auto
-.ie11 {
-  .masthead_logo--header_link {
+// IE11 on Windows 7 & 8 has issues with flex-basis: autoie11 {
+.ie .masthead_logo--header_link {
+  display: block;
+  height: 1.5em;
+}
+
+@media (min-width: $tui-screen-sm) {
+  .ie11 .masthead_logo--header_link {
     display: block;
     height: 2.8rem;
   }
