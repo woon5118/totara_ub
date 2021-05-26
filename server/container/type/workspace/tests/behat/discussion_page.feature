@@ -59,3 +59,8 @@ Feature: Single discussion page
     Then ".tui-workspaceEditPostDiscussionForm" "css_element" should not exist
     And I should not see "Discussion 100"
     And I should see "Discussion 101"
+
+  Scenario: User can not access non existence discussion
+    Given I log in as "user_one"
+    When I access the discussion by id "100"
+    Then I should see "The discussion cannot be found. It appears to be deleted."

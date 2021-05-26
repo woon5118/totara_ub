@@ -50,84 +50,101 @@ $tab = optional_param('tab', null, PARAM_ALPHA);
 // Get the flag of notification to check the notification is fired or not.
 $hold_notification = optional_param('hold_notification', false, PARAM_BOOL);
 
-/** @var workspace $workspace */
-$workspace = factory::from_id($id);
+try {
+    /** @var workspace $workspace */
+    $workspace = factory::from_id($id);
 
-if (!$workspace->is_typeof(workspace::get_type())) {
-    throw new \coding_exception("Invalid type of container");
-}
+    if (!$workspace->is_typeof(workspace::get_type())) {
+        throw new \coding_exception("Invalid type of container");
+    }
 
-advanced_feature::require('container_workspace');
+    advanced_feature::require('container_workspace');
 
-$interactor = new interactor($workspace);
-$context = $workspace->get_context();
+    $interactor = new interactor($workspace);
+    $context = $workspace->get_context();
 
-$PAGE->set_url($workspace->get_view_url());
-$PAGE->set_context($context);
+    $PAGE->set_url($workspace->get_view_url());
+    $PAGE->set_context($context);
 
-if ($interactor->is_joined()) {
-    $PAGE->set_totara_menu_selected(your_spaces::class);
-} else {
-    $PAGE->set_totara_menu_selected(find_spaces::class);
-}
+    if ($interactor->is_joined()) {
+        $PAGE->set_totara_menu_selected(your_spaces::class);
+    } else {
+        $PAGE->set_totara_menu_selected(find_spaces::class);
+    }
 
-if ($interactor->can_view_workspace()) {
-    $PAGE->set_title(format_string($workspace->fullname));
-} else {
-    $PAGE->set_title(get_string('error:view_workspace', 'container_workspace'));
-}
+    if ($interactor->can_view_workspace()) {
+        $PAGE->set_title(format_string($workspace->fullname));
+    } else {
+        $PAGE->set_title(get_string('error:view_workspace', 'container_workspace'));
+    }
 
-$PAGE->set_pagelayout('legacynolayout');
+    if ($workspace->is_to_be_deleted()) {
+        $PAGE->set_title(get_string('error:not_found', 'container_workspace'));
+    }
 
-$workspace_id = $workspace->get_id();
-$member = loader::get_for_user($USER->id, $workspace_id);
+    $PAGE->set_pagelayout('legacynolayout');
 
-if (null !== $member && $member->is_active()) {
-    // User is a member of this workspace, therefore we should track the workspace for user.
-    $tracker = new tracker($USER->id);
-    $tracker->visit_workspace($workspace);
-}
+    $workspace_id = $workspace->get_id();
+    $member = loader::get_for_user($USER->id, $workspace_id);
 
-if (!member_sort::is_valid($member_sort)) {
-    $member_sort = member_sort::NAME;
-}
+    if (null !== $member && $member->is_active()) {
+        // User is a member of this workspace, therefore we should track the workspace for user.
+        $tracker = new tracker($USER->id);
+        $tracker->visit_workspace($workspace);
+    }
 
-if (!discussion_sort::is_valid($discussion_sort)) {
-    $discussion_sort = discussion_sort::is_valid($discussion_sort);
-}
+    if (!member_sort::is_valid($member_sort)) {
+        $member_sort = member_sort::NAME;
+    }
 
-$tui = new component('container_workspace/pages/WorkspaceEmptyPage');
-$interactor = new interactor($workspace);
-
-if ($interactor->can_view_workspace()) {
-    $parameters = [
-        'workspace-id' => $workspace->get_id(),
-        'member-sort-option' => member_sort::get_code($member_sort),
-        'discussion-sort-option' => discussion_sort::get_code($discussion_sort),
-        'show-library-tab' => advanced_feature::is_enabled('engage_resources'),
-    ];
-
-    if (null !== $tab && in_array($tab, ['library', 'discussion', 'members'])) {
-        // Processing on tab.
-        if ('members' === $tab && !$interactor->can_view_members()) {
-            // Nope, user cannot see member tab - make it to discussions.
-            $tab = 'discussion';
-        } else if ('library' === $tab && !$interactor->can_view_library()) {
-            // Nope, user cannot see library tab - make it to discussions.
-            $tab = 'discussion';
-        }
-
-        $parameters['selected-tab'] = $tab;
+    if (!discussion_sort::is_valid($discussion_sort)) {
+        $discussion_sort = discussion_sort::is_valid($discussion_sort);
     }
 
     $tui = new component(
-        'container_workspace/pages/WorkspacePage',
-        $parameters
+        'container_workspace/pages/WorkspaceEmptyPage',
+        ['not-found' => $workspace->is_to_be_deleted()]
     );
+    $interactor = new interactor($workspace);
 
-    // We only want to count views if access is allowed.
-    $workspace_viewed = workspace_viewed::from_workspace($workspace);
-    $workspace_viewed->trigger();
+    if ($interactor->can_view_workspace()) {
+        $parameters = [
+            'workspace-id' => $workspace->get_id(),
+            'member-sort-option' => member_sort::get_code($member_sort),
+            'discussion-sort-option' => discussion_sort::get_code($discussion_sort),
+            'show-library-tab' => advanced_feature::is_enabled('engage_resources'),
+        ];
+
+        if (null !== $tab && in_array($tab, ['library', 'discussion', 'members'])) {
+            // Processing on tab.
+            if ('members' === $tab && !$interactor->can_view_members()) {
+                // Nope, user cannot see member tab - make it to discussions.
+                $tab = 'discussion';
+            } else if ('library' === $tab && !$interactor->can_view_library()) {
+                // Nope, user cannot see library tab - make it to discussions.
+                $tab = 'discussion';
+            }
+
+            $parameters['selected-tab'] = $tab;
+        }
+
+        $tui = new component(
+            'container_workspace/pages/WorkspacePage',
+            $parameters
+        );
+
+        // We only want to count views if access is allowed.
+        $workspace_viewed = workspace_viewed::from_workspace($workspace);
+        $workspace_viewed->trigger();
+    }
+} catch (dml_missing_record_exception $e) {
+    $PAGE->set_context(context_system::instance());
+    $PAGE->set_url('/container/type/workspace/workspace.php', ['id' => $id]);
+    $PAGE->set_title(get_string('error:workspace_not_found', 'container_workspace'));
+    $tui = new component(
+        'container_workspace/pages/WorkspaceEmptyPage',
+        ['not-found' => true, 'type' => 'workspace']
+    );
 }
 
 $tui->register($PAGE);

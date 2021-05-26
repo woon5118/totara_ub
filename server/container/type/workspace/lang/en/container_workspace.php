@@ -273,6 +273,7 @@ $string['error:copy_to_clipboard'] = 'Cannot copy to the clipboard';
 $string['error:create'] = 'Cannot create a workspace';
 $string['error:create_discussion'] = 'Cannot create a discussion for workspace';
 $string['error:delete_discussion'] = 'Cannot delete the discussion';
+$string['error:discussion_not_found'] = 'The discussion cannot be found. It appears to be deleted.';
 $string['error:delete_workspace'] = 'Cannot delete the workspace';
 $string['error:join_space'] = 'Cannot join a workspace';
 $string['error:leave_space'] = 'Cannot leave the workspace';
@@ -286,6 +287,8 @@ $string['error:remove_user'] = 'Cannot remove the user';
 $string['error:request_to_join'] = 'Cannot request to join the workspace';
 $string['error:report_discussion'] = 'Cannot report the discussion';
 $string['error:view_workspace'] = 'You don\'t have permission to view this page.';
+$string['error:workspace_not_found'] = 'The workspace cannot be found. It appears to be deleted.';
+
 
 // Strings for Library
 $string['workspace:add_library'] = 'Select content to share with workspaces';

@@ -34,34 +34,41 @@ require_login();
 // Requiring discussion's id
 $discussion_id = required_param('id', PARAM_INT);
 advanced_feature::require('container_workspace');
-
-$discussion = discussion::from_id($discussion_id);
-$workspace = $discussion->get_workspace();
-
-$context = $workspace->get_context();
-$PAGE->set_context($context);
-
-$interactor = new interactor($workspace);
-
-if ($interactor->can_view_discussions()) {
-    $PAGE->set_title(format_string($workspace->fullname));
-} else {
-    $PAGE->set_title(get_string('error:view_workspace', 'container_workspace'));
-}
-
 $PAGE->set_url("/container/type/workspace/discussion.php", ['id' => $discussion_id]);
-$PAGE->set_totara_menu_selected(your_spaces::class);
-$PAGE->set_pagelayout('legacynolayout');
+try {
+    $discussion = discussion::from_id($discussion_id);
+    $workspace = $discussion->get_workspace();
 
-$tui = new component('container_workspace/pages/WorkspaceEmptyPage');
+    $context = $workspace->get_context();
+    $PAGE->set_context($context);
 
-if ($interactor->can_view_discussions()) {
+    $interactor = new interactor($workspace);
+
+    if ($interactor->can_view_discussions()) {
+        $PAGE->set_title(format_string($workspace->fullname));
+    } else {
+        $PAGE->set_title(get_string('error:view_workspace', 'container_workspace'));
+    }
+
+    $PAGE->set_totara_menu_selected(your_spaces::class);
+    $PAGE->set_pagelayout('legacynolayout');
+
+    $tui = new component('container_workspace/pages/WorkspaceEmptyPage');
+
+    if ($interactor->can_view_discussions()) {
+        $tui = new component(
+            'container_workspace/pages/WorkspaceDiscussionPage',
+            ['discussion-id' => $discussion_id]
+        );
+    }
+} catch (dml_missing_record_exception $e) {
+    $PAGE->set_context(context_system::instance());
+    $PAGE->set_title(get_string('error:discussion_not_found', 'container_workspace'));
     $tui = new component(
-        'container_workspace/pages/WorkspaceDiscussionPage',
-        ['discussion-id' => $discussion_id]
+        'container_workspace/pages/WorkspaceEmptyPage',
+        ['not-found' => true, 'type' => 'discussion']
     );
 }
-
 $tui->register($PAGE);
 
 echo $OUTPUT->header();

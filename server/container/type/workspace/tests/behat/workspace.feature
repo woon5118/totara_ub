@@ -25,3 +25,8 @@ Feature: General workspace workflow
     And I log in as "user_one"
     And I click on "Your Workspaces" in the totara menu
     And ".tui-contributeWorkspace__button" "css_element" should not exist
+
+  Scenario: User can not access non existence workspace
+    Given I log in as "user_one"
+    When I access the workspace by id "100"
+    Then I should see "The workspace cannot be found. It appears to be deleted."

@@ -19,15 +19,44 @@
 <template>
   <div class="tui-workspaceEmptyPage">
     <p class="tui-workspaceEmptyPage__text">
-      {{ $str('error:view_workspace', 'container_workspace') }}
+      {{ getContentMessage }}
     </p>
   </div>
 </template>
+<script>
+export default {
+  props: {
+    notFound: {
+      type: Boolean,
+      default: false,
+    },
+    type: {
+      type: String,
+      default: 'workspace',
+      validator(prop) {
+        return ['workspace', 'discussion'].includes(prop);
+      },
+    },
+  },
+  computed: {
+    getContentMessage() {
+      if (!this.notFound) {
+        return this.$str('error:not_found', 'container_workspace');
+      }
+      return this.type == 'workspace'
+        ? this.$str('error:workspace_not_found', 'container_workspace')
+        : this.$str('error:discussion_not_found', 'container_workspace');
+    },
+  },
+};
+</script>
 
 <lang-strings>
 {
   "container_workspace": [
-    "error:view_workspace"
+    "error:view_workspace",
+    "error:discussion_not_found",
+    "error:workspace_not_found"
   ]
 }
 </lang-strings>

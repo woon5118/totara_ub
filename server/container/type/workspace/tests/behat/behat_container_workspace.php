@@ -113,6 +113,25 @@ class behat_container_workspace extends behat_base {
     }
 
     /**
+     * @When /^I access the workspace by id "([^"]*)"$/
+     * @param int $id
+     */
+    public function i_access_the_workspace_by_id(int $id): void {
+        behat_hooks::set_step_readonly(false);
+        $workspace_url = workspace::create_url($id);
+        $this->getSession()->visit($this->locate_path($workspace_url->out(false)));
+    }
+
+    /**
+     * @When /^I access the discussion by id "([^"]*)"$/
+     * @param int $id
+     */
+    public function i_access_the_discussion_by_id(int $id): void {
+        behat_hooks::set_step_readonly(false);
+        $this->getSession()->visit($this->locate_path("/container/type/workspace/discussion.php?id={$id}"));
+    }
+
+    /**
      * @param string $name
      * @return workspace
      */
