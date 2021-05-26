@@ -91,14 +91,15 @@ define(['jquery', 'core/config', 'core/templates'], function ($, mdlconfig, temp
             // Make the ajax call.
             return $.get(
                 mdlconfig.wwwroot + '/blocks/totara_report_table/ajax_instantreport.php?' + querystring
-            ).done( function (data) {
+            ).done(function(data) {
                 var $content = $('.block_totara_report_table.' + uniqueid + ' .content');
                 // Clear all waiting icons.
                 $content.find('.block_totara_report_table_instant_wait').remove();
 
                 // Replace contents.
-                $content.find('.rb-display-table-container').remove();
-                $content.prepend($(data).find('.rb-display-table-container'));
+                $content.find('.rb-display-table-container').html($(data).find('.rb-display-table-container').html());
+                $content.find('.rb-display-table-container').removeClass('block_totara_report_table_loading');
+
                 // Remove all forms from table view (otherwise we need to handle them as well, which is beyond this block).
                 $content.find('form').remove();
 
