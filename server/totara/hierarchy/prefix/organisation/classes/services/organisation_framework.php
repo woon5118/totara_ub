@@ -28,6 +28,7 @@ use core\orm\paginator;
 use core\orm\query\builder;
 use external_function_parameters;
 use external_single_structure;
+use external_multiple_structure;
 use external_value;
 use hierarchy_organisation\entity\organisation_framework as organisation_framework_entity;
 
@@ -87,10 +88,31 @@ class organisation_framework extends \external_api {
                 ];
             })->to_array();
     }
+
     /**
-     * @return null
+     * @return external_single_structure
      */
     public static function index_returns() {
-        return null;
+        return new external_single_structure(
+            [
+                'items' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'id' => new external_value(PARAM_INT, 'org framework id'),
+                            'display_name' => new external_value(PARAM_TEXT, 'org framework display name'),
+                            'fullname'  => new external_value(PARAM_TEXT, 'org framework fullname name')
+                        ],
+                        'org frameworks'
+                    )
+                ),
+                'page' => new external_value(PARAM_INT, 'current page no'),
+                'pages' => new external_value(PARAM_INT, 'total no of pages'),
+                'per_page' => new external_value(PARAM_INT, 'orgs per page'),
+                'next' => new external_value(PARAM_TEXT, 'next page cursor'),
+                'prev' => new external_value(PARAM_TEXT, 'previous page cursor'),
+                'total' => new external_value(PARAM_INT, 'total no of orgs')
+            ],
+            'items'
+        );
     }
 }

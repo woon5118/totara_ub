@@ -114,10 +114,45 @@ class organisation extends \external_api {
     }
 
     /**
-     * @return null
+     * @return external_single_structure
      */
     public static function index_returns() {
-        return null;
+        return new external_single_structure(
+            [
+                'items' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'id' => new external_value(PARAM_INT, 'org id'),
+                            'display_name' => new external_value(PARAM_TEXT, 'org display name'),
+                            'fullname'  => new external_value(PARAM_TEXT, 'org fullname'),
+                            'idnumber' => new external_value(PARAM_TEXT, 'org idnumber'),
+                            'crumbtrail' => new external_multiple_structure(
+                                new external_single_structure(
+                                    [
+                                        'id' => new external_value(PARAM_INT, 'id'),
+                                        'name' => new external_value(PARAM_TEXT, 'name'),
+                                        'parent_id' => new external_value(PARAM_INT, 'parent_id'),
+                                        'type' => new external_value(PARAM_INT, 'type'),
+                                        'active' => new external_value(PARAM_INT, 'active'),
+                                        'first' => new external_value(PARAM_INT, 'first'),
+                                        'last' => new external_value(PARAM_INT, 'last')
+                                    ],
+                                    'organisations'
+                                )
+                            )
+                        ],
+                        'organisations'
+                    )
+                ),
+                'page' => new external_value(PARAM_INT, 'current page no'),
+                'pages' => new external_value(PARAM_INT, 'total no of pages'),
+                'per_page' => new external_value(PARAM_INT, 'orgs per page'),
+                'next' => new external_value(PARAM_TEXT, 'next page cursor'),
+                'prev' => new external_value(PARAM_TEXT, 'previous page cursor'),
+                'total' => new external_value(PARAM_INT, 'total no of orgs')
+            ],
+            'items'
+        );
     }
 
     /**
@@ -177,9 +212,39 @@ class organisation extends \external_api {
     }
 
     /**
-     * @return null
+     * @return external_single_structure
      */
     public static function show_returns() {
-        return null;
+        // Note: the fields are all optional here because the expected response
+        // to retrieving non existent records is to return an empty result set.
+        return new external_single_structure(
+            [
+                'id' => new external_value(PARAM_INT, 'org id', VALUE_OPTIONAL),
+                'fullname' => new external_value(PARAM_TEXT, 'org fullname', VALUE_OPTIONAL),
+                'idnumber' => new external_value(PARAM_TEXT, 'org idnumber', VALUE_OPTIONAL),
+                'description' => new external_value(PARAM_RAW, 'org description', VALUE_OPTIONAL),
+                'shortname' => new external_value(PARAM_TEXT, 'org shortname', VALUE_OPTIONAL),
+                'visible' => new external_value(PARAM_INT, 'visible', VALUE_OPTIONAL),
+                'frameworkid' => new external_value(PARAM_INT, 'org framework id', VALUE_OPTIONAL),
+                'crumbtrail' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'id' => new external_value(PARAM_INT, 'id'),
+                            'name' => new external_value(PARAM_TEXT, 'name'),
+                            'parent_id' => new external_value(PARAM_INT, 'parent_id'),
+                            'type' => new external_value(PARAM_TEXT, 'type'),
+                            'active' => new external_value(PARAM_BOOL, 'active'),
+                            'first' => new external_value(PARAM_BOOL, 'first'),
+                            'last' => new external_value(PARAM_BOOL, 'last')
+                        ],
+                        'organisations',
+                        VALUE_OPTIONAL
+                    ),
+                    'organisations',
+                    VALUE_OPTIONAL
+                )
+            ],
+            'item'
+        );
     }
 }
