@@ -207,4 +207,39 @@ class container_workspace_notify_added_to_workspace_testcase extends advanced_te
         $this->assertEquals($rendered_content, $message->fullmessagehtml);
         $this->assertEquals(html_to_text($rendered_content), $message->fullmessage);
     }
+
+    /**
+     * @return void
+     */
+    public function test_notify_user_added_to_workspace_and_removed(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var \container_workspace\testing\generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Clear the adhoc tasks.
+        $this->executeAdhocTasks();
+
+        // Create user two and add the user to the workspace.
+        $user_two = $generator->create_user();
+        member::added_to_workspace($workspace, $user_two->id);
+
+        // Delete user two to force error.
+        delete_user($user_two);
+
+        // Start the sink and execute the adhoc tasks.
+        $message_sink = $this->redirectMessages();
+        $this->executeAdhocTasks();
+
+        // Member not found by notify_added_to_workspace_task should fire a debug message.
+        $this->assertDebuggingCalled('Skipped sending notification to non-existent member with id ' . $user_two->id);
+
+        // No message should have been sent to user.
+        $messages = $message_sink->get_messages();
+        $this->assertCount(0, $messages);
+    }
 }

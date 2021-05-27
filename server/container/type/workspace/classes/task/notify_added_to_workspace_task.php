@@ -23,6 +23,7 @@
 namespace container_workspace\task;
 
 use container_workspace\member\member;
+use container_workspace\loader\member\loader;
 use container_workspace\output\added_to_workspace_notification;
 use container_workspace\workspace;
 use core\message\message;
@@ -59,7 +60,13 @@ final class notify_added_to_workspace_task extends adhoc_task {
             throw new \coding_exception("There was no user's id or workspace's id was set");
         }
 
-        $member = member::from_user($data->user_id, $data->workspace_id);
+        $member = loader::get_for_user($data->user_id, $data->workspace_id);
+        if (!$member) {
+            // Skip if member doesn't exist - unlikely, but kind of possible.
+            debugging('Skipped sending notification to non-existent member with id ' . $data->user_id, DEBUG_DEVELOPER);
+            return;
+        }
+
         $recipient = core_user::get_user($member->get_user_id());
         if (!$recipient) {
             // Skip if user doesn't exist.
