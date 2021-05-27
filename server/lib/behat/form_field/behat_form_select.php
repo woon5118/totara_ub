@@ -112,7 +112,7 @@ class behat_form_select extends behat_form_field {
         $selectedoptionvalues = $this->get_unescaped_options($values);
 
         // Precheck to speed things up.
-        if (strlen($expectedoptions) !== strlen($selectedoptiontexts) ||
+        if (strlen($expectedoptions) !== strlen($selectedoptiontexts) &&
             strlen($expectedoptions) !== strlen($selectedoptionvalues)) {
             return false;
         }
