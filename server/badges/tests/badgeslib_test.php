@@ -1096,4 +1096,35 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $badge->delete_related_badge($newid2);
         $this->assertCount(2, $badge->get_related_badges());
     }
+
+    /**
+     * Make sure criteria validation for programs doesn't fail for more than 10 programs (this used to be a bug).
+     */
+    public function test_program_criteria_validation_for_more_than_10_programs(): void {
+        // Create 11 programs.
+        /** @var \totara_program\testing\generator $program_generator */
+        $program_generator = self::getDataGenerator()->get_plugin_generator('totara_program');
+        $program_ids = [];
+        for ($i = 0; $i < 11; $i ++) {
+            $program_ids[] = $program_generator->create_program()->id;
+        }
+
+        // Save the criteria for the badge.
+        $badge = new badge($this->badgeid);
+        award_criteria::build([
+            'criteriatype' => BADGE_CRITERIA_TYPE_PROGRAM,
+            'badgeid' => $badge->id
+        ])->save([
+            'agg' => BADGE_CRITERIA_AGGREGATION_ALL,
+            'program_programs' => $program_ids
+        ]);
+
+        $criteria = $badge->get_criteria();
+        $program_criterion = $criteria[BADGE_CRITERIA_TYPE_PROGRAM];
+        self::assertCount(11, $program_criterion->params);
+
+        [$valid, $error_message] = $program_criterion->validate();
+        self::assertTrue($valid);
+        self::assertEmpty($error_message);
+    }
 }

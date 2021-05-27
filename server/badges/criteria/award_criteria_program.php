@@ -203,7 +203,7 @@ class award_criteria_program extends award_criteria {
 
         list($sql, $params) = $DB->get_in_or_equal(array_keys($this->params));
         $count = $DB->count_records_select('prog', 'id ' . $sql, $params);
-        $missing = count($params) - $count;
+        $missing = count($this->params) - $count;
 
         // If there's only 1 criterion in the badge, or there only 1
         // missing from a set but all must be available flag an error.
