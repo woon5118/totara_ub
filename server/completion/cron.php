@@ -215,7 +215,10 @@ function completion_cron_criteria() {
 function completion_cron_completions(int $userid = 0) {
     global $DB;
 
-    if (debugging() && !PHPUNIT_TEST) {
+    // Suppress output during tests.
+    $quiet = !debugging() || PHPUNIT_TEST || defined('BEHAT_SITE_RUNNING');
+
+    if (!$quiet) {
         mtrace('Aggregating completions');
     }
 
@@ -229,7 +232,7 @@ function completion_cron_completions(int $userid = 0) {
     // Grab all criteria and their associated criteria completions
     $sql = '
         SELECT
-            crc.*
+            crc.*, c.enablecompletion
         FROM
             {course_completions} crc
         INNER JOIN
@@ -247,29 +250,137 @@ function completion_cron_completions(int $userid = 0) {
         $sql .= "AND crc.userid = :userid";
         $params['userid'] = $userid;
     }
-    $rs = $DB->get_recordset_sql($sql, $params);
+
+    $limit = $DB->get_max_in_params();
+    $sql .= " ORDER BY crc.course";
+    $rs = $DB->get_recordset_sql($sql, $params, 0, $limit);
+
+    $course_info_cache = [];
+    $completion_ids = [];
+
+    if (!$quiet) {
+        mtrace('... Recalculating criteria completion', '');
+    }
+
+    $cnt = 0;
 
     // Grab records for current user/course
     foreach ($rs as $record) {
+        if (!$quiet && $cnt === 1000) {
+            mtrace('.', '');
+            $cnt = 0;
+        }
+        $cnt += 1;
+
+        $completion_ids[] = $record->id;
+
+        if (!isset($course_info_cache[$record->course])) {
+            $course_info_cache[$record->course] = (object)[
+                'id' => $record->course,
+                'enablecompletion' => $record->enablecompletion,
+            ];
+            fetch_course_info($course_info_cache[$record->course]);
+        }
+        $cur_course_info = $course_info_cache[$record->course];
+
+        if (!$cur_course_info->enabled) {
+            unset($completion, $record);
+            continue;
+        }
+
         // Recalculate course's criteria
-        completion_handle_criteria_recalc($record->course, $record->userid);
-
-        // Reload the data from the db, because the previous function might have changed it.
-        $record = $DB->get_record('course_completions', array('id' => $record->id));
-
-        $completion = new completion_completion((array) $record, false);
-
-        // Aggregate the criteria and complete if necessary
-        $completion->aggregate();
-
-        $DB->set_field('course_completions', 'reaggregate', 0, array('id' => $record->id));
+        completion_handle_criteria_recalc($record->course, $record->userid, $cur_course_info);
 
         unset($completion, $record);
     }
 
-    if (debugging() && !PHPUNIT_TEST) {
-        mtrace('Finished aggregating completions');
+    $rs->close();
+
+    if (empty($completion_ids)) {
+        if (debugging() && !PHPUNIT_TEST) {
+            mtrace('');
+            mtrace('Finished aggregating completions');
+        }
+        return;
+    }
+
+    $cnt = $sub_total = 0;
+    $total = count($completion_ids);
+
+    if (!$quiet) {
+        mtrace('');
+        mtrace('... Aggregating');
+    }
+
+    // Reload the data from the db, because the previous function might have changed it.
+    [$in_sql, $in_params] = $DB->get_in_or_equal($completion_ids, SQL_PARAMS_NAMED);
+
+    $sql = "
+        SELECT *
+        FROM
+            {course_completions}
+         WHERE id {$in_sql}
+         ORDER BY course
+    ";
+
+    $rs = $DB->get_recordset_sql($sql, $in_params);
+    foreach ($rs as $record) {
+        // Log progress every 1000
+        if (!$quiet && $cnt === 1000) {
+            $sub_total += $cnt;
+            mtrace("   ... $sub_total of $total");
+            $cnt = 0;
+        }
+        $cnt += 1;
+
+        // No need to re-fetch course info. Added to the cache in the previous loop
+        if (!isset($course_info_cache[$record->course])) {
+            // Something went terribly wrong between execution of the 2 loops
+            if (!$quiet) {
+                mtrace('Unexpected caching error detected while aggregating completions');
+            }
+            return;
+        }
+        $cur_course_info = $course_info_cache[$record->course];
+
+        $completion = new completion_completion((array) $record, false);
+
+        // Aggregate the criteria and complete if necessary
+        $completion->aggregate($cur_course_info);
+
+        unset($completion, $record);
     }
 
     $rs->close();
+
+    if (!empty($completion_ids)) {
+        $resetsql = "
+            UPDATE {course_completions}
+               SET reaggregate = 0
+             WHERE id {$in_sql}";
+        $DB->execute($resetsql, $in_params);
+    }
+
+    if (!$quiet) {
+        mtrace('Finished aggregating completions');
+        $mem_peak = round(memory_get_peak_usage() / 1024 / 1024);
+        mtrace("... peaked memory usage:  {$mem_peak}MB");
+    }
+}
+
+/**
+ * @param stdClass $course
+ */
+function fetch_course_info(stdClass $course): void {
+    $course->info = new completion_info($course);
+    $course->enabled = $course->info->is_enabled();
+    if ($course->enabled) {
+        $course->agg = $course->info->get_aggregation_method();
+
+        $course->criteria = $course->info->get_criteria();
+        foreach ($course->criteria as $criterion) {
+            $criterion->agg_method = $course->info->get_aggregation_method($criterion->criteriatype);
+        }
+    }
+    $course->progressinfobase = $course->info->get_progressinfo()->prepare_to_cache();
 }

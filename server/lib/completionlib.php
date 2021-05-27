@@ -556,7 +556,6 @@ class completion_info {
      * @param int $criteriatype Specific criteria type to return (optional)
      */
     public function get_criteria($criteriatype = null) {
-
         // Fill cache if empty
         if (!is_array($this->criteria)) {
             global $DB;
@@ -599,7 +598,6 @@ class completion_info {
         // If we are only after a specific criteria type
         $criteria = array();
         foreach ($this->criteria as $criterion) {
-
             if ($criterion->criteriatype != $criteriatype) {
                 continue;
             }
@@ -1509,6 +1507,12 @@ class completion_info {
     protected function get_incomplete_data_object($cmid, $userid) {
         global $DB;
 
+        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING')) {
+            $modules = array();
+        } else {
+            static $modules = array();
+        }
+
         // This needs to match a record from course_modules_completion.
         $data = new stdClass;
         $data->id = 0;
@@ -1521,19 +1525,24 @@ class completion_info {
         $data->reaggregate = 0;
 
         // TOTARA - Check the criteria in case it should be complete.
-        $sql = 'SELECT cm.*, m.name AS modname
-                  FROM {course_modules} cm
-                  JOIN {modules} m ON m.id = cm.module
-                 WHERE cm.id = :cmid';
-        $params = [
-            'cmid' => $cmid
-        ];
-        $coursemodule = $DB->get_record_sql($sql, $params);
-        if (!$coursemodule) {
-            // The course module doesn't exist, this should not happen.
-            // Handling this has been kept as legacy, but should be cleaned up in the future.
-            debugging('Requesting completion data for a course module that does not exist', DEBUG_DEVELOPER);
-            return $data;
+        if (!isset($modules[$cmid])) {
+            $sql = 'SELECT cm.*, m.name AS modname
+                      FROM {course_modules} cm
+                      JOIN {modules} m ON m.id = cm.module
+                     WHERE cm.id = :cmid';
+            $params = [
+                'cmid' => $cmid
+            ];
+            $coursemodule = $DB->get_record_sql($sql, $params);
+            if (!$coursemodule) {
+                // The course module doesn't exist, this should not happen.
+                // Handling this has been kept as legacy, but should be cleaned up in the future.
+                debugging('Requesting completion data for a course module that does not exist', DEBUG_DEVELOPER);
+                return $data;
+            }
+            $modules[$cmid] = $coursemodule;
+        } else {
+            $coursemodule = $modules[$cmid];
         }
 
         $state = $this->internal_get_state($coursemodule, $userid, $data);

@@ -178,9 +178,10 @@ class completion_criteria_completion extends data_object {
  *
  * @param   integer $courseid
  * @param   integer $userid
+ * @param   \stdClass|null $cached_course_info
  * @return  boolean
  */
-function completion_handle_criteria_recalc($courseid, $userid) {
+function completion_handle_criteria_recalc($courseid, $userid, $cached_course_info = null) {
     global $DB;
     if (PHPUNIT_TEST || defined('BEHAT_SITE_RUNNING')) {
         // TODO: static variables break phpunit execution very very badly, we need to rework the caching here.
@@ -191,19 +192,27 @@ function completion_handle_criteria_recalc($courseid, $userid) {
 
     // Cached course completion enabled and aggregation method
     if (!isset($courses[$courseid])) {
-        $c = new stdClass();
-        $c->id = $courseid;
-        $info = new completion_info($c);
-        $courses[$courseid] = new stdClass();
-        $courses[$courseid]->enabled = $info->is_enabled();
-        if ($courses[$courseid]->enabled) {
-            $courses[$courseid]->criteria = $info->get_criteria();
+        if ($cached_course_info !== null && $cached_course_info->id == $courseid) {
+            $courses[$courseid] = $cached_course_info;
+        } else {
+            $courses[$courseid] = new stdClass();
+            $courses[$courseid]->id = $courseid;
         }
+    }
+    if (!isset($courses[$courseid]->info)) {
+        $courses[$courseid]->info = new completion_info($courses[$courseid]);
+    }
+    if (!isset($courses[$courseid]->enabled)) {
+        $courses[$courseid]->enabled = $courses[$courseid]->info->is_enabled();
     }
 
     // No need to do this if completion is disabled
     if (!$courses[$courseid]->enabled) {
         return false;
+    }
+
+    if (!isset($courses[$courseid]->criteria)) {
+        $courses[$courseid]->criteria = $courses[$courseid]->info->get_criteria();
     }
 
     // Review each of the criteria

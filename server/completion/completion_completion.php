@@ -623,9 +623,10 @@ class completion_completion extends data_object {
     /**
      * Aggregate completion
      *
+     * @param stdClass|null $cached_course_info
      * @return bool
      */
-    public function aggregate() {
+    public function aggregate($cached_course_info = null) {
         global $DB;
         static $courses = array();
 
@@ -651,17 +652,27 @@ class completion_completion extends data_object {
 
         // Cached course completion enabled and aggregation method.
         if (!isset($courses[$this->course])) {
-            $c = new stdClass();
-            $c->id = $this->course;
-            $info = new completion_info($c);
-            $courses[$this->course] = new stdClass();
-            $courses[$this->course]->enabled = $info->is_enabled();
-            $courses[$this->course]->agg = $info->get_aggregation_method();
+            if ($cached_course_info !== null && $cached_course_info->id == $this->course) {
+                $courses[$this->course] = $cached_course_info;
+            } else {
+                $courses[$this->course] = new stdClass();
+                $courses[$this->course]->id = $this->course;
+            }
+        }
 
+        if (!isset($courses[$this->course]->info)) {
+            $courses[$this->course]->info = new completion_info($courses[$this->course]);
+        }
+
+        if (!isset($courses[$this->course]->enabled)) {
+            $courses[$this->course]->enabled = $courses[$this->course]->info->is_enabled();
+        }
+
+        if (!isset($courses[$this->course]->progressinfobase)) {
             // We do not want to re-read the completion criteria structure more than necessary
             // Therefore keeping the structure in the cache and filling it for each user
             // when needed (filled structures are stored in the instance's progressinfo attribute)
-            $courses[$this->course]->progressinfobase = $info->get_progressinfo()->prepare_to_cache();
+            $courses[$this->course]->progressinfobase = $courses[$this->course]->info->get_progressinfo()->prepare_to_cache();
         }
 
         // Use fresh progress info.
@@ -673,48 +684,21 @@ class completion_completion extends data_object {
             return false;
         }
 
-        // Get user's completions.
-        $sql = "
-            SELECT
-                cr.id AS criteriaid,
-                cr.course,
-                co.userid,
-                cr.criteriatype,
-                cr.moduleinstance,
-                cr.courseinstance,
-                cr.enrolperiod,
-                cr.timeend,
-                cr.gradepass,
-                cr.role,
-                co.id AS completionid,
-                co.gradefinal,
-                co.rpl,
-                co.unenroled,
-                co.timecompleted,
-                a.method AS agg_method
-            FROM
-                {course_completion_criteria} cr
-            LEFT JOIN
-                {course_completion_crit_compl} co
-             ON co.criteriaid = cr.id
-            AND co.userid = :userid
-            LEFT JOIN
-                {course_completion_aggr_methd} a
-             ON a.criteriatype = cr.criteriatype
-            AND a.course = cr.course
-            WHERE
-                cr.course = :course
-        ";
+        if (!isset($courses[$this->course]->criteria)) {
+            $courses[$this->course]->criteria = $courses[$this->course]->info->get_criteria();
+        }
+        foreach ($courses[$this->course]->criteria as $criterion) {
+            if (!isset($criterion->agg_method)) {
+                $criterion->agg_method = $courses[$this->course]->info->get_aggregation_method($criterion->criteriatype);
+            }
+        }
 
-        $params = array(
-            'userid' => $this->userid,
-            'course' => $this->course
-        );
-
-        $completions = $DB->get_records_sql($sql, $params);
+        if (!isset($courses[$this->course]->agg)) {
+            $courses[$this->course]->agg = $courses[$this->course]->info->get_aggregation_method();
+        }
 
         // If no criteria, no need to aggregate.
-        if (empty($completions)) {
+        if (empty($courses[$this->course]->criteria)) {
             $result = $this->_save(false);
             // Cache the result only after successful save.
             $cache = $this->get_progressinfo_cache();
@@ -726,6 +710,17 @@ class completion_completion extends data_object {
             }
             return $result;
         }
+
+        // Get user's completions.
+        $params = array(
+            'userid' => $this->userid,
+            'course' => $this->course
+        );
+        $completions = $DB->get_records('course_completion_crit_compl', $params);
+        $criteria_ids = array_column($completions, 'criteriaid');
+        $completions = array_combine($criteria_ids, $completions);
+
+        $criteria = $courses[$this->course]->criteria;
 
         // Get aggregation methods.
         $agg_overall = $courses[$this->course]->agg;
@@ -739,22 +734,27 @@ class completion_completion extends data_object {
         $timecompleted = null;
 
         // Check each of the criteria.
-        foreach ($completions as $completion) {
-            $timecompleted = max($timecompleted, $completion->timecompleted);
-            $iscomplete = (bool) $completion->timecompleted;
+        foreach ($criteria as $criterion_id => $criterion) {
+            $completion = $completions[$criterion_id] ?? null;
+            if ($completion !== null) {
+                $timecompleted = max($timecompleted, $completion->timecompleted);
+                $iscomplete = (bool) $completion->timecompleted;
+            } else {
+                $iscomplete = false;
+            }
 
             // Handle aggregation special cases.
-            switch ($completion->criteriatype) {
+            switch ($criterion->criteriatype) {
                 case COMPLETION_CRITERIA_TYPE_ACTIVITY:
-                    completion_status_aggregate($completion->agg_method, $iscomplete, $activity_status);
+                    completion_status_aggregate($criterion->agg_method, $iscomplete, $activity_status);
                     break;
 
                 case COMPLETION_CRITERIA_TYPE_COURSE:
-                    completion_status_aggregate($completion->agg_method, $iscomplete, $prerequisite_status);
+                    completion_status_aggregate($criterion->agg_method, $iscomplete, $prerequisite_status);
                     break;
 
                 case COMPLETION_CRITERIA_TYPE_ROLE:
-                    completion_status_aggregate($completion->agg_method, $iscomplete, $role_status);
+                    completion_status_aggregate($criterion->agg_method, $iscomplete, $role_status);
                     break;
 
                 default:
@@ -778,7 +778,7 @@ class completion_completion extends data_object {
         }
 
         // Aggregate the course progress
-        $this->aggregate_progress($completions);
+        $this->aggregate_progress($completions, $criteria);
 
         // If overall aggregation status is true, mark course complete for user.
         if ($overall_status) {
@@ -813,10 +813,10 @@ class completion_completion extends data_object {
      * progress into consideration, etc.))
      *
      * @param array $completions Information on the activities that the user completed
+     * @param array $criteria Criteria detail
      * @since Totara 10
      */
-    private function aggregate_progress($completions) {
-
+    private function aggregate_progress($completions, $criteria) {
         // The progressinfo object for a course contains a hierarchy representing all the completion criteria
         // that must be met.
         // The root node contains the aggregated progress towards completion of this course for this user.
@@ -831,47 +831,36 @@ class completion_completion extends data_object {
         // (see the PHPunit tests for some examples)
 
         $multi_activity_criteria = completion_info::get_multi_activity_criteria();
-        foreach ($completions as $completion) {
+        foreach ($criteria as $criterion) {
+            $completion = $completions[$criterion->id] ?? null;
+            $cc = completion_criteria::factory(array('criteriatype' => $criterion->criteriatype));
 
-            $cc = completion_criteria::factory(array('criteriatype' => $completion->criteriatype));
-
-            if (!empty($completion->completionid)) {
+            if ($completion !== null) {
                 // Entry exists in course_completion_crit_compl for this course and user
-                $params = array(
-                    'id' => $completion->completionid,
-                    'course' => $completion->course,
-                    'userid' => $completion->userid,
-                    'criteriaid' => $completion->criteriaid,
-                    'gradefinal' => $completion->gradefinal,
-                    'rpl' => $completion->rpl,
-                    'unenroled' => $completion->unenroled,
-                    'timecompleted' => $completion->timecompleted
-                );
-
                 // Not fetching row from the database - use values from $completions
-                $crc = new completion_criteria_completion($params, false);
+                $crc = new completion_criteria_completion((array)$completion, false);
                 $progress = $cc->get_progress($crc);
             } else {
                 $progress = 0;
             }
 
-            $key = $completion->criteriatype;
+            $key = $criterion->criteriatype;
             if ($this->progressinfo->criteria_exist($key)) {
                 $curnode = $this->progressinfo->get_criteria($key);
             } else {
                 // Should have been initialized for the completion_info - but just in case.
-                $curnode = $this->progressinfo->add_criteria($key, $completion->agg_method, $cc->get_weight());
+                $curnode = $this->progressinfo->add_criteria($key, $criterion->agg_method, $cc->get_weight());
             }
 
-            if ($curnode && array_key_exists($completion->criteriatype, $multi_activity_criteria)) {
+            if ($curnode && array_key_exists($criterion->criteriatype, $multi_activity_criteria)) {
                 // Must set score on lowest level
 
                 // Again, this should have been initialized for the completion_info, but just making sure
-                $key = $completion->{$multi_activity_criteria[$completion->criteriatype]};
+                $key = $criterion->{$multi_activity_criteria[$criterion->criteriatype]};
                 if ($curnode->criteria_exist($key)) {
                     $curnode = $curnode->get_criteria($key);
                 } else {
-                    $curnode = $curnode->add_criteria($key, $completion->agg_method, $cc->get_weight());
+                    $curnode = $curnode->add_criteria($key, $criterion->agg_method, $cc->get_weight());
                 }
             }
 
@@ -1142,6 +1131,7 @@ function completion_start_user_bulk($courseid = 0, int $userid = 0) {
             END,
             :reaggregate
     ";
+
     $basesql = "
         FROM
             {user_enrolments} ue
@@ -1151,22 +1141,24 @@ function completion_start_user_bulk($courseid = 0, int $userid = 0) {
         INNER JOIN
             {course} c
          ON c.id = e.courseid
-        LEFT JOIN
-            {course_completions} crc
-         ON crc.course = c.id
-        AND crc.userid = ue.userid
         WHERE
             c.enablecompletion = 1
-        AND crc.id IS NULL
         {$coursesql}
         {$usersql}
         AND ue.status = :userenrolstatus
         AND e.status = :instanceenrolstatus
         AND (ue.timeend > :timeendafter OR ue.timeend = 0)
+        AND NOT EXISTS (
+            SELECT crc.id
+            FROM
+                {course_completions} crc
+            WHERE crc.course = c.id
+            AND crc.userid = ue.userid
+        )
         GROUP BY
             c.id,
             ue.userid
-    ";
+        ";
 
     $params = array(
         'changeuserid' => !empty($USER->id) ? $USER->id : 0,
