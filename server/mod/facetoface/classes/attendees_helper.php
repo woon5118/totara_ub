@@ -948,11 +948,11 @@ final class attendees_helper {
         if (empty($errors)) {
             $baseurl->params(array('approved' => '1'));
         } else {
-            $output = html_writer::start_tag('ul');
+            $output = \html_writer::start_tag('ul');
             foreach ($errors as $attendeeid => $errmsg) {
-                $output .= html_writer::tag('li', $errmsg);
+                $output .= \html_writer::tag('li', $errmsg);
             }
-            $output .= html_writer::end_tag('ul');
+            $output .= \html_writer::end_tag('ul');
             \core\notification::error($output);
         }
         return $baseurl;
