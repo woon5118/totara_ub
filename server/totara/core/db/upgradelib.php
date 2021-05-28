@@ -1608,3 +1608,48 @@ function totara_core_init_setting_disableconsistentcleaning() {
         set_config('disableconsistentcleaning', '1');
     }
 }
+
+/**
+ * Add additional columns for type and showing default branding to the existing oauth2_issuers table.
+ * Can just determine this from the image field.
+ *
+ * @since Totara 13.9
+ */
+function totara_core_upgrade_oauth2_issuers_add_type_and_branding_columns() {
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    // Define field type to be added to oauth2_issuer.
+    $table = new xmldb_table('oauth2_issuer');
+    $field = new xmldb_field('type', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'requireconfirmation');
+
+    // Conditionally launch add field type.
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
+
+    // Define field show_default_branding to be added to oauth2_issuer.
+    $table = new xmldb_table('oauth2_issuer');
+    $field = new xmldb_field('show_default_branding', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'type', ['0', '1']);
+
+    // Conditionally launch add field show_default_branding.
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
+
+    $issuer_types = [
+        'google',
+        'microsoft',
+        'facebook',
+        'nextcloud',
+    ];
+
+    foreach ($issuer_types as $issuer_type) {
+        $issuer_like = $DB->sql_like('image', ':issuer_type');
+        $DB->execute("
+            UPDATE {oauth2_issuer}
+            SET type = '{$issuer_type}'
+            WHERE {$issuer_like}
+        ", ['issuer_type' => "%{$issuer_type}%"]);
+    }
+}

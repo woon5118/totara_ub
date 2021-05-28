@@ -244,4 +244,49 @@ class core_oauth2_testcase extends advanced_testcase {
         $this->assertTrue($issuer->is_valid_login_domain('longer.example@sub.example.com'));
     }
 
+    /**
+     * @since Totara 13.9
+     */
+    public function test_upgrade_oauth2_issuers_add_type_and_branding_columns() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/totara/core/db/upgradelib.php');
+        $this->setAdminUser();
+
+        $google_issuer = \core\oauth2\api::create_standard_issuer('google');
+        $microsoft_issuer = \core\oauth2\api::create_standard_issuer('microsoft');
+        $custom_issuer = \core\oauth2\api::create_issuer((object) [
+            'timecreated' => '1622604687',
+            'timemodified' => '1622604687',
+            'usermodified' => '2',
+            'name' => 'Custom',
+            'image' => 'https://www.custom.com/logo.png',
+            'baseurl' => '',
+            'clientid' => '',
+            'clientsecret' => '',
+            'loginscopes' => 'openid profile email user.read',
+            'loginscopesoffline' => 'openid profile email user.read offline_access',
+            'loginparams' => '',
+            'loginparamsoffline' => '',
+            'alloweddomains' => '',
+            'enabled' => '1',
+            'showonloginpage' => '1',
+            'basicauth' => '0',
+            'sortorder' => '3',
+            'requireconfirmation' => '1',
+        ]);
+
+        // Remove the type data in order to simulate the upgrade step.
+        $DB->execute('UPDATE {oauth2_issuer} SET type = null WHERE 1 = 1');
+
+        $this->assertNull($DB->get_field('oauth2_issuer', 'type', ['id' => $google_issuer->get('id')]));
+        $this->assertNull($DB->get_field('oauth2_issuer', 'type', ['id' => $microsoft_issuer->get('id')]));
+        $this->assertNull($DB->get_field('oauth2_issuer', 'type', ['id' => $custom_issuer->get('id')]));
+
+        totara_core_upgrade_oauth2_issuers_add_type_and_branding_columns();
+
+        $this->assertEquals('google', $DB->get_field('oauth2_issuer', 'type', ['id' => $google_issuer->get('id')]));
+        $this->assertEquals('microsoft', $DB->get_field('oauth2_issuer', 'type', ['id' => $microsoft_issuer->get('id')]));
+        $this->assertNull($DB->get_field('oauth2_issuer', 'type', ['id' => $custom_issuer->get('id')]));
+    }
+
 }

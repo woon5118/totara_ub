@@ -3647,6 +3647,8 @@
         <FIELD NAME="basicauth" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Use HTTP Basic authentication scheme when sending client ID and password"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The defined sort order."/>
         <FIELD NAME="requireconfirmation" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Authentication requires email confirmation"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="What kind of issuer this is, e.g. microsoft. Set to null if it is custom."/>
+        <FIELD NAME="show_default_branding" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ALLOWED_VALUES="0,1" COMMENT="Whether or not to enforce this issuer type's organisational branding policy when displaying logos etc"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -1,6 +1,13 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.9 ===
+
+* Added columns 'type' and 'show_default_branding' to the oauth2_issuer table, and added them as properties to core\oauth2\issuer.
+* The login template (login.mustache) has been updated to support overriding the default OAuth2 IDP sign in buttons,
+  allowing a custom button image to be specified with the buttonimageurl and issuertype template variables.
+  The example context JSON for this template has also been updated.
+
 === 13.8 ===
 
 * backported https://github.com/jquery/jquery/pull/4642 to prevent a minor security issue

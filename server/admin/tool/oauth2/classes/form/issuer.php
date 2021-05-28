@@ -41,7 +41,7 @@ class issuer extends persistent {
     protected static $persistentclass = 'core\\oauth2\\issuer';
 
     /** @var array $fieldstoremove */
-    protected static $fieldstoremove = array('type', 'submitbutton', 'action');
+    protected static $fieldstoremove = array('submitbutton', 'action');
 
     /** @var string $type */
     protected $type;
@@ -74,6 +74,9 @@ class issuer extends persistent {
         if (array_key_exists('type', $customdata)) {
             $this->type = $customdata['type'];
         }
+        if ($this->type === null && isset($customdata['persistent'])) {
+            $this->type = $customdata['persistent']->get('type');
+        }
         $this->showrequireconfirm = !empty($customdata['showrequireconfirm']);
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable, $ajaxformdata);
     }
@@ -85,7 +88,12 @@ class issuer extends persistent {
         global $PAGE, $OUTPUT;
 
         $mform = $this->_form;
+
+        /** @var \core\oauth2\issuer $issuer */
         $issuer = $this->get_persistent();
+
+        // Totara: For the Microsoft type, we show an option that enforces their corporate branding guidelines.
+        $default_branding_allowed = $this->type === 'microsoft';
 
         $docslink = get_docs_url('OAuth2'); // Totara: Update to point to our docs
         if ($docslink) {
@@ -99,7 +107,12 @@ class issuer extends persistent {
         $mform->addElement('text', 'name', get_string('issuername', 'tool_oauth2'));
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('name', 'issuername', 'tool_oauth2');
+        // Totara: Show type specific help for how an issuer name is displayed.
+        if ($default_branding_allowed) {
+            $mform->addHelpButton('name', 'issuername_' . $this->type, 'tool_oauth2');
+        } else {
+            $mform->addHelpButton('name', 'issuername', 'tool_oauth2');
+        }
 
         // Client ID.
         $mform->addElement('text', 'clientid', get_string('issuerclientid', 'tool_oauth2'));
@@ -152,6 +165,15 @@ class issuer extends persistent {
         $mform->addRule('alloweddomains', get_string('maximumchars', '', 1024), 'maxlength', 1024, 'client');
         $mform->addHelpButton('alloweddomains', 'issueralloweddomains', 'tool_oauth2');
 
+        // Totara: Add show_default_branding option for enforcing corporate branding guidelines for the login buttons.
+        if ($default_branding_allowed) {
+            $mform->addElement('checkbox', 'show_default_branding', get_string('show_default_branding_' . $this->type, 'tool_oauth2'));
+            $mform->addHelpButton('show_default_branding', 'show_default_branding_' . $this->type, 'tool_oauth2');
+        } else {
+            $mform->addElement('hidden', 'show_default_branding');
+            $mform->setType('show_default_branding', PARAM_INT);
+        }
+
         // Image.
         $mform->addElement('text', 'image', get_string('issuerimage', 'tool_oauth2'), 'maxlength="1024"');
         $mform->addRule('image', get_string('maximumchars', '', 1024), 'maxlength', 1024, 'client');
@@ -173,12 +195,12 @@ class issuer extends persistent {
         $mform->addElement('hidden', 'sortorder');
         $mform->setType('sortorder', PARAM_INT);
 
-        if ($this->type) {
+        $mform->addElement('hidden', 'type');
+        $mform->setType('type', PARAM_ALPHA);
+
+        if ($this->type && !$issuer->is_configured()) {
             $mform->addElement('hidden', 'action', 'savetemplate');
             $mform->setType('action', PARAM_ALPHA);
-
-            $mform->addElement('hidden', 'type', $this->_customdata['type']);
-            $mform->setType('type', PARAM_ALPHA);
         } else {
             $mform->addElement('hidden', 'action', 'edit');
             $mform->setType('action', PARAM_ALPHA);

@@ -49,6 +49,7 @@ class api {
     private static function init_google() {
         $record = (object) [
             'name' => 'Google',
+            'type' => 'google',
             'image' => 'https://accounts.google.com/favicon.ico',
             'baseurl' => 'https://accounts.google.com/',
             'loginparamsoffline' => 'access_type=offline&prompt=consent',
@@ -86,6 +87,7 @@ class api {
         // Facebook is a custom setup.
         $record = (object) [
             'name' => 'Facebook',
+            'type' => 'facebook',
             'image' => 'https://facebookbrand.com/wp-content/uploads/2016/05/flogo_rgb_hex-brc-site-250.png',
             'baseurl' => '',
             'loginscopes' => 'public_profile email',
@@ -164,11 +166,13 @@ class api {
         // Microsoft is a custom setup.
         $record = (object) [
             'name' => 'Microsoft',
+            'type' => 'microsoft',
             'image' => 'https://www.microsoft.com/favicon.ico',
             'baseurl' => '',
             'loginscopes' => 'openid profile email user.read',
             'loginscopesoffline' => 'openid profile email user.read offline_access',
-            'showonloginpage' => true
+            'showonloginpage' => true,
+            'show_default_branding' => true,
         ];
 
         $issuer = new issuer(0, $record);
@@ -231,6 +235,7 @@ class api {
         // Nextcloud has a custom baseurl. Thus, the creation of endpoints has to be done later.
         $record = (object) [
             'name' => 'Nextcloud',
+            'type' => 'nextcloud',
             'image' => 'https://nextcloud.com/wp-content/themes/next/assets/img/common/favicon.png?x16328',
             'basicauth' => 1,
         ];

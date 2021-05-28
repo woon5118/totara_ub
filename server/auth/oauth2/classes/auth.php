@@ -184,6 +184,7 @@ class auth extends \auth_plugin_base {
      * @return array List of arrays with keys url, iconurl and name.
      */
     public function loginpage_idp_list($wantsurl) {
+        global $OUTPUT;
         $providers = \core\oauth2\api::get_all_issuers();
         $result = [];
         if (empty($wantsurl)) {
@@ -193,8 +194,19 @@ class auth extends \auth_plugin_base {
             if ($this->is_ready_for_login_page($idp)) {
                 $params = ['id' => $idp->get('id'), 'wantsurl' => $wantsurl, 'sesskey' => sesskey()];
                 $url = new moodle_url('/auth/oauth2/login.php', $params);
-                $icon = $idp->get('image');
-                $result[] = ['url' => $url, 'iconurl' => $icon, 'name' => $idp->get('name'), 'authtype' => $this->authtype];
+                $template = ['url' => $url, 'name' => $idp->get('name'), 'authtype' => $this->authtype];
+
+                // Totara: Show a hard-coded logo instead if it is explicitly set to be overridden for this issuer.
+                if ($idp->get('show_default_branding')) {
+                    $type = $idp->get('type');
+                    $template['issuertype'] = $type;
+                    $template['buttonimageurl'] = $OUTPUT->image_url('login_button/' . $type, 'auth_oauth2');
+                } else {
+                    $icon = $idp->get('image');
+                    $template['iconurl'] = $icon;
+                }
+
+                $result[] = $template;
             }
         }
         return $result;

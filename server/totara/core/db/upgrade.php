@@ -1510,5 +1510,12 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020100118, 'totara', 'core');
     }
 
+    if ($oldversion < 2020100119) {
+        totara_core_upgrade_oauth2_issuers_add_type_and_branding_columns();
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100119, 'totara', 'core');
+    }
+
     return true;
 }

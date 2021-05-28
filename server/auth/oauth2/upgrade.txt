@@ -1,0 +1,8 @@
+This files describes API changes in /auth/oauth2/*,
+information provided here is intended especially for developers.
+
+=== 13.9 ===
+
+* Added override in \auth_oauth2\auth::loginpage_idp_list for when show_default_branding is enabled for an issuer,
+  returning template data for buttonimageurl and issuertype instead of iconurl.
+* Added a hardcoded button logo image for the microsoft issuer type, located at pix/login_button/microsoft.svg

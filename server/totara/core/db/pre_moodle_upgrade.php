@@ -134,3 +134,6 @@ $field = new xmldb_field('overrideby', XMLDB_TYPE_INTEGER, '10', null, null, nul
 if ($dbman->field_exists($table, $field)) {
     $dbman->drop_field($table, $field);
 }
+
+// Add extra columns to core oauth2 issuers table required for Totara.
+totara_core_upgrade_oauth2_issuers_add_type_and_branding_columns();

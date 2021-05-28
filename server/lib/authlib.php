@@ -717,7 +717,7 @@ class auth_plugin_base {
                     // Pre-3.3 auth plugins provide icon as a pix_icon instance. New auth plugins (since 3.3) provide iconurl.
                     $idp['iconurl'] = $output->image_url($idp['icon']->pix, $idp['icon']->component);
                 }
-                if ($idp['iconurl'] instanceof moodle_url) {
+                if (!empty($idp['iconurl']) && $idp['iconurl'] instanceof moodle_url) {
                     $idp['iconurl'] = $idp['iconurl']->out(false);
                 }
                 unset($idp['icon']);
