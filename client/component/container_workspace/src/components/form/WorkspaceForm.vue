@@ -49,7 +49,6 @@
               <Weka
                 :id="id"
                 v-model="description"
-                :aria-disabled="submitting"
                 :context-id="contextId"
                 :compact="true"
                 :usage-identifier="{

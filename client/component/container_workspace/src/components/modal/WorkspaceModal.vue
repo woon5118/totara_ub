@@ -129,6 +129,7 @@ export default {
         return;
       }
 
+      // This is cleared by page load or component destruction
       this.submitting = true;
 
       try {
@@ -154,8 +155,6 @@ export default {
           message: this.$str('error:create', 'container_workspace'),
           type: 'error',
         });
-      } finally {
-        this.submitting = false;
       }
     },
   },
