@@ -33,6 +33,7 @@ use single_button;
 use theme_msteams\hook\get_page_navigation_hook;
 use theme_msteams\loader;
 use theme_msteams\session;
+use totara_tui\output\component;
 
 /**
  * Override core_renderer.
@@ -224,7 +225,8 @@ class core_renderer extends \core_renderer {
             $alert = html_writer::div($hook->alert, 'totara_msteams__alert');
         }
 
-        return $out.$nav.$alert;
+        $tui = new component('totara_msteams/components/modal/ExternalUrlModal');
+        return $out.$nav.$alert.$tui->out_html();
     }
 
     /**

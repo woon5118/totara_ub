@@ -28,4 +28,5 @@ $string['choosereadme'] = 'Microsoft Teams theme for Totara. (For internal use o
 $string['goback'] = 'Back';
 $string['loggedinasuser'] = 'Logged in as {$a}.';
 $string['openexternally'] = 'Open in browser';
+$string['open_externally_content'] = 'You are about to be taken to your default browser to view this page';
 $string['pluginname'] = 'Microsoft Teams';

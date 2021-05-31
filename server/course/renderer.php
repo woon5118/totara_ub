@@ -666,13 +666,24 @@ class core_course_renderer extends plugin_renderer_base {
         $groupinglabel = $mod->get_grouping_label($textclasses);
 
         // Totara: Display link itself with flex icon.
-        global $OUTPUT;
+        global $OUTPUT, $SESSION;
         $instancename = $mod->get_formatted_name();
         $activitylink  = $mod->render_icon($OUTPUT, 'activityicon');
         $activitylink .= $accesstext;
         $activitylink .= html_writer::tag('span', $instancename, array('class' => 'instancename', 'data-movetext' => 'true'));
 
         if ($mod->uservisible && empty($displayoptions['nolink'])) {
+
+            // Totara: Replace internal url with external url for msteam theme.
+            if (isset($SESSION->theme)) {
+                if ($mod->modname === 'url' && $SESSION->theme === 'msteams') {
+                    global $DB;
+                    $cm = get_coursemodule_from_id('url', $mod->id, 0, false, MUST_EXIST);
+                    $url = $DB->get_record('url', array('id' => $cm->instance), '*', MUST_EXIST);
+                    $url = $url->externalurl;
+                }
+            }
+
             $output .= html_writer::link($url, $activitylink, array('class' => $linkclasses, 'onclick' => $onclick)) .
                     $groupinglabel;
         } else {
