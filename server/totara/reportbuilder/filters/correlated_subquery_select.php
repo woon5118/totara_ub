@@ -50,6 +50,12 @@ class rb_filter_correlated_subquery_select extends rb_filter_select {
      * @return array containing filtering condition SQL clause and params
      */
     public function get_sql_filter($data) {
+        // When the filter is deactivated ('any value' is selected), we don't want to add a subquery at all because it
+        // would exclude those rows that don't have a value for the filtered field.
+        if ($data['value'] === '') {
+            return ['', []];
+        }
+
         $this->overrideselectfield = $this->options['searchfield'];
         list($select, $params) = parent::get_sql_filter($data);
         $this->overrideselectfield = null;

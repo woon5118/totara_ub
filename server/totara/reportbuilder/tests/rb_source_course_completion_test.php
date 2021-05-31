@@ -233,4 +233,96 @@ class totara_reportbuilder_rb_source_course_completion_testcase extends advanced
         $mformsidebar = new report_builder_sidebar_search_form(null,
             array('report' => $report, 'fields' => $report->get_sidebar_filters()));
     }
+
+    public function test_tag_filter(): void {
+        global $DB;
+
+        set_config('enablecompletion', 1);
+        self::setAdminUser();
+        $generator = self::getDataGenerator();
+        $user = $generator->create_user();
+        $course1 = $generator->create_course([
+            'tags' => 'tag1,common_tag',
+            'enablecompletion' => 1,
+            'completionstartonenrol' => 1,
+            'coursetype' => 0,
+        ]);
+        $course2 = $generator->create_course([
+            'tags' => 'tag2,common_tag',
+            'enablecompletion' => 1,
+            'completionstartonenrol' => 1,
+            'coursetype' => 0,
+        ]);
+        $course_no_tags = $generator->create_course([
+            'enablecompletion' => 1,
+            'completionstartonenrol' => 1,
+            'coursetype' => 0,
+        ]);
+
+        $generator->enrol_user($user->id, $course1->id);
+        $generator->enrol_user($user->id, $course2->id);
+        $generator->enrol_user($user->id, $course_no_tags->id);
+
+        $rid = $this->create_report('course_completion', 'Test course report');
+        $this->assert_report_result($rid, [$course1, $course2, $course_no_tags]);
+
+        // Add filter.
+        $filter_record = new stdClass();
+        $filter_record->reportid = $rid;
+        $filter_record->advanced = 0;
+        $filter_record->region = rb_filter_type::RB_FILTER_REGION_STANDARD;
+        $filter_record->type = 'tags';
+        $filter_record->value = 'tagid';
+        $filter_record->filtername = 'Tags';
+        $filter_record->customname = 0;
+        $filter_record->sortorder = 1;
+        $DB->insert_record('report_builder_filters', $filter_record);
+
+        // Make sure filter is as expected
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
+        $filters = $report->get_filters();
+        self::assertCount(1, $filters);
+        /** @var rb_filter_correlated_subquery_select $filter */
+        $filter = reset($filters);
+        self::assertInstanceOf(rb_filter_correlated_subquery_select::class, $filter);
+        self::assertSame('tags', $filter->type);
+        self::assertSame('tagid', $filter->value);
+
+        $tags = $DB->get_records_menu('tag', null, '', 'name,id');
+        self::assertCount(3, $tags);
+
+        $filter->set_data(['value' => $tags['tag1']]);
+        $this->assert_report_result($rid, [$course1]);
+
+        $filter->set_data(['value' => $tags['tag2']]);
+        $this->assert_report_result($rid, [$course2]);
+
+        $filter->set_data(['value' => $tags['common_tag']]);
+        $this->assert_report_result($rid, [$course1, $course2]);
+
+        $filter->set_data(['value' => '']);
+        $this->assert_report_result($rid, [$course1, $course2, $course_no_tags]);
+    }
+
+    /**
+     * @param int $report_id
+     * @param array $expected_courses
+     */
+    private function assert_report_result(int $report_id, array $expected_courses): void {
+        global $DB;
+
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($report_id, $config);
+        [$sql, $params] = $report->build_query(false, true);
+        $records = $DB->get_records_sql($sql, $params);
+
+        $completion_ids = array_column($records, 'id');
+        [$in_sql, $params] = $DB->get_in_or_equal($completion_ids);
+        $actual_course_ids = $DB->get_fieldset_select('course_completions', 'course', 'id ' . $in_sql, $params);
+
+        $expected_course_ids = array_column($expected_courses, 'id');
+
+        self::assertEqualsCanonicalizing($expected_course_ids, $actual_course_ids);
+    }
 }
