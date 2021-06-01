@@ -150,4 +150,27 @@ class block_current_learning_testcase extends block_current_learning_testcase_ba
         // Check there is only one course.
         $this->assertCount(1, $new_items);
     }
+
+    public function test_default_config_values() {
+        global $CFG, $PAGE;
+
+        require_once($CFG->dirroot . '/blocks/current_learning/block_current_learning.php');
+        $this->setAdminUser();
+
+        $block_instance = new block_current_learning();
+        $this->assertEmpty($block_instance->config);
+        $block_instance->page = $PAGE;
+        $block_instance->instance = new \stdClass();
+        $block_instance->instance->id = 1; // Add instance id so the get_content call doesn't error.
+        $block_instance->get_content();
+
+        // Check the default alert period
+        $this->assertSame($block_instance->config->alertperiod, $block_instance::DEFAULT_ALERT_PERIOD);
+
+        // Check the default warning period
+        $this->assertSame($block_instance->config->warningperiod, $block_instance::DEFAULT_WARNING_PERIOD);
+
+        // Check the default view
+        $this->assertSame($block_instance->config->view, $block_instance::DEFAULT_VIEW);
+    }
 }

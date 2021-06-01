@@ -106,7 +106,7 @@ class block_current_learning extends block_base {
             $this->config = new stdClass();
         }
 
-        if (empty($this->config->alerperiod)) {
+        if (empty($this->config->alertperiod)) {
             $this->config->alertperiod = self::DEFAULT_ALERT_PERIOD;
         }
 
