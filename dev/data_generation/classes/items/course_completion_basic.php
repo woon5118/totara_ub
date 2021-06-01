@@ -43,7 +43,7 @@ class course_completion_basic extends course_completion {
         $completed = time() - 3600;
 
         $completion = [
-            'userid' => $this->by->get_data()->id,
+            'userid' => $this->by,
             'course' => $this->for->get_data()->id,
             'timeenrolled' => $start,
             'timestarted' => $start,
