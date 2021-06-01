@@ -65,14 +65,13 @@ class user extends base {
         }
 
         if (($restriction & self::USER_DIRECT_REPORTS) == self::USER_DIRECT_REPORTS) {
-            $conditions[] = "EXISTS (SELECT 1
+            $conditions[] = "{$field} IN (SELECT d1ja.userid
                                        FROM {user} u1
                                  INNER JOIN {job_assignment} u1ja
                                          ON u1ja.userid = u1.id
                                  INNER JOIN {job_assignment} d1ja
                                          ON d1ja.managerjaid = u1ja.id
                                       WHERE u1.id = :viewer1
-                                        AND d1ja.userid = {$field}
                                         AND d1ja.userid != u1.id
                                      )";
             $params['viewer1'] = $userid;
@@ -80,14 +79,13 @@ class user extends base {
 
         if (($restriction & self::USER_INDIRECT_REPORTS) == self::USER_INDIRECT_REPORTS) {
             $ilikesql = $DB->sql_concat('u2ja.managerjapath', "'/%'");
-            $conditions[] = "EXISTS (SELECT 1
+            $conditions[] = "{$field} IN (SELECT i2ja.userid
                                        FROM {user} u2
                                  INNER JOIN {job_assignment} u2ja
                                          ON u2ja.userid = u2.id
                                  INNER JOIN {job_assignment} i2ja
                                          ON i2ja.managerjapath LIKE {$ilikesql}
                                       WHERE u2.id = :viewer2
-                                        AND i2ja.userid = {$field}
                                         AND i2ja.userid != u2.id
                                         AND i2ja.managerjaid != u2ja.id
                                     )";
@@ -95,14 +93,13 @@ class user extends base {
         }
 
         if (($restriction & self::USER_TEMP_REPORTS) == self::USER_TEMP_REPORTS) {
-            $conditions[] = "EXISTS (SELECT 1
+            $conditions[] = "{$field} IN (SELECT t3ja.userid
                                        FROM {user} u3
                                  INNER JOIN {job_assignment} u3ja
                                          ON u3ja.userid = u3.id
                                  INNER JOIN {job_assignment} t3ja
                                          ON t3ja.tempmanagerjaid = u3ja.id
                                       WHERE u3.id = :viewer3
-                                        AND t3ja.userid = {$field}
                                         AND t3ja.userid != u3.id
                                     )";
             $params['viewer3'] = $userid;
