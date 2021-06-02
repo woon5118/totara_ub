@@ -36,7 +36,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
     use webapi_phpunit_helper;
 
     private function resolve($field, $learning_item, array $args = []) {
-        return $this->resolve_graphql_type('totara_mobile_learning_item', $field, $learning_item, $args);
+        return $this->resolve_graphql_type('mobile_currentlearning_item', $field, $learning_item, $args);
     }
 
     /**
@@ -118,7 +118,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->fail('Only learning_item instances should be accepted');
         } catch (\coding_exception $ex) {
             $this->assertSame(
-                'Coding error detected, it must be fixed by a programmer: Only learning_item objects are accepted: integer',
+                'Coding error detected, it must be fixed by a programmer: Only mobile learning_item objects are accepted: integer',
                 $ex->getMessage()
             );
         }
@@ -128,7 +128,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->fail('Only learning_item instances should be accepted');
         } catch (\coding_exception $ex) {
             $this->assertSame(
-                'Coding error detected, it must be fixed by a programmer: Only learning_item objects are accepted: array',
+                'Coding error detected, it must be fixed by a programmer: Only mobile learning_item objects are accepted: array',
                 $ex->getMessage()
             );
         }
@@ -138,7 +138,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->fail('Only learning_item instances should be accepted');
         } catch (\coding_exception $ex) {
             $this->assertSame(
-                'Coding error detected, it must be fixed by a programmer: Only learning_item objects are accepted: object',
+                'Coding error detected, it must be fixed by a programmer: Only mobile learning_item objects are accepted: object',
                 $ex->getMessage()
             );
         }
@@ -274,9 +274,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'shortname'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
@@ -302,9 +309,17 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+            $this->fail('Expected failure on denied RAW $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'shortname'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
@@ -330,9 +345,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'shortname'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
@@ -353,7 +375,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
 
         try {
             $value = $this->resolve('fullname', $item);
-            $this->fail('Expected failure on null $format');
+            $this->fail('Expected failure on undefined format');
         } catch (\coding_exception $ex) {
             $this->assertSame(
                 'Coding error detected, it must be fixed by a programmer: Invalid format given',
@@ -367,9 +389,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'fullname'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
@@ -395,9 +424,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'fullname'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
@@ -409,7 +445,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
 
         try {
             $value = $this->resolve('fullname', $item);
-            $this->fail('Expected failure on null $format');
+            $this->fail('Expected failure on denied RAW $format');
         } catch (\coding_exception $ex) {
             $this->assertSame(
                 'Coding error detected, it must be fixed by a programmer: Invalid format given',
@@ -423,9 +459,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'fullname'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
@@ -460,9 +503,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'summary'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -493,9 +543,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'summary'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -522,9 +579,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'summary'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -564,9 +628,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'summary'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -598,9 +669,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'summary'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -633,9 +711,16 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
             $this->assertTrue(is_string($value));
         }
 
-        // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        try {
+            // Check the permissions required for format::FORMAT_RAW
+            $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+            $this->assertNull($value);
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                "Coding error detected, it must be fixed by a programmer: Not authorized to request this format for 'summary'",
+                $ex->getMessage()
+            );
+        }
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -813,9 +898,6 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
         ];
 
         foreach ($items as $item) {
-            $value = $this->resolve('duedate', $item);
-            $this->assertEquals(null, $value);
-
             // This course item is not assigned via a learning plan so can not have a duedate set.
             if ($item->itemtype != 'course') {
                 // Fake setting the timedue for the user.

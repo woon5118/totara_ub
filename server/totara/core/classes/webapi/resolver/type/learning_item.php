@@ -50,18 +50,9 @@ class learning_item implements type_resolver {
              throw new \coding_exception('Only learning_item objects are accepted: ' . gettype($item));
         }
 
-        if ($item->get_type() == 'course') {
-            $classpath = 'core\webapi\resolver\type\course';
-        } else {
-            $classpath = $item->get_component() . '\webapi\resolver\type\\' . $item->get_type();
-        }
-
         $format = $args['format'] ?? null;
         $context = self::get_item_context($item);
-        $authfield = ($field == 'description') ? 'summary' : $field;
-        if (!$classpath::authorize($authfield, $format, $context)) {
-            throw new \coding_exception("Not authorized to request this format for '{$authfield}'");
-        }
+        self::authorize($item, $field, $format, $context); // Verify user is authorized to access item.
 
         // Transform the format field from the constants to a core_format string.
         if ($field == 'description_format') {
@@ -125,21 +116,40 @@ class learning_item implements type_resolver {
         }
 
         $formatter = new learning_item_formatter($item, $context);
-        $formatted = $formatter->format($field, $format);
+        return $formatter->format($field, $format);
+    }
 
-        // For mobile execution context, rewrite pluginfile urls in description and image_src fields.
-        // This is clearly a hack, please suggest something more elegant.
-        if (is_a($ec, 'totara_mobile\webapi\execution_context') && in_array($field, ['description', 'image_src'])) {
-            $formatted = str_replace($CFG->wwwroot . '/pluginfile.php', $CFG->wwwroot . '/totara/mobile/pluginfile.php', $formatted);
+    /**
+     * Verify that the item is the expected type, verify the classpath and check current user authorization.
+     *
+     * @param item|item_base $item
+     * @param string $field
+     * @param string|null $format
+     * @param context $context
+     * @return bool
+     * @throws coding_exception
+     */
+    protected static function authorize($item, $field, $format, $context) {
+
+        if ($item->get_type() == 'course') {
+            $classpath = 'core\webapi\resolver\type\course';
+        } else {
+            $classpath = $item->get_component() . '\webapi\resolver\type\\' . $item->get_type();
         }
-        return $formatted;
+
+        $authfield = ($field == 'description') ? 'summary' : $field;
+        if (!$classpath::authorize($authfield, $format, $context)) {
+            throw new \coding_exception("Not authorized to request this format for '{$authfield}'");
+        }
+
+        return true;
     }
 
     /**
      * @param item|item_base $item
      * @return \context_course|\context_program|false
      */
-    private static function get_item_context(item $item) {
+    protected static function get_item_context(item $item) {
         switch ($item->get_type()) {
             case 'course':
                 return \context_course::instance($item->id);

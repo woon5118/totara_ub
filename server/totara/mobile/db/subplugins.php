@@ -1,9 +1,8 @@
 <?php
-/**
+/*
+ * This file is part of Totara Learn
  *
- * This file is part of Totara LMS
- *
- * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,24 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Chris Snyder <chris.snyder@totaralearning.com>
  * @author David Curry <david.curry@totaralearning.com>
  * @package totara_mobile
  */
 
-namespace totara_mobile\webapi\resolver\type;
+defined('MOODLE_INTERNAL') || die();
 
-use core\webapi\execution_context;
-use mobile_currentlearning\webapi\resolver\type\item as plugin_item;
-
-/**
- * @deprecated since totara 13.10 and replaced by the sub-plugin mobile_currentlearning
- */
-class learning_item extends plugin_item {
-
-    public static function resolve(string $field, $item, array $args, execution_context $ec) {
-        debugging('This class has been deprecated, please use \item in mobile_currentlearning');
-
-        return parent::resolve($field, $item, $args, $ec);
-    }
-}
+$subplugins = [
+    'mobile' => 'totara/mobile/plugins',
+];

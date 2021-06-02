@@ -1,6 +1,5 @@
-# @deprecated since Totara 13.10 - moved to subplugin mobile_currentlearning
 query totara_mobile_current_learning {
-  currentLearning: mobile_currentlearning_my_items {
+  currentLearning: mobile_currentlearning_items {
     id
     itemtype
     itemcomponent

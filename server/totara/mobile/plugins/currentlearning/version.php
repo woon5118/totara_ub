@@ -1,9 +1,8 @@
 <?php
-/**
+/*
+ * This file is part of Totara Learn
  *
- * This file is part of Totara LMS
- *
- * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,24 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Chris Snyder <chris.snyder@totaralearning.com>
  * @author David Curry <david.curry@totaralearning.com>
- * @package totara_mobile
+ * @package mobile_currentlearning.
  */
 
-namespace totara_mobile\webapi\resolver\query;
+defined('MOODLE_INTERNAL') || die();
 
-use core\webapi\execution_context;
-use mobile_currentlearning\webapi\resolver\query\my_items as plugin_query;
+// Note that \totara_mobile\util::API_VERSION may also need to be changed,
+// if endpoints or HTTP response codes have changed.
 
-/**
- * @deprecated since totara 13.10 and replaced by the sub-plugin mobile_currentlearning
- */
-class current_learning extends plugin_query {
-
-    public static function resolve(array $args, execution_context $ec) {
-        debugging('This class has been deprecated, please use my_items in mobile_currentlearning');
-
-        return parent::resolve($args, $ec);
-    }
-}
+$plugin->version   = 2021061700;    // The current module version (Date: YYYYMMDDXX).
+$plugin->requires  = 2017111309;    // Requires this platform version.
+$plugin->component = 'mobile_currentlearning'; // To check on upgrade, that module sits in correct place.

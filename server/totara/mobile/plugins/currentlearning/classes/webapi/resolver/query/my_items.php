@@ -18,24 +18,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Chris Snyder <chris.snyder@totaralearning.com>
  * @author David Curry <david.curry@totaralearning.com>
- * @package totara_mobile
+ * @package mobile_currentlearning
  */
 
-namespace totara_mobile\webapi\resolver\type;
+namespace mobile_currentlearning\webapi\resolver\query;
 
-use core\webapi\execution_context;
-use mobile_currentlearning\webapi\resolver\type\item as plugin_item;
+use totara_core\webapi\resolver\query\my_current_learning;
 
 /**
- * @deprecated since totara 13.10 and replaced by the sub-plugin mobile_currentlearning
+ * Class current_learning extends totara_core_my_current_learning query
+ *
+ * @package totara_mobile\webapi\resolver\query
  */
-class learning_item extends plugin_item {
-
-    public static function resolve(string $field, $item, array $args, execution_context $ec) {
-        debugging('This class has been deprecated, please use \item in mobile_currentlearning');
-
-        return parent::resolve($field, $item, $args, $ec);
-    }
+class my_items extends my_current_learning {
+    // Simply brings the class into this namespace.
 }
