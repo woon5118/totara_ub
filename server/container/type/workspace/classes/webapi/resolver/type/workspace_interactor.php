@@ -57,6 +57,9 @@ final class workspace_interactor implements type_resolver {
             case 'can_delete':
                 return $source->can_delete();
 
+            case 'can_add_members':
+                return $source->can_add_members();
+
             case 'can_invite':
                 return $source->can_invite();
 

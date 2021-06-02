@@ -72,15 +72,12 @@ final class interactor {
         $workspace = factory::from_id($workspace_id);
         $owner_id = $workspace->get_user_id();
 
+        // Owners can not remove themselves from the workspace.
         if ($owner_id == $this->user_id) {
-            // Actor is an owner. We need to check whether this member is an actor/owner or not.
             $member_user_id = $this->member->get_user_id();
             if ($this->user_id == $member_user_id) {
                 return false;
             }
-
-            // Owner can do anything except for deleting him/her-self out of the workspace.
-            return true;
         }
 
         $context = $workspace->get_context();

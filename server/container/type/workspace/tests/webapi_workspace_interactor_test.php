@@ -44,6 +44,7 @@ class container_workspace_webapi_workspace_interactor_testcase extends advanced_
         self::assertTrue($interactor->is_joined());
         self::assertTrue($interactor->can_update());
         self::assertTrue($interactor->can_delete());
+        self::assertTrue($interactor->can_add_members());
         self::assertTrue($interactor->can_invite());
         self::assertFalse($interactor->can_join());
         self::assertFalse($interactor->can_request_to_join());
@@ -73,6 +74,7 @@ class container_workspace_webapi_workspace_interactor_testcase extends advanced_
         self::assertFalse($interactor->is_joined());
         self::assertTrue($interactor->can_update());
         self::assertTrue($interactor->can_delete());
+        self::assertTrue($interactor->can_add_members());
         self::assertTrue($interactor->can_invite());
         self::assertTrue($interactor->can_join());
         self::assertTrue($interactor->can_remove_members());

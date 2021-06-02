@@ -246,14 +246,10 @@ final class manager {
             $actor_id = $USER->id;
         }
 
-        $owner_id = $this->workspace->get_user_id();
-        if ($actor_id != $owner_id) {
-            // Not an actor, time to check for capability.
-            $context = $this->workspace->get_context();
-
-            if (!has_capability('container/workspace:addmember', $context, $actor_id)) {
-                throw enrol_exception::on_manual_enrol();
-            }
+        // Check capability.
+        $context = $this->workspace->get_context();
+        if (!has_capability('container/workspace:addmember', $context, $actor_id)) {
+            throw enrol_exception::on_manual_enrol();
         }
 
         $this->enrol_user($user_id, $role_id, 'manual');

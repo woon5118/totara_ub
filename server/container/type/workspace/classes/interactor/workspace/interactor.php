@@ -195,6 +195,18 @@ final class interactor {
     /**
      * @return bool
      */
+    public function can_add_members(): bool {
+        if (!$this->can_view_workspace()) {
+            return false;
+        }
+
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:addmember', $context, $this->user_id);
+    }
+
+    /**
+     * @return bool
+     */
     public function can_invite(): bool {
         if (!$this->can_view_workspace()) {
             return false;

@@ -199,6 +199,11 @@ class container_workspace_workspace_interactor_testcase extends advanced_testcas
         );
 
         self::assertTrue(
+            $interactor->can_add_members(),
+            "User should be able to add members to workspace before deletion"
+        );
+
+        self::assertTrue(
             $interactor->can_invite(),
             "User should be able to invite members to workspace before deletion"
         );
@@ -272,8 +277,62 @@ class container_workspace_workspace_interactor_testcase extends advanced_testcas
         );
 
         self::assertFalse(
+            $interactor->can_add_members(),
+            "User should not be able to add members to workspace after deletion"
+        );
+
+        self::assertFalse(
             $interactor->can_invite(),
             "User should not be able to invite members to workspace after deletion"
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_check_owner_capability() {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+        $interactor = new interactor($workspace, $user_one->id);
+
+        self::assertTrue(
+            $interactor->can_add_members(),
+            "Workspace owner should be capable to add members to workspace"
+        );
+
+        // Remove capability and confirm that workspace owner cannot add members.
+        $this->remove_workspace_owner_capability("container/workspace:addmember");
+        self::assertFalse(
+            $interactor->can_add_members(),
+            "Workspace owner should not be able to add members to workspace without capability"
+        );
+
+        self::assertTrue(
+            $interactor->can_invite(),
+            "Workspace owner should be capable to invite members to workspace"
+        );
+
+        // Remove capability and confirm that workspace owner cannot invite members.
+        $this->remove_workspace_owner_capability("container/workspace:invite");
+        self::assertFalse(
+            $interactor->can_invite(),
+            "Workspace owner should not be able to invite members to workspace without capability"
+        );
+
+        // Confirm that admin still has capability.
+        $interactor = new interactor($workspace, get_admin()->id);
+        self::assertTrue(
+            $interactor->can_add_members(),
+            "Admin should be capable to add members to workspace"
+        );
+        self::assertTrue(
+            $interactor->can_invite(),
+            "Admin should be capable to invite members to workspace"
         );
     }
 
@@ -307,6 +366,11 @@ class container_workspace_workspace_interactor_testcase extends advanced_testcas
 
         $interactor = new interactor($workspace, $user->id);
         $this->assertTrue($interactor->can_add_audiences());
+    }
+
+    private function remove_workspace_owner_capability(string $capability) {
+        $role = builder::table('role')->where('shortname', 'workspaceowner')->value('id');
+        unassign_capability($capability, $role);
     }
 
 }

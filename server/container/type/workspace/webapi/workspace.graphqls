@@ -68,7 +68,11 @@ type container_workspace_workspace_interactor {
   """
   can_delete: Boolean!
   """
-  Whether the user is able to invite other member to the workspace or not.
+  Whether the user is able to add other members to the workspace or not.
+  """
+  can_add_members: Boolean!
+  """
+  Whether the user is able to invite other members to the workspace or not.
   """
   can_invite: Boolean!
   """

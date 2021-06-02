@@ -139,7 +139,10 @@
           {{ $str('leave_workspace', 'container_workspace') }}
         </DropdownItem>
 
-        <DropdownItem @click="modal.adder = true">
+        <DropdownItem
+          v-if="interactor.can_add_members"
+          @click="modal.adder = true"
+        >
           {{ $str('add_members', 'container_workspace') }}
         </DropdownItem>
 

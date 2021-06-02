@@ -5,6 +5,7 @@ query container_workspace_workspace_interactor($workspace_id: param_integer!) {
     __typename
     can_delete
     can_update
+    can_add_members
     can_invite
     can_join
     can_leave
