@@ -608,7 +608,7 @@ class notice_sender {
     private static function send_notice_oneperday(seminar_event $seminarevent, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT,
                                                   $icalattachmentmethod = MDL_F2F_INVITE, array $olddates = [],
                                                   $notifyuser = true, $notifymanager = true) {
-        global $DB, $CFG;
+        global $CFG;
 
         $notificationdisable = get_config(null, 'facetoface_notificationdisable');
         if (!empty($notificationdisable)) {
@@ -626,13 +626,16 @@ class notice_sender {
         $session = $seminarevent->to_record();
         $session->sessiondates = [];
         foreach ($eventsessions as $eventsession) {
-            array_push($session->sessiondates, (object) [
-                'id' => $eventsession->get_id(),
+            $session_date_id = $eventsession->get_id();
+            $session->sessiondates[] = (object)[
+                'id' => $session_date_id,
                 'sessionid' => $eventsession->get_sessionid(),
                 'sessiontimezone' => $eventsession->get_sessiontimezone(),
                 'timestart' => $eventsession->get_timestart(),
                 'timefinish' => $eventsession->get_timefinish(),
-            ]);
+                'roomids' => room_helper::get_room_ids_sorted($session_date_id),
+                'facilitatorids' => facilitator_helper::get_facilitator_ids_sorted($session_date_id),
+            ];
         }
 
         // Filtering dates.
@@ -644,11 +647,14 @@ class notice_sender {
 
         $dates = array_filter($session->sessiondates, function ($date) use (&$olds) {
             if (isset($olds[$date->id])) {
+                // Remove from the list of old dates. We only want to send for those old date ids that don't have a corresponding
+                // new date - that's the case when a date is deleted.
                 $old = $olds[$date->id];
                 unset($olds[$date->id]);
-                if ($old->sessiontimezone == $date->sessiontimezone &&
-                    $old->timestart == $date->timestart &&
-                    $old->timefinish == $date->timefinish) {
+
+                // If both old and new date have been passed in, it means we are looking at a notification where we only want to
+                // send it for a particular date when relevant change is detected. So exclude those dates that don't have any changes.
+                if (!seminar_session_list::has_date_changed($old, $date)) {
                     return false;
                 }
             }
@@ -657,7 +663,7 @@ class notice_sender {
         });
 
         $send = function ($dates, $cancel = false, $notifyuser = true, $notifymanager = true) use ($seminarevent, $session,
-            $icalattachmenttype, $icalattachmentmethod, $user, $params, $DB, $CFG
+            $icalattachmenttype, $icalattachmentmethod, $user, $params, $CFG
         ) {
             $seminareventid = $seminarevent->get_id();
             foreach ($dates as $date) {

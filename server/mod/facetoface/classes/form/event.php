@@ -29,7 +29,10 @@ namespace mod_facetoface\form;
 global $CFG;
 
 use core\notification;
+use mod_facetoface\facilitator_helper;
+use mod_facetoface\room_helper;
 use mod_facetoface\seminar;
+use mod_facetoface\seminar_session;
 use mod_facetoface\trainer_helper;
 use mod_facetoface\seminar_event;
 use mod_facetoface\attendees_helper;
@@ -1014,8 +1017,8 @@ class event extends \moodleform {
             $sessionid = $session->id;
             $olddates  = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
             foreach ($olddates as &$olddate) {
-                $olddate->roomids = array_keys($DB->get_records('facetoface_room_dates', ['sessionsdateid' => $olddate->id], 'roomid', 'roomid'));
-                $olddate->facilitatorids = array_keys($DB->get_records('facetoface_facilitator_dates', ['sessionsdateid' => $olddate->id], 'facilitatorid', 'facilitatorid'));
+                $olddate->roomids = room_helper::get_room_ids_sorted($olddate->id);
+                $olddate->facilitatorids = facilitator_helper::get_facilitator_ids_sorted($olddate->id);
             }
         } else {
             // Create or Duplicate the session.

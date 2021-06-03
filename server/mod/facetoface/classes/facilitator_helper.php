@@ -122,4 +122,20 @@ final class facilitator_helper {
         $ret = $DB->get_field_sql($sql, array('id' => $sessionid));
         return $ret ? $ret : '';
     }
+
+    /**
+     * Get all facilitator ids for a given session date, sorted by id.
+     *
+     * @param int $session_date_id
+     * @return array
+     */
+    public static function get_facilitator_ids_sorted(int $session_date_id): array {
+        global $DB;
+        return array_keys($DB->get_records(
+            'facetoface_facilitator_dates',
+            ['sessionsdateid' => $session_date_id],
+            'facilitatorid',
+            'facilitatorid'
+        ));
+    }
 }

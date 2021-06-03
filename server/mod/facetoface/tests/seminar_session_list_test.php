@@ -213,4 +213,35 @@ class mod_facetoface_seminar_session_list_testcase extends advanced_testcase {
 
         $this->assertSame(3, $count);
     }
+
+    public function test_has_date_changed(): void {
+        $old_date = (object)[
+            'timestart' => 111,
+            'timefinish' => 222,
+            'sessiontimezone' => 333,
+            'roomids' => [1, 2],
+            'facilitatorids' => [3, 4],
+        ];
+        $new_date = clone $old_date;
+        self::assertFalse(seminar_session_list::has_date_changed($old_date, $new_date));
+
+        $new_date->timestart ++;
+        self::assertTrue(seminar_session_list::has_date_changed($old_date, $new_date));
+
+        $new_date = clone $old_date;
+        $new_date->timefinish ++;
+        self::assertTrue(seminar_session_list::has_date_changed($old_date, $new_date));
+
+        $new_date = clone $old_date;
+        $new_date->sessiontimezone ++;
+        self::assertTrue(seminar_session_list::has_date_changed($old_date, $new_date));
+
+        $new_date = clone $old_date;
+        $new_date->roomids = [5];
+        self::assertTrue(seminar_session_list::has_date_changed($old_date, $new_date));
+
+        $new_date = clone $old_date;
+        $new_date->facilitatorids = [6];
+        self::assertTrue(seminar_session_list::has_date_changed($old_date, $new_date));
+    }
 }

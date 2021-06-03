@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/datetime/define.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/datetime/field.class.php');
 
-use mod_facetoface\{signup_helper, seminar_event, trainer_helper};
+use mod_facetoface\{facilitator_helper, room_helper, signup_helper, seminar_event, trainer_helper};
 
 class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_testcase {
 
@@ -2719,5 +2719,104 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             ->save();
 
         return new \mod_facetoface\seminar($f2f->id);
+    }
+
+    /**
+     * Check signup_datetime_changed notification in conjunction with the 'facetoface_oneemailperday' setting turned on.
+     *
+     * Only those dates with relevant changes are expected to have a notification sent.
+     */
+    public function test_signup_datetime_changed_oneemailperday(): void {
+        set_config('facetoface_oneemailperday', true);
+        $course = $this->createCourse();
+        $user = $this->createUser();
+        $this->enrolUser($user, $course);
+        $seminar = $this->createSeminar($course, 'f2f');
+        $room1 = $this->createSeminarRoom(
+            [
+                'name' => 'Test Room One',
+                'url' => 'https://example.com/test_room_1',
+            ],
+            [
+                'locationaddress' => "Address\nSuburb\nCity",
+            ]
+        );
+
+        $dates = [
+            // Use different timezones for easy distinction when asserting.
+            $this->createSeminarDate(WEEKSECS, null, 0, 'Pacific/Tahiti'),
+            $this->createSeminarDate(WEEKSECS + DAYSECS * 2, null, 0, 'Pacific/Galapagos'),
+            $this->createSeminarDate(WEEKSECS + DAYSECS * 5, null, 0, 'Pacific/Honolulu'),
+        ];
+        $session = $this->addSeminarSession($seminar, $dates);
+
+        // Trigger the signup_datetime_changed message WITHOUT having changed anything (old dates = new dates).
+        $old_dates = $session->sessiondates;
+        $signup = \mod_facetoface\signup::create($user->id, new \mod_facetoface\seminar_event($session->id));
+        \mod_facetoface\notice_sender::signup_datetime_changed($signup, $old_dates);
+
+        // No notifications expected.
+        $this->assert_datetime_changed_notifications_sent($user, []);
+
+        // Set the roomids/facilitatorids properties of old dates to existing values.
+        foreach ($old_dates as &$old_date) {
+            $old_date->roomids = room_helper::get_room_ids_sorted($old_date->id);
+            $old_date->facilitatorids = facilitator_helper::get_facilitator_ids_sorted($old_date->id);
+        }
+        unset($old_date);
+        \mod_facetoface\notice_sender::signup_datetime_changed($signup, $old_dates);
+
+        // Still no notifications expected.
+        $this->assert_datetime_changed_notifications_sent($user, []);
+
+        // Set room id for one old date, so a change should be detected.
+        $old_dates[0]->roomids = [$room1->id];
+        \mod_facetoface\notice_sender::signup_datetime_changed($signup, $old_dates);
+
+        // One notification expected.
+        $this->assert_datetime_changed_notifications_sent($user, ['Pacific/Tahiti']);
+
+        // Make sure a change of facilitator also triggers notification.
+        $facilitator = $this->createUser();
+        $old_dates[1]->facilitatorids = [$facilitator->id];
+        \mod_facetoface\notice_sender::signup_datetime_changed($signup, $old_dates);
+
+        // Two notifications expected.
+        $this->assert_datetime_changed_notifications_sent($user, ['Pacific/Tahiti', 'Pacific/Galapagos']);
+
+        // Make sure changing time also triggers notification.
+        $old_dates[2]->timestart ++;
+        \mod_facetoface\notice_sender::signup_datetime_changed($signup, $old_dates);
+
+        // Three notifications expected.
+        $this->assert_datetime_changed_notifications_sent($user, ['Pacific/Tahiti', 'Pacific/Galapagos', 'Pacific/Honolulu']);
+    }
+
+    /**
+     * @param stdClass $recipient
+     * @param array $expected_fullmessage_substrings
+     */
+    private function assert_datetime_changed_notifications_sent(stdClass $recipient, array $expected_fullmessage_substrings): void {
+        $email_sink = $this->redirectMessages();
+        self::executeAdhocTasks();
+        $emails = $email_sink->get_messages();
+        self::assertCount(count($expected_fullmessage_substrings), $emails);
+        foreach ($emails as $email) {
+            self::assertEquals($recipient->id, $email->useridto);
+            self::assertStringContainsString('Seminar date/time changed', $email->subject);
+            
+            // Make sure it matches exactly one of the expected fullmessage substrings.
+            $count_fullmessage_match = 0;
+            $found_key = null;
+            foreach ($expected_fullmessage_substrings as $key => $expected_substring) {
+                if (strpos($email->fullmessage, $expected_substring) !== false) {
+                    $count_fullmessage_match ++;
+                    $found_key = $key;
+                }
+            }
+            unset($expected_fullmessage_substrings[$found_key]);
+            self::assertEquals(1, $count_fullmessage_match);
+        }
+        $email_sink->clear();
     }
 }

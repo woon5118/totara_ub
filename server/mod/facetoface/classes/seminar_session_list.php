@@ -311,19 +311,33 @@ final class seminar_session_list implements \Iterator, \Countable {
 
         $dateschanged = false;
 
-        for ($i = 0; $i < count($olddates); $i++) {
-            if ($olddates[$i]->timestart != $newdates[$i]->timestart ||
-                $olddates[$i]->timefinish != $newdates[$i]->timefinish ||
-                $olddates[$i]->sessiontimezone != $newdates[$i]->sessiontimezone ||
-                // NOTE: roomids and facilitatorids must be sorted in the same order.
-                (isset($olddates[$i]->roomids) && isset($newdates[$i]->roomids) && $olddates[$i]->roomids != $newdates[$i]->roomids) ||
-                (isset($olddates[$i]->facilitatorids) && isset($newdates[$i]->facilitatorids) && $olddates[$i]->facilitatorids != $newdates[$i]->facilitatorids)) {
+        $old_date_count = count($olddates);
+        for ($i = 0; $i < $old_date_count; $i++) {
+            if (self::has_date_changed($olddates[$i], $newdates[$i])) {
                 $dateschanged = true;
                 break;
             }
         }
 
         return $dateschanged;
+    }
+
+    /**
+     * Check for one old date/new date object pair if anything relevant has changed.
+     *
+     * @param \stdClass $old_date
+     * @param \stdClass $new_date
+     * @return bool
+     */
+    public static function has_date_changed(\stdClass $old_date, \stdClass $new_date): bool {
+        return (
+            $old_date->timestart != $new_date->timestart
+                || $old_date->timefinish != $new_date->timefinish
+                || $old_date->sessiontimezone != $new_date->sessiontimezone
+                // NOTE: roomids and facilitatorids must be sorted in the same order.
+                || (isset($old_date->roomids, $new_date->roomids) && $old_date->roomids != $new_date->roomids)
+                || (isset($old_date->facilitatorids, $new_date->facilitatorids) && $old_date->facilitatorids != $new_date->facilitatorids)
+        );
     }
 
     /**

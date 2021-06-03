@@ -301,4 +301,20 @@ final class room_helper {
             ->where('sd.id', $session->get_id())
             ->exists();
     }
+
+    /**
+     * Get all room ids for a given session date, sorted by id.
+     *
+     * @param int $session_date_id
+     * @return array
+     */
+    public static function get_room_ids_sorted(int $session_date_id): array {
+        global $DB;
+        return array_keys($DB->get_records(
+            'facetoface_room_dates',
+            ['sessionsdateid' => $session_date_id],
+            'roomid',
+            'roomid'
+        ));
+    }
 }
