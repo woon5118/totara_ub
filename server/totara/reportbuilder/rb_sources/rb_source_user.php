@@ -133,6 +133,11 @@ class rb_source_user extends rb_base_source {
     protected function define_joinlist() {
         global $CFG;
 
+        /**
+         * @deprecated Do not use these joins anymore, they are scaling poorly and have been replaced with subselects
+         *
+         * START DO NOT USE
+         */
         $joinlist = array(
             new rb_join(
                 'totara_stats_comp_achieved',
@@ -188,12 +193,16 @@ class rb_source_user extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             )
         );
+        /**
+         * END DO NOT USE
+         */
 
         $joinlist[] = new rb_join(
             'user_extra',
             'LEFT',
             '{totara_userdata_user}',
-            'base.id = user_extra.userid');
+            'base.id = user_extra.userid'
+        );
 
         $joinlist[] = new rb_join(
             'suspended_purge_type',
@@ -201,7 +210,8 @@ class rb_source_user extends rb_base_source {
             '{totara_userdata_purge_type}',
             'user_extra.suspendedpurgetypeid = suspended_purge_type.id',
             null,
-            'user_extra');
+            'user_extra'
+        );
 
         $joinlist[] = new rb_join(
             'deleted_purge_type',
@@ -209,7 +219,8 @@ class rb_source_user extends rb_base_source {
             '{totara_userdata_purge_type}',
             'user_extra.deletedpurgetypeid = deleted_purge_type.id',
             null,
-            'user_extra');
+            'user_extra'
+        );
 
         // Special join intended to be used for 'participantstenantid' parameter only.
         if (!empty($CFG->tenantsenabled)) {
@@ -219,7 +230,8 @@ class rb_source_user extends rb_base_source {
                 '(SELECT t.id AS tenantid, cm.userid
                     FROM {tenant} t
                     JOIN {cohort_members} cm ON cm.cohortid = t.cohortid)',
-                'base.id = tenant_participants.userid');
+                'base.id = tenant_participants.userid'
+            );
         }
 
         $this->add_totara_job_tables($joinlist, 'base', 'id');
@@ -244,35 +256,38 @@ class rb_source_user extends rb_base_source {
 
         // A column to display a user's profile picture
         $columnoptions[] = new rb_column_option(
-                        'user',
-                        'userpicture',
-                        get_string('userspicture', 'rb_source_user'),
-                        'base.id',
-                        array(
-                            'displayfunc' => 'user_icon',
-                            'noexport' => true,
-                            'defaultheading' => get_string('picture', 'rb_source_user'),
-                            'extrafields' => array_merge(array(
-                                'id' => "base.id",
-                                'deleted' => "base.deleted",
-                                'picture' => "base.picture",
-                                'imagealt' => "base.imagealt",
-                                'email' => "base.email"),
-                                $allnamefields),
-                        )
+            'user',
+            'userpicture',
+            get_string('userspicture', 'rb_source_user'),
+            'base.id',
+            array(
+                'displayfunc' => 'user_icon',
+                'noexport' => true,
+                'defaultheading' => get_string('picture', 'rb_source_user'),
+                'extrafields' => array_merge(
+                    array(
+                        'id' => "base.id",
+                        'deleted' => "base.deleted",
+                        'picture' => "base.picture",
+                        'imagealt' => "base.imagealt",
+                        'email' => "base.email"
+                    ),
+                    $allnamefields
+                ),
+            )
         );
 
         // A column to display the "My Learning" icons for a user
         $columnoptions[] = new rb_column_option(
-                        'user',
-                        'userlearningicons',
-                        get_string('mylearningicons', 'rb_source_user'),
-                        'base.id',
-                        array(
-                            'displayfunc' => 'user_learning_icons',
-                            'noexport' => true,
-                            'defaultheading' => get_string('options', 'rb_source_user')
-                        )
+            'user',
+            'userlearningicons',
+            get_string('mylearningicons', 'rb_source_user'),
+            'base.id',
+            array(
+                'displayfunc' => 'user_learning_icons',
+                'noexport' => true,
+                'defaultheading' => get_string('options', 'rb_source_user')
+            )
         );
 
         $columnoptions[] = new rb_column_option(
@@ -322,57 +337,53 @@ class rb_source_user extends rb_base_source {
         );
 
         // A column to display the number of achieved competencies for a user
-        // We need a COALESCE on the field for 0 to replace nulls, which ensures correct sorting order.
         $columnoptions[] = new rb_column_option(
-                        'statistics',
-                        'competenciesachieved',
-                        get_string('usersachievedcompcount', 'rb_source_user'),
-                        'COALESCE(totara_stats_comp_achieved.number,0)',
-                        array(
-                            'displayfunc' => 'integer',
-                            'joins' => 'totara_stats_comp_achieved',
-                            'dbdatatype' => 'integer',
-                        )
+            'statistics',
+            'competenciesachieved',
+            get_string('usersachievedcompcount', 'rb_source_user'),
+            '(SELECT COUNT(*) FROM {block_totara_stats} bts WHERE bts.eventtype = 4 AND bts.userid = base.id)',
+            array(
+                'displayfunc' => 'integer',
+                'issubquery' => true,
+                'dbdatatype' => 'integer',
+            )
         );
 
         // A column to display the number of started courses for a user
-        // We need a COALESCE on the field for 0 to replace nulls, which ensures correct sorting order.
         $columnoptions[] = new rb_column_option(
-                        'statistics',
-                        'coursesstarted',
-                        get_string('userscoursestartedcount', 'rb_source_user'),
-                        'COALESCE(course_completions_courses_started.number,0)',
-                        array(
-                            'displayfunc' => 'integer',
-                            'joins' => 'course_completions_courses_started',
-                            'dbdatatype' => 'integer',
-                        )
+            'statistics',
+            'coursesstarted',
+            get_string('userscoursestartedcount', 'rb_source_user'),
+            '(SELECT COUNT(*) FROM {course_completions} cc WHERE (cc.timestarted > 0 OR cc.timecompleted > 0) AND cc.userid = base.id)',
+            array(
+                'displayfunc' => 'integer',
+                'issubquery' => true,
+                'dbdatatype' => 'integer',
+            )
         );
 
         // A column to display the number of completed courses for a user
-        // We need a COALESCE on the field for 0 to replace nulls, which ensures correct sorting order.
         $columnoptions[] = new rb_column_option(
-                        'statistics',
-                        'coursescompleted',
-                        get_string('userscoursescompletedcount', 'rb_source_user'),
-                        'COALESCE(totara_stats_courses_completed.number,0)',
-                        array(
-                            'displayfunc' => 'integer',
-                            'joins' => 'totara_stats_courses_completed',
-                            'dbdatatype' => 'integer',
-                        )
+            'statistics',
+            'coursescompleted',
+            get_string('userscoursescompletedcount', 'rb_source_user'),
+            '(SELECT COUNT(DISTINCT cc.course) AS number FROM {course_completions} cc WHERE cc.status >= ' . COMPLETION_STATUS_COMPLETE . ' AND cc.userid = base.id)',
+            array(
+                'displayfunc' => 'integer',
+                'issubquery' => true,
+                'dbdatatype' => 'integer',
+            )
         );
 
         // A column to display the number of course completions as evidence for a user.
-        // We need a COALESCE on the field for 0 to replace nulls, which ensures correct sorting order.
         $columnoptions[] = new rb_column_option(
             'statistics',
             'coursecompletionsasevidence',
             get_string('coursecompletionsasevidence', 'rb_source_user'),
-            'COALESCE(totara_stats_course_completion_imports.number,0)',
+            '(SELECT COUNT(DISTINCT tcic.courseidnumber) FROM {totara_compl_import_course} tcic WHERE tcic.importevidence = 1 AND tcic.username = base.username)',
             array(
                 'displayfunc' => 'integer',
-                'joins' => 'totara_stats_course_completion_imports',
+                'issubquery' => true,
                 'dbdatatype' => 'integer',
             )
         );
@@ -380,34 +391,38 @@ class rb_source_user extends rb_base_source {
         $usednamefields = totara_get_all_user_name_fields_join('base', null, true);
         $allnamefields = totara_get_all_user_name_fields_join('base');
         $columnoptions[] = new rb_column_option(
-                        'user',
-                        'namewithlinks',
-                        get_string('usernamewithlearninglinks', 'rb_source_user'),
-                        $DB->sql_concat_join("' '", $usednamefields),
-                        array(
-                            'displayfunc' => 'user_with_components_links',
-                            'defaultheading' => get_string('user', 'rb_source_user'),
-                            'extrafields' => array_merge(array('id' => 'base.id',
-                                                               'picture' => 'base.picture',
-                                                               'imagealt' => 'base.imagealt',
-                                                               'email' => 'base.email',
-                                                               'deleted' => 'base.deleted'),
-                                                         $allnamefields),
-                            'dbdatatype' => 'char',
-                            'outputformat' => 'text'
-                        )
+            'user',
+            'namewithlinks',
+            get_string('usernamewithlearninglinks', 'rb_source_user'),
+            $DB->sql_concat_join("' '", $usednamefields),
+            array(
+                'displayfunc' => 'user_with_components_links',
+                'defaultheading' => get_string('user', 'rb_source_user'),
+                'extrafields' => array_merge(
+                    array(
+                        'id' => 'base.id',
+                        'picture' => 'base.picture',
+                        'imagealt' => 'base.imagealt',
+                        'email' => 'base.email',
+                        'deleted' => 'base.deleted'
+                    ),
+                    $allnamefields
+                ),
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
+            )
         );
 
         $columnoptions[] = new rb_column_option(
-                        'user',
-                        'extensionswithlink',
-                        get_string('extensions', 'totara_program'),
-                        'prog_extension_count.extensioncount',
-                        array(
-                            'joins' => 'prog_extension_count',
-                            'displayfunc' => 'program_extension_link',
-                            'extrafields' => array('user_id' => 'base.id')
-                        )
+            'user',
+            'extensionswithlink',
+            get_string('extensions', 'totara_program'),
+            '(SELECT COUNT(*) FROM {prog_extension} pe WHERE pe.userid = base.id AND pe.status = 0)',
+            array(
+                'issubquery' => true,
+                'displayfunc' => 'program_extension_link',
+                'extrafields' => array('user_id' => 'base.id')
+            )
         );
 
         $usednamefields = totara_get_all_user_name_fields_join('base', null, true);
