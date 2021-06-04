@@ -150,6 +150,7 @@ export default {
 
 <style lang="scss">
 .tui-commentReplyHeader {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;

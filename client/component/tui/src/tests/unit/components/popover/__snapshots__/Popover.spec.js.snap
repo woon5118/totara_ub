@@ -9,6 +9,7 @@ exports[`Popover matches snapshot 1`] = `
   </popovertrigger-stub>
    
   <popoverpositioner-stub
+    contextmode="contained"
     position="bottom"
     preferslide="true"
     transition="default"

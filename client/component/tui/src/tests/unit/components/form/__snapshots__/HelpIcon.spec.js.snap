@@ -6,6 +6,7 @@ exports[`presentation/form/HelpIcon.vue Checks snapshot 1`] = `
 >
   <popover-stub
     closeable="true"
+    contextmode="contained"
     position="top"
     triggers="click"
   >

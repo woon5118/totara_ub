@@ -123,6 +123,7 @@ export default {
 
       // Overriding the comment thread to make it fit with the sidepanel
       &__comments {
+        position: relative;
         padding-right: var(--gap-2);
         overflow: auto;
 

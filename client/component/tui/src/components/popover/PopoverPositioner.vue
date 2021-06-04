@@ -28,6 +28,7 @@
   >
     <div
       v-show="shouldBeOpen"
+      ref="popover"
       class="tui-popoverPositioner"
       :class="[
         transition && 'tui-popoverPositioner--transition-' + transition,
@@ -59,6 +60,12 @@ import { getClosestScrollable } from 'tui/dom/scroll';
 import { position } from 'tui/lib/popover';
 import { Point, Size, Rect } from 'tui/geometry';
 import pending from 'tui/pending';
+import { getTabbableElements } from 'tui/dom/focus';
+
+const ContextType = {
+  CONTAINED: 'contained',
+  UNCONTAINED: 'uncontained',
+};
 
 export default {
   props: {
@@ -75,6 +82,14 @@ export default {
     preferSlide: Boolean,
     // match the width of the reference element
     matchWidth: Boolean,
+    // uncontained injects the element on the root level
+    contextMode: {
+      type: String,
+      default: ContextType.CONTAINED,
+      validator: function(value) {
+        return Object.values(ContextType).includes(value);
+      },
+    },
   },
 
   data() {
@@ -196,7 +211,8 @@ export default {
         if (
           process.env.NODE_ENV !== 'production' &&
           this.$el.offsetParent &&
-          refEl.offsetParent != this.$el.offsetParent
+          refEl.offsetParent != this.$el.offsetParent &&
+          this.contextMode === ContextType.CONTAINED
         ) {
           console.warn(
             '[PopoverPositioner] Reference element and PopoverPositioner are not in the same offset parent.'
@@ -206,11 +222,18 @@ export default {
           console.log('PopoverPositioner', this.$el);
           console.log('PopoverPositioner offset parent', this.$el.offsetParent);
         }
+
+        // Switch depending on context mode
+        let offsetRef =
+          this.contextMode === ContextType.UNCONTAINED
+            ? document.body
+            : refEl.offsetParent;
+
         // using offsetTop etc doesn't account for scrolling of intermediate elements
         refRect = getBoundingClientRect(refEl).sub(
-          getBoundingClientRect(refEl.offsetParent).getPosition()
+          getBoundingClientRect(offsetRef).getPosition()
         );
-        const offsetParentPosition = getDocumentPosition(refEl.offsetParent);
+        const offsetParentPosition = getDocumentPosition(offsetRef);
         viewport = getViewportRect().sub(offsetParentPosition);
       }
 
@@ -245,6 +268,63 @@ export default {
       });
     },
 
+    $_handleDocumentKeyDown(e) {
+      switch (e.key) {
+        case 'Tab':
+          this.$_customFocus(this.$refs.popover, e);
+          break;
+      }
+    },
+
+    $_customFocus(el, e) {
+      const tabbableElements = getTabbableElements(el);
+      if (tabbableElements.length === 0) {
+        return;
+      }
+
+      // Check if referenceElement is the active element
+      const isRefElActive = document.activeElement === this.referenceElement;
+
+      if (isRefElActive && !e.shiftKey) {
+        tabbableElements[0].focus();
+        e.preventDefault();
+      } else {
+        const index = tabbableElements.indexOf(document.activeElement);
+
+        if (!e.shiftKey) {
+          // Focus on the element after referenceElement if reached the end of tabbableElements
+          if (index === tabbableElements.length - 1) {
+            const allElements = getTabbableElements(document.body);
+            const afterRefEl = allElements.indexOf(this.referenceElement) + 1;
+
+            if (allElements[afterRefEl]) {
+              allElements[afterRefEl].focus();
+              e.preventDefault();
+            }
+          }
+        } else {
+          // Focus on referenceElement if tabbing has reached the beginning of tabbableElements (in reverse)
+          if (index === 0) {
+            this.referenceElement.focus();
+            e.preventDefault();
+          }
+
+          const allElements = getTabbableElements(document.body);
+          const afterRefEl = allElements.indexOf(this.referenceElement) + 1;
+
+          // Focus on the last element in tabbableElements if activeElement is the element after
+          // referenceElement (in reverse)
+          if (
+            allElements[afterRefEl] &&
+            document.activeElement === allElements[afterRefEl]
+          ) {
+            tabbableElements[tabbableElements.length - 1].focus();
+            e.preventDefault();
+          }
+        }
+      }
+    },
+
     transitionEnter() {
       if (this.enterDone) {
         this.enterDone();
@@ -275,6 +355,7 @@ export default {
 
     $_setupOpen() {
       this.$_closeCleanup();
+      this.$_activateContextMode();
 
       window.addEventListener('resize', this.handleResizeThrottled);
       window.addEventListener('scroll', this.handleResizeThrottled, {
@@ -283,8 +364,13 @@ export default {
 
       this.isFixed = this.$_useFixedPositioning();
 
+      // Add keydown event for uncontained mode to handle accessibility
+      if (this.contextMode === ContextType.UNCONTAINED) {
+        window.addEventListener('keydown', this.$_handleDocumentKeyDown);
+      }
+
       this.scrollableContainers = [];
-      let scrollable = getClosestScrollable(this.$el.parentNode);
+      let scrollable = getClosestScrollable(this.referenceElement);
       while (scrollable) {
         this.scrollableContainers.push(scrollable);
         scrollable.addEventListener('scroll', this.handleResize);
@@ -302,13 +388,35 @@ export default {
         );
         this.scrollableContainers = null;
       }
+
+      if (this.contextMode === ContextType.UNCONTAINED) {
+        window.removeEventListener('keydown', this.$_handleDocumentKeyDown);
+      }
+
+      this.$_removeElements();
     },
 
     $_useFixedPositioning() {
       return (
+        this.contextMode === ContextType.CONTAINED &&
         !!this.$el.closest('.tui-modalContent') &&
         !this.$el.closest('.tui-weka')
       );
+    },
+
+    /**
+     * If context mode is uncontained then appends popover in the root
+     */
+    $_activateContextMode() {
+      if (this.contextMode === ContextType.UNCONTAINED) {
+        document.body.appendChild(this.$refs.popover);
+      }
+    },
+
+    $_removeElements() {
+      if (this.$refs.popover && this.contextMode === ContextType.UNCONTAINED) {
+        this.$refs.popover.remove();
+      }
     },
   },
 };

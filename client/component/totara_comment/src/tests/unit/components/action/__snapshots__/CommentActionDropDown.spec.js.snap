@@ -6,6 +6,7 @@ exports[`totara_comment/components/action/CommentActionDropDown.vue Checks snaps
   canclose="true"
   class="tui-commentActionDropDown"
   closeonclick="true"
+  contextmode="contained"
   deleteable="true"
   editable="true"
   position="bottom-right"

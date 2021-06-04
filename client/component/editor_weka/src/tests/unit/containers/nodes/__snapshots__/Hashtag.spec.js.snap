@@ -6,6 +6,7 @@ exports[`editor_weka/components/nodes/Hashtag.vue Checks snapshot 1`] = `
   canclose="true"
   class="tui-wekaHashtag"
   closeonclick="true"
+  contextmode="contained"
   position="bottom-left"
   role="menu"
   separator="true"

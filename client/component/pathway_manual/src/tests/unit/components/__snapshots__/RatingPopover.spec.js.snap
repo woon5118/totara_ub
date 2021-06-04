@@ -3,6 +3,7 @@
 exports[`components/RatingPopover.vue Checks snapshot 1`] = `
 <popover-stub
   closeable="true"
+  contextmode="contained"
   position="bottom-right"
   triggers="click"
 >

@@ -88,13 +88,16 @@ export default class Suggestion {
       );
       this._scrollableContainers = null;
     }
+
+    window.removeEventListener('resize', this._updatePosition);
+
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
       this._resizeObserver = null;
     }
     if (this._instance !== null) {
       this._instance.$destroy();
-      this._editor.viewExtrasLiveEl.removeChild(this._instance.$el);
+      document.body.removeChild(this._instance.$el);
       this._instance = null;
     }
   }
@@ -137,7 +140,7 @@ export default class Suggestion {
     await loadStrings(collectStrings(component.component));
 
     const element = document.createElement('span');
-    this._editor.viewExtrasLiveEl.appendChild(element);
+    document.body.appendChild(element);
 
     this._view = view;
     this._range = range;
@@ -167,6 +170,8 @@ export default class Suggestion {
     }
     this._scrollableContainers.push(document);
     document.addEventListener('scroll', this._updatePosition);
+
+    window.addEventListener('resize', this._updatePosition);
 
     this._resizeObserver = new ResizeObserver(this._updatePosition);
     this._resizeObserver.observe(this._instance.$el);
@@ -203,9 +208,7 @@ export default class Suggestion {
    */
   _getLocation() {
     const html = document.documentElement;
-    const parentCoords = getBoundingClientRect(
-      this._editor.viewExtrasLiveEl.offsetParent
-    );
+    const parentCoords = getBoundingClientRect(document.body);
     const refCoords = this._view.coordsAtPos(this._range.from);
     const refRect = Rect.fromPositions({
       left: refCoords.left,

@@ -9,6 +9,7 @@ exports[`editor_weka/components/suggestion/User.vue Checks snapshot 1`] = `
     animation="default"
     canclose="true"
     closeonclick="true"
+    contextmode="contained"
     inlinemenu="true"
     position="bottom-left"
     role="menu"

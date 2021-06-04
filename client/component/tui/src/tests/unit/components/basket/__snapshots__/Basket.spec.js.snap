@@ -32,6 +32,7 @@ exports[`Basket matches snapshot 1`] = `
       animation="default"
       canclose="true"
       closeonclick="true"
+      contextmode="contained"
       position="bottom-right"
       role="menu"
       separator="true"

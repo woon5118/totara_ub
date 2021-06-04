@@ -44,6 +44,7 @@
       :reference-element="$refs.trigger"
       :match-width="matchWidth"
       transition="dropdown"
+      :context-mode="contextMode"
     >
       <div
         ref="dropdownMenu"
@@ -120,6 +121,10 @@ export default {
     /** Show the menu inline (rather than as a popover/overlay) */
     inlineMenu: Boolean,
     fixedHeight: Boolean,
+    contextMode: {
+      type: String,
+      default: 'contained',
+    },
   },
 
   data() {

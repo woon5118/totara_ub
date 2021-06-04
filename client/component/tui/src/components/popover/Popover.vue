@@ -34,6 +34,7 @@
       :open="isOpen"
       :reference-element="getReference()"
       :prefer-slide="true"
+      :context-mode="contextMode"
     >
       <PopoverFrame
         ref="frame"
@@ -90,6 +91,10 @@ export default {
       default: true,
     },
     size: String,
+    contextMode: {
+      type: String,
+      default: 'contained',
+    },
   },
 
   data() {
