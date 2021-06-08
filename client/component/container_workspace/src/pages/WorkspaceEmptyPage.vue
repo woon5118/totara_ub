@@ -41,7 +41,7 @@ export default {
   computed: {
     getContentMessage() {
       if (!this.notFound) {
-        return this.$str('error:not_found', 'container_workspace');
+        return this.$str('error:view_workspace', 'container_workspace');
       }
       return this.type == 'workspace'
         ? this.$str('error:workspace_not_found', 'container_workspace')
