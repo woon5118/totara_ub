@@ -21,7 +21,7 @@ import HashtagSuggestion from 'editor_weka/components/suggestion/Hashtag';
 import Suggestion from '../helpers/suggestion';
 import { debounce } from 'tui/util';
 
-export const REGEX = new RegExp(`#[^#\\s]+`, 'g');
+export const REGEX = new RegExp(`#[^#\\s]+$`, 'g');
 
 /**
  *

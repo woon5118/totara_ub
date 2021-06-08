@@ -51,7 +51,7 @@ export default class Suggestion {
 
     const text = $position.doc.textBetween(
       $position.start(),
-      $position.end(),
+      $position.pos,
       '\n',
       '\0'
     );

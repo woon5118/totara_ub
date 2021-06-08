@@ -30,7 +30,7 @@ import UserSuggestion from 'editor_weka/components/suggestion/User';
 export default function(editor) {
   const key = new PluginKey('mentions');
   let suggestion = new Suggestion(editor);
-  const regex = new RegExp(`@[^@\\s]+`, 'g');
+  const regex = new RegExp(`@[^@\\s]+$`, 'g');
 
   return new Plugin({
     key: key,
