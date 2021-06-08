@@ -196,13 +196,17 @@ class lesson_page_type_multichoice extends lesson_page {
                 foreach ($studentanswers as $answerid) {
                     if ($answerid == $answer->id) {
                         $studentanswerarray[] = format_text($answer->answer, $answer->answerformat, $formattextdefoptions);
-                        $responses[$answerid] = format_text($answer->response, $answer->responseformat, $formattextdefoptions);
+                        if (trim(strip_tags($answer->response))) {
+                            // As we are doing an implode later on, we dont want empty values in the array to prevent response containing only delimiters
+                            $responses[$answerid] = format_text($answer->response, $answer->responseformat, $formattextdefoptions);
+                        }
                     }
                 }
             }
             $result->studentanswer = implode(self::MULTIANSWER_DELIMITER, $studentanswerarray);
             $correctpageid = null;
             $wrongpageid = null;
+            $first_wrongpageid = null;
 
             // Iterate over all the possible answers.
             foreach ($answers as $answer) {
@@ -243,6 +247,10 @@ class lesson_page_type_multichoice extends lesson_page {
                     if ($correctanswerid == 0) {
                         $correctanswerid = $answer->id;
                     }
+                } else {
+                    if ($first_wrongpageid === null) {
+                        $first_wrongpageid = $answer->jumpto;
+                    }
                 }
             }
 
@@ -253,8 +261,8 @@ class lesson_page_type_multichoice extends lesson_page {
                 $result->answerid  = $correctanswerid;
             } else {
                 $result->response  = implode(self::MULTIANSWER_DELIMITER, $responses);
-                $result->newpageid = $wrongpageid;
-                $result->answerid  = $wronganswerid;
+                $result->newpageid = $wrongpageid ?? $first_wrongpageid;
+                $result->answerid  = $wronganswerid != 0 ? $wronganswerid : $correctanswerid; // Partially correct answer
             }
         } else {
             // only one answer allowed
