@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Ben Lobo <ben.lobo@kineo.com>
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package totara_program
  */
 
@@ -33,6 +34,7 @@ use totara_core\advanced_feature;
  * history table.
  */
 class recurrence_history_task extends \core\task\scheduled_task {
+
     /**
      * Get a descriptive name for this task (shown to admins).
      *
@@ -51,8 +53,7 @@ class recurrence_history_task extends \core\task\scheduled_task {
     public function execute() {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/totara/program/lib.php');
-        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
-        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
 
         // Don't run programs cron if programs and certifications are disabled.
         if (advanced_feature::is_disabled('programs') &&
@@ -60,22 +61,29 @@ class recurrence_history_task extends \core\task\scheduled_task {
             return false;
         }
 
-        $history_records = $DB->get_records('prog_completion_history', array('status' => STATUS_PROGRAM_INCOMPLETE));
+        $sql = "
+            UPDATE {prog_completion_history} 
+            SET status = :prog_complete_status, timecompleted = :time_completed
+            WHERE status = :prog_incomplete_status
+                AND EXISTS (
+                    SELECT cc.id 
+                    FROM {course_completions} cc
+                    WHERE cc.timecompleted IS NOT NULL
+                        AND cc.status = :course_completed_status
+                        AND cc.userid = {prog_completion_history}.userid 
+                        AND cc.course = {prog_completion_history}.recurringcourseid
+                )
+        ";
 
-        foreach ($history_records as $history_record) {
-
-            if ($course = $DB->get_record('course', array('id' => $history_record->recurringcourseid))) {
-
-                // Create a new completion object for this course.
-                $completion_info = new \completion_info($course);
-                // Check if the course is complete.
-                if ($completion_info->is_course_complete($history_record->userid)) {
-                    $history_record->status = STATUS_PROGRAM_COMPLETE;
-                    $history_record->timecompleted = time();
-                    $DB->update_record('prog_completion_history', $history_record);
-                }
-            }
-        }
+        $DB->execute(
+            $sql,
+            [
+                'prog_complete_status' => STATUS_PROGRAM_COMPLETE,
+                'time_completed' => time(),
+                'prog_incomplete_status' => STATUS_PROGRAM_INCOMPLETE,
+                'course_completed_status' => COMPLETION_STATUS_COMPLETE
+            ]
+        );
     }
 }
 
