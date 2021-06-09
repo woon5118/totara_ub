@@ -208,9 +208,9 @@ class core_renderer extends \core_renderer {
             $template_data = ['links' => $links];
         }
 
-        if ($hook->has_sign_out) {
+        if ($hook->has_sign_out && !empty($USER->id)) {
             $template_data['logout'] = [
-                'logouttitle' => get_string('loggedinasuser', 'theme_msteams', (core_user::get_user($USER->id)->firstname)),
+                'logouttitle' => get_string('loggedinasuser', 'theme_msteams', fullname($USER)),
                 'logouttext' => get_string('botfw:msg_signout_button', 'totara_msteams'),
                 'logouthref' => (new moodle_url('/login/logout.php', ['sesskey' => sesskey(), 'redirecturl' => (new moodle_url($data['url']))->out(false)]))->out(false)
             ];

@@ -59,8 +59,16 @@ export default {
     triggerPopup(event) {
       const link = event.target.closest('a');
 
-      // If not a link or the link URL is an internal URL.
-      if (!link || !link.href || link.href.startsWith(config.wwwroot)) {
+      // If not a link or the link URL is an internal URL and doesn't have the show_redirect_confirmation param.
+      // So for the confirmation modal to be shown, the URL must either be like:
+      // - https://www.external-website.com/ OR
+      // - https://www.totara-website.com/totara/plugin/page.php?totara_msteams_confirm_redirect=1
+      if (
+        !link ||
+        !link.href ||
+        (link.href.startsWith(config.wwwroot) &&
+          !link.href.includes('totara_msteams_confirm_redirect=1'))
+      ) {
         return;
       }
 

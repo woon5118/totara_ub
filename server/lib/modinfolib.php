@@ -1771,6 +1771,17 @@ class cm_info implements IteratorAggregate {
     }
 
     /**
+     * Sets the full url for viewing the activity module.
+     *
+     * @param moodle_url $url URL to link to for this module, or null if it doesn't have a view page
+     * @return void
+     * @since Totara 13.9
+     */
+    public function set_url(moodle_url $url): void {
+        $this->url = $url;
+    }
+
+    /**
      * Some set functions can only be called from _cm_info_dynamic and not _cm_info_view.
      * This is because they may affect parts of this object which are used on pages other
      * than the view page (e.g. in the navigation block, or when checking access on

@@ -7,6 +7,7 @@ information provided here is intended especially for developers.
 * The login template (login.mustache) has been updated to support overriding the default OAuth2 IDP sign in buttons,
   allowing a custom button image to be specified with the buttonimageurl and issuertype template variables.
   The example context JSON for this template has also been updated.
+* Added new method set_url() to \cm_info to allow modules to set and override their own URL.
 
 === 13.8 ===
 

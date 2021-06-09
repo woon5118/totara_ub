@@ -357,3 +357,23 @@ function url_check_updates_since(cm_info $cm, $from, $filter = array()) {
     $updates = course_check_module_updates_since($cm, $from, array('content'), $filter);
     return $updates;
 }
+
+/**
+ * Sets dynamic information about a course module
+ *
+ * @param cm_info $cm
+ * @see \cm_info::obtain_dynamic_data
+ * @since Totara 13.9
+ */
+function url_cm_info_dynamic(cm_info $cm) {
+    global $CFG, $DB, $SESSION;
+
+    // Totara: Add an additional param to the module URL if we are viewing this from within Microsoft teams.
+    $url = $cm->url;
+    if (isset($SESSION->theme) && $SESSION->theme === 'msteams' && $url->get_param('totara_msteams_confirm_redirect') === null) {
+        $external_url = $DB->get_field('url', 'externalurl', ['id' => $cm->instance], MUST_EXIST);
+        $is_external_url = strpos($external_url, $CFG->wwwroot) === false;
+        $url->param('totara_msteams_confirm_redirect', (int) $is_external_url);
+        $cm->set_url($url);
+    }
+}
