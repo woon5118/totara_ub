@@ -28,6 +28,7 @@ use core\theme\file\theme_file;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\formatter;
 use context;
+use moodle_url;
 
 class theme_file_formatter extends formatter {
 
@@ -84,9 +85,10 @@ class theme_file_formatter extends formatter {
 
     /**
      * Get the default URL taking the reference copy into consideration.
-     * @return string
+     *
+     * @return moodle_url|null
      */
-    protected function get_default_url(): string {
+    protected function get_default_url(): ?moodle_url {
         $url = $this->object->get_reference_url();
         if (empty($url)) {
             $url = $this->object->get_default_url();
