@@ -293,8 +293,8 @@ Feature: Navigate a learning item in a static tab
     Then I should see "Course: Activity test course" in the page title
 
     When I follow "Test url"
-    Then I should see "This page is not fully compatible with Microsoft Teams"
-    And I click on "Activity test course" "link" in the ".totara_msteams__navigation" "css_element"
+    Then I should see "You are about to be taken to your default browser to view this page"
+    When I click on "Cancel" "button"
     Then I should see "Course: Activity test course" in the page title
 
     When I follow "Test wiki"

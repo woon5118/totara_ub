@@ -30,6 +30,7 @@
 
 <script>
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import { config } from 'tui/config';
 
 export default {
   components: {
@@ -58,8 +59,8 @@ export default {
     triggerPopup(event) {
       const link = event.target.closest('a');
 
-      // If not an external link
-      if (!link || !link.href || link.host === document.location.hostname) {
+      // If not a link or the link URL is an internal URL.
+      if (!link || !link.href || link.href.startsWith(config.wwwroot)) {
         return;
       }
 
