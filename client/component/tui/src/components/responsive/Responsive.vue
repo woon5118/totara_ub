@@ -39,8 +39,9 @@ export default {
     },
 
     /**
-     * Time delay before firing resize event. The event will be fired after the
-     * time limit, not before and not in between. Time is in milliseconds.
+     * Time delay before firing resize event. The event will be fired
+     * immediately on the first resize, then again after the time limit if
+     * there have been further resizes in between. Time is in milliseconds.
      **/
     resizeThrottleTime: {
       type: Number,
@@ -72,7 +73,7 @@ export default {
      **/
     largestBreakpoint() {
       let largestBreakpoint = this.breakpoints[0];
-      this.breakpoints.map(function(breakpoint) {
+      this.breakpoints.map(breakpoint => {
         if (breakpoint.boundaries[0] > largestBreakpoint.boundaries[0]) {
           largestBreakpoint = breakpoint;
         }
@@ -89,23 +90,19 @@ export default {
     // column, for example
     if (this.$el instanceof Element && this.breakpoints.length) {
       // wrap our resizing in a throttle method to prevent excessive execution
-      const resize = throttle(
-        entries => {
-          // try to find a breakpoint match from supplied breakpoints. an
-          // element width may be wider than supplied breakpoint values, in
-          // which case use the largest available value
-          let boundaryName =
-            this.getBoundaryName(entries) || this.largestBreakpoint.name;
+      const resize = throttle(entries => {
+        // try to find a breakpoint match from supplied breakpoints. an
+        // element width may be wider than supplied breakpoint values, in
+        // which case use the largest available value
+        let boundaryName =
+          this.getBoundaryName(entries) || this.largestBreakpoint.name;
 
-          // update current boundary so it can be passed as a slot prop
-          this.currentBoundaryName = boundaryName;
+        // update current boundary so it can be passed as a slot prop
+        this.currentBoundaryName = boundaryName;
 
-          // notify parent  components of the change
-          this.$emit('responsive-resize', boundaryName);
-        },
-        this.resizeThrottleTime,
-        { leading: true, trailing: false }
-      );
+        // notify parent  components of the change
+        this.$emit('responsive-resize', boundaryName);
+      }, this.resizeThrottleTime);
 
       this.resizeObserverRef = new ResizeObserver(resize);
       this.resizeObserverRef.observe(this.$el);
@@ -125,9 +122,9 @@ export default {
      * Returns the `name` property of the breakpoint whose boundaries match the
      * width of the observed element. If no match is found, returns undefined.
      **/
-    getBoundaryName: function(entries) {
+    getBoundaryName(entries) {
       let boundaryName;
-      this.breakpoints.map(function(breakpoint) {
+      this.breakpoints.map(breakpoint => {
         if (
           entries[0].contentRect.width > breakpoint.boundaries[0] &&
           entries[0].contentRect.width < breakpoint.boundaries[1]
