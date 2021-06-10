@@ -58,6 +58,7 @@ class expand_task {
         $assignments = assignment::repository()
             ->filter_by_active()
             ->filter_by_expand()
+            ->order_by('id')
             ->get_lazy();
 
         foreach ($assignments as $assignment) {
