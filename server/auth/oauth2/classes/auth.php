@@ -616,7 +616,8 @@ class auth extends \auth_plugin_base {
                 } else {
                     // Create a new confirmed account.
                     $newuser = \auth_oauth2\api::create_new_confirmed_account($userinfo, $issuer);
-                    $userinfo = get_complete_user_data('id', $newuser->id);
+                    $newuser = get_complete_user_data('id', $newuser->id);
+                    $userinfo = $this->update_user($userinfo, $newuser);
                     // No redirect, we will complete this login.
                 }
             }
