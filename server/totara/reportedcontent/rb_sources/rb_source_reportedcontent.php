@@ -184,7 +184,10 @@ class rb_source_reportedcontent extends rb_base_source {
                 'displayfunc' => 'reportedcontent_content',
                 'extrafields' => array(
                     'format' => 'base.format',
+                    'context_id' => 'base.context_id',
+                    'component' => 'base.component',
                     'area' => 'base.area',
+                    'item_id' => 'base.item_id',
                 ),
             ]
         );

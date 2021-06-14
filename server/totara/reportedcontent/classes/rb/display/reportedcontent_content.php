@@ -45,17 +45,23 @@ final class reportedcontent_content extends base {
             return '';
         }
 
-        $extra_fields = static::get_extrafields_row($row, $column);
-        $content_format = $extra_fields->format;
+        $extra_fields = self::get_extrafields_row($row, $column);
+        $content = \file_rewrite_pluginfile_urls(
+            $value,
+            'pluginfile.php',
+            $extra_fields->context_id,
+            $extra_fields->component,
+            $extra_fields->area,
+            $extra_fields->item_id
+        );
 
-        // Convert it back based on the saved format (usually json editor)
-        $result = format_text($value, $content_format);
+        $content = format_text($content, $extra_fields->format);
 
         if ($format !== 'html') {
-            $result = static::to_plaintext($result);
+            $content = self::to_plaintext($content);
         }
 
-        return $result;
+        return $content;
     }
 
     /**
