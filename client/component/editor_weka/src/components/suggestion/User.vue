@@ -17,10 +17,14 @@
 -->
 
 <template>
-  <div class="tui-wekaUserSuggestions" :style="positionStyle">
+  <div
+    v-if="mentionOpen"
+    class="tui-wekaUserSuggestions"
+    :style="positionStyle"
+  >
     <Dropdown
       :separator="true"
-      :open="$apollo.loading || users.length > 0"
+      :open="mentionOpen"
       :inline-menu="true"
       @dismiss="$emit('dismiss')"
     >
@@ -106,6 +110,13 @@ export default {
         left: `${this.location.x}px`,
         top: `${this.location.y}px`,
       };
+    },
+
+    /**
+     * Whether this has options or is loading options for the mention
+     */
+    mentionOpen() {
+      return this.$apollo.loading || this.users.length > 0;
     },
   },
 
