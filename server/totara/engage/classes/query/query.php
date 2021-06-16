@@ -460,7 +460,7 @@ final class query {
      * @return bool
      */
     public function is_search(): bool {
-        return $this->area === 'search';
+        return $this->area === 'search' || ($this->is_library_from_workspace() && !empty($this->search));
     }
 
     /**

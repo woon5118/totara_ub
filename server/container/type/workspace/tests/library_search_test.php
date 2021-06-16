@@ -1,14 +1,8 @@
 <?php
-
-use container_workspace\enrol\manager;
-use container_workspace\member\member;
-use container_workspace\totara_engage\share\recipient\library;
-use totara_tenant\local\util;
-
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,249 +17,132 @@ use totara_tenant\local\util;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_userstatus
+ * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
+ * @package container_workspace
  */
 
+use engage_article\totara_engage\card\article_card;
+use totara_engage\card\card;
+use totara_playlist\totara_engage\card\playlist_card;
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
 class totara_engage_library_search_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
 
-    public function test_search_workspaces() {
-        $this->setAdminUser();
+    public function test_search_library(): void {
+        $gen = $this->getDataGenerator();
 
-        $owner = $this->getDataGenerator()->create_user();
-        $member = $this->getDataGenerator()->create_user();
+        /**
+         * @var container_workspace_generator $workspace_gen
+         */
+        $workspace_gen = $gen->get_plugin_generator('container_workspace');
 
-        /** @var container_workspace_generator $workspace_generator */
-        $workspace_generator = $this->getDataGenerator()->get_plugin_generator('container_workspace');
+        /** @var engage_article_generator $article_gen */
+        $article_gen = $gen->get_plugin_generator('engage_article');
 
-        $priv_workspace_member = $workspace_generator->create_private_workspace(
-            'private workspace member',
-            'description',
-            null,
-            $owner->id
-        );
-        $priv_hidden_workspace_member1 = $workspace_generator->create_hidden_workspace(
-            'private hidden workspace member',
-            'description',
-            null,
-            $owner->id
-        );
-        $priv_workspace_non_member = $workspace_generator->create_private_workspace(
-            'private workspace w/o member',
-            'description',
-            null,
-            $owner->id
-        );
+        /** @var engage_survey_generator $survey_gen */
+        $survey_gen = $gen->get_plugin_generator('engage_survey');
 
-        $pub_workspace_member = $workspace_generator->create_workspace(
-            'public workspace member',
-            'description',
-            null,
-            $owner->id
-        );
-        $pub_workspace_non_member = $workspace_generator->create_workspace(
-            'public workspace w/o member',
-            'description',
-            null,
-            $owner->id
-        );
+        /** @var totara_playlist_generator $playlist_gen */
+        $playlist_gen = $gen->get_plugin_generator('totara_playlist');
 
-        member::added_to_workspace($priv_workspace_member, $member->id, false);
-        member::added_to_workspace($priv_hidden_workspace_member1, $member->id, false);
-        member::added_to_workspace($pub_workspace_member, $member->id, false);
+        $user1 = $gen->create_user();
+        $this->setUser($user1);
 
-        // Admin user is not a member so shouldn't find anything
-        $result = library::search('', null);
-        $this->assertCount(0, $result);
+        // Give user create workspace capability.
+        $workspace_gen->set_capabilities(CAP_ALLOW, $user1->id);
 
-        $this->setUser($member);
+        // Create workspace.
+        $workspace = $workspace_gen->create_workspace('SpaceX', 'X', null, null, false);
 
-        $result = library::search('', null);
-        $this->assertCount(3, $result);
+        // Create recipients.
+        $recipients = $workspace_gen->create_workspace_recipients([$workspace]);
 
-        $recipient_ids = [];
-        foreach ($result as $recipient) {
-            $recipient_ids[] = $recipient->get_id();
-        }
+        // Create and share items.
+        $article = $article_gen->create_article(['name' => 'This are tickle', 'access' => \totara_engage\access\access::PUBLIC]);
+        $survey = $survey_gen->create_survey('2B || !2B', [], 1, ['access' => \totara_engage\access\access::PUBLIC]);
+        $playlist = $playlist_gen->create_playlist(['name' => 'Playing in a list', 'access' => \totara_engage\access\access::PUBLIC]);
 
-        $this->assertEqualsCanonicalizing(
+        $article_gen->share_article($article, $recipients);
+        $survey_gen->share_survey($survey, $recipients);
+        $playlist_gen->share_playlist($playlist, $recipients);
+
+        // We should only be getting the article.
+        $result = $this->resolve_graphql_query(
+            'container_workspace_shared_cards',
             [
-                $priv_workspace_member->get_id(),
-                $priv_hidden_workspace_member1->get_id(),
-                $pub_workspace_member->get_id()
-            ],
-            $recipient_ids
+                'workspace_id' => $workspace->get_id(),
+                'area' => 'library',
+                'include_footnotes' => false,
+                'filter' => [
+                    'search' => 'tickle'
+                ]
+            ]
         );
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('cards', $result);
+        $this->assertCount(1, $result['cards']);
+        $this->assertInstanceOf(article_card::class, $result['cards'][0]);
+        /** @var article_card $article */
+        $article = $result['cards'][0];
+        $this->assertEquals('This are tickle', $article->get_name());
 
-        // Now unenrol user from workspace
-        $member = member::from_user($member->id, $pub_workspace_member->get_id());
-        $member->leave();
-
-        $result = library::search('', null);
-        $this->assertCount(2, $result);
-
-        $recipient_ids = [];
-        foreach ($result as $recipient) {
-            $recipient_ids[] = $recipient->get_id();
-        }
-
-        $this->assertEqualsCanonicalizing(
+        // We should only be getting the playlist.
+        $result = $this->resolve_graphql_query(
+            'container_workspace_shared_cards',
             [
-                $priv_workspace_member->get_id(),
-                $priv_hidden_workspace_member1->get_id(),
-            ],
-            $recipient_ids
+                'workspace_id' => $workspace->get_id(),
+                'area' => 'library',
+                'include_footnotes' => false,
+                'filter' => [
+                    'search' => 'playing'
+                ]
+            ]
         );
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('cards', $result);
+        $this->assertCount(1, $result['cards']);
+        $this->assertInstanceOf(playlist_card::class, $result['cards'][0]);
+        /** @var playlist_card $article */
+        $playlist = $result['cards'][0];
+        $this->assertEquals('Playing in a list', $playlist->get_name());
+
+        // Create another article.
+        $article = $article_gen->create_article(['name' => 'Article in a playlist', 'access' => \totara_engage\access\access::PUBLIC]);
+        $article_gen->share_article($article, $recipients);
+
+        // We should now get the article and playlist.
+        $result = $this->resolve_graphql_query(
+            'container_workspace_shared_cards',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'area' => 'library',
+                'include_footnotes' => false,
+                'filter' => [
+                    'search' => 'play'
+                ]
+            ]
+        );
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('cards', $result);
+        $this->assertCount(2, $result['cards']);
+        $this->assertContainsCard(article_card::class, 'Article in a playlist', $result['cards']);
+        $this->assertContainsCard(playlist_card::class, 'Playing in a list', $result['cards']);
     }
 
-    public function test_search_workspaces_with_multi_tenancy() {
-        /** @var container_workspace_generator $workspace_generator */
-        $workspace_generator = $this->getDataGenerator()->get_plugin_generator('container_workspace');
-
-        /** @var totara_tenant_generator $tenant_generator */
-        $tenant_generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
-        $tenant_generator->enable_tenants();
-
-        $tenant1 = $tenant_generator->create_tenant();
-        $tenant2 = $tenant_generator->create_tenant();
-
-        $systemuser1 = $this->getDataGenerator()->create_user();
-        $systemuser2 = $this->getDataGenerator()->create_user();
-        util::add_other_participant($tenant1->id, $systemuser1->id);
-        util::add_other_participant($tenant2->id, $systemuser1->id);
-
-        $this->setAdminUser();
-
-        $system_workspace1 = $workspace_generator->create_private_workspace(
-            'system private workspace member',
-            'description',
-            null,
-            $systemuser1->id
-        );
-        $system_workspace2 = $workspace_generator->create_private_workspace(
-            'system private workspace member',
-            'description',
-            null,
-            $systemuser2->id
-        );
-        member::added_to_workspace($system_workspace2, $systemuser1->id, false);
-
-        $owner1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
-        $member1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
-
-        $owner2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
-        $member2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
-
-        $this->setUser($owner1);
-
-        $priv_workspace_member1 = $workspace_generator->create_private_workspace(
-            'private workspace member',
-            'description',
-            null,
-            $owner1->id
-        );
-        $priv_hidden_workspace_member1 = $workspace_generator->create_hidden_workspace(
-            'private hidden workspace member',
-            'description',
-            null,
-            $owner1->id
-        );
-        $priv_workspace_non_member1 = $workspace_generator->create_private_workspace(
-            'private workspace w/o member',
-            'description',
-            null,
-            $owner1->id
-        );
-
-        $pub_workspace_member1 = $workspace_generator->create_workspace(
-            'public workspace member',
-            'description',
-            null,
-            $owner1->id
-        );
-        $pub_workspace_non_member1 = $workspace_generator->create_workspace(
-            'public workspace w/o member',
-            'description',
-            null,
-            $owner1->id
-        );
-
-        member::added_to_workspace($priv_workspace_member1, $member1->id, false);
-        member::added_to_workspace($priv_hidden_workspace_member1, $member1->id, false);
-        member::added_to_workspace($pub_workspace_member1, $member1->id, false);
-        member::added_to_workspace($pub_workspace_member1, $systemuser1->id, false);
-
-        $this->setUser($owner2);
-
-        $priv_workspace_member2 = $workspace_generator->create_private_workspace(
-            'private workspace member',
-            'description',
-            null,
-            $owner2->id
-        );
-        $priv_workspace_non_member2 = $workspace_generator->create_private_workspace(
-            'private workspace w/o member',
-            'description',
-            null,
-            $owner2->id
-        );
-
-        $pub_workspace_member2 = $workspace_generator->create_workspace(
-            'public workspace member',
-            'description',
-            null,
-            $owner2->id
-        );
-        $pub_workspace_non_member2 = $workspace_generator->create_workspace(
-            'public workspace w/o member',
-            'description',
-            null,
-            $owner2->id
-        );
-
-        member::added_to_workspace($priv_workspace_member2, $systemuser1->id, false);
-        member::added_to_workspace($priv_workspace_member2, $member2->id, false);
-        member::added_to_workspace($pub_workspace_member2, $member2->id, false);
-
-        $this->setUser($member1);
-
-        $result = library::search('', null);
-        $this->assertCount(3, $result);
-
-        $recipient_ids = [];
-        foreach ($result as $recipient) {
-            $recipient_ids[] = $recipient->get_id();
+    /**
+     * @param string $card_type
+     * @param string $card_name
+     * @param array $array
+     */
+    protected function assertContainsCard(string $card_type, string $card_name, array $array): void {
+        /** @var card $card */
+        foreach ($array as $card) {
+            if ($card->get_name() === $card_name && $card instanceof $card_type) {
+                return;
+            }
         }
-
-        $this->assertEqualsCanonicalizing(
-            [
-                $priv_hidden_workspace_member1->get_id(),
-                $priv_workspace_member1->get_id(),
-                $pub_workspace_member1->get_id()
-            ],
-            $recipient_ids
-        );
-
-        // Now as a system user
-        $this->setUser($systemuser1);
-
-        $result = library::search('', null);
-        $this->assertCount(4, $result);
-
-        $recipient_ids = [];
-        foreach ($result as $recipient) {
-            $recipient_ids[] = $recipient->get_id();
-        }
-
-        $this->assertEqualsCanonicalizing(
-            [
-                $system_workspace1->get_id(),
-                $system_workspace2->get_id(),
-                $priv_workspace_member2->get_id(),
-                $pub_workspace_member1->get_id(),
-            ],
-            $recipient_ids
-        );
+        $this->fail("Expected card \"{$card_type}\" with name \"{$card_name}\" not found.");
     }
 
 }
