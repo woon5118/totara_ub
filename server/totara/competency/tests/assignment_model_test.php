@@ -23,6 +23,9 @@
  */
 
 use core\entity\user as user_entity;
+use core\orm\entity\repository;
+use core\orm\query\builder;
+use totara_competency\admin_setting_unassign_behaviour;
 use totara_competency\entity\assignment as assignment_entity;
 use totara_competency\entity\competency as competency_entity;
 use totara_competency\entity\competency_assignment_user;
@@ -30,6 +33,7 @@ use totara_competency\expand_task;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\user_group\user;
 use totara_competency\user_groups;
+use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -170,6 +174,182 @@ class totara_competency_assignment_model_testcase extends assignment_model_base_
         $this->assertFalse($assignment->is_active());
         $this->assertFalse($assignment->is_draft());
         $this->assertTrue($assignment->is_archived());
+    }
+
+    public function test_user_is_assigned_and_unassigned_at() {
+        $this->setAdminUser();
+        // Create user
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        // Make sure we keep the data
+        set_config('unassign_behaviour', admin_setting_unassign_behaviour::KEEP, 'totara_competency');
+
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $fw = $hierarchy_generator->create_pos_frame(['fullname' => 'Pos Framework']);
+        // Create position 1
+        $position1 = $hierarchy_generator->create_pos(['frameworkid' => $fw->id, 'fullname' => 'Position 1']);
+        // Create position 2
+        $position2 = $hierarchy_generator->create_pos(['frameworkid' => $fw->id, 'fullname' => 'Position 2']);
+        // Create position 3
+        $position3 = $hierarchy_generator->create_pos(['frameworkid' => $fw->id, 'fullname' => 'Position 3']);
+
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()
+            ->get_plugin_generator('totara_competency')
+            ->assignment_generator();
+
+        // Create competency
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $totara_hierarchy_generator->create_comp_frame([]);
+        $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+
+        // Create position 1 assignment
+        $pos_assignment1 = $assignment_generator->create_position_assignment(
+            $comp->id,
+            $position1->id,
+            ['status' => assignment_entity::STATUS_ACTIVE]
+        );
+        // Create position 2 assignment
+        $pos_assignment2 = $assignment_generator->create_position_assignment(
+            $comp->id,
+            $position2->id,
+            ['status' => assignment_entity::STATUS_ACTIVE]
+        );
+        // Create position 3 assignment
+        $pos_assignment3 = $assignment_generator->create_position_assignment(
+            $comp->id,
+            $position3->id,
+            ['status' => assignment_entity::STATUS_ACTIVE]
+        );
+
+        $ja1 = job_assignment::create_default($user1->id, ['positionid' => $position1->id]);
+        $ja2 = job_assignment::create_default($user1->id, ['positionid' => $position2->id]);
+        $ja3 = job_assignment::create_default($user1->id, ['positionid' => $position3->id]);
+
+        (new expand_task(builder::get_db()))->expand_all();
+
+        $pos_assignment1 = assignment_model::load_by_id($pos_assignment1->id);
+        $pos_assignment2 = assignment_model::load_by_id($pos_assignment2->id);
+        $pos_assignment3 = assignment_model::load_by_id($pos_assignment3->id);
+
+        $this->assertTrue($pos_assignment1->is_assigned($user1->id));
+        $this->assertFalse($pos_assignment1->is_assigned($user2->id));
+        $this->assertNull($pos_assignment1->get_unassigned_at($user1->id));
+        $this->assertNull($pos_assignment1->get_unassigned_at($user2->id));
+
+        $this->assertTrue($pos_assignment2->is_assigned($user1->id));
+        $this->assertFalse($pos_assignment2->is_assigned($user2->id));
+        $this->assertNull($pos_assignment2->get_unassigned_at($user1->id));
+        $this->assertNull($pos_assignment2->get_unassigned_at($user2->id));
+
+        $this->assertTrue($pos_assignment3->is_assigned($user1->id));
+        $this->assertFalse($pos_assignment3->is_assigned($user2->id));
+        $this->assertNull($pos_assignment3->get_unassigned_at($user1->id));
+        $this->assertNull($pos_assignment3->get_unassigned_at($user2->id));
+
+        // Now unassign user from position 1
+        $ja1->update(['positionid' => null]);
+        // And archive the second one
+        $pos_assignment2->archive();
+
+        (new expand_task(builder::get_db()))->expand_all();
+
+        // Reload the assignments
+        $pos_assignment1 = assignment_model::load_by_id($pos_assignment1->id);
+        $pos_assignment2 = assignment_model::load_by_id($pos_assignment2->id);
+        $pos_assignment3 = assignment_model::load_by_id($pos_assignment3->id);
+
+        $this->assertFalse($pos_assignment1->is_assigned($user1->id));
+        $this->assertFalse($pos_assignment1->is_assigned($user2->id));
+        $this->assertNotNull($pos_assignment1->get_unassigned_at($user1->id));
+        $this->assertNull($pos_assignment1->get_unassigned_at($user2->id));
+
+        $this->assertFalse($pos_assignment2->is_assigned($user1->id));
+        $this->assertFalse($pos_assignment2->is_assigned($user2->id));
+        $this->assertNotNull($pos_assignment2->get_unassigned_at($user1->id));
+        $this->assertNull($pos_assignment2->get_unassigned_at($user2->id));
+
+        $this->assertTrue($pos_assignment3->is_assigned($user1->id));
+        $this->assertFalse($pos_assignment3->is_assigned($user2->id));
+        $this->assertNull($pos_assignment3->get_unassigned_at($user1->id));
+        $this->assertNull($pos_assignment3->get_unassigned_at($user2->id));
+    }
+
+    public function test_user_is_assigned_and_unassigned_at_with_preloaded_user_assignment() {
+        $this->setAdminUser();
+        // Create user
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        // Make sure we keep the data
+        set_config('unassign_behaviour', admin_setting_unassign_behaviour::KEEP, 'totara_competency');
+
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $fw = $hierarchy_generator->create_pos_frame(['fullname' => 'Pos Framework']);
+        // Create position 1
+        $position1 = $hierarchy_generator->create_pos(['frameworkid' => $fw->id, 'fullname' => 'Position 1']);
+
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()
+            ->get_plugin_generator('totara_competency')
+            ->assignment_generator();
+
+        // Create competency
+        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
+        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $totara_hierarchy_generator->create_comp_frame([]);
+        $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+
+        // Create position 1 assignment
+        $pos_assignment1 = $assignment_generator->create_position_assignment(
+            $comp->id,
+            $position1->id,
+            ['status' => assignment_entity::STATUS_ACTIVE]
+        );
+
+        $ja1 = job_assignment::create_default($user1->id, ['positionid' => $position1->id]);
+        $ja2 = job_assignment::create_default($user2->id, ['positionid' => $position1->id]);
+
+        (new expand_task(builder::get_db()))->expand_all();
+
+        /** @var assignment_entity $pos_assignment1_entity */
+        $pos_assignment1_entity = assignment_entity::repository()
+            ->where('id', $pos_assignment1->id)
+            ->with([
+                'assignment_user' => function (repository $repository) use ($user1) {
+                    $repository->where('user_id', $user1->id);
+                }
+            ])
+            ->one();
+
+        $pos_assignment1 = assignment_model::load_by_entity($pos_assignment1_entity);
+
+        $this->assertTrue($pos_assignment1->is_assigned($user1->id));
+        $this->assertNull($pos_assignment1->get_unassigned_at($user1->id));
+
+        try {
+            $pos_assignment1->is_assigned($user2->id);
+            $this->fail('Exception should have been thrown');
+        } catch (coding_exception $exception) {
+            $this->assertStringContainsString(
+                'The assignment had to be loaded with the assignment_user relation for the specific user',
+                $exception->getMessage()
+            );
+        }
+
+        try {
+            $pos_assignment1->get_unassigned_at($user2->id);
+            $this->fail('Exception should have been thrown');
+        } catch (coding_exception $exception) {
+            $this->assertStringContainsString(
+                'The assignment had to be loaded with the assignment_user relation for the specific user',
+                $exception->getMessage()
+            );
+        }
     }
 
 }

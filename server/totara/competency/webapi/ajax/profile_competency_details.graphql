@@ -1,10 +1,12 @@
 query totara_competency_profile_competency_details(
-  $user_id: core_id
-  $competency_id: core_id
+  $user_id: core_id!
+  $competency_id: core_id!
+  $status: Int
 ) {
   totara_competency_profile_competency_details(
     user_id: $user_id
     competency_id: $competency_id
+    status: $status
   ) {
     competency {
       id
@@ -22,6 +24,8 @@ query totara_competency_profile_competency_details(
         progress_name
         reason_assigned
         can_archive
+        is_assigned(user_id: $user_id)
+        unassigned_at(format: DATE, user_id: $user_id)
       }
       my_value {
         id

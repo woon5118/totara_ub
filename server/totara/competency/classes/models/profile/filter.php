@@ -23,12 +23,10 @@
 
 namespace totara_competency\models\profile;
 
-use coding_exception;
 use core\collection;
 use totara_competency\data_providers\assignments;
-use totara_competency\models\assignment;
-use totara_competency\models\assignment as assignment_model;
 use totara_competency\entity\assignment as assignment_entity;
+use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\profile\traits\assignment_key;
 use totara_competency\models\user_group_factory;
 
@@ -61,14 +59,14 @@ class filter {
     /**
      * Create filter from assignment and key
      *
-     * @param assignment $assignment Assignment
+     * @param assignment_model $assignment Assignment
      * @param string $key Key
      */
-    public function __construct(assignment $assignment, string $key) {
+    public function __construct(assignment_model $assignment, string $key) {
         $this->attributes = [
             'name' => $assignment->get_progress_name(),
             'status_name' => $this->get_human_status($assignment),
-            'status' => $assignment->status,
+            'status' => $this->get_status($assignment),
             'user_group_type' => $assignment->user_group_type,
             'user_group_id' => $assignment->user_group_id,
             'type' => $assignment->type,
@@ -129,13 +127,34 @@ class filter {
     }
 
     /**
+     * Make sure we get the right status for this filter.
+     * If an assignment is active but doesn't have user assignments treat it as archived.
+     *
+     * @param assignment_model $assignment
+     * @return int
+     */
+    public function get_status(assignment_model $assignment): int {
+        $status = $assignment->get_status();
+        $user_assignment = $assignment->get_entity()->assignment_user;
+
+        // If this assignment has no active user entries it has to be an archived one.
+        if ($status == assignment_entity::STATUS_ACTIVE && !$user_assignment) {
+            $status = assignment_entity::STATUS_ARCHIVED;
+        }
+
+        return $status;
+    }
+
+    /**
      * Get human readable name for the status filter
      *
      * @param assignment_model $assignment
      * @return string
      */
     protected function get_human_status(assignment_model $assignment) {
-        switch ($assignment->get_status()) {
+        $status = $this->get_status($assignment);
+
+        switch ($status) {
             case assignment_entity::STATUS_ACTIVE:
                 return get_string('status_active_alt', 'totara_competency');
             case assignment_entity::STATUS_ARCHIVED:
@@ -143,7 +162,7 @@ class filter {
             case assignment_entity::STATUS_DRAFT:
                 return get_string('status_draft', 'totara_competency');
             default:
-                debugging('Unknown assignment status: ' . $assignment->get_status(), DEBUG_DEVELOPER);
+                debugging('Unknown assignment status: ' . $status, DEBUG_DEVELOPER);
                 return 'Unknown';
         }
     }

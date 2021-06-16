@@ -1,5 +1,5 @@
 query totara_competency_progress_for_user(
-  $user_id: core_id
+  $user_id: core_id!
   $filters: totara_competency_profile_assignment_filters
 ) {
   totara_competency_profile_progress(user_id: $user_id, filters: $filters) {

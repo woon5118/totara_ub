@@ -43,7 +43,14 @@ trait assignment_key {
             $type = assignment::TYPE_ADMIN;
         }
 
-        $key = $include_status ? "{$assignment->status}/" : '';
+        $status = $assignment->status;
+
+        // If this assignment has no active user entries it has to be an archived one.
+        if ($assignment->status == assignment::STATUS_ACTIVE && !$assignment->assignment_user) {
+            $status = assignment::STATUS_ARCHIVED;
+        }
+
+        $key = $include_status ? "{$status}/" : '';
 
         return "{$key}{$type}/{$assignment->user_group_type}/{$assignment->user_group_id}";
     }

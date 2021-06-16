@@ -1,5 +1,5 @@
 query totara_competency_competency_progress_for_user(
-  $user_id: core_id
+  $user_id: core_id!
   $order: String
   $filters: totara_competency_profile_assignment_filters
 ) {
@@ -17,6 +17,8 @@ query totara_competency_competency_progress_for_user(
       assignment {
         archived_at(format: DATE)
         progress_name
+        is_assigned(user_id: $user_id)
+        unassigned_at(format: DATE, user_id: $user_id)
       }
       my_value {
         id

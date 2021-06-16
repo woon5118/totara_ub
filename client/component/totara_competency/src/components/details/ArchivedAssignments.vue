@@ -32,6 +32,8 @@
 // Components
 import ArchivedAssignmentsTable from 'totara_competency/components/details/ArchivedAssignmentsTable';
 import Loader from 'tui/components/loading/Loader';
+import { ASSIGNMENT_ARCHIVED } from 'totara_competency/constants';
+
 // GraphQL
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
 
@@ -67,10 +69,12 @@ export default {
   apollo: {
     data: {
       query: CompetencyProfileDetailsQuery,
+      fetchPolicy: 'network-only',
       variables() {
         return {
           user_id: this.userId,
           competency_id: this.competencyId,
+          status: ASSIGNMENT_ARCHIVED,
         };
       },
       update({
@@ -91,20 +95,21 @@ export default {
       let archivedAssignmentList = [];
 
       // Filter for only archived assignments
-      archivedAssignmentList = this.data.items
-        .filter(function(elem) {
-          return (
-            elem.assignment.archived_at || elem.assignment.type === 'legacy'
-          );
-        })
-        .map(function(elem) {
-          return {
-            name: elem.assignment.progress_name,
-            archivedAt: elem.assignment.archived_at,
-            legacy: elem.assignment.type === 'legacy',
-            proficient: elem.my_value.proficient,
-          };
-        });
+      archivedAssignmentList = this.data.items.map(function(elem) {
+        let archivedDate = null;
+        if (elem.assignment.archived_at) {
+          archivedDate = elem.assignment.archived_at;
+        } else {
+          archivedDate = elem.assignment.unassigned_at;
+        }
+
+        return {
+          name: elem.assignment.progress_name,
+          archivedAt: archivedDate,
+          legacy: elem.assignment.type === 'legacy',
+          proficient: elem.my_value.proficient,
+        };
+      });
       return archivedAssignmentList;
     },
   },

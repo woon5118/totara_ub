@@ -77,6 +77,17 @@ type totara_competency_assignment {
   True if current user is permitted to archive this assignment
   """
   can_archive: Boolean
+  """
+  Whether the user is currently assigned
+  """
+  is_assigned(user_id: core_id!): Boolean!
+  """
+  If the user is not assigned then this returns the date the user got unassigned last
+  """
+  unassigned_at(
+    format: core_date_format = TIMESTAMP
+    user_id: core_id!
+  ): core_date
 }
 
 """

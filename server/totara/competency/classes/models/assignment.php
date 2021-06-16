@@ -35,6 +35,7 @@ use totara_competency\assignment_create_exception;
 use totara_competency\entity\assignment as assignment_entity;
 use totara_competency\entity\competency;
 use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\competency_assignment_user_log;
 use totara_competency\event\assignment_activated;
 use totara_competency\event\assignment_archived;
 use totara_competency\event\assignment_created;
@@ -532,6 +533,52 @@ class assignment {
 
     public function get_assigner(): ?user {
         return $this->entity->assigner;
+    }
+
+    /**
+     * Check whether the user is assigned to the current assignment.
+     *
+     * @return bool
+     */
+    public function is_assigned(int $user_id): bool {
+        if ($this->entity->relation_loaded('assignment_user') && $this->entity->assignment_user) {
+            if ($this->entity->assignment_user->user_id != $user_id) {
+                throw new coding_exception('The assignment had to be loaded with the assignment_user relation for the specific user, everything else does not make sense.');
+            }
+            return true;
+        }
+
+        return $this->entity->assignment_user()
+            ->where('user_id', $user_id)
+            ->exists();
+    }
+
+    /**
+     * Returns the last unassigned date if the user is not currently assigned.
+     *
+     * @param int $user_id
+     * @return int|null
+     */
+    public function get_unassigned_at(int $user_id): ?int {
+        if ($this->is_assigned($user_id)) {
+            return null;
+        }
+
+        /** @var competency_assignment_user_log $log_entry */
+        $log_entry = competency_assignment_user_log::repository()
+            ->where('user_id', $user_id)
+            ->where('assignment_id', $this->get_id())
+            ->where(
+                'action',
+                [
+                    competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED,
+                    competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP,
+                ]
+            )
+            ->order_by('created_at', 'desc')
+            ->first();
+
+        return $log_entry ? $log_entry->created_at : null;
     }
 
     /**

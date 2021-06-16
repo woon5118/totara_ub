@@ -148,6 +148,7 @@ import NotificationBanner from 'tui/components/notifications/NotificationBanner'
 import PageBackLink from 'tui/components/layouts/PageBackLink';
 import Progress from 'totara_competency/components/details/Progress';
 import { notify } from 'tui/notifications';
+import { ASSIGNMENT_ACTIVE } from 'totara_competency/constants';
 // GraphQL
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
 import UserQuery from 'totara_competency/graphql/user';
@@ -223,6 +224,7 @@ export default {
         return {
           user_id: this.userId,
           competency_id: this.competencyId,
+          status: ASSIGNMENT_ACTIVE,
         };
       },
       update({ totara_competency_profile_competency_details }) {

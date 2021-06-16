@@ -115,6 +115,7 @@ import { notify } from 'tui/notifications';
 // GraphQL
 import ArchiveUserAssignment from 'totara_competency/graphql/archive_user_assignment';
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
+import { ASSIGNMENT_ACTIVE } from '../../js/constants';
 
 export default {
   components: {
@@ -207,6 +208,7 @@ export default {
               variables: {
                 user_id: this.userId,
                 competency_id: this.competencyId,
+                status: ASSIGNMENT_ACTIVE,
               },
             },
           ],

@@ -140,12 +140,23 @@ class competency_progress {
      *
      * @param int|user|stdClass $user User id or object
      * @param int $competency_id Competency id
+     * @param int|null $status optional status filter
      * @return competency_progress|null
      */
-    public static function build_for_competency($user, int $competency_id): ?self {
-        $assignments = assignments::for($user)->set_filters([
+    public static function build_for_competency($user, int $competency_id, int $status = null): ?self {
+        $filters = [
             'competency_id' => $competency_id,
-        ])->fetch()->get();
+        ];
+
+        if ($status !== null) {
+            if ($status !== assignment::STATUS_ACTIVE && $status !== assignment::STATUS_ARCHIVED) {
+                throw new coding_exception('Invalid status filter value');
+            }
+
+            $filters['status'] = $status;
+        }
+
+        $assignments = assignments::for($user)->set_filters($filters)->fetch()->get();
 
         // An in progress competency was found, return it.
         if ($assignments->count() > 0) {

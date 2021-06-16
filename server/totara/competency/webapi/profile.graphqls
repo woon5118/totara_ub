@@ -95,6 +95,17 @@ type totara_competency_profile_assignment_progress {
   The minimum required proficiency for this competency
   """
   min_value: totara_competency_profile_scale_value_progress!
+  """
+  Whether the user is currently assigned
+  """
+  is_assigned(user_id: core_id!): Boolean!
+  """
+  If the user is not assigned then this returns the date the user got unassigned last
+  """
+  unassigned_at(
+    format: core_date_format = TIMESTAMP
+    user_id: core_id!
+  ): core_date
 }
 
 """
@@ -219,7 +230,7 @@ extend type Query {
   Competency profile overall progress data for a specified user by ID, optionally filtered.
   """
   totara_competency_profile_progress(
-    user_id: core_id
+    user_id: core_id!
     filters: totara_competency_profile_assignment_filters
   ): totara_competency_profile_overall_progress
 
@@ -227,7 +238,7 @@ extend type Query {
   Competency profile detailed competency progress data for a specified user by ID, optionally filtered and ordered.
   """
   totara_competency_profile_competency_progress(
-    user_id: core_id
+    user_id: core_id!
     order: String
     filters: totara_competency_profile_assignment_filters
   ): [totara_competency_profile_competency_progress]
@@ -236,8 +247,9 @@ extend type Query {
   Competency profile detailed competency progress data for a single user/competency pair.
   """
   totara_competency_profile_competency_details(
-    user_id: core_id
-    competency_id: core_id
+    user_id: core_id!
+    competency_id: core_id!
+    status: Int
   ): totara_competency_profile_competency_progress
 
   """

@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2021 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_orm
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package totara_competency
  */
 
-namespace totara_competency\webapi\resolver\query;
+namespace totara_competency\webapi\resolver\type;
 
-use core\webapi\execution_context;
-use totara_competency\models\profile\competency_progress;
-
-class profile_competency_details extends profile_resolver {
-    public static function resolve(array $args, execution_context $ec) {
-        $user_id = static::authorize($args['user_id'] ?? null);
-        $status = $args['status'] ?? null;
-
-        return competency_progress::build_for_competency($user_id, $args['competency_id'], $status);
-    }
+/**
+ * This type is just a alias for an assignment
+ */
+class profile_assignment_progress extends assignment {
 
 }

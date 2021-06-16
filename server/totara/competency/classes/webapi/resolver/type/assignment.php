@@ -23,7 +23,11 @@
 
 namespace totara_competency\webapi\resolver\type;
 
+use coding_exception;
+use context_system;
+use core\date_format;
 use core\webapi\execution_context;
+use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\type_resolver;
 use totara_competency\formatter;
 use totara_competency\models\assignment as assignment_model;
@@ -42,10 +46,30 @@ class assignment implements type_resolver {
      */
     public static function resolve(string $field, $assignment, array $args, execution_context $ec) {
         if (!$assignment instanceof assignment_model) {
-            throw new \coding_exception('Accepting only assignment models.');
+            throw new coding_exception('Accepting only assignment models.');
         }
 
-        $formatter = new formatter\assignment($assignment, \context_system::instance());
+        if ($field === 'is_assigned') {
+            if (empty($args['user_id'])) {
+                throw new coding_exception('Missing user_id argument for assignment field \'is_assigned\'');
+            }
+
+            return $assignment->is_assigned($args['user_id']);
+        }
+
+        if ($field === 'unassigned_at') {
+            if (empty($args['user_id'])) {
+                throw new coding_exception('Missing user_id argument for assignment field \'unassigned_at\'');
+            }
+
+            $format = $args['format'] ?? date_format::FORMAT_TIMESTAMP;
+            $context = $ec->has_relevant_context() ? $ec->get_relevant_context() : context_system::instance();
+            $formatter = new date_field_formatter($format, $context);
+
+            return $formatter->format($assignment->get_unassigned_at($args['user_id']));
+        }
+
+        $formatter = new formatter\assignment($assignment, context_system::instance());
         return $formatter->format($field, $args['format'] ?? null);
     }
 
