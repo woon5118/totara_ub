@@ -259,7 +259,7 @@ function install_generate_configphp($database, $cfg) {
     if (isset($cfg->upgradekey) and $cfg->upgradekey !== '') {
         $configphp .= '$CFG->upgradekey = ' . var_export($cfg->upgradekey, true) . ';' . PHP_EOL . PHP_EOL;
     }
-    
+
     $configphp .= '// There is no php closing tag in this file,' . PHP_EOL;
     $configphp .= '// it is intentional because it prevents trailing whitespace problems!' . PHP_EOL;
 
@@ -541,4 +541,73 @@ function install_cli_database(array $options, $interactive, $checkenvironment = 
     if (isset($options['summary'])) {
         $DB->set_field('course', 'summary', $options['summary'], array('format' => 'site'));
     }
+}
+
+/**
+ * @param array $languages
+ * @return string
+ */
+function install_cli_choose_language(array $languages): string {
+    global $CFG;
+
+    cli_separator();
+    // Do not put the langs into columns because it is not compatible with RTL.
+    $default = $CFG->lang;
+    cli_heading(get_string('chooselanguagehead', 'install'));
+    if (array_key_exists($default, $languages)) {
+        echo $default.' - '.$languages[$default]."\n";
+    }
+    if ($default !== 'en') {
+        echo 'en - English (en)'."\n";
+    }
+    echo '? - '.get_string('availablelangs', 'install')."\n";
+    $prompt = get_string('clitypevaluedefault', 'admin', $CFG->lang);
+    $error = '';
+    do {
+        echo $error;
+        $input = cli_input($prompt, $default);
+
+        if ($input === '?') {
+            echo implode("\n", $languages)."\n";
+            $error = "\n";
+        } else {
+            $input = clean_param($input, PARAM_SAFEDIR);
+
+            if (!array_key_exists($input, $languages)) {
+                $error = get_string('cliincorrectvalueretry', 'admin')."\n";
+            } else {
+                $error = '';
+            }
+        }
+    } while ($error !== '');
+
+    return $input;
+}
+
+/**
+ * @param string|array $languages
+ * @return array
+ */
+function install_cli_language_packs($languages): array {
+    global $CFG;
+
+    cli_separator();
+    cli_heading(get_string('cliinstalllangdownloadstart', 'install'));
+    $installer = new lang_installer($languages);
+    $results = $installer->run();
+    $result = [];
+    foreach ($results as $langcode => $langstatus) {
+        if ($langstatus === lang_installer::RESULT_DOWNLOADERROR) {
+            $a       = new stdClass();
+            $a->url  = $installer->lang_pack_url($langcode);
+            $a->dest = $CFG->dataroot.'/lang';
+            cli_problem(get_string('remotedownloaderror', 'error', $a));
+            $result[$langcode] = false;
+        } else {
+            cli_writeln(get_string('cliinstalllangdownloadsuccess', 'install', $langcode));
+            $result[$langcode] = true;
+        }
+    }
+
+    return $result;
 }

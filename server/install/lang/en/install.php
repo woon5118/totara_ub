@@ -34,6 +34,10 @@ $string['availablelangs'] = 'Available language packs';
 $string['clialreadyconfigured'] = 'The configuration file config.php already exists. Please use admin/cli/install_database.php to install Totara for this site.';
 $string['clialreadyinstalled'] = 'The configuration file config.php already exists. Please use admin/cli/install_database.php to upgrade Totara for this site.';
 $string['cliinstallheader'] = 'Totara {$a} command line installation program';
+$string['cliinstalllangdownloadfailedoptions'] = '1 - retry
+2 - select different language';
+$string['cliinstalllangdownloadstart'] = 'Downloading language packs';
+$string['cliinstalllangdownloadsuccess'] = 'Language pack "{$a}" successfully downloaded.';
 $string['configfilenotwritten'] = 'The installer script was not able to automatically create a config.php file containing your chosen settings, probably because the Totara directory is not writeable. You can manually copy the following code into a file named config.php within the root directory of Totara.';
 $string['configfilewritten'] = 'config.php has been successfully created';
 $string['configurationcompletesub'] = 'Totara made an attempt to save your configuration in a file in the root of your Totara installation.';

@@ -299,42 +299,9 @@ cli_logo();
 echo PHP_EOL;
 echo get_string('cliinstallheader', 'install', $TOTARA->release)."\n";
 
-//Fist select language
+// Fist select language if interactive. If non-interactive the language is already selected and verified.
 if ($interactive) {
-    cli_separator();
-    // Do not put the langs into columns because it is not compatible with RTL.
-    $default = $CFG->lang;
-    cli_heading(get_string('chooselanguagehead', 'install'));
-    if (array_key_exists($default, $languages)) {
-        echo $default.' - '.$languages[$default]."\n";
-    }
-    if ($default !== 'en') {
-        echo 'en - English (en)'."\n";
-    }
-    echo '? - '.get_string('availablelangs', 'install')."\n";
-    $prompt = get_string('clitypevaluedefault', 'admin', $CFG->lang);
-    $error = '';
-    do {
-        echo $error;
-        $input = cli_input($prompt, $default);
-
-        if ($input === '?') {
-            echo implode("\n", $languages)."\n";
-            $error = "\n";
-
-        } else {
-            $input = clean_param($input, PARAM_SAFEDIR);
-
-            if (!array_key_exists($input, $languages)) {
-                $error = get_string('cliincorrectvalueretry', 'admin')."\n";
-            } else {
-                $error = '';
-            }
-        }
-    } while ($error !== '');
-    $CFG->lang = $input;
-} else {
-    // already selected and verified
+    $CFG->lang = install_cli_choose_language($languages);
 }
 
 // Set directorypermissions first
@@ -457,16 +424,40 @@ $CFG->localcachedir = $CFG->dataroot.'/localcache';
 
 // download required lang packs
 if ($CFG->lang !== 'en') {
-    $installer = new lang_installer($CFG->lang);
-    $results = $installer->run();
-    foreach ($results as $langcode => $langstatus) {
-        if ($langstatus === lang_installer::RESULT_DOWNLOADERROR) {
-            $a       = new stdClass();
-            $a->url  = $installer->lang_pack_url($langcode);
-            $a->dest = $CFG->dataroot.'/lang';
-            cli_problem(get_string('remotedownloaderror', 'error', $a));
+    $language = $CFG->lang;
+    do {
+        $retry = false;
+        $result = install_cli_language_packs($language);
+
+        // If language pack failed to download give the user the option to retry, select a different language or
+        // continue with the installation using English.
+        if (!$result[$language]) {
+            do {
+                $error = false;
+                cli_writeln(get_string('cliinstalllangdownloadfailedoptions', 'install'));
+                $prompt = get_string('clitypevaluedefault', 'admin', 'English (en)');
+                $option = cli_input($prompt);
+                switch ($option) {
+                    case '1':
+                        $retry = true;
+                        break;
+                    case '2':
+                        $retry = true;
+                        $language = install_cli_choose_language($languages);
+                        $CFG->lang = $language;
+                        break;
+                    case '':
+                        $CFG->lang = 'en';
+                        break;
+                    default:
+                        $error = true;
+                        cli_writeln(get_string('cliincorrectvalueretry', 'admin'));
+                }
+            } while ($error);
+        } else {
+            $CFG->lang = $language;
         }
-    }
+    } while ($retry && $CFG->lang !== 'en');
 }
 
 // switch the string_manager instance to stop using install/lang/
