@@ -4944,7 +4944,15 @@ class reportbuilder {
                 $table->set_no_records_message(get_string('norecordsinreport', 'totara_reportbuilder'));
             }
 
-            $require_complete_graph = ($count <= $perpage);
+            // Make sure we have the first 'maxrecords' rows for the chart, if not do a new SQL query instead.
+            $require_complete_graph = false;
+            if ($graph) {
+                $require_complete_graph = true;
+                $spage = optional_param('spage', 0, PARAM_INT);
+                if ($spage == 0 && $perpage >= $graph->get_max_records()) {
+                    $require_complete_graph = false;
+                }
+            }
 
             $location = 0;
             foreach ($records as $record) {
@@ -4961,7 +4969,7 @@ class reportbuilder {
                     $table->add_data($record_data);
                 }
 
-                if ($graph and !$require_complete_graph) {
+                if ($graph and !$require_complete_graph and $location <= $graph->get_max_records()) {
                     $graph->add_record($record);
                 }
             }
@@ -4970,15 +4978,7 @@ class reportbuilder {
             $records->close();
 
             if ($graph and $require_complete_graph) {
-                $records = $this->get_data(
-                    $this->get_report_sort($table),
-                    0,
-                    $graph->get_max_records()
-                );
-                foreach ($records as $record) {
-                    $graph->add_record($record);
-                }
-                $records->close();
+                $graph->load();
             }
         }
 
