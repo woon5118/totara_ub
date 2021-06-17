@@ -197,7 +197,7 @@ final class generator {
     private function add_dynamic_tabs(array &$manifest): void {
         $manifest['configurableTabs'] = [[
             'configurationUrl' => (new moodle_url('/totara/msteams/tabs/config.php'))->out(false),
-            'canUpdateConfiguration' => false,
+            'canUpdateConfiguration' => true,
             'scopes' => [
                 'team',
             ]],
