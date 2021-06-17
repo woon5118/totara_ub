@@ -105,10 +105,16 @@ class role_assigned extends base {
      */
     protected function get_legacy_logdata() {
         $roles = get_all_roles();
-        $neededrole = array($this->objectid => $roles[$this->objectid]);
-        $rolenames = role_fix_names($neededrole, $this->get_context(), ROLENAME_ORIGINAL, true);
-        return array($this->courseid, 'role', 'assign', 'admin/roles/assign.php?contextid='.$this->contextid.'&roleid='.$this->objectid,
+
+        // Check that role does exist.
+        if (isset($roles[$this->objectid])) {
+            $neededrole = array($this->objectid => $roles[$this->objectid]);
+            $rolenames = role_fix_names($neededrole, $this->get_context(), ROLENAME_ORIGINAL, true);
+            return array($this->courseid, 'role', 'assign', 'admin/roles/assign.php?contextid='.$this->contextid.'&roleid='.$this->objectid,
                 $rolenames[$this->objectid], '', $this->userid);
+        }
+
+        return null;
     }
 
     /**

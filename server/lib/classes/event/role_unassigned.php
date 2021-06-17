@@ -102,9 +102,15 @@ class role_unassigned extends base {
      */
     protected function get_legacy_logdata() {
         $roles = get_all_roles();
-        $rolenames = role_fix_names($roles, $this->get_context(), ROLENAME_ORIGINAL, true);
-        return array($this->courseid, 'role', 'unassign', 'admin/roles/assign.php?contextid='.$this->contextid.'&roleid='.$this->objectid,
+
+        // Check that role does exist.
+        if (isset($roles[$this->objectid])) {
+            $rolenames = role_fix_names($roles, $this->get_context(), ROLENAME_ORIGINAL, true);
+            return array($this->courseid, 'role', 'unassign', 'admin/roles/assign.php?contextid='.$this->contextid.'&roleid='.$this->objectid,
                 $rolenames[$this->objectid], '', $this->userid);
+        }
+
+        return null;
     }
 
     /**

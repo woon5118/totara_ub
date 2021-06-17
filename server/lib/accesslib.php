@@ -5015,7 +5015,9 @@ function role_fix_names($roleoptions, context $context = null, $rolenamedisplay 
     if (!is_object($first) or !property_exists($first, 'shortname')) {
         $allroles = get_all_roles($context);
         foreach ($roleoptions as $rid => $unused) {
-            $roleoptions[$rid] = $allroles[$rid];
+            if (isset($allroles[$rid])) {
+                $roleoptions[$rid] = $allroles[$rid];
+            }
         }
     }
 
@@ -5034,7 +5036,20 @@ function role_fix_names($roleoptions, context $context = null, $rolenamedisplay 
 
     // Add localname property.
     foreach ($roleoptions as $rid => $role) {
-        $roleoptions[$rid]->localname = role_get_name($role, $coursecontext, $rolenamedisplay);
+        if ($role != null) {
+            $roleoptions[$rid]->localname = role_get_name($role, $coursecontext, $rolenamedisplay);
+        } else {
+            // This should never occur, but there is a very small chance for roles that could be assigned in the future
+            // to be deleted before any user is actually assigned to that role by a triggering event,
+            // e.g. self-enrolment event.
+            $missing_role_name = get_string('roledeleted', 'core_role', $rid);
+
+            $missing_role = new stdClass();
+            $missing_role->coursealias = $missing_role_name;
+            $missing_role->localname = $missing_role_name;
+
+            $roleoptions[$rid] = $missing_role;
+        }
     }
 
     if (!$returnmenu) {

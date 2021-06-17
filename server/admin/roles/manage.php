@@ -55,8 +55,7 @@ admin_externalpage_setup('defineroles');
 // Get some basic data we are going to need.
 $roles = role_fix_names(get_all_roles(), $systemcontext, ROLENAME_ORIGINAL);
 
-
-// Check all assigned roles under User Policies.
+// Check all assigned roles under User Policies and other references (e.g. self-enrolment default role).
 $hook = new \core_role\hook\discover_undeletable_roles(
     core_role_user_policies::get_roles()
 );
@@ -66,8 +65,7 @@ $hook->execute();
 $confirmed = (optional_param('confirm', false, PARAM_BOOL) && data_submitted() && confirm_sesskey());
 switch ($action) {
     case 'delete':
-        $count = $DB->count_records_select('role_assignments', 'roleid = ?', array($roleid), 'COUNT(DISTINCT userid)');
-        if ($hook->is_role_undeletable($roleid) || $count > 0) {
+        if ($hook->is_role_undeletable($roleid)) {
             redirect(
                 new moodle_url($baseurl),
                 get_string('cannotdeletethisrole', 'error'),
@@ -83,7 +81,7 @@ switch ($action) {
             $a->id = $roleid;
             $a->name = $roles[$roleid]->name;
             $a->shortname = $roles[$roleid]->shortname;
-            $a->count = $count;
+            $a->count = $DB->count_records_select('role_assignments', 'roleid = ?', [$roleid], 'COUNT(DISTINCT userid)');
 
             $formcontinue = new single_button(new moodle_url($baseurl, $optionsyes), get_string('yes'));
             $formcancel = new single_button(new moodle_url($baseurl), get_string('no'), 'get');

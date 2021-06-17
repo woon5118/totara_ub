@@ -24,7 +24,8 @@
 namespace core_role\hook;
 
 /**
- * Hook for monitoring of system roles setting changes which are assigned under User Policies
+ * Hook for monitoring of system roles setting changes which are assigned under User Policies, or other references (e.g.
+ * self enrolment default role).
  */
 class discover_undeletable_roles extends \totara_core\hook\base {
 
@@ -60,7 +61,7 @@ class discover_undeletable_roles extends \totara_core\hook\base {
      * @return bool
      */
     public function is_role_undeletable(int $roleid): bool {
-        return isset($this->undeletable_roles[$roleid]);
+        return isset($this->undeletable_roles[$roleid]) || $this->roleid_is_referenced($roleid);
     }
 
     /**
@@ -83,5 +84,25 @@ class discover_undeletable_roles extends \totara_core\hook\base {
         return isset($this->undeletable_roles[$roleid]['config_name']) ?
             $this->undeletable_roles[$roleid]['config_name'] :
             '';
+    }
+
+    /**
+     * Determine whether the role id is being referenced elsewhere in the system, e.g. there are users assigned to the
+     * role, or when a role has been specified as a default role to assign to users who self-enrol on a course.
+     *
+     * @param int $roleid
+     * @return bool
+     */
+    private function roleid_is_referenced(int $roleid): bool {
+        global $DB;
+
+        $count = $DB->count_records_select('role_assignments', 'roleid = ?', [$roleid], 'COUNT(roleid)');
+
+        // Only bother with subsequent selects if we have not already found records - saves unnecessary DB traffic.
+        if ($count == 0) {
+            $count = $DB->count_records_select('enrol', 'roleid = ?', [$roleid], 'COUNT(id)');
+        }
+
+        return ($count > 0);
     }
 }

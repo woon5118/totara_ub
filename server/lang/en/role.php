@@ -376,6 +376,7 @@ $string['roleallowinfo'] = 'Select a role to be added to the list of allowed rol
 $string['role:assign'] = 'Assign roles to users';
 $string['roleassignments'] = 'Role assignments';
 $string['roledefinitions'] = 'Role definitions';
+$string['roledeleted'] = 'The role with id {$a} has been deleted';
 $string['rolefullname'] = 'Role name';
 $string['roleincontext'] = '{$a->role} in {$a->context}';
 $string['role:manage'] = 'Create and manage roles';
