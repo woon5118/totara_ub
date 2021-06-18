@@ -290,4 +290,55 @@ class format_topics_testcase extends advanced_testcase {
         $this->assertNotEmpty($format->get_view_url(1, ['navigation' => 1]));
         $this->assertNotEmpty($format->get_view_url(0, ['navigation' => 1]));
     }
+
+    /**
+     * The zeroth topic section is not collapsible, so we should not see the default collapse state selector
+     * on the section settings edit page.
+     */
+    public function test_section_form_format_options() {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+
+        // Number of sections to generate (over and above section 0 - General).
+        $num_sections = 2;
+        $course = $generator->create_course(['numsections' => $num_sections, 'format' => 'topics'], ['createsections' => true]);
+
+        // Check that we have the correct number of sections.
+        $this->assertEquals($num_sections + 1, $DB->count_records('course_sections', ['course' => $course->id]));
+
+        // Get sections in course.
+        $course_sections = $DB->get_records('course_sections', ['course' => $course->id]);
+
+        // Switch on collapsible sections.
+        $course_format_options = $DB->get_record_select('course_format_options', 'name = :name', ['name' => 'collapsiblesections']);
+        $course_format_options->value = 1;
+        $DB->update_record('course_format_options', $course_format_options);
+
+        // Cache refresh and load format.
+        \format_base::reset_course_cache();
+        $course_format = course_get_format($course);
+
+        // Check that each section has the expected options.
+        foreach ($course_sections as $section) {
+            $mform = new MoodleQuickForm('test_form', 'POST', 'http://example.com');
+
+            // Get section options.
+            $format_options = $course_format->section_format_options(true);
+            $this->assertFalse(empty($format_options));
+
+            // Apply format and build edit form.
+            $course_format->create_edit_form_elements($mform, true);
+            $course_format->create_section_edit_form_elements($mform, $section);
+
+            // Check the form elements.
+            if ($section->section == 0) {
+                $this->assertFalse(isset($mform->_elementIndex['collapseddefault']));
+                $this->assertTrue(isset($mform->_elementIndex['cssclasses']));
+            } else {
+                $this->assertTrue(isset($mform->_elementIndex['collapseddefault']));
+                $this->assertTrue(isset($mform->_elementIndex['cssclasses']));
+            }
+        }
+    }
 }

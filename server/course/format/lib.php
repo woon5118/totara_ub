@@ -724,6 +724,82 @@ abstract class format_base {
     }
 
     /**
+     * Adds format options elements to the section edit form.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $section
+     * @return array
+     */
+    public function create_section_edit_form_elements(\MoodleQuickForm &$mform, \stdClass $section): array {
+        $options = $this->section_format_options(true);
+        $elements = $this->add_options_to_form_elements($mform, $options);
+
+        return $elements;
+    }
+
+    /**
+     * Adds format options elements to the course edit form.
+     *
+     * @param MoodleQuickForm $mform
+     * @return array
+     */
+    public function create_course_edit_form_elements(\MoodleQuickForm &$mform): array {
+        $options = $this->course_format_options(true);
+        $elements = $this->add_options_to_form_elements($mform, $options);
+
+        if (empty($this->courseid)) {
+            // Check if course end date form field should be enabled by default.
+            // If a default date is provided to the form element, it is magically enabled by default in the
+            // MoodleQuickForm_date_time_selector class, otherwise it's disabled by default.
+            if (get_config('moodlecourse', 'courseenddateenabled')) {
+                // At this stage (this is called from definition_after_data) course data is already set as default.
+                // We can not overwrite what is in the database.
+                $mform->setDefault('enddate', $this->get_default_course_enddate($mform));
+            }
+        }
+
+        return $elements;
+    }
+
+    /**
+     * Adds format options elements common to both course and section edit forms.
+     *
+     * @param MoodleQuickForm $mform
+     * @param array $options
+     * @return array
+     */
+    protected function add_options_to_form_elements(\MoodleQuickForm &$mform, array $options): array {
+        $elements = [];
+        foreach ($options as $optionname => $option) {
+            if (!isset($option['element_type'])) {
+                $option['element_type'] = 'text';
+            }
+            $args = array($option['element_type'], $optionname, $option['label']);
+            if (!empty($option['element_attributes'])) {
+                $args = array_merge($args, $option['element_attributes']);
+            }
+            $elements[] = call_user_func_array(array($mform, 'addElement'), $args);
+            if (isset($option['help'])) {
+                $helpcomponent = 'format_'. $this->get_format();
+                if (isset($option['help_component'])) {
+                    $helpcomponent = $option['help_component'];
+                }
+                $mform->addHelpButton($optionname, $option['help'], $helpcomponent);
+            }
+            if (isset($option['type'])) {
+                $mform->setType($optionname, $option['type']);
+            }
+            if (isset($option['default']) && !array_key_exists($optionname, $mform->_defaultValues)) {
+                // Set defaults for the elements in the form.
+                // Since we call this method after set_data() make sure that we don't override what was already set.
+                $mform->setDefault($optionname, $option['default']);
+            }
+        }
+
+        return $elements;
+    }
+
+    /**
      * Override if you need to perform some extra validation of the format options
      *
      * @param array $data array of ("fieldname"=>value) of submitted data

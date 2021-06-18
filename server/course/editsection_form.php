@@ -55,7 +55,7 @@ class editsection_form extends moodleform {
         $courseformat = course_get_format($course);
         $formatoptions = $courseformat->section_format_options(true);
         if (!empty($formatoptions)) {
-            $elements = $courseformat->create_edit_form_elements($mform, true);
+            $elements = $courseformat->create_section_edit_form_elements($mform, $this->_customdata['section']);
         }
 
         $mform->_registerCancelButton('cancel');
