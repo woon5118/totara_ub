@@ -439,6 +439,17 @@ extend type Mutation {
     cmid: core_id!
     activity: String!
   ): Boolean!
+
+  """
+  Mark a course as viewed for the current user
+  The course_id is mandatory, and the current user must be able to access the course
+  The section_id is optional, but if given must be the id of a section within the given course_id
+  """
+  totara_mobile_course_view(course_id: core_id!, section_id: core_id): Boolean!
+  """
+  Mark a program as viewed for the current user, the program_id is mandatory
+  """
+  totara_mobile_program_view(program_id: core_id!): Boolean!
 }
 
 """
