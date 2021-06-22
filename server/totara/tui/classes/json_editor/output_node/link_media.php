@@ -80,7 +80,7 @@ final class link_media extends output_node {
             case 'audio':
                 return \html_writer::tag(
                     'div',
-                    \html_writer::tag('audio', null, ['src' => $this->node->get_url()]),
+                    \html_writer::tag('audio', null, ['src' => $this->node->get_url(), 'controls' => true]),
                     ['class' => 'tui-rendered__block']
                 );
 
