@@ -140,4 +140,30 @@ class tool_sitepolicy_navbar_test extends \advanced_testcase {
         $this->assertStringContainsString("nav-message-popover-container", $output);
         $this->assertStringContainsString("nav-notification-popover-container", $output);
     }
+
+    /**
+     * Confirm that user with pending site policies doesn't get navbar
+     */
+    public function test_get_navbar_with_policypolicy_url_and_enabled_sitepolicy() {
+        global $CFG, $PAGE;
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $CFG->enablesitepolicies = 1;
+        $CFG->sitepolicy = 'www.example.com';
+
+        $corerenderer = $PAGE->get_renderer('core');
+        /**
+         * @var \tool_sitepolicy\testing\generator $generator
+         */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_sitepolicy');
+        $policy = $generator->create_published_policy();
+        $generator->add_userconsent($policy, true, $user->id);
+
+        $output = message_popup_render_navbar_output($corerenderer);
+
+        $this->assertStringContainsString("nav-message-popover-container", $output);
+        $this->assertStringContainsString("nav-notification-popover-container", $output);
+    }
 }
