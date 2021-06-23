@@ -785,7 +785,7 @@ class enrol_self_plugin extends enrol_plugin {
      * @return bool
      */
     public function edit_instance_form($instance, MoodleQuickForm $mform, $context) {
-        global $CFG;
+        global $CFG, $DB;
 
         // Totara: convert database fields to a form field
         self::fixup_expirynotify_from_database($instance);
