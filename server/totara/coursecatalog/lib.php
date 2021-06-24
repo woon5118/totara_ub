@@ -338,15 +338,22 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
             throw new \coding_exception('Unknown type', $type);
     }
 
+    $type = \totara_core\visibility_controller::get($type);
+    $type->set_sql_separator($separator);
+
     // Deal with the old showhidden argument, it was always half broken and only worked with traditional visibility.
     // So just hack it in here in the same way it used to be dealt with.
     if (!$audiencebased && ($showhidden || has_capability($capability, $systemcontext, $userid))) {
-        return array('1=1', array());
+        // Instead of returning everything we still need to limit the user's visibility to the tenancy
+        // if the user belongs to one.
+        if (!empty($CFG->tenantsenabled)) {
+            $sql = $type->get_multitenancy_sql($usercontext, $tablealias);
+        } else {
+            return array('1=1', array());
+        }
+    } else {
+        $sql = $type->sql_where_visible($userid, $alias);
     }
-
-    $type = \totara_core\visibility_controller::get($type);
-    $type->set_sql_separator($separator);
-    $sql = $type->sql_where_visible($userid, $alias);
     if ($sql->is_empty()) {
         return ['1=1', []];
     }

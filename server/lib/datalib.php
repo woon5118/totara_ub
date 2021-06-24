@@ -870,7 +870,7 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
     $limitto   = $limitfrom + $recordsperpage;
 
     // Add audience visibility setting.
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible', 'c');
     $visibilitysql = "AND {$visibilitysql}";
     $params = array_merge($params, $visibilityparams);
 

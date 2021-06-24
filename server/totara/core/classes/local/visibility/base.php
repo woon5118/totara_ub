@@ -110,6 +110,9 @@ abstract class base implements resolver {
         }
 
         if ($this->can_see_all($userid)) {
+            if ($usercontext && !empty($CFG->tenantsenabled)) {
+                return $this->get_multitenancy_sql($usercontext, $tablealias);
+            }
             return new sql('');
         }
 
@@ -149,7 +152,7 @@ abstract class base implements resolver {
      * @param string $tablealias
      * @return sql The SQL snippet to use to restrict or null if none is required.
      */
-    final protected function get_multitenancy_sql(\context_user $context, string $tablealias): sql {
+    final public function get_multitenancy_sql(\context_user $context, string $tablealias): sql {
         $separator = $this->sql_separator();
         if ($separator !== '.') {
             // NOTE: rb caching is force turned off when multitenancy is enabled,
