@@ -37,7 +37,7 @@ $PAGE->set_title(get_string('botfw:output_title', 'totara_msteams'));
 
 $doc_link = html_writer::tag('a', get_string('help_page_product_doc', 'totara_msteams'),
     [
-        'href' => 'https://help.totaralearning.com/display/TC/Microsoft+Teams+for+Totara+Cloud',
+        'href' => 'https://help.totaralearning.com/display/THM/.Totara+application+for+Microsoft+Teams+v13',
         'target' => '_blank',
         'rel' => 'noreferrer noopener'
     ]
