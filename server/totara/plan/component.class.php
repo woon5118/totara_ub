@@ -494,9 +494,11 @@ abstract class dp_base_component {
             $tablehide[] = 'linkedcourses';
         }
 
-        $tableheaders[] = get_string('numberoflinkedevidence', 'totara_plan');
-        $tablecolumns[] = 'linkedevidence';
-        $tablehide[] = 'linkedevidence';
+        if (\totara_core\advanced_feature::is_enabled('evidence')) {
+            $tableheaders[] = get_string('numberoflinkedevidence', 'totara_plan');
+            $tablecolumns[] = 'linkedevidence';
+            $tablehide[] = 'linkedevidence';
+        }
 
         if ($showpriorities) {
             $tableheaders[] = get_string('priority', 'totara_plan');

@@ -264,6 +264,18 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'learning_plan_objective_for_behat',
                 'required' => array('user', 'plan', 'name')
             ),
+            'linked courses' => array(
+                'datagenerator' => 'learning_plan_course_link_for_behat',
+                'required' => array('user', 'plan', 'name')
+            ),
+            'linked competencies' => array(
+                'datagenerator' => 'learning_plan_competency_link_for_behat',
+                'required' => array('user', 'plan', 'name')
+            ),
+            'linked programs' => array(
+                'datagenerator' => 'learning_plan_program_link_for_behat',
+                'required' => array('user', 'plan', 'name')
+            ),
         ),
         'totara_appraisal' => array (
             'appraisals' => array(

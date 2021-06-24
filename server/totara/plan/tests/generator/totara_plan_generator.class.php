@@ -352,11 +352,9 @@ class totara_plan_generator extends component_generator_base {
      * @return stdClass Created learning plan objective instance.
      */
     public function create_learning_plan_objective_for_behat($record = null) {
-        global $DB, $USER;
+        global $USER;
 
-        // Look up the learning plan id from the user and plan names.
-        $userid = $DB->get_field('user', 'id', array('username' => $record['user']), MUST_EXIST);
-        $planid = $DB->get_field('dp_plan', 'id', array('userid' => $userid, 'name' => $record['plan']), MUST_EXIST);
+        $planid = $this->get_plan_id_for_behat($record);
 
         // Set the data up correctly for objective creation and remove the data we no longer need.
         $record['fullname'] = $record['name'];
@@ -364,7 +362,50 @@ class totara_plan_generator extends component_generator_base {
         unset($record['plan']);
         unset($record['name']);
 
-        return $this->create_learning_plan_objective ($planid, $USER->id, $record);
+        return $this->create_learning_plan_objective($planid, $USER->id, $record);
+    }
+
+    /**
+     * @param array $data
+     */
+    public function create_learning_plan_course_link_for_behat(array $data): void {
+        global $DB;
+        $this->add_learning_plan_course(
+            $this->get_plan_id_for_behat($data),
+            $DB->get_field('course', 'id', ['fullname' => $data['name']], MUST_EXIST)
+        );
+    }
+
+    /**
+     * @param array $data
+     */
+    public function create_learning_plan_competency_link_for_behat(array $data): void {
+        global $DB;
+        $this->add_learning_plan_competency(
+            $this->get_plan_id_for_behat($data),
+            $DB->get_field('comp', 'id', ['fullname' => $data['name']], MUST_EXIST)
+        );
+    }
+
+    /**
+     * @param array $data
+     */
+    public function create_learning_plan_program_link_for_behat(array $data): void {
+        global $DB;
+        $this->add_learning_plan_program(
+            $this->get_plan_id_for_behat($data),
+            $DB->get_field('prog', 'id', ['fullname' => $data['name']], MUST_EXIST)
+        );
+    }
+
+    /**
+     * @param array $data
+     * @return int
+     */
+    private function get_plan_id_for_behat(array $data): int {
+        global $DB;
+        $userid = $DB->get_field('user', 'id', ['username' => $data['user']], MUST_EXIST);
+        return $DB->get_field('dp_plan', 'id', ['userid' => $userid, 'name' => $data['plan']], MUST_EXIST);
     }
 
 }
