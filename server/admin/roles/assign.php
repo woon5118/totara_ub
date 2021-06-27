@@ -312,10 +312,11 @@ if ($roleid) {
     }
 
     foreach ($assignableroles as $roleid => $rolename) {
-        $description = format_string($DB->get_field('role', 'description', array('id'=>$roleid)));
+        $role = $DB->get_record('role', ['id' => $roleid]);
+        $description = role_get_description($role);
         $assignurl = new moodle_url($PAGE->url, array('roleid'=>$roleid));
         $row = array('<a href="'.$assignurl.'">'.$rolename.'</a>',
-                $description, $assigncounts[$roleid]);
+            $description, $assigncounts[$roleid]);
         if ($showroleholders) {
             $row[] = $roleholdernames[$roleid];
         }

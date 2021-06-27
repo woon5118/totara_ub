@@ -181,7 +181,7 @@ class core_role_preset {
 
         $info['description'] = self::get_node_value($dom, '/role/description');
         if (isset($value)) {
-            $info['description'] = clean_param($info['description'], PARAM_CLEANHTML);
+            $info['description'] = clean_param($info['description'], PARAM_RAW);
         }
 
         $info['archetype'] = self::get_node_value($dom, '/role/archetype');
