@@ -1,3 +1,241 @@
+Release 13.9 (28th June 2021):
+==============================
+
+
+Important:
+
+    TL-31000       Changed the default of the "Disable consistent cleaning" setting to "Yes" when upgrading from version 12 or lower to 13
+
+                   With Totara 13 the new “Disable consistent cleaning” security setting
+                   was introduced. Prior to this patch, upgrading from Totara 12 or lower to
+                   Totara 13 left this new setting disabled, thereby introducing added
+                   security but potentially leading to unintentional data loss when editing
+                   existing HTML content. With this patch, upgrading from Totara 12 or lower
+                   to Totara 13 will enable this setting to preserve previous behaviour in
+                   order to prevent data loss.
+
+Performance improvements:
+
+    TL-30630       Fixed counting likes/comments in a workspace discussion multiple times in one request
+
+                   Previously when loading a list of discussions in a workspace, the number of
+                   likes and number of comments for each discussion were independently
+                   queried, resulting in a large number of queries run for a single request.
+
+                   With this patch in place when loading a list of workspace discussions, the
+                   counts are performed once with the initial query, decreasing the number of
+                   queries needed to return the results.
+
+    TL-30973       Improved the performance of the Record of Learning: Course report source when used with a very large number of course completion history records
+
+                   Prior to this patch on older databases a large number of course completion
+                   history records (in the millions) would slow down the Record of Learning:
+                   Course report when the Past Completions columns were added. With this patch
+                   the report should now behave faster when used with a large dataset.
+
+                   Important: This change introduces a new index on the
+                   course_completion_history table, which can take several minutes to run on a
+                   large Totara instance.
+
+    TL-31089       Improved user content restriction query performance
+
+                   Mainly on MySQL databases the user content restrictions were scaling poorly
+                   with larger amounts of job assignment records. This has been fixed and
+                   performance on MySQL 5.7 and MySQL 8 is now significantly improved if user
+                   content restrictions are used in reports.
+
+    TL-31095       Improved performance of reports based on the user source when certain count columns are used
+
+                   The query part for the following columns changed to improve performance:
+                    * User's Achieved Competency Count
+                    * User's Courses Started Count
+                    * User's Courses Completed Count
+                    * Course Completions as Evidence
+                    * Extensions
+
+Improvements:
+
+    TL-29734       Updated 'help command' into 'hero card' that contains 'sign-in', 'sign-out' and 'help' button in Microsoft Teams
+    TL-30025       Created a new 'help tab' to display 'help' information in Microsoft Teams
+    TL-30027       Added sign-out link for manual login settings on each static tab in Microsoft Teams
+    TL-30221       Added 'Achievement Status' column and filter to the Competency Status report
+
+                   It is now possible to filter records shown in the Competency Status report
+                   on the Achievement status column thus allowing users to view only active
+                   (current) achieved values.
+
+    TL-30395       Set loglevel to "warn" in .npmrc, which suppresses "notice" level output such as the core-js advertising on npm ci / npm install.
+    TL-30791       Added a logo button to use by default for Microsoft OAuth2 issuers on the site login page
+
+                   A new option has been added to Microsoft issuers for the OAuth2 plugin,
+                   named 'Show default Microsoft branding'. This ensures that any new issuers
+                   of the Microsoft type meet Microsoft's corporate branding requirements.
+                   Existing issuers of the Microsoft type are not affected by this change.
+
+    TL-30794       Added config for report builder graph to specify max value for x and y axes
+    TL-30797       A users competency page now uses up to 2 lines when viewing the competency graph
+    TL-30852       Renamed the 'Open in new window' button in Microsoft Teams to 'Open in browser'
+    TL-31009       Adjusted the default scheduled 'send_registration_data_task' task to randomise the time it is run to distribute the load
+
+                   The change also uses an upgrade script to reset the task to ensure the
+                   new 'randomised' time is set.
+
+    TL-31021       Ensure MS teams theme CSS is compatible with older browsers
+    TL-31038       Added settings option to Microsoft Teams tabs to allow the modification of existing tabs
+
+Bug fixes:
+
+    TL-28866       Fixed the report builder course category filter showing the hidden workspace and performance activity categories.
+    TL-29257       Fixed styling of "programs" header in record of learning
+    TL-29923       Clicking on a link in a navigation block no longer expands the node
+    TL-29958       Report tiles no longer have the brand colour in their shadow
+    TL-30032       Added the alert when users visit external url from totara msteams tabs
+    TL-30057       Fixed pulling the image from Vimeo to render on resource cards when Vimeo config is enabled
+    TL-30072       Fixed page advancement on multi-value multichoice questions in lessons
+
+                   When using a multi-choice question with multiple answers in a lesson where
+                   the user is allowed to have multiple attempts, the system now uses the
+                   defined 'Jump to' page as defined in the answers as follows:
+                    * If the answer is correct, i.e. all the correct answer(s) are selected
+                   without selecting an incorrect answer, the 'Jump to' value of the first
+                   correct answer is used.
+                    * If the answer is not totally correct, i.e. not all correct answer(s) are
+                   selected or any incorrect answer is selected, the 'Jump to' value of the
+                   first incorrect answer is used.
+                    * It only some of the correct answers are selected and the question has no
+                   incorrect answers defined, the user will stay on the same page.
+
+    TL-30119       The bottom of 'g' is no longer hidden in a mini profile card
+    TL-30254       Fixed error being caused when mathjax filter was enabled
+    TL-30359       Fixed a report builder bug where tag filter could exclude rows without any tags
+
+                   Prior to this patch, reports that had a tag filter added did not show rows
+                   without any tags assigned when resetting the tag filter to the 'Any value'
+                   option after having it set to another option. This bug is fixed with this
+                   patch.
+
+    TL-30481       Fixed PHP warning if language pack cannot be downloaded and provided option to retry or choose different language
+    TL-30563       Fixed bug causing enrolment error exception when default role has been deleted
+
+                   It has been possible for administrators to delete a role whilst that role
+                   has active future references (e.g. default role for self enrolment).  When
+                   a user self-enrols on such a course after the role has been removed, the
+                   system would throw an error.  This patch prevents removal of roles
+                   referenced as default roles and also prevents system from throwing an error
+                   if the role was somehow removed.
+
+    TL-30597       Fixed the report builder course category filter showing an error message when using hidden categories.
+
+                   Previously when there are hidden categories in a site and a user tried to
+                   use the "Course Category (multichoice)" filter in a report, the category
+                   picker would display an error message. With this fix categories the user
+                   can see should be listed without the error message.
+
+    TL-30599       Added relationship validation check for update_section_settings_validation graphql call
+    TL-30614       Added CSS.AllowTricky to the HTMLPurifier configuration to allow page layout modifying CSS which does not directly constitute a security risk
+    TL-30636       Enabled localisation for custom field checkbox options in totara catalog
+    TL-30653       Updated the reCAPTCHA endpoints to use internationally accessible URLs
+    TL-30654       Implemented return methods for organisation and position webservices
+
+                   Previously,  these webservices always returned a null value (instead of a
+                   'proper' value eg list of org frameworks) when the webservice was accessed
+                   by REST clients.
+
+                   This patch fixes the return methods for these webservices.
+
+    TL-30688       Book Activity print stylesheet is now correctly applied
+    TL-30689       Fixed current learning block always using default alert period
+    TL-30702       Fixed an error creating the "Resources Engagement" report that happened when "Recommendations" was turned off in Engage settings
+    TL-30752       Added missing multilang filter support to the Recently Viewed block
+    TL-30754       The drag and drop notification on course pages no longer makes items unclickable after it disappears
+    TL-30763       Improved the displayed error message for non-existent workspaces or discussions
+    TL-30768       Removed extra space above logo in mobile widths
+    TL-30822       Changed the Report builder table to stay below the graph in the report graph block when changing the page or sorting the table
+    TL-30823       Fixed notification not being sent when seminar booking is cancelled due to user unenrolment
+    TL-30833       Fixed error when checking whether competency profile can be viewed of a deleted user
+    TL-30834       Added HTML sanitization when displaying draft content in atto editor
+    TL-30835       Fixed the display of error notifications when attempting to approve seminar requests
+    TL-30847       Improved height calculation incorporating available window height when using SCORM packages
+    TL-30861       Fixed a bug when adding more than 10 programs to badge criteria
+
+                   Prior to this patch, badge access could not be activated when there were
+                   more than 10 programs assigned to the badge criteria in combination with
+                   selecting the option "Complete all of the selected programs". This patch
+                   fixes this bug.
+
+    TL-30903       Fixed incorrect conversion of emojis in the JSON editor emoji node to the correct HTML entities and unicode characters
+    TL-30913       Fixed member add/remove capability checks for Workspace Owner role
+    TL-30930       Fixed missing password message displays when the Unmask password is selected
+    TL-30936       Behat multiselect matches checks now works as expected
+
+                   The behat steps `And the field "<name>" does not match value "<comma
+                   separated value>"` and `And the field "<name>" matches value "<comma
+                   separated value>"` now work correctly when pointing to a multiselect HTML
+                   input
+
+    TL-30959       Fixed notifications for performance activities not being sent in the preferred language of the recipients
+
+                   Notifications for performance activities are now sent in the preferred
+                   language of the recipient. If the recipient is an external participant it
+                   will use the default language of the site.
+
+    TL-30962       Blanked out content text field during a soft delete of a comment
+
+                   Previously, only the content field in comment database record was cleared
+                   in a soft delete; the contexttext column still showed the original comment.
+                   This patch makes sure the contenttext column gets cleared as well.
+
+    TL-30966       Fixed a bug where notify_added_to_workspace_task triggers an error if a member user is deleted before a notification is sent
+    TL-30968       Fixed performance activity name not being formatted by format_string in several places
+    TL-30969       Fixed bug where .ods and .xlsx spreadsheet downloads are corrupted by double-quotes in sheet title
+    TL-30991       Fixed Responsive component losing resizes in rapid succession
+    TL-30995       Fixed modal transitions ending early
+    TL-31017       Fixed issue when creating a workspace with a description in Safari causing a navigate away browser notification
+    TL-31039       Fixed notification not being sent on room change for 'One message per date' setting
+
+                   Prior to this patch, when the 'One message per date' setting was turned on
+                   in the seminar global settings and room or facilitator changes were made to
+                   a session, the 'Date/time changed' notifications were not sent to the
+                   participant. This patch fixes the issue, so that notifications will be sent
+                   in this case.
+
+    TL-31078       Fixed placeholder dropdown appearing when clicked randomly inside the editor
+    TL-31111       Updated user details during user creation
+
+                   Previously, when an oauth2 authenticated user first logged onto Totara,
+                   only a few key fields were populated in that user's mdl_user record (eg
+                   alternatename, firstname, lastname). The user had to log on a second time
+                   before other fields (eg description, city, country) were updated in the
+                   record.
+
+                   This patch fixes the user creation process so that all details are put into
+                   the user record on the first login.
+
+    TL-31144       Fixed theme formatter to not force theme files to have default versions
+    TL-31185       Fixed the Inappropriate Content report displaying an error when a comment with a embedded image is reported.
+    TL-31191       Fixed loading of current and archived assignments on the competency profile
+
+                   When a user got unassigned due to not being part of the assigned group
+                   anymore, the competency profile and competency details page still showed
+                   the unassigned competency under the current assignments. This has been
+                   fixed. Unassigned competencies are now treated the same as archived
+                   assignments and show up under the archived assignments list.
+
+    TL-31212       Fixed broken engage workspace library search
+    TL-31217       Removed horizontal scrollbar when viewing the activity completion report (in a course)
+    TL-31251       Modified Report Builder graphs to respect the 'Maximum number of used records' setting  instead of current page limit
+
+API changes:
+
+    TL-30635       Made grade feedback format an optional value for get_grade_items webservice return values
+
+Contributions:
+
+    * David Scotson - Synergy Learning - TL-30689
+    * Davo Smith - Synergy Learning - TL-30936
+    * Joseph Kelly - Digital Learning (Chile) - TL-30654
+
+
 Release 13.8 (19th May 2021):
 =============================
 
