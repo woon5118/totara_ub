@@ -23,25 +23,41 @@
 
 namespace enrol_totara_facetoface\watcher;
 
+use enrol_totara_facetoface_plugin;
+use mod_facetoface\hook\alternative_signup_link;
+
 /**
  * Hook watcher for a seminar.
  */
 class seminar_watcher {
+
+    // Let's have a static instance of the enrol_plugin object so we can take advantage of its cache.
+    private static $enrol_plugin;
+
+    /**
+     * Reset the enrol_plugin static instance
+     */
+    public static function reset_enrol_plugin(): void {
+        self::$enrol_plugin = null;
+    }
+
     /**
      * Rewrite a sign-up link if necessary.
      *
-     * @param \mod_facetoface\hook\alternative_signup_link $hook
+     * @param alternative_signup_link $hook
      * @return void
      */
-    public static function alter_signup_link(\mod_facetoface\hook\alternative_signup_link $hook) {
+    public static function alter_signup_link(alternative_signup_link $hook) {
         global $CFG;
         require_once($CFG->dirroot . '/enrol/totara_facetoface/lib.php');
 
-        /** @var \enrol_totara_facetoface_plugin */
-        $enrol = new \enrol_totara_facetoface_plugin();
+        if (!self::$enrol_plugin) {
+            self::$enrol_plugin = new enrol_totara_facetoface_plugin();
+        }
+
         $seminar = $hook->seminarevent->get_seminar();
         // see if the current user can enrol on the course
-        if (in_array($hook->seminarevent->get_id(), array_keys($enrol->get_enrolable_sessions($seminar->get_course())))) {
+        if (array_key_exists($hook->seminarevent->get_id(), self::$enrol_plugin->get_enrolable_sessions($seminar->get_course()))) {
             $showsignuplink = true;
             if (!enrol_is_enabled('totara_facetoface') || $CFG->enableavailability) {
                 $cm = get_coursemodule_from_instance('facetoface', $hook->seminarevent->get_facetoface());

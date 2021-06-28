@@ -21,6 +21,8 @@
  * @package mod_facetoface
  */
 
+use enrol_totara_facetoface\watcher\seminar_watcher;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
@@ -32,6 +34,18 @@ require_once("{$CFG->dirroot}/lib/modinfolib.php");
  * @see facetoface_cm_info_view
  */
 class mod_facetoface_cm_info_view_testcase extends advanced_testcase {
+
+    protected function setUp(): void {
+        parent::setUp();
+        // Make sure we're not dealing with stale cache data on the enrol_totara_facetoface watcher.
+        seminar_watcher::reset_enrol_plugin();
+    }
+
+    protected function tearDown(): void {
+        seminar_watcher::reset_enrol_plugin();
+        parent::tearDown();
+    }
+
     /**
      * Create facetoface
      * Create events

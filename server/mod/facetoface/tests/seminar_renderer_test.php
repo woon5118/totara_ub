@@ -26,7 +26,8 @@ global $CFG;
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 require_once("{$CFG->dirroot}/mod/facetoface/renderer.php");
 
-use mod_facetoface\{seminar, signup, seminar_event, seminar_session, signup_list, render_event_info_option};
+use enrol_totara_facetoface\watcher\seminar_watcher;
+use mod_facetoface\{seminar, signup, seminar_event, seminar_session, render_event_info_option};
 use totara_job\job_assignment;
 use mod_facetoface\signup\state\booked;
 
@@ -34,6 +35,17 @@ use mod_facetoface\signup\state\booked;
  * Class mod_facetoface_seminar_renderer_testcase
  */
 class mod_facetoface_seminar_renderer_testcase extends advanced_testcase {
+
+    protected function setUp(): void {
+        parent::setUp();
+        // Make sure we're not dealing with stale cache data on the enrol_totara_facetoface watcher.
+        seminar_watcher::reset_enrol_plugin();
+    }
+
+    protected function tearDown(): void {
+        seminar_watcher::reset_enrol_plugin();
+        parent::tearDown();
+    }
 
     /**
      * @param int $approvaltype

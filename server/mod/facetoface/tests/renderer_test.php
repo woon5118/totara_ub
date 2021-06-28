@@ -24,6 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+
+use enrol_totara_facetoface\watcher\seminar_watcher;
 use mod_facetoface\seminar;
 use mod_facetoface\seminar_event;
 use mod_facetoface\seminar_event_helper;
@@ -50,12 +52,17 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $this->data_generator = $this->getDataGenerator();
         $this->facetoface_generator = $this->data_generator->get_plugin_generator('mod_facetoface');
         $this->customfield_generator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
+
+        // Make sure we're not dealing with stale cache data on the enrol_totara_facetoface watcher.
+        seminar_watcher::reset_enrol_plugin();
     }
 
     protected function tearDown(): void {
         $this->data_generator = null;
         $this->facetoface_generator = null;
         $this->customfield_generator = null;
+
+        seminar_watcher::reset_enrol_plugin();
         parent::tearDown();
     }
 
