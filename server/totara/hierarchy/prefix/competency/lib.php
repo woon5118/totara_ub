@@ -1322,4 +1322,52 @@ class competency extends hierarchy {
         });
     }
 
+    /**
+     * Update assignment availability data for competencies
+     *
+     * @param array $availabilities
+     * @param int|null $fw_id
+     */
+    public static function update_assignment_availabilities(array $availabilities, ?int $fw_id = null) {
+        global $DB;
+
+        if (!advanced_feature::is_enabled('competency_assignment')) {
+            return;
+        }
+
+        $delete_sql = "DELETE from {comp_assign_availability}";
+        $delete_params = [];
+
+        $insert_sql =
+            "INSERT into {comp_assign_availability}
+             (comp_id, availability)   
+             SELECT c.id, :availability
+               FROM {comp} c";
+        $insert_params = [];
+
+        if ($fw_id !== null) {
+            $delete_sql .= " WHERE comp_id IN (
+                SELECT id FROM {comp}
+                 WHERE frameworkid = :fw_id)";
+            $delete_params['fw_id'] = $fw_id;
+
+            $insert_sql .= " WHERE c.frameworkid = :fw_id";
+            $insert_params['fw_id'] = $fw_id;
+        }
+
+        // To avoid differences in databases on using the same table for insert and sub-select table,
+        // we are going for the more brute approach - delete competency_assign_availability records and re-insert the onces we need
+
+        /** @var moodle_transaction $transaction */
+        $transaction = $DB->start_delegated_transaction();
+        $DB->execute($delete_sql, $delete_params);
+
+        foreach ($availabilities as $availability) {
+            $insert_params['availability'] = $availability;
+            $DB->execute($insert_sql, $insert_params);
+        }
+
+        $transaction->allow_commit();
+    }
+
 }  // class
