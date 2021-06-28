@@ -1,6 +1,10 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.10 ===
+
+* Increased character limit for the name column in the course_categories table to 1333 characters.
+
 === 13.9 ===
 
 * Added columns 'type' and 'show_default_branding' to the oauth2_issuer table, and added them as properties to core\oauth2\issuer.

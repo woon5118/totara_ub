@@ -391,7 +391,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         if (empty($data->name)) {
             throw new moodle_exception('categorynamerequired');
         }
-        if (core_text::strlen($data->name) > 255) {
+        if (core_text::strlen($data->name) > 1333) {
             throw new moodle_exception('categorytoolong');
         }
         $newcategory->name = $data->name;
@@ -523,7 +523,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         if (!empty($data->name) && $data->name !== $this->name) {
-            if (core_text::strlen($data->name) > 255) {
+            if (core_text::strlen($data->name) > 1333) {
                 throw new moodle_exception('categorytoolong');
             }
             $newcategory->name = $data->name;

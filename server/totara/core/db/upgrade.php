@@ -1537,5 +1537,17 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020100120, 'totara', 'core');
     }
 
+    if ($oldversion < 2020100122) {
+        // Changing precision of field name on table course_categories to (1333).
+        $table = new xmldb_table('course_categories');
+        $field = new xmldb_field('name', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null, null, 'id');
+
+        // Launch change of precision for field name.
+        $dbman->change_field_precision($table, $field);
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100122, 'totara', 'core');
+    }
+
     return true;
 }

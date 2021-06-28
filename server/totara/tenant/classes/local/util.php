@@ -162,7 +162,7 @@ final class util {
         // Create top course category.
         $coursecat = new \stdClass();
         $coursecat->name = empty($data['categoryname']) ? $tenant->name : $data['categoryname'];
-        $coursecat->name = \core_text::substr($coursecat->name, 0, 255);
+        $coursecat->name = \core_text::substr($coursecat->name, 0, 1333);
         $coursecat->idnumber = $data['categoryidnumber'] ?? null; // NOTE: add validation if added to UI
         $coursecat->description = '';
         $coursecat->parent = 0;

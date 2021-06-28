@@ -73,6 +73,7 @@ class core_course_editcategory_form extends moodleform {
 
         $mform->addElement('text', 'name', get_string('categoryname'), array('size' => '30'));
         $mform->addRule('name', get_string('required'), 'required', null);
+        $mform->addRule('name', get_string('maximumchars', '', 1333), 'maxlength', 1333);
         $mform->setType('name', PARAM_TEXT);
 
         $mform->addElement('text', 'idnumber', get_string('idnumbercoursecategory'), 'maxlength="100" size="10"');

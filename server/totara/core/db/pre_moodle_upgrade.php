@@ -137,3 +137,8 @@ if ($dbman->field_exists($table, $field)) {
 
 // Add extra columns to core oauth2 issuers table required for Totara.
 totara_core_upgrade_oauth2_issuers_add_type_and_branding_columns();
+
+// Increase character limit for name on course_categories table to 1333.
+$table = new xmldb_table('course_categories');
+$field = new xmldb_field('name', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null, null, 'id');
+$dbman->change_field_precision($table, $field);
