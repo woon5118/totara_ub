@@ -58,6 +58,8 @@ if (isset($options['file'])) {
     unset($options['file']);
 }
 $userselector = new $classname($name, $options);
+// Totara: do not show all system users here unless current user is a privileged non-tenant user account.
+$userselector->enabletenantrestrictions = !has_any_capability(array('moodle/role:assign', 'moodle/role:safeoverride', 'moodle/role:override', 'moodle/role:manage'), context_system::instance());
 
 // Do the search and output the results.
 $results = $userselector->find_users($search);
