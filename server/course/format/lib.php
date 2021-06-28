@@ -674,21 +674,16 @@ abstract class format_base {
      *
      * @param MoodleQuickForm $mform form the elements are added to
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form
-     * @param bool $remove_collapse 'true' skip the collapse setting for the first section when it is a section edit form
      * @return array array of references to the added form elements
      */
-    public function create_edit_form_elements(&$mform, $forsection = false, $remove_collapse = false) {
+    public function create_edit_form_elements(&$mform, $forsection = false) {
         $elements = array();
         if ($forsection) {
             $options = $this->section_format_options(true);
         } else {
             $options = $this->course_format_options(true);
         }
-
         foreach ($options as $optionname => $option) {
-            if ($forsection && $remove_collapse && $optionname == 'collapseddefault') {
-                continue;
-            }
             if (!isset($option['element_type'])) {
                 $option['element_type'] = 'text';
             }

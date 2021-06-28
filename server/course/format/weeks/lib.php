@@ -304,11 +304,10 @@ class format_weeks extends format_base {
      *
      * @param MoodleQuickForm $mform form the elements are added to.
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
-     * @param bool $remove_collapse 'true' skip the collapse setting for the first section when it is a section edit form
      * @return array array of references to the added form elements.
      */
-    public function create_edit_form_elements(&$mform, $forsection = false, $remove_collapse = false) {
-        $elements = parent::create_edit_form_elements($mform, $forsection, $remove_collapse);
+    public function create_edit_form_elements(&$mform, $forsection = false) {
+        $elements = parent::create_edit_form_elements($mform, $forsection);
 
         // Totara: Keep numsections.
         // Increase the number of sections combo box values if the user has increased the number of sections

@@ -90,8 +90,7 @@ $defaultsectionname = $courseformat->get_default_section_name($section);
 $customdata = array(
     'cs' => $sectioninfo,
     'editoroptions' => $editoroptions,
-    'defaultsectionname' => $defaultsectionname,
-    'removeDefaultCollapse' => $sectionnum == 0
+    'defaultsectionname' => $defaultsectionname
 );
 $mform = $courseformat->editsection_form($PAGE->url, $customdata);
 
