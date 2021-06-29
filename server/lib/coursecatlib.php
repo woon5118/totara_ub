@@ -1213,7 +1213,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return coursecat[] Array of coursecat objects indexed by category id
      */
     public function get_children($options = array()) {
-        global $DB;
+        global $DB, $USER;
         $coursecatcache = cache::make('core', 'coursecat');
 
         // Get default values for options.
@@ -1242,7 +1242,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         // First retrieve list of user-visible and sorted children ids from cache.
-        $cache_key = 'c'. $this->id. ':' .  serialize($sortfields) . ':' . $where_system_param['is_system'];
+        $cache_key = 'c'. $this->id. ':' .  serialize($sortfields) . ':' . $where_system_param['is_system'] . ':' . $USER->id;
         $sortedids = $coursecatcache->get($cache_key);
         if ($sortedids === false) {
             $sortfieldskeys = array_keys($sortfields);
