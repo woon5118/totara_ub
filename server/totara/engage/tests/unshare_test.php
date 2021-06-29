@@ -84,7 +84,7 @@ class totara_engage_unshare_testcase extends advanced_testcase {
     /**
      *  @return void
      */
-    public function test_unshare_via_graphql(): void {
+    public function test_unshare_user_via_graphql(): void {
         global $DB;
 
         $gen = $this->getDataGenerator();
@@ -125,6 +125,63 @@ class totara_engage_unshare_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $share->get_recipient_id()]));
     }
 
+    /**
+     *  @return void
+     */
+    public function test_unshare_workspace_via_graphql(): void {
+        global $DB;
+
+        // Get generators.
+        $gen = $this->getDataGenerator();
+        /** @var totara_playlist_generator $playlistgen */
+        $playlist_gen = $gen->get_plugin_generator('totara_playlist');
+        /** @var container_workspace_generator $workspace_gen */
+        $workspace_gen = $gen->get_plugin_generator('container_workspace');
+
+        // Create a user.
+        $user = $gen->create_user();
+
+        // Create a playlist.
+        $this->setUser($user);
+        $playlist = $playlist_gen->create_playlist(['access' => access::PUBLIC]);
+
+        // Create a few workspaces we can share to.
+        $workspaces = [
+            $workspace_gen->create_workspace(),
+            $workspace_gen->create_workspace(),
+            $workspace_gen->create_workspace(),
+            $workspace_gen->create_workspace(),
+            $workspace_gen->create_workspace(),
+        ];
+
+        // Share the playlist to all workspaces.
+        $recipients = $workspace_gen->create_workspace_recipients($workspaces);
+        $shares = $playlist_gen->share_playlist($playlist, $recipients);
+
+        // Unshare all shares.
+        /** @var \totara_engage\share\share $share */
+        foreach ($shares as $share) {
+            $this->assertTrue($DB->record_exists('engage_share', ['id' => $share->get_id()]));
+            $this->assertEquals(1, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $share->get_recipient_id()]));
+
+            $parameters = [
+                'recipient_id' => $share->get_recipient_id(),
+                'component' => 'totara_playlist',
+                'item_id' => $playlist->get_id()
+            ];
+
+            // Remove share via graphql.
+            $ec = execution_context::create('ajax', 'totara_engage_unshare');
+            $result = graphql::execute_operation($ec, $parameters);
+
+            $this->assertEmpty($result->errors, !empty($result->errors) ? $result->errors[0]->message : '');
+            $this->assertNotEmpty($result->data);
+
+            $this->assertTrue($DB->record_exists('engage_share', ['id' => $share->get_id()]));
+            $this->assertEquals(0, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $share->get_recipient_id()]));
+        }
+    }
+
     public function test_unshare_before_bookmark_item(): void {
         global $DB;
 
@@ -163,7 +220,7 @@ class totara_engage_unshare_testcase extends advanced_testcase {
             'engage_article_get_article',
             ['id' => $article->get_id()]
         );
-        
+
         self::assertEquals($article->get_id(), $result->get_id());
     }
 }

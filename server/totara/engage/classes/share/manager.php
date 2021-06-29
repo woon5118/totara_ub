@@ -312,10 +312,10 @@ final class manager {
             if (!$share_recipient->can_unshare_resources()) {
                 throw new share_exception('error:sharecapability', $instance::get_resource_type());
             }
-        }
-
-        if (!$instance->can_unshare($recipient->instanceid, $recipient->area !== user::AREA)) {
-            throw new share_exception('error:sharecapability', $instance::get_resource_type());
+        } else {
+            if (!$instance->can_unshare($recipient->sharerid, $recipient->area !== user::AREA)) {
+                throw new share_exception('error:sharecapability', $instance::get_resource_type());
+            }
         }
 
         $recipient->visibility = 0;

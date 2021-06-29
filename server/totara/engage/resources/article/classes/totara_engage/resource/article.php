@@ -537,15 +537,19 @@ final class article extends resource_item implements time_viewable {
      * @inheritDoc
      */
     public function can_unshare(int $sharer_id, ?bool $is_container = false): bool {
-        // Sharer can not be owner of resources If resource is shared to share_with_me,
-        // but sharer can be the owner if resource is shared to the container.
-        if (!$is_container) {
-            if ($sharer_id == $this->get_userid()) {
-                return false;
-            }
+        global $USER;
+
+        // Check if current user is sharer.
+        if ($USER->id == $sharer_id) {
+            return true;
         }
 
-        $context = \context_user::instance($sharer_id);
-        return has_capability('engage/article:unshare', $context, $sharer_id);
+        // Check if current user is the owner of the resource.
+        if ($USER->id == $this->get_userid()) {
+            return true;
+        }
+
+        // Check if the current user has capability to unshare this resource.
+        return has_capability('engage/article:unshare', $this->get_context(), $USER->id);
     }
 }
