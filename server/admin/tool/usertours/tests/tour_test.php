@@ -1110,4 +1110,95 @@ class tool_usertours_tour_testcase extends advanced_testcase {
 
         $tour->set_filter_values($filtername, $newvalues);
     }
+
+    /**
+     * Confirm the validate tour context handles specific edge cases correctly.
+     */
+    public function test_validate_tour_context() {
+        global $PAGE, $CFG;
+
+        $generator = $this->getDataGenerator();
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+
+        $this->setAdminUser();
+
+        $course = $generator->create_course();
+
+        $workspace = $workspace_generator->create_workspace();
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+
+        // User 1 belongs to the course & workspace, user 2 does not
+        $workspace_generator->add_member($workspace, $user1->id);
+        $generator->enrol_user($user1->id, $course->id);
+
+        $course_context = context_course::instance($course->id);
+        $workspace_context = $workspace->get_context();
+        $user_context = context_user::instance($user1->id);
+
+        $scenarios = [
+            'course enrollment page uses course cat context for enrolled user' => [
+                $course_context,
+                $CFG->wwwroot . '/enrol/index.php',
+                $user1,
+                $course_context->get_parent_context(),
+            ],
+            'course enrollment page uses course cat context for not enrolled user' => [
+                $course_context,
+                $CFG->wwwroot . '/enrol/index.php',
+                $user2,
+                $course_context->get_parent_context(),
+            ],
+            'workspace uses workspace category context for member' => [
+                $workspace_context,
+                $CFG->wwwroot . '/container/type/workspace/workspace.php?id=' . $workspace->id,
+                $user1,
+                $workspace_context->get_parent_context(),
+            ],
+            'workspace uses workspace category context for non member' => [
+                $workspace_context,
+                $CFG->wwwroot . '/container/type/workspace/workspace.php?id=' . $workspace->id,
+                $user2,
+                $workspace_context->get_parent_context(),
+            ],
+            'engage resource uses the owner context for the owner' => [
+                $user_context,
+                $CFG->wwwroot . '/totara/engage/resources/article/index.php?id=101',
+                $user1,
+                $user_context,
+            ],
+            'engage resource uses the owner context for another user' => [
+                $user_context,
+                $CFG->wwwroot . '/totara/engage/resources/article/index.php?id=101',
+                $user2,
+                $user_context,
+            ],
+            'course page uses course context for a enrolled user' => [
+                $course_context,
+                $CFG->wwwroot . '/course/view.php?id=' . $course->id,
+                $user1,
+                $course_context,
+            ],
+        ];
+
+        foreach ($scenarios as $description => $data) {
+            list($context, $page_url, $user, $expected_context) = $data;
+            $this->setUser($user);
+
+            tool_usertours\external\tour::validate_tour_context($context, $page_url);
+
+            // Check the page context is what we expect
+            self::assertEquals($expected_context, $PAGE->context, $description);
+        }
+
+        // Check that a user not enrolled in a course throws an exception
+        $this->setUser($user2);
+        self::expectException(require_login_exception::class);
+
+        tool_usertours\external\tour::validate_tour_context(
+            $course_context,
+            $CFG->wwwroot . '/course/view.php?id=' . $course->id
+        );
+    }
 }

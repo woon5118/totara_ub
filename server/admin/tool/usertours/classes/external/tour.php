@@ -57,6 +57,11 @@ class tour extends external_api {
             $context = $context->get_parent_context();
         }
 
+        if (strpos($pageurl, $CFG->wwwroot . '/container/type/workspace/workspace.php') === 0) {
+            // Workspaces can be accessed without being a member.
+            $context = $context->get_parent_context();
+        }
+
         if (strpos($pageurl, $CFG->wwwroot . '/user/edit.php') === 0 && isloggedin()) {
             // Skip validation on profile edit page if the user is logged in already.
             return;
