@@ -50,4 +50,9 @@ $observers = array(
         'eventname' => '\core\event\course_updated',
         'callback'  => 'mod_forum_observer::course_updated',
     ),
+
+    array(
+        'eventname' => '\core\event\user_created',
+        'callback'  => 'mod_forum_observer::user_created',
+    ),
 );

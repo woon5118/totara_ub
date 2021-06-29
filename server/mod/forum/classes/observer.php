@@ -97,6 +97,43 @@ class mod_forum_observer {
     }
 
     /**
+     * Automatically subscribe new users to forums on the front page when
+     * they are created if the forum setup specifies it.
+     *
+     * @param \core\event\user_created $event
+     * @throws coding_exception
+     */
+    public static function user_created(\core\event\user_created $event) {
+        global $CFG, $DB;
+
+        // Forum lib required for the constant used below.
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        $userid = $event->relateduserid;
+        $sql = "SELECT f.id, f.course as course, cm.id AS cmid, f.forcesubscribe
+                  FROM {forum} f
+                  JOIN {course_modules} cm ON (cm.instance = f.id)
+                  JOIN {modules} m ON (m.id = cm.module)
+             LEFT JOIN {forum_subscriptions} fs ON (fs.forum = f.id AND fs.userid = :userid)
+                 WHERE f.course = :courseid
+                   AND f.forcesubscribe = :initial
+                   AND m.name = 'forum'
+                   AND fs.id IS NULL";
+        // Only get frontpage forums (those in the site course)
+        $sitecourseid = SITEID;
+        $params = array('courseid' => $sitecourseid, 'userid' => $userid, 'initial' => FORUM_INITIALSUBSCRIBE);
+
+        $forums = $DB->get_records_sql($sql, $params);
+        foreach ($forums as $forum) {
+            // If user doesn't have allowforcesubscribe capability then don't subscribe.
+            $modcontext = context_module::instance($forum->cmid);
+            if (has_capability('mod/forum:allowforcesubscribe', $modcontext, $userid)) {
+                \mod_forum\subscriptions::subscribe_user($userid, $forum, $modcontext);
+            }
+        }
+    }
+
+    /**
      * Observer for \core\event\course_module_created event.
      *
      * @param \core\event\course_module_created $event

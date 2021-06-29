@@ -391,6 +391,9 @@ class subscriptions {
             $includediscussionsubscriptions = false) {
         global $CFG, $DB;
 
+        // Needed for call to forum_get_context
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
         if (empty($fields)) {
             $allnames = get_all_user_name_fields(true, 'u');
             $fields ="u.id,
@@ -416,7 +419,7 @@ class subscriptions {
         }
 
         // Retrieve the forum context if it wasn't specified.
-        $context = forum_get_context($forum->id, $context);
+        $context = \forum_get_context($forum->id, $context);
 
         if (self::is_forcesubscribed($forum)) {
             $results = \mod_forum\subscriptions::get_potential_subscribers($context, $groupid, $fields, "u.email ASC");
