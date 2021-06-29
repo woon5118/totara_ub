@@ -40,6 +40,7 @@ if (!isset($CFG->registrationenabled)) {
 if (!empty($CFG->sitetype) && $download) {
     $data = get_registration_data();
     $data['manualupdate'] = 1;
+    $data['registrationreceivedvia'] = 3; // REGISTRATION_RECEIVED_VIA_DOWNLOAD
     $encrypted = encrypt_data(json_encode($data));
     send_file($encrypted, 'site_registration.ttr', null, 0, true, true);
 }
