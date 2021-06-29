@@ -80,9 +80,8 @@ class container_workspace_notify_create_new_discussion_testcase extends advanced
 
         $message = builder::table('message')
             ->where('useridto', $user_two->id)
-            ->order_by('timecreated', 'DESC')
-            ->order_by('id', 'DESC')
-            ->first();
+            ->where_like_starts_with('subject', 'New discussion by')
+            ->one();
 
         $this->assertStringContainsString(
             'New discussion by '.fullname($user_one).' in '.$workspace->fullname,
