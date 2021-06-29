@@ -97,6 +97,10 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
 
         $this->assertTrue(document_helper::is_valid_document($proper_document));
         $this->assertTrue(document_helper::is_valid_json_document(json_encode($proper_document)));
+
+        $document = '{somecontent}some content{somecontent}';
+        $this->assertFalse(document_helper::is_valid_json_document($document));
+        $this->assertFalse(document_helper::is_valid_json_document(json_encode($document)));
     }
 
     /**
@@ -203,6 +207,31 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
             ],
             document_helper::parse_document(json_encode(['type' => 'doc', 'content' => null]))
         );
+    }
+
+    /**
+     * @covers ::parse_document
+     */
+    public function test_parse_invalid_document(): void {
+        $document = '{somecontent}some content{somecontent}';
+        // Suppress debugging messages
+        $this->assertEmpty(document_helper::parse_document($document, false));
+
+        $document = '{somecontent}some content{somecontent}';
+        $this->assertEmpty(document_helper::parse_document($document, true));
+        $this->assertDebuggingCalled('There was an error on parsing json content: Syntax error');
+
+        $document = '{somecontent}some content{somecontent}';
+        $this->assertEmpty(document_helper::parse_document($document));
+        $this->assertDebuggingCalled('There was an error on parsing json content: Syntax error');
+
+        $document = 'John says "Hello!"';
+        $this->assertEmpty(document_helper::parse_document($document));
+        $this->assertDebuggingCalled('There was an error on parsing json content: Syntax error');
+
+        $document = '{"name": "Joe", , "age": null}';
+        $this->assertEmpty(document_helper::parse_document($document));
+        $this->assertDebuggingCalled('There was an error on parsing json content: Syntax error');
     }
 
     /**

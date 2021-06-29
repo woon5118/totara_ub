@@ -42,9 +42,10 @@ final class document_helper {
      * machine can understand.
      *
      * @param \stdClass|array|string|\JsonSerializable $json
+     * @param bool $debug_on_error if set to false debugging messages on errors are suppressed
      * @return array
      */
-    public static function parse_document($json): array {
+    public static function parse_document($json, $debug_on_error = true): array {
         if (is_array($json)) {
             return $json;
         }
@@ -55,18 +56,20 @@ final class document_helper {
             $document = @json_decode($json, true);
 
             if (JSON_ERROR_NONE !== json_last_error() || !is_array($document)) {
-                // Return the raw content, when there is an error.
-                $msg = json_last_error_msg();
-                debugging("There was an error on parsing json content: {$msg}", DEBUG_DEVELOPER);
+                // Return empty content, when there is an error.
+                if ($debug_on_error) {
+                    $msg = json_last_error_msg();
+                    debugging("There was an error on parsing json content: {$msg}", DEBUG_DEVELOPER);
+                }
 
                 return [];
             }
         } else if (is_object($json)) {
-            // Converting the whole data object holder intto an array, even with the nested object.
+            // Converting the whole data object holder to an array, even with the nested object.
             $content = json_encode($json);
             $document = json_decode($content, true);
 
-            if (JSON_ERROR_NONE !== json_last_error()) {
+            if (JSON_ERROR_NONE !== json_last_error() && $debug_on_error) {
                 $msg = json_last_error_msg();
                 debugging(
                     "There was an error when converting an object into array via json encoding/decoding: {$msg}",
@@ -75,7 +78,9 @@ final class document_helper {
             }
 
             if (!is_array($document)) {
-                debugging("Cannot format the json content", DEBUG_DEVELOPER);
+                if ($debug_on_error) {
+                    debugging("Cannot format the json content", DEBUG_DEVELOPER);
+                }
                 return [];
             }
         }
@@ -108,9 +113,9 @@ final class document_helper {
             return false;
         }
 
-        $document = self::parse_document($json_document);
+        // Suppress debugging messages during parsing
+        $document = self::parse_document($json_document, false);
         if (empty($document)) {
-            debugging("Cannot decode the json document as it is invalid json", DEBUG_DEVELOPER);
             return false;
         }
 
