@@ -6525,7 +6525,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
             $attachmentpath = $attachment;
 
             // Before doing the comparison, make sure that the paths are correct (Windows uses slashes in the other direction).
-            $attachpath = str_replace('\\', '/', $attachmentpath);
+            $attachpath = str_replace('\\', '/', realpath($attachmentpath));
             // Make sure both variables are normalised before comparing.
             $temppath = str_replace('\\', '/', realpath($CFG->tempdir));
 
