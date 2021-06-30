@@ -190,10 +190,10 @@
             $undeletable = '';
         } else if (in_array($blockname, $undeletableblocktypes)) {
             $undeletable = '<a href="blocks.php?unprotect='.$blockid.'&amp;sesskey='.sesskey().'" title="'.$strunprotect.'">'.
-                       $OUTPUT->flex_icon('unlock', array('alt' => $strunprotect));
+                       $OUTPUT->flex_icon('lock', array('alt' => $strunprotect));
         } else {
             $undeletable = '<a href="blocks.php?protect='.$blockid.'&amp;sesskey='.sesskey().'" title="'.$strprotect.'">'.
-                       $OUTPUT->flex_icon('lock', array('alt' => $strprotect));
+                       $OUTPUT->flex_icon('unlock', array('alt' => $strprotect));
         }
 
         $row = array(
