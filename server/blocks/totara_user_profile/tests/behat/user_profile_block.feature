@@ -58,4 +58,77 @@ Feature: Add User Profile blocks in a Default profile page
     Then I should not see "Edit Profile"
     Then I should not see "Email address"
 
+  Scenario: Empty custom fields appear in custom settings
+    Given I log in as "admin"
+    When I navigate to "User profile fields" node in "Site administration > Users"
+    And I set the following fields to these values:
+      | datatype | text |
+    And I set the following fields to these values:
+      | Name       | customfield_text1 |
+      | Short name | customfield_text1 |
+    And I press "Save changes"
+    Then I should see "customfield_text1"
+
+    When I set the following fields to these values:
+      | datatype | textarea |
+    And I set the following fields to these values:
+      | Name       | customfield_textarea1 |
+      | Short name | customfield_textarea1 |
+    And I press "Save changes"
+    Then I should see "customfield_textarea1"
+
+    When I set the following fields to these values:
+      | datatype | menu |
+    And I set the following fields to these values:
+      | Name       | customfield_menu1 |
+      | Short name | customfield_menu1 |
+    And I set the field "Menu options (one per line)" to multiline:
+"""
+A
+B
+"""
+    And I press "Save changes"
+    Then I should see "customfield_menu1"
+
+    When I set the following fields to these values:
+      | datatype | datetime |
+    And I set the following fields to these values:
+      | Name       | customfield_datetime1 |
+      | Short name | customfield_datetime |
+    And I press "Save changes"
+    Then I should see "customfield_datetime1"
+
+    When I set the following fields to these values:
+      | datatype | date |
+    And I set the following fields to these values:
+      | Name       | customfield_date1 |
+      | Short name | customfield_date1 |
+    And I press "Save changes"
+    Then I should see "customfield_date1"
+
+    When I set the following fields to these values:
+      | datatype | checkbox |
+    And I set the following fields to these values:
+      | Name       | customfield_checkbox1 |
+      | Short name | customfield_checkbox1 |
+    And I press "Save changes"
+    Then I should see "customfield_checkbox1"
+
+    When I navigate to "Default profile page" node in "Site administration > Users"
+    Then I should see "customfield_checkbox1"
+    And I should not see "customfield_text1"
+    And I should not see "customfield_textarea1"
+    And I should not see "customfield_menu1"
+    And I should not see "customfield_datetime1"
+    And I should not see "customfield_date1"
+
+    When I press "Blocks editing on"
+    And I configure the "User Profile" block
+    And I expand all fieldsets
+    Then I should see "customfield_checkbox1"
+    And I should see "customfield_text1"
+    And I should see "customfield_textarea1"
+    And I should see "customfield_menu1"
+    And I should see "customfield_datetime1"
+    And I should see "customfield_date1"
 

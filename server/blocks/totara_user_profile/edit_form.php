@@ -39,13 +39,38 @@ class block_totara_user_profile_edit_form extends block_edit_form {
      * @param MoodleQuickForm $mform
      */
     protected function specific_definition($mform) {
-        global $DB, $USER;
+        global $DB, $USER, $CFG;
         parent::specific_definition($mform);
         $mform->addElement('header', 'configheader', get_string('customblocksettings', 'block'));
 
         if (has_any_capability(['moodle/block:edit', 'moodle/user:manageblocks'], $this->block->context)) {
             $user = $DB->get_record('user', array('id' => $USER->id), '*', MUST_EXIST);
             $tree = core_user\output\myprofile\manager::build_tree($user, true, null, true);
+
+            // We also need to ensure empty custom fields are included.
+            $nodes = $tree->nodes;
+            if ($categories = $DB->get_records('user_info_category', null, 'sortorder ASC')) {
+                foreach ($categories as $category) {
+                    if ($fields = $DB->get_records('user_info_field', array('categoryid' => $category->id), 'sortorder ASC')) {
+                        foreach ($fields as $field) {
+                            require_once($CFG->dirroot.'/user/profile/field/'.$field->datatype.'/field.class.php');
+                            $newfield = 'profile_field_'.$field->datatype;
+                            $formfield = new $newfield($field->id, $user->id);
+
+                            if (isset($nodes['custom_field_' . $formfield->field->shortname])) {
+                                continue;
+                            }
+
+                            if ($formfield->is_visible() and $formfield->is_empty()) {
+                                $node = new core_user\output\myprofile\node('contact', 'custom_field_' . $formfield->field->shortname,
+                                    format_string($formfield->field->name), null, null, $formfield->display_data());
+                                $tree->add_node($node);
+                            }
+                        }
+                    }
+                }
+            }
+
             $admintree = block_totara_user_profile::block_user_profile_settings($tree);
             $admintree->sort_categories();
             $categories = $admintree->categories;
