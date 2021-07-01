@@ -38,19 +38,19 @@ class container_workspace_notify_create_new_discussion_testcase extends advanced
      */
     public function test_new_discussion_created(): void {
         $generator = $this->getDataGenerator();
-        $user_one = $generator->create_user();
+        $user_one = $generator->create_user(['firstname' => 'First', 'lastname' => 'Last']);
+        $user_two = $generator->create_user();
 
         $this->setUser($user_one);
 
         /** @var container_workspace_generator $workspace_generator */
         $workspace_generator = $generator->get_plugin_generator('container_workspace');
-        $workspace = $workspace_generator->create_workspace();
+        $workspace = $workspace_generator->create_workspace('Workspace');
 
         // Clear the adhoc tasks.
         $this->executeAdhocTasks();
 
-        // Create user two and add the user to the workspace.
-        $user_two = $generator->create_user();
+        // Add the second user to the workspace.
         $member = member::added_to_workspace($workspace, $user_two->id);
 
         $this->executeAdhocTasks();
