@@ -12,6 +12,9 @@ Feature: Test competencies can be user assigned
       | competency | Comp type 1 | Competency Type One |
       | competency | Comp type 2 | Competency Type Two |
 
+    And the following "users" exist:
+      | username | firstname | lastname | email             |
+      | user1    | User      | One      | user1@example.com |
 
   Scenario: I can filter competencies and assign many to myself
     Given I log in as "admin"
@@ -233,3 +236,17 @@ Feature: Test competencies can be user assigned
     And I should not see "Self assignment"
     And I should not see "Back to your competency profile"
     And I should not see "Self-assign competencies"
+
+  Scenario: Authenticated user for competency assigning self is prohibited
+    Given I log in as "user1"
+    And I navigate to my competency profile
+    Then "Self-assign competencies" "link" should exist
+    And I log out
+
+    And I log in as "admin"
+    When I set the following system permissions of "Authenticated user" role:
+    | totara/competency:assign_self | Prohibit |
+    And I log out
+    And I log in as "user1"
+    And I navigate to my competency profile
+    Then "Self-assign competencies" "link" should not exist

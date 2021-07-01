@@ -35,6 +35,7 @@
       <NoCompetencyAssignments
         v-if="noAssignments"
         :is-mine="isMine"
+        :is-assign-enabled="canAssign"
         :self-assignment-url="selfAssignmentUrl"
       />
       <div v-else>
@@ -52,6 +53,7 @@
               :text="$str('rate_competencies', 'pathway_manual')"
             />
             <ActionLink
+              v-if="canAssign"
               :href="selfAssignmentUrl"
               :text="
                 $str(
@@ -203,6 +205,7 @@ export default {
     hasPendingAggregation: {
       type: Boolean,
     },
+    canAssign: Boolean,
   },
 
   data() {

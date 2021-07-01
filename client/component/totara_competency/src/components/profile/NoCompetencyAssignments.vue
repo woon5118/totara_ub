@@ -22,7 +22,10 @@
       type="warning"
       :message="$str('no_competencies_assigned', 'totara_competency')"
     />
-    <div class="tui-noCompetencyAssignments__search-competencies">
+    <div
+      v-if="isAssignEnabled"
+      class="tui-noCompetencyAssignments__search-competencies"
+    >
       <ActionLink
         :href="selfAssignmentUrl"
         :text="
@@ -58,6 +61,8 @@ export default {
     },
 
     isMine: Boolean,
+
+    isAssignEnabled: Boolean,
   },
 };
 </script>
