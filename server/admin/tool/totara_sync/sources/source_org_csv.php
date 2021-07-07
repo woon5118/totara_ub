@@ -71,9 +71,7 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
             if (empty($this->config->{'import_'.$f})) {
                 continue;
             }
-            if (empty($this->config->{'fieldmapping_'.$f})) {
-                $fieldmappings[$f] = $f;
-            } else {
+            if (!empty($this->config->{'fieldmapping_'.$f})) {
                 $fieldmappings[$this->config->{'fieldmapping_'.$f}] = $f;
             }
         }
@@ -127,10 +125,24 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
                 }
             }
         }
-        // Finally, perform CSV to db field mapping
+
+        // Create an import map of fields that are going to be imported with their
+        // mapped field name for use later on.
+        $importmap = [];
         foreach ($fields as $index => $field) {
-            if (in_array($field, array_keys($fieldmappings))) {
-                $fields[$index] = $fieldmappings[$field];
+            if (!empty($fieldmappings[$field])) {
+                // There is a mapping entry so we are mapping this field
+                $realname = $fieldmappings[$field];
+                if (!empty($this->config->{'import_' . $realname})) {
+                    $importmap[$field] = $realname;
+                }
+            } else if (in_array($field, $fieldmappings)) {
+                // This field is already mapped, continue
+                continue;
+            } else {
+                if (!empty($this->config->{'import_'.$field})) {
+                    $importmap[$field] = $field;
+                }
             }
         }
 
@@ -168,10 +180,13 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
             // Set up a db row
             $row = array();
 
-            // General fields
-            foreach ($this->fields as $field) {
-                if (!empty($this->config->{'import_'.$field})) {
-                    $row[$field] = $csvrow[$field];
+            foreach ($importmap as $fieldname => $realname) {
+                if (isset($csvrow[$fieldname])) {
+                    if ($realname !== $fieldname) {
+                        $row[$realname] = $csvrow[$fieldname];
+                    } else {
+                        $row[$fieldname] = $csvrow[$fieldname];
+                    }
                 }
             }
 
@@ -228,6 +243,13 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
             }
 
             if (!empty($this->hierarchy_customfields)) {
+                // Add values keyed with actual fields names for use in
+                // get_customfield_json function
+                $csvrow['idnumber'] = $row['idnumber'];
+                if (isset($row['typeidnumber'])) {
+                    $csvrow['typeidnumber'] = $row['typeidnumber'];
+                }
+
                 $row['customfields'] = $this->get_customfield_json($csvrow, $csvsaveemptyfields);
                 foreach ($this->hierarchy_customfields as $hierarchy_customfield) {
                     if ($this->is_importing_customfield($hierarchy_customfield)) {

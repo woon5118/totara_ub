@@ -83,10 +83,24 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
                 }
             }
         }
-        // Finally, perform CSV to db field mapping.
-        foreach ($fields as $i => $f) {
-            if (in_array($f, array_keys($fieldmappings))) {
-                $fields[$i] = $fieldmappings[$f];
+
+        // Create an import map of fields that are going to be imported with their
+        // mapped field name for use later on.
+        $importmap = [];
+        foreach ($fields as $index => $field) {
+            if (!empty($fieldmappings[$field])) {
+                // There is a mapping entry so we are mapping this field
+                $realname = $fieldmappings[$field];
+                if (!empty($this->config->{'import_' . $realname})) {
+                    $importmap[$field] = $realname;
+                }
+            } else if (in_array($field, $fieldmappings)) {
+                // This field is already mapped, continue
+                continue;
+            } else {
+                if (!empty($this->config->{'import_'.$field})) {
+                    $importmap[$field] = $field;
+                }
             }
         }
 
@@ -132,21 +146,21 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
             }
 
             $csvrow = array_combine($fields, $csvrow);
-            $csvrow = $this->clean_fields($csvrow);
 
             // Set up a db row.
             $dbrow = array();
 
-            // General fields.
-            foreach ($this->fields as $f) {
-                if ($this->is_importing_field($f)) {
-                    if (!$saveemptyfields and ($csvrow[$f] === '') and !isset($notnullfields[$f])) {
-                        $dbrow[$f] = null;
+            foreach ($importmap as $fieldname => $realname) {
+                if (isset($csvrow[$fieldname])) {
+                    if ($realname !== $fieldname) {
+                        $dbrow[$realname] = $csvrow[$fieldname];
                     } else {
-                        $dbrow[$f] = $csvrow[$f];
+                        $dbrow[$fieldname] = $csvrow[$fieldname];
                     }
                 }
             }
+
+            $dbrow = $this->clean_fields($dbrow);
 
             if (empty($csvrow['timemodified'])) {
                 $dbrow['timemodified'] = 0;
@@ -178,6 +192,15 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
 
                         // Set date to null. We don't want to unset as this will stop the Assignment being added.
                         $dbrow[$datefield] = null;
+                    }
+                }
+            }
+
+            // Unset fields we are not saving since they are empty
+            if (!$saveemptyfields) {
+                foreach ($dbrow as $key => $value) {
+                    if ($value === '') {
+                        $dbrow[$key] = null;
                     }
                 }
             }

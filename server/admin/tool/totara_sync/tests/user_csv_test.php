@@ -942,4 +942,37 @@ class tool_totara_sync_user_csv_testcase extends advanced_testcase {
         $user = $DB->get_record('user', array('idnumber' => 'User3'));
         $this->assertEquals('0', $user->emailstop);
     }
+
+    public function test_user_csv_with_field_mapping() {
+        global $DB;
+
+        $csv_settings = [
+            'fieldmapping_idnumber' => 'useridnumber',
+            'import_deleted' => '1'
+        ];
+
+        $configcsv = array_merge($this->configcsv, $csv_settings);
+        foreach ($configcsv as $k => $v) {
+            set_config($k, $v, 'totara_sync_source_user_csv');
+        }
+
+        $config = $this->config;
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /* @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_csv_fieldmapping_1.csv');
+        $filepath = $this->filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $user = $DB->get_record('user', ['firstname' => 'Clive', 'lastname' => 'Jones']);
+        $this->assertEquals('UID3', $user->idnumber);
+    }
 }

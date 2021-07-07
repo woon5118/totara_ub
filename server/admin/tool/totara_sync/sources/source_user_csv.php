@@ -113,10 +113,26 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 }
             }
         }
-        // Finally, perform CSV to db field mapping
-        foreach ($fields as $i => $f) {
-            if (in_array($f, array_keys($fieldmappings))) {
-                $fields[$i] = $fieldmappings[$f];
+
+        // Create an import map of fields that are going to be imported with their
+        // mapped field name for use later on.
+        $importmap = [];
+        foreach ($fields as $index => $field) {
+            if (!empty($fieldmappings[$field])) {
+                // We have a mapping
+                $realfieldname = $fieldmappings[$field];
+                if (!empty($this->config->{'import_'.$realfieldname})) {
+                    $importmap[$field] = $realfieldname;
+                }
+            } else {
+                // No entry in fieldmappings but it could be a field that has
+                // been configured to be mapped so we need to ensure there is
+                // no fieldmapping setting before adding to import map.
+                if (empty($this->config->{'fieldmapping_' . $field})) {
+                    if (!empty($this->config->{'import_' . $field})) {
+                        $importmap[$field] = $field;
+                    }
+                }
             }
         }
 
@@ -177,12 +193,15 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
             $csvrow = array_combine($fields, $csvrow);  // nice associative array ;)
 
             // Set up a db row
-            $dbrow = array();
+            $dbrow = [];
 
-            // General fields
-            foreach ($this->fields as $f) {
-                if (!empty($this->config->{'import_'.$f})) {
-                    $dbrow[$f] = $csvrow[$f];
+            foreach ($importmap as $mappedname => $fieldname) {
+                if (isset($csvrow[$mappedname])) {
+                    if ($mappedname !== $fieldname) {
+                        $dbrow[$fieldname] = $csvrow[$mappedname];
+                    } else {
+                        $dbrow[$fieldname] = $csvrow[$fieldname];
+                    }
                 }
             }
 
