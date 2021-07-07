@@ -94,7 +94,7 @@ final class audio extends base_file implements block_node, has_extra_linked_file
         }
 
         // Validate transcript if it exist in the node data.
-        if (array_key_exists('transcript', $attrs)) {
+        if (array_key_exists('transcript', $attrs) && !empty($attrs['transcript'])) {
             if (!is_array($attrs['transcript'])) {
                 return false;
             }
@@ -128,11 +128,14 @@ final class audio extends base_file implements block_node, has_extra_linked_file
         // Cleaning the transcript object, if there is any.
         if (array_key_exists('transcript', $attrs)) {
             $transcript = $attrs['transcript'];
+            if (empty($transcript)) {
+                unset($attrs['transcript']);
+            } else {
+                $transcript['url'] = clean_param($transcript['url'], PARAM_URL);
+                $transcript['filename'] = clean_param($transcript['filename'], PARAM_FILE);
 
-            $transcript['url'] = clean_param($transcript['url'], PARAM_URL);
-            $transcript['filename'] = clean_param($transcript['filename'], PARAM_FILE);
-
-            $attrs['transcript'] = $transcript;
+                $attrs['transcript'] = $transcript;
+            }
         }
 
         $cleaned_raw_node['attrs'] = $attrs;

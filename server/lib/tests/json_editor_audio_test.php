@@ -37,7 +37,17 @@ class core_json_editor_audio_testcase extends advanced_testcase {
                 'mime_type' => 'audio/mp3'
             ]
         ]);
+        $this->assertTrue($result);
 
+        $result = audio::validate_schema([
+            'type' => audio::get_type(),
+            'attrs' => [
+                'filename' => 'some_file.png',
+                'url' => 'http://example.com',
+                'mime_type' => 'audio/mp3',
+                'transcript' => null,
+            ]
+        ]);
         $this->assertTrue($result);
     }
 
@@ -165,18 +175,6 @@ class core_json_editor_audio_testcase extends advanced_testcase {
      * @return void
      */
     public function test_validate_schema_with_invalid_transcript(): void {
-        self::assertFalse(
-            audio::validate_schema([
-                'type' => audio::get_type(),
-                'attrs' => [
-                    'filename' => 'data.mp3',
-                    'url' => 'http://example.com/data.mp3',
-                    'mime_type' => 'audio/mp3',
-                    'transcript' => false
-                ]
-            ])
-        );
-
         self::assertFalse(
             audio::validate_schema([
                 'type' => audio::get_type(),
