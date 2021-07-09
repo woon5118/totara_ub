@@ -24,13 +24,17 @@
 use core\entity\user;
 use core\plugininfo\virtualmeeting;
 use totara_core\http\clients\curl_client;
+use totara_core\http\util;
 use totara_core\virtualmeeting\plugin\factory\auth_factory;
 
 require_once(__DIR__ . '/../../config.php');
 require_login();
 
 $method = strtoupper($_SERVER['REQUEST_METHOD']);
-$headers = getallheaders() ?: [];
+$headers = util::get_request_headers();
+if ($headers === false) {
+    $headers = [];
+}
 $relativepath = get_file_argument();
 $args = explode('/', ltrim($relativepath, '/'));
 $body = @file_get_contents('php://input');

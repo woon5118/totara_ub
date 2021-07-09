@@ -29,6 +29,8 @@ define('NO_MOODLE_COOKIES', true);
 require_once(__DIR__ . '/../../config.php');
 
 use totara_core\http\clients\curl_client;
+use totara_core\http\response_code;
+use totara_core\http\util;
 use totara_msteams\botfw\activity;
 use totara_msteams\botfw\builder;
 use totara_msteams\botfw\auth\default_authoriser;
@@ -53,42 +55,42 @@ $logger = new syslog_logger();
 // Reject access if the full feature is disabled
 if (\totara_core\advanced_feature::is_disabled('totara_msteams')) {
     $logger->log('The bot endpoint was accessed while the teams feature was disabled');
-    http::send_error(http::BAD_REQUEST);
+    http::send_error(response_code::BAD_REQUEST);
     die;
 }
 
 // Reject access to the endpoint if neither the bot feature nor the messaging extension feature is enabled
 if (empty(get_config('totara_msteams', 'bot_feature_enabled')) && empty(get_config('totara_msteams', 'messaging_extension_enabled'))) {
     $logger->log('The bot endpoint was accessed while no features were enabled');
-    http::send_error(http::BAD_REQUEST);
+    http::send_error(response_code::BAD_REQUEST);
     die;
 }
 
 // Reject access during site maintenance.
 if (!empty($CFG->maintenance_enabled)) {
     $logger->log('The bot endpoint was accessed while the site was being under maintenance.');
-    http::send_error(http::SERVICE_UNAVAILABLE);
+    http::send_error(response_code::SERVICE_UNAVAILABLE);
     die;
 }
 
-$headers = http::get_request_headers();
+$headers = util::get_request_headers();
 if (empty($headers)) {
     $logger->debug('No headers');
-    http::send_error(http::BAD_REQUEST);
+    http::send_error(response_code::BAD_REQUEST);
     die;
 }
 
 $contents = file_get_contents('php://input');
 if ($contents === false || $contents === '') {
     $logger->debug('No input');
-    http::send_error(http::BAD_REQUEST);
+    http::send_error(response_code::BAD_REQUEST);
     die;
 }
 
 $json = json_decode($contents, false, 512, JSON_BIGINT_AS_STRING);
 if ($json === null) {
     $logger->debug(json_last_error_msg());
-    http::send_error(http::BAD_REQUEST);
+    http::send_error(response_code::BAD_REQUEST);
     die;
 }
 
@@ -109,7 +111,7 @@ try {
     try {
         $bot->set_hook(new bot_hook());
         if (!$bot->process($input, $headers)) {
-            http::send_error(http::UNAUTHORIZED);
+            http::send_error(response_code::UNAUTHORIZED);
             die;
         }
     } catch (auth_required_exception $ex) {
@@ -130,7 +132,7 @@ try {
         throw $ex;
     }
 } catch (Throwable $ex) {
-    http::send_error(http::INTERNAL_SERVER_ERROR);
+    http::send_error(response_code::INTERNAL_SERVER_ERROR);
     $logger->debug("Exception: ".$ex->getMessage()."\nTrace: ".$ex->getTraceAsString()."\n");
 }
 

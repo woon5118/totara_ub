@@ -23,26 +23,32 @@
 
 namespace totara_msteams\botfw\util;
 
+use totara_core\http\response_code;
+use totara_core\http\util;
+
 /**
  * A helper class for http.
  */
 final class http {
-    /** 200 OK */
-    const OK = 200;
-    /** 400 Bad Request */
-    const BAD_REQUEST = 400;
-    /** 401 Unauthorized */
-    const UNAUTHORIZED = 401;
-    /** 403 Forbidden */
-    const FORBIDDEN = 403;
-    /** 404 Not Found */
-    const NOT_FOUND = 404;
-    /** 500 Internal Server Error */
-    const INTERNAL_SERVER_ERROR = 500;
-    /** 503 Service Unavailable */
-    const SERVICE_UNAVAILABLE = 503;
+    /** @deprecated since Totara 13.10 */
+    const OK = response_code::OK;
+    /** @deprecated since Totara 13.10 */
+    const BAD_REQUEST = response_code::BAD_REQUEST;
+    /** @deprecated since Totara 13.10 */
+    const UNAUTHORIZED = response_code::UNAUTHORIZED;
+    /** @deprecated since Totara 13.10 */
+    const FORBIDDEN = response_code::FORBIDDEN;
+    /** @deprecated since Totara 13.10 */
+    const NOT_FOUND = response_code::NOT_FOUND;
+    /** @deprecated since Totara 13.10 */
+    const INTERNAL_SERVER_ERROR = response_code::INTERNAL_SERVER_ERROR;
+    /** @deprecated since Totara 13.10 */
+    const SERVICE_UNAVAILABLE = response_code::SERVICE_UNAVAILABLE;
 
-    /** @var string[] */
+    /**
+     * @var string[]
+     * @deprecated since Totara 13.10
+     */
     static private $mapping = [
         'Host' => 'HTTP_HOST',
         'User-Agent' => 'HTTP_USER_AGENT',
@@ -63,30 +69,22 @@ final class http {
      * - Content-Length
      *
      * @return array|false
+     * @deprecated since Totara 13.10
      */
     public static function get_request_headers() {
-        if (function_exists('getallheaders')) {
-            return getallheaders();
-        }
-        return self::getallheaders_downlevel();
+        debugging('\totara_msteams\botfw\util\http::get_request_headers is deprecated, please use \totara_core\http\util::get_request_headers instead.', DEBUG_DEVELOPER);
+        return util::get_request_headers();
     }
 
     /**
      * Simulate getallheaders().
      *
      * @return array|false
+     * @deprecated since Totara 13.10
      */
     private static function getallheaders_downlevel() {
-        $headers = [];
-        foreach (static::$mapping as $header => $index) {
-            if (isset($_SERVER[$index])) {
-                $headers[$header] = $_SERVER[$index];
-            }
-        }
-        if (empty($headers)) {
-            return false;
-        }
-        return $headers;
+        debugging('\totara_msteams\botfw\util\http::getallheaders_downlevel is deprecated, please use \totara_core\http\util::get_request_headers instead.', DEBUG_DEVELOPER);
+        return util::get_request_headers();
     }
 
     /**

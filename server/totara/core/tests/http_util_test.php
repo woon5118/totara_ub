@@ -18,15 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
- * @package totara_msteams
+ * @package totara_core
  */
 
-use totara_msteams\botfw\util\http;
+use totara_core\http\util;
 
 /**
- * @coversDefaultClass \totara_msteams\botfw\util\http
+ * @coversDefaultClass \totara_core\http\util
  */
-class totara_msteams_botfw_util_http_testcase extends advanced_testcase {
+class totara_core_http_util_testcase extends advanced_testcase {
     /**
      * @return array of [_SERVER, expected]
      */
@@ -110,7 +110,7 @@ class totara_msteams_botfw_util_http_testcase extends advanced_testcase {
         foreach ($input as $key => $value) {
             $_SERVER[$key] = $value;
         }
-        $method = new ReflectionMethod(http::class, 'getallheaders_downlevel');
+        $method = new ReflectionMethod(util::class, 'getallheaders_polyfill');
         $method->setAccessible(true);
         $result = $method->invoke(null);
         if (is_array($result)) {
