@@ -752,6 +752,28 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
     }
 
     /**
+     * If a job assignment is both a manager and temporary manager, make sure they are both removed.
+     */
+    public function test_delete_both_manager_and_temp_manager_assignments() {
+        $manager_user = $this->users[1];
+        $staff_user = $this->users[2];
+        $manager_ja = \totara_job\job_assignment::create_default($manager_user->id, ['idnumber' => 1]);
+        $staff_ja = \totara_job\job_assignment::create_default($staff_user->id, [
+            'managerjaid' => $manager_ja->id,
+            'tempmanagerjaid' => $manager_ja->id,
+            'tempmanagerexpirydate' => time() + HOURSECS,
+            'idnumber' => 2,
+        ]);
+
+        \totara_job\job_assignment::delete($manager_ja);
+
+        $staff_ja = \totara_job\job_assignment::get_with_id($staff_ja->id);
+        $this->assertNull($staff_ja->managerjaid);
+        $this->assertNull($staff_ja->tempmanagerjaid);
+        $this->assertNull($staff_ja->tempmanagerexpirydate);
+    }
+
+    /**
      * Tests get_with_idnumber().
      */
     public function test_get_with_idnumber() {

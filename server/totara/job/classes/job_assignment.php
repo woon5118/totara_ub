@@ -1091,7 +1091,8 @@ class job_assignment {
             foreach ($staffjas as $staffja) {
                 if ($staffja->managerjaid == $jobassignment->id) {
                     $staffja->update_internal(array('managerjaid' => null));
-                } else if ($staffja->tempmanagerjaid == $jobassignment->id) {
+                }
+                if ($staffja->tempmanagerjaid == $jobassignment->id) {
                     $staffja->update_internal(array('tempmanagerjaid' => null, 'tempmanagerexpirydate' => null));
                 }
             }
