@@ -82,7 +82,7 @@ class mod_facetoface_signup_approval_admin_testcase extends advanced_testcase {
             $users[] = $user;
         }
 
-        return $users;
+        return [$users, $manager];
     }
 
     /**
@@ -110,10 +110,10 @@ class mod_facetoface_signup_approval_admin_testcase extends advanced_testcase {
      * @param int $numberofsignups
      * @param seminar $seminar
      * @param string $state
-     * @return array of [ signups, users ]
+     * @return array of [ signups, users, manager ]
      */
     private function create_signups(int $numberofsignups, seminar $seminar, string $state): array {
-        $users = $this->create_users($numberofsignups);
+        [$users, $manager] = $this->create_users($numberofsignups);
         $generator = $this->getDataGenerator();
         /** @var seminar_event $seminarevent */
         $seminarevent = $seminar->get_events()->current();
@@ -131,7 +131,7 @@ class mod_facetoface_signup_approval_admin_testcase extends advanced_testcase {
             $allusers[] = $user->id;
             $allusers[] = $user->jobassignment->managerid;
         }
-        return [$signups, $allusers];
+        return [$signups, $allusers, $manager];
     }
 
     /**
@@ -210,6 +210,36 @@ class mod_facetoface_signup_approval_admin_testcase extends advanced_testcase {
         $signups->rewind();
         foreach ($signups as $signup) {
             $this->assertInstanceOf(booked::class, $signup->get_state());
+        }
+    }
+
+    public function test_manager_cannot_double_approve_signup() {
+        $this->setAdminUser();
+
+        $f2f = $this->get_facetoface();
+        [$signups, $users, $manager] = $this->create_signups(1, $f2f, requested::class);
+
+        $this->setUser($manager);
+        /** @var signup $signup */
+        foreach ($signups as $signup) {
+            $signup->switch_state(requestedadmin::class);
+            $this->assertFalse($signup->can_switch(booked::class));
+        }
+    }
+
+    public function test_admin_approver_can_approve_without_manager() {
+        global $DB;
+        $generator = $this->getDataGenerator();
+        $approver = $generator->create_user();
+
+        $this->setUser($approver);
+
+        $f2f = $this->get_facetoface();
+        [$signups] = $this->create_signups(1, $f2f, requested::class);
+
+        /** @var signup $signup */
+        foreach ($signups as $signup) {
+            $this->assertTrue($signup->can_switch(booked::class));
         }
     }
 

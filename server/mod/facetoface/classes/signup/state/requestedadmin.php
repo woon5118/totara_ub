@@ -23,8 +23,17 @@
 
 namespace mod_facetoface\signup\state;
 
-use mod_facetoface\signup\condition\{approval_admin_required, approval_manager_required, approval_not_required, booking_common,
-    event_is_cancelled, event_is_not_cancelled, signup_awaits_approval, waitlist_common, waitlist_everyone_disabled};
+use mod_facetoface\signup\condition\{approval_admin_not_required,
+    approval_admin_required,
+    approval_manager_required,
+    approval_not_required,
+    booking_common,
+    event_is_cancelled,
+    event_is_not_cancelled,
+    signup_awaits_approval,
+    waitlist_common,
+    waitlist_everyone_disabled};
+use mod_facetoface\signup\restriction\actor_is_manager_or_admin;
 use mod_facetoface\signup\transition;
 use mod_facetoface\signup\restriction\actor_is_admin;
 
@@ -66,7 +75,10 @@ class requestedadmin extends state {
             transition::to(new booked($this->signup))->with_conditions(
                 booking_common::class,
                 waitlist_everyone_disabled::class,
-                approval_manager_required::class
+                approval_manager_required::class,
+                approval_admin_not_required::class
+            )->with_restrictions(
+                actor_is_manager_or_admin::class
             ),
             // Admin approver approves or declines the request.
             transition::to(new waitlisted($this->signup))->with_conditions(
