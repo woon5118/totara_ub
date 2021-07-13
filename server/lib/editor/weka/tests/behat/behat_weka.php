@@ -140,7 +140,7 @@ function wekaNodeClickTarget(domNode, type) {
      * @param string $selector
      */
     public function i_activate_the_weka_editor_with_css($selector) {
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         if (!$this->running_javascript()) {
             throw new coding_exception('Weka editor tests require JavaScript.');
         }
@@ -187,7 +187,7 @@ function wekaNodeClickTarget(domNode, type) {
      */
     public function i_type_in_the_weka_editor($value) {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $value = str_replace('\n', "\n", $value);
         $this->type_chars($value);
     }
@@ -200,7 +200,7 @@ function wekaNodeClickTarget(domNode, type) {
      */
     public function i_replace_the_selection_with_in_the_weka_editor($value) {
         $this->validate_common();
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $value = str_replace('\n', "\n", $value);
         $js = "(function(){
 var sel = window.getSelection();
@@ -221,11 +221,50 @@ range.insertNode(document.createTextNode(". json_encode($value, JSON_UNESCAPED_S
      */
     public function i_click_on_the_toolbar_button_in_the_weka_editor($button_name) {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $xpathtarget = "//*[@aria-label=" . behat_context_helper::escape($button_name) . "]";
         $button_node = $this->find('xpath', $xpathtarget, false, $this->current_weka);
         $this->ensure_node_is_visible($button_node);
         $button_node->click();
+    }
+
+    /**
+     * A specified toolbar button is not available.
+     *
+     * @Then /^I should not see the "(?P<button_name>(?:[^"]|\\")*)" toolbar button in the weka editor$/
+     * @param string $button_name
+     */
+    public function i_should_not_see_the_toolbar_button_in_the_weka_editor($button_name) {
+        if (!$this->current_weka) {
+            throw new coding_exception('Activate a Weka editor first.');
+        }
+        behat_hooks::set_step_readonly(false);
+        $xpathtarget = "//*[@aria-label=" . behat_context_helper::escape($button_name) . "]";
+        try {
+            $button_node = $this->find('xpath', $xpathtarget, false, $this->current_weka);
+        } catch (ElementNotFoundException $exception) {
+            return;
+        }
+
+        if (!is_null($button_node)) {
+            throw new ExpectationException("$button_name found in the toolbar.", $this->getSession());
+        }
+    }
+
+    /**
+     * A specified toolbar button is available.
+     *
+     * @Then /^I should see the "(?P<button_name>(?:[^"]|\\")*)" toolbar button in the weka editor$/
+     * @throws ElementNotFoundException Thrown by behat_base::find
+     * @param string $button_name
+     */
+    public function i_should_see_the_toolbar_button_in_the_weka_editor($button_name) {
+        if (!$this->current_weka) {
+            throw new coding_exception('Activate a Weka editor first.');
+        }
+        behat_hooks::set_step_readonly(false);
+        $xpathtarget = "//*[@aria-label=" . behat_context_helper::escape($button_name) . "]";
+        $this->find('xpath', $xpathtarget, true, $this->current_weka);
     }
 
     /**
@@ -235,7 +274,7 @@ range.insertNode(document.createTextNode(". json_encode($value, JSON_UNESCAPED_S
      */
     public function i_select_all_text_in_the_weka_editor() {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $js = "(function(){" . self::EDITOR_SELECT_HELPER . "
 const el = " . $this->editor_inner_el_js($this->current_weka) . ";
 el.focus();
@@ -256,7 +295,7 @@ selectRange(range);
      */
     public function i_select_the_text_in_the_weka_editor($text) {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $js = "(function(){" . self::EDITOR_SELECT_HELPER . self::EDITOR_TEXT_NODE_HELPER . "
 const el = " . $this->editor_inner_el_js($this->current_weka) . ";
 el.focus();
@@ -273,7 +312,7 @@ selectRange(textSelectRange(findEditorTextNode(el, search), search));
      */
     public function i_move_the_cursor_to_the_end_of_the_weka_editor() {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $js = "(function(){" . self::EDITOR_SELECT_HELPER . "
 const el = " . $this->editor_inner_el_js($this->current_weka) . ";
 el.focus();
@@ -298,7 +337,7 @@ selectRange(range);
      */
     public function i_delete_the_selected_text_in_the_weka_editor() {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $js = "(function(){
 var sel = window.getSelection();
 if (sel.rangeCount < 1) return;
@@ -316,7 +355,7 @@ sel.getRangeAt(0).deleteContents();
      */
     public function i_activate_the_menu_of_the_node_in_the_weka_editor($word, $type) {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $js = "(function(){" . self::EDITOR_TEXT_NODE_HELPER . self::EDITOR_WEKA_NODE_HELPER . "
 const el = " . $this->editor_inner_el_js($this->current_weka) . ";
 el.focus();
@@ -338,7 +377,7 @@ clickTarget.click();
      */
     public function i_select_the_node_in_the_weka_editor($word, $type) {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $js = "(function(){" . self::EDITOR_SELECT_HELPER . self::EDITOR_TEXT_NODE_HELPER . self::EDITOR_WEKA_NODE_HELPER . "
 const el = " . $this->editor_inner_el_js($this->current_weka) . ";
 el.focus();
@@ -361,7 +400,7 @@ domNode.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: tru
      */
     public function i_delete_the_selected_node_in_the_weka_editor() {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $js = "(function(){" . self::EDITOR_SELECT_HELPER . self::EDITOR_TEXT_NODE_HELPER . self::EDITOR_WEKA_NODE_HELPER . "
 const el = " . $this->editor_inner_el_js($this->current_weka) . ";
 el.querySelector('.ProseMirror-selectednode').remove();
@@ -376,7 +415,7 @@ el.querySelector('.ProseMirror-selectednode').remove();
      */
     public function i_click_on_the_block_menu_in_the_weka_editor() {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $trigger = $this->find('css', '.tui-wekaToolbar__currentBlock', false, $this->current_weka);
         $trigger->click();
     }
@@ -426,7 +465,7 @@ el.querySelector('.ProseMirror-selectednode').remove();
      */
     private function text_in_weka_base($text, $expected) {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(true);
+        behat_hooks::set_step_readonly(true);
         $field_text = $this->current_weka_field->getText();
         $present = strpos($field_text, $text) !== false;
         if ($present !== $expected) {
@@ -468,7 +507,7 @@ el.querySelector('.ProseMirror-selectednode').remove();
      */
     private function node_in_weka_base($word, $type, $expected) {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
-        \behat_hooks::set_step_readonly(true);
+        behat_hooks::set_step_readonly(true);
         $js = "(function(){" . self::EDITOR_SELECT_HELPER . self::EDITOR_TEXT_NODE_HELPER . self::EDITOR_WEKA_NODE_HELPER . "
 const el = " . $this->editor_inner_el_js($this->current_weka) . ";
 const word = " . json_encode($word) . ";
@@ -490,7 +529,7 @@ if (" . ($expected ? '!' : '') . "domNode) {
      */
     public function i_upload_file_to_weka_editor(string $type, string $file_path): void {
         global $CFG;
-        \behat_hooks::set_step_readonly(false);
+        behat_hooks::set_step_readonly(false);
         $this->validate_common();
         $type = ucfirst($type);
 
@@ -607,7 +646,7 @@ if (" . ($expected ? '!' : '') . "domNode) {
         string $locator,
         string $selector
     ): void {
-        \behat_hooks::set_step_readonly(true);
+        behat_hooks::set_step_readonly(true);
 
         $should_exist = $should === 'should';
 
