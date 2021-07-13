@@ -96,12 +96,8 @@ class totara_completionimport_csv_import_testcase extends advanced_testcase {
         $errors = \totara_completionimport\csv_import::basic_import($content, $importname, $importime);
 
         // We should get the errors returned by validation.
-        $this->assertContains("Missing required column 'username'", $errors);
-        $this->assertContains("Missing required column 'courseshortname'", $errors);
-        $this->assertContains("Missing required column 'courseidnumber'", $errors);
-        $this->assertContains("Missing required column 'completiondate'", $errors);
-        $this->assertContains("Missing required column 'grade'", $errors);
-        $this->assertCount(5, $errors);
+        $this->assertCount(1, $errors);
+        $this->assertContains("The CSV file is empty", $errors);
 
         // There also should be nothing in the import tables.
         $courseimportrecords = $DB->get_records('totara_compl_import_course');

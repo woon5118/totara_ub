@@ -23,6 +23,9 @@
 
 namespace totara_completionimport;
 
+use totara_evidence\entity\evidence_type as evidence_type_entity;
+use totara_evidence\models\evidence_type as evidence_type_model;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -85,7 +88,7 @@ class csv_import {
         // For backwards compatibility, rowcount is number 1 for columns and then data rows begin below that at row 2.
         $rownumber = 2;
         while ($item = $csvimport->next()) {
-            $import[] = self::new_row_object($item, $rownumber, $allcolumns, $importtime, $csvdateformat);
+            $import[] = self::new_row_object($item, $rownumber, $allcolumns, $importtime, $csvdateformat, []);
             $rownumber++;
         }
         $DB->insert_records_via_batch($tablename, $import);
@@ -117,15 +120,17 @@ class csv_import {
      *
      * @param array $columns the names of columns within a csv file.
      * @param string $importname either course or certification.
+     * @param string[] $customfields list of allowed customfields
      * @return array of any error strings.
      * @throws \coding_exception
      */
-    private static function validate_columns($columns, $importname) {
+    private static function validate_columns($columns, $importname, array $customfields = []) {
         global $CFG;
         require_once($CFG->dirroot . '/totara/completionimport/lib.php');
 
         $errors = array();
-        $expected_columns = get_columnnames($importname);
+        $requiredcolumns = get_columnnames($importname);
+        $expected_columns = array_merge($requiredcolumns, $customfields);
 
         if (!empty($columns)) {
             foreach ($columns as $column) {
@@ -138,7 +143,7 @@ class csv_import {
         }
 
         // Check for required fields.
-        foreach ($expected_columns as $columnname) {
+        foreach ($requiredcolumns as $columnname) {
             if (empty($columns) or !in_array($columnname, $columns)) {
                 $field = new \stdClass();
                 $field->columnname = $columnname;
@@ -160,10 +165,10 @@ class csv_import {
      * @param array $allcolumns all columns being imported.
      * @param int $importtime timestamp of import time.
      * @param string $csvdateformat.
-     * @param array|null $customfields - obsolete, unused
+     * @param array $customfields - shortnames of custom fields being used.
      * @return \stdClass containg data for a new completion import record (not yet saved to the database).
      */
-    private static function new_row_object($item, $rownumber, $allcolumns, $importtime, $csvdateformat, $customfields = array()) {
+    private static function new_row_object($item, $rownumber, $allcolumns, $importtime, $csvdateformat, $customfields = []) {
         global $USER;
 
         $rowobject = new \stdClass();
@@ -176,6 +181,7 @@ class csv_import {
             $rowobject->importerrormsg = '';
         }
 
+        $customfielddata = [];
         foreach ($item as $key => $value) {
             if (empty($allcolumns[$key])) {
                 // Likely due to a 'fieldcountmismatch' error.
@@ -184,7 +190,11 @@ class csv_import {
 
             $column = $allcolumns[$key];
 
-            $rowobject->{$column} = self::validate_field($rowobject, $column, $value);
+            if (!empty($customfields) and in_array($column, $customfields)) {
+                $customfielddata[$column] = $value;
+            } else {
+                $rowobject->{$column} = self::validate_field($rowobject, $column, $value);
+            }
         }
 
         $rowobject->timecreated = $importtime;
@@ -192,6 +202,10 @@ class csv_import {
         $rowobject->importuserid = $USER->id;
         $rowobject->rownumber = $rownumber;
         $rowobject->completiondateparsed = totara_date_parse_from_format($csvdateformat, $rowobject->completiondate);
+
+        if (!empty($customfielddata)) {
+            $rowobject->customfields = serialize($customfielddata);
+        }
 
         return $rowobject;
     }
@@ -253,13 +267,21 @@ class csv_import {
         $csvdelimiter = get_default_config($pluginname, 'csvseparator', TCI_CSV_SEPARATOR);
         $csvencoding = get_default_config($pluginname, 'csvencoding', TCI_CSV_ENCODING);
         $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+        $create_evidence = (int)get_default_config($pluginname, 'create_evidence', 0);
+        $evidencetype_id = (int)get_default_config($pluginname, 'evidencetype', 0);
 
         $importid = \csv_import_reader::get_new_iid('completionimport');
         $csvimport = new \csv_import_reader($importid, 'completionimport');
-        $csvimport->load_csv_content($content, $csvencoding, $csvdelimiter, null, $csvenclosure);
+        if ($csvimport->load_csv_content($content, $csvencoding, $csvdelimiter, null, $csvenclosure) === false) {
+            return [$csvimport->get_error()];
+        }
 
         $allcolumns = $csvimport->get_columns();
-        $columnerrors = self::validate_columns($allcolumns, $importname);
+        $customfields = [];
+        if ($create_evidence && $evidencetype_id !== 0) {
+            $customfields = evidence_type_model::load_by_id($evidencetype_id)->get_import_fields();
+        }
+        $columnerrors = self::validate_columns($allcolumns, $importname, $customfields);
         if ($columnerrors) {
             return $columnerrors;
         }
@@ -269,7 +291,7 @@ class csv_import {
         // For backwards compatibility, rowcount is number 1 for columns and then data rows begin below that at row 2.
         $rownumber = 2;
         while ($item = $csvimport->next()) {
-            $import[] = self::new_row_object($item, $rownumber, $allcolumns, $importtime, $csvdateformat);
+            $import[] = self::new_row_object($item, $rownumber, $allcolumns, $importtime, $csvdateformat, $customfields);
             $rownumber++;
         }
         $DB->insert_records_via_batch($tablename, $import);

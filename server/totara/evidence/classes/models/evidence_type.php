@@ -29,6 +29,7 @@ use core\entity\user;
 use core\orm\collection;
 use core\orm\query\builder;
 use required_capability_exception;
+use totara_core\advanced_feature;
 use totara_evidence\customfield_area;
 use totara_evidence\entity;
 use totara_evidence\entity\evidence_type_field;
@@ -71,6 +72,11 @@ class evidence_type extends evidence {
 
     public const DESCRIPTION_FILEAREA = 'type_description';
 
+    public const DEFAULT_SYSTEM_TYPES = [
+        'course' => 'coursecompletionimport',
+        'certification' => 'certificationcompletionimport',
+    ];
+
     protected $entity_attribute_whitelist = [
         'id',
         'name',
@@ -95,6 +101,8 @@ class evidence_type extends evidence {
         'display_description',
         'display_idnumber',
     ];
+
+    private static $default_system_type_fields = null;
 
     protected static function get_entity_class(): string {
         return entity\evidence_type::class;
@@ -164,7 +172,56 @@ class evidence_type extends evidence {
      * @return bool
      */
     public function is_system(): bool {
-        return (int) $this->location === self::LOCATION_RECORD_OF_LEARNING;
+        return !$this->is_editable();
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_editable(): bool {
+        return $this->location !== self::LOCATION_RECORD_OF_LEARNING
+            && !$this->is_default_system_type();
+    }
+
+    /**
+     * @param string $type
+     * @return static
+     */
+    public static function load_by_default_system_type(string $type): self {
+        if (empty(static::DEFAULT_SYSTEM_TYPES[$type])) {
+            throw new coding_exception('Invalid system type specified: ' . $type);
+        }
+        $entity = entity\evidence_type::repository()
+            ->where('idnumber', static::DEFAULT_SYSTEM_TYPES[$type])
+            ->one();
+        return static::load_by_entity($entity);
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_default_system_type(): bool {
+        return in_array($this->idnumber, self::DEFAULT_SYSTEM_TYPES);
+    }
+
+    /**
+     * Return a list of custom fields excluding system fields
+     * @return array
+     */
+    public function get_import_fields(): array {
+        if (!advanced_feature::is_enabled('evidence')) {
+            return [];
+        }
+
+        // We do not support importing of file and multiselect customfields
+        return $this->fields
+            ->filter(function ($field) {
+                return !in_array($field->datatype, ['file', 'multiselect']);
+            })
+            ->map(function ($field) {
+                return 'customfield_' . ($field->shortname ?? $field->fullname);
+            })
+            ->to_array();
     }
 
     /**
@@ -174,6 +231,7 @@ class evidence_type extends evidence {
      * @param string|null $idnumber
      * @param string|null $description
      * @param string|null $descriptionformat
+     * @param int|null $location
      *
      * @return evidence_type
      */
@@ -181,7 +239,8 @@ class evidence_type extends evidence {
         string $name,
         string $idnumber = null,
         string $description = null,
-        string $descriptionformat = null
+        string $descriptionformat = null,
+        int $location = self::LOCATION_EVIDENCE_BANK
     ): self {
         if (empty(trim($name))) {
             throw new coding_exception('A name must be specified');
@@ -198,7 +257,7 @@ class evidence_type extends evidence {
         $entity->descriptionformat = $descriptionformat;
         $entity->modified_by = user::logged_in()->id;
         $entity->created_by = user::logged_in()->id;
-        $entity->location = self::LOCATION_EVIDENCE_BANK;
+        $entity->location = $location;
         $entity->status = self::STATUS_ACTIVE;
         $entity->save();
 
@@ -222,7 +281,8 @@ class evidence_type extends evidence {
         string $name = null,
         string $idnumber = null,
         string $description = null,
-        string $descriptionformat = null
+        string $descriptionformat = null,
+        int $location = null
     ): self {
         if ($name === null && $idnumber === null && $description === null && $descriptionformat === null) {
             throw new coding_exception('Must specify an attribute to change');
@@ -243,6 +303,9 @@ class evidence_type extends evidence {
         }
         if ($descriptionformat !== null) {
             $this->entity->descriptionformat = $descriptionformat;
+        }
+        if ($location !== null) {
+            $this->entity->location = $location;
         }
         $this->entity->modified_by = user::logged_in()->id;
         $this->entity->save();

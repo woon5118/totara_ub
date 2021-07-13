@@ -23,8 +23,9 @@
  */
 
 use totara_evidence\customfield_area\evidence;
-use totara_evidence\entity\evidence_item;
+use totara_evidence\entity\evidence_item as evidence_item_entity;
 use totara_completionimport\event\bulk_course_completionimport;
+use totara_evidence\models\evidence_item as evidence_item_model;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -422,8 +423,8 @@ function import_data_checks($importname, $importtime) {
     }
 
     // Do not create evidence option.
-    $evidencetype = get_default_config($pluginname, 'create_evidence', 0);
-    if (!$evidencetype) {
+    $create_evidence = get_default_config($pluginname, 'create_evidence', 0);
+    if (!$create_evidence) {
         $importidfield = $importname . 'id';
         $params = array_merge($stdparams, array('errorstring' => 'nomatching' . $importname . ';'));
         $sql = "UPDATE {{$tablename}}
@@ -664,8 +665,9 @@ function totara_completionimport_resolve_references($importname, $importtime) {
  * @global object $USER
  * @param string $importname name of import
  * @param int $importtime time of import
+ * @param int $evicence_type_id
  */
-function create_evidence($importname, $importtime) {
+function create_evidence($importname, $importtime, $evidence_type_id = 0) {
     global $DB;
 
     list($sqlwhere, $params) = \totara_completionimport\helper::get_importsqlwhere($importtime);
@@ -676,36 +678,28 @@ function create_evidence($importname, $importtime) {
 
     if ($importname == 'course') {
         // Add any missing courses to other training (evidence).
-        $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield}, i.{$idnumberfield}, i.completiondateparsed, i.grade
+        $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield}, i.{$idnumberfield}, i.completiondateparsed, i.grade, i.customfields
                 FROM {{$tablename}} i
                 JOIN {user} u ON u.username = i.username
                 {$sqlwhere}
                   AND i.courseid IS NULL";
     } else if ($importname == 'certification') {
         // Add any missing certifications to other training (evidence).
-        $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield},  i.{$idnumberfield}, i.completiondateparsed, i.duedate
+        $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield},  i.{$idnumberfield}, i.completiondateparsed, i.duedate, i.customfields
                 FROM {{$tablename}} i
                 JOIN {user} u ON u.username = i.username
                 {$sqlwhere}
                 AND i.certificationid IS NULL";
     }
 
-
     $pluginname = 'totara_completionimport_' . $importname;
-    $evidencetype = $DB->get_field('totara_evidence_type', 'id', ['idnumber' => $importname . 'completionimport'], MUST_EXIST);
-
-    $create_evidence = get_default_config($pluginname, 'create_evidence', 0);
-    if (!$create_evidence) {
-        return;
-    }
-
     $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
 
     $evidences = $DB->get_recordset_sql($sql, $params);
 
     // Insert the evidence data.
     foreach ($evidences as $evidence) {
-        create_evidence_item($evidence, $evidencetype, $csvdateformat, $tablename, $shortnamefield, $idnumberfield, $importname);
+        create_evidence_item($evidence, $evidence_type_id, $csvdateformat, $tablename, $shortnamefield, $idnumberfield, $importname);
     }
 
     $evidences->close();
@@ -737,20 +731,26 @@ function create_evidence_item($item, $evidencetype, $csvdateformat, $tablename,
         $itemname = get_string('evidence_idnumber_' . $importname, 'totara_completionimport', $item->$idnumberfield);
     }
 
+    $system_evidence_type = $DB->get_field('totara_evidence_type', 'id', ['idnumber' => $importname . 'completionimport'], MUST_EXIST);
+
+    if ($evidencetype == 0) {
+        $evidencetype = $system_evidence_type;
+    }
+
     // Create the evidence item
-    $evidence = new evidence_item();
+    $evidence = new evidence_item_entity();
     $evidence->typeid = $evidencetype;
     $evidence->name = $itemname;
     $evidence->user_id = $item->userid;
     $evidence->created_by = $USER->id;
     $evidence->modified_by = $USER->id;
-    $evidence->status = totara_evidence\models\evidence_item::STATUS_ACTIVE;
+    $evidence->status = evidence_item_model::STATUS_ACTIVE;
     $evidence->save();
 
-    // Insert customfield data
+    // First insert system customfield data
     $customfield_data = [
         'id' => $evidence->id,
-        'typeid' => $evidencetype,
+        'typeid' => $system_evidence_type,
         'customfield_importid' => $item->importid,
         'customfield_completiondate' => $item->completiondateparsed,
     ];
@@ -767,6 +767,33 @@ function create_evidence_item($item, $evidencetype, $csvdateformat, $tablename,
     }
     customfield_save_data((object) $customfield_data, evidence::get_prefix(), evidence::get_base_table(), true);
 
+    // Now add type specific customfields if needed
+    $uploaded_customfields = [];
+    if ($evidencetype != $system_evidence_type) {
+        $uploaded_customfields = unserialize($item->customfields);
+    }
+
+    if (!empty($uploaded_customfields)) {
+        $type_customfields = customfield_get_fields_definition(evidence::get_base_table(), ['typeid' => $evidencetype]);
+
+        $customfield_data = [
+            'id' => $evidence->id,
+            'typeid' => $evidencetype,
+        ];
+
+        foreach ($type_customfields as $cf) {
+            $datafield = 'customfield_' . $cf->shortname;
+            // Add the custom field data.
+            if (isset($uploaded_customfields[$datafield])) {
+                $customfield_data[$datafield] = parse_customfield_data($uploaded_customfields[$datafield], $cf, [
+                    'csvdateformat' => $csvdateformat,
+                ]);
+            }
+        }
+
+        customfield_save_data((object) $customfield_data, evidence::get_prefix(), evidence::get_base_table(), true);
+    }
+
     // Mark upload as competed.
     $update = new stdClass();
     $update->id = $item->importid;
@@ -774,6 +801,43 @@ function create_evidence_item($item, $evidencetype, $csvdateformat, $tablename,
     $update->importevidence = 1;
     $update->evidenceid = $evidence->id;
     $DB->update_record($tablename, $update, true);
+}
+
+/**
+ * Processes a given custom field data string and converts it to something that can actually be saved into the custom fields api.
+ *
+ * @param string $field_input The input string
+ * @param object $custom_field The custom field definition the input is for
+ * @param array $options Additional formatting options
+ * @return mixed
+ */
+function parse_customfield_data(string $field_input, object $custom_field, array $options) {
+    if ($field_input !== '') {
+        // Convert special data types from their text versions.
+        switch ($custom_field->datatype) {
+            case 'datetime':
+                $parsed_value = totara_date_parse_from_format($options['csvdateformat'], $field_input);
+                return empty($parsed_value) ? null : $parsed_value;
+            case 'url':
+                return ['url' => $field_input];
+            default:
+                return $field_input;
+        }
+    }
+
+    // No data was specified, so fall back to the default custom field data.
+    switch ($custom_field->datatype) {
+        case 'datetime':
+            return empty($custom_field->defaultdata) ? null : $custom_field->defaultdata;
+        case 'url':
+            return [
+                'url' => $custom_field->defaultdata,
+                'text' => $custom_field->param1,
+                'target' => $custom_field->param2
+            ];
+        default:
+            return $custom_field->defaultdata;
+    }
 }
 
 /**
@@ -1784,6 +1848,7 @@ function get_config_data($filesource, $importname) {
     $data->filesource = $filesource;
     $data->sourcefile = get_config($pluginname, 'sourcefile');
     $data->create_evidence = get_default_config($pluginname, 'create_evidence', 0);
+    $data->evidencetype = get_default_config($pluginname, 'evidencetype', 0);
     $data->csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
     $data->csvdelimiter = get_default_config($pluginname, 'csvdelimiter', TCI_CSV_DELIMITER);
     $data->csvseparator = get_default_config($pluginname, 'csvseparator', TCI_CSV_SEPARATOR);
@@ -1810,6 +1875,7 @@ function get_config_data($filesource, $importname) {
 function set_config_data($data, $importname) {
     $pluginname = 'totara_completionimport_' . $importname;
     set_config('create_evidence', $data->create_evidence, $pluginname);
+    set_config('evidencetype', $data->evidencetype ?? 0, $pluginname);
 
     if ($data->filesource == TCI_SOURCE_EXTERNAL) {
         set_config('sourcefile', $data->sourcefile, $pluginname);

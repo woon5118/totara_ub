@@ -21,6 +21,11 @@
  * @package totara
  * @subpackage completionimport
  */
+
+use core\collection;
+use totara_evidence\entity\evidence_type as evidence_type_entity;
+use totara_evidence\models\evidence_type as evidence_type_model;
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/formslib.php');
@@ -109,6 +114,30 @@ class upload_form extends moodleform {
             ),
         ]);
         $mform->addHelpButton('create_evidence', 'create_evidence', 'totara_completionimport');
+
+        // Evidence types, array of [id => name]
+        $evidence_type_options = [0 => get_string('default', 'totara_completionimport')];
+        $evidence_type_options += evidence_type_entity::repository()
+            ->select(['id', 'name'])
+            ->where('location', evidence_type_model::LOCATION_RECORD_OF_LEARNING)
+            ->where_not_in('idnumber', evidence_type_model::DEFAULT_SYSTEM_TYPES)
+            ->order_by('name')
+            ->get()
+            ->map(function (evidence_type_entity $type) {
+                return evidence_type_model::load_by_entity($type)->display_name;
+            })
+            ->all(true);
+        $mform->addElement('select', 'evidencetype', get_string('evidencetype', 'totara_completionimport'), $evidence_type_options);
+        $mform->setType('evidencetype', PARAM_INT);
+        $mform->addHelpButton('evidencetype', 'evidencetype', 'totara_completionimport');
+        $mform->disabledIf('evidencetype', 'create_evidence', 'notchecked', 1);
+
+        // Static elements are not created with a name or id.
+        // Wrapping it in a div with a specific id in order to allow update
+        $mform->addElement('html', \html_writer::start_div('completionimport_evidencetype_customfields hidden'));
+        $mform->addElement('static', '', '', get_string('evidencetype_customfields_list', 'totara_completionimport'));
+        $mform->addElement('static', '', '', '');
+        $mform->addElement('html', \html_writer::end_div());
 
         $dateformats = get_dateformats();
         $mform->addElement('select', 'csvdateformat', get_string('csvdateformat', 'totara_completionimport'), $dateformats,

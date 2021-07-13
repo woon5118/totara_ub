@@ -121,6 +121,7 @@ class evidence_item extends entity {
     public function data(): has_many {
         return $this->has_many(evidence_field_data::class, 'evidenceid')
             ->join([evidence_type_field::TABLE, 'field'], 'fieldid', 'id')
+            ->order_by('field.typeid')
             ->order_by('field.sortorder');
     }
 

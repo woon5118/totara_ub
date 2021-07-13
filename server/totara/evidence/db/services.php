@@ -99,4 +99,13 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'totara/evidence:managetype',
     ],
+    'totara_evidence_type_import_fields' => [
+        'classname' => \totara_evidence\services\type::class,
+        'methodname' => 'get_import_fields',
+        'description' => 'Returns list of custom fields that may be imported',
+        'type' => 'read',
+        'loginrequired' => true,
+        'ajax' => true,
+        'capabilities' => '',
+    ],
 ];

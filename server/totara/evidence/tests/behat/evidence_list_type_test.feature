@@ -138,12 +138,10 @@ Feature: Evidence type index page
     Then I should see "EvidenceTest_type_three" in the ".tw-evidence__header" "css_element"
     And I should not see "Edit this type" in the ".tw-evidence__header" "css_element"
 
-  Scenario: Record of learning type cannot be modified
+  Scenario: Record of learning type can be modified
     Given I navigate to "Evidence > Manage types" in site administration
-    Then I should see "cannot be modified" in the "Evidence_Type_System" "table_row"
-    And I should not see "edit" in the "Evidence_Type_System" "table_row"
-    And I should not see "delete" in the "Evidence_Type_System" "table_row"
-    And I should not see "show" in the "Evidence_Type_System" "table_row"
-    And I should not see "hide" in the "Evidence_Type_System" "table_row"
+    Then I should see "Edit" in the "Evidence_Type_System" "table_row"
+    And I should see "Delete" in the "Evidence_Type_System" "table_row"
+    And I should see "Hide" in the "Evidence_Type_System" "table_row"
     When I click on "Evidence_Type_System" "link" in the "Evidence_Type_System" "table_row"
-    Then I should not see "Edit this type"
+    Then I should see "Edit this type"

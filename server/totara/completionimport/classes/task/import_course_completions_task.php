@@ -47,6 +47,8 @@ class import_course_completions_task extends \core\task\adhoc_task {
         // Get customdata for adhoc task.
         $customdata = $this->get_custom_data();
         $importtime = $customdata->importtime;
+        $create_evidence = $customdata->create_evidence ?? 0;
+        $evidence_type_id = $customdata->evidence_type_id ?? 0;
 
         $userstonotify = \totara_completionimport\helper::get_list_of_import_users('course', $importtime);
 
@@ -56,8 +58,10 @@ class import_course_completions_task extends \core\task\adhoc_task {
         $numerrors = $DB->count_records('totara_compl_import_course', ['timecreated' => $importtime, 'importerror' => 1]);
 
         try {
-            // Put into evidence any courses not found.
-            create_evidence('course', $importtime);
+            if ($create_evidence) {
+                // Put into evidence any courses not found.
+                create_evidence('course', $importtime, $evidence_type_id);
+            }
 
             // Run the specific course enrolment.
             import_course('course', $importtime);

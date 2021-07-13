@@ -545,12 +545,16 @@ class totara_evidence_model_type_testcase extends totara_evidence_testcase {
         $system_type = $this->generator()->create_evidence_type([
             'location' => models\evidence_type::LOCATION_RECORD_OF_LEARNING,
         ]);
+        $course_completion_type = models\evidence_type::load_by_default_system_type('course');
 
+        // Only the default systen types are regarded as 'system' types
         $this->assertFalse($standard_type->is_system());
-        $this->assertTrue($system_type->is_system());
+        $this->assertFalse($system_type->is_system());
+        $this->assertTrue($course_completion_type->is_system());
 
         $this->assertTrue($standard_type->can_modify());
-        $this->assertFalse($system_type->can_modify());
+        $this->assertTrue($system_type->can_modify());
+        $this->assertFalse($course_completion_type->can_modify());
     }
 
     /**
@@ -562,12 +566,14 @@ class totara_evidence_model_type_testcase extends totara_evidence_testcase {
         $system_type = $this->generator()->create_evidence_type([
             'location' => models\evidence_type::LOCATION_RECORD_OF_LEARNING,
         ]);
+        $course_completion_type = models\evidence_type::load_by_default_system_type('course');
 
         $standard_type->update('New Name');
+        $system_type->update('New Name');
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage("Evidence type with ID {$system_type->id} is a system type and can not be modified");
-        $system_type->update('New Name');
+        $this->expectExceptionMessage("Evidence type with ID {$course_completion_type->id} is a system type and can not be modified");
+        $course_completion_type->update('New Name');
     }
 
     /**
@@ -579,12 +585,14 @@ class totara_evidence_model_type_testcase extends totara_evidence_testcase {
         $system_type = $this->generator()->create_evidence_type([
             'location' => models\evidence_type::LOCATION_RECORD_OF_LEARNING,
         ]);
+        $course_completion_type = models\evidence_type::load_by_default_system_type('course');
 
         $standard_type->update_status(models\evidence_type::STATUS_HIDDEN);
+        $system_type->update_status(models\evidence_type::STATUS_HIDDEN);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage("Evidence type with ID {$system_type->id} is a system type and can not be modified");
-        $system_type->update_status(models\evidence_type::STATUS_HIDDEN);
+        $this->expectExceptionMessage("Evidence type with ID {$course_completion_type->id} is a system type and can not be modified");
+        $course_completion_type->update_status(models\evidence_type::STATUS_HIDDEN);
     }
 
     /**
@@ -596,12 +604,14 @@ class totara_evidence_model_type_testcase extends totara_evidence_testcase {
         $system_type = $this->generator()->create_evidence_type([
             'location' => models\evidence_type::LOCATION_RECORD_OF_LEARNING,
         ]);
+        $course_completion_type = models\evidence_type::load_by_default_system_type('course');
 
         $standard_type->delete();
+        $system_type->delete();
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage("Evidence type with ID {$system_type->id} is a system type and can not be modified");
-        $system_type->delete();
+        $this->expectExceptionMessage("Evidence type with ID {$course_completion_type->id} is a system type and can not be modified");
+        $course_completion_type->delete();
     }
 
     /**

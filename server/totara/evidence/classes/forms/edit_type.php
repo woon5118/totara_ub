@@ -23,9 +23,11 @@
 
 namespace totara_evidence\forms;
 
-use totara_evidence\entity\evidence_type;
+use totara_evidence\entity\evidence_type as evidence_type_entity;
+use totara_evidence\models\evidence_type as evidence_type_model;
 use totara_form\form;
 use totara_form\form\element\action_button;
+use totara_form\form\element\checkbox;
 use totara_form\form\element\editor;
 use totara_form\form\element\hidden;
 use totara_form\form\element\text;
@@ -44,6 +46,12 @@ class edit_type extends form implements viewable {
         $this->model->add(
             new text('idnumber', get_string('type_idnumber', 'totara_evidence'), PARAM_TEXT)
         )->set_attribute('maxlength', 100);
+
+        $this->model->add(
+            new checkbox('location',
+                get_string('type_available_for_completion_import', 'totara_evidence'),
+            evidence_type_model::LOCATION_RECORD_OF_LEARNING)
+        )->add_help_button('type_available_for_completion_import', 'totara_evidence');
 
         $this->model->add(
             new editor('description', get_string('type_description', 'totara_evidence'))
@@ -70,7 +78,7 @@ class edit_type extends form implements viewable {
         if (empty(trim($data->name))) {
             $errors['name'] = get_string('error_message_empty_name', 'totara_evidence');
         }
-        if ($data->idnumber !== '' && totara_idnumber_exists(evidence_type::TABLE, $data->idnumber, $data->id)) {
+        if ($data->idnumber !== '' && totara_idnumber_exists(evidence_type_entity::TABLE, $data->idnumber, $data->id)) {
             $errors['idnumber'] = get_string('idnumberexists', 'totara_core');
         }
 

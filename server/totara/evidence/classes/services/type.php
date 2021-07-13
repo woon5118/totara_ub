@@ -190,6 +190,13 @@ class type extends external_api {
                 '',
                 true
             ),
+            'location' => new external_value(
+                PARAM_INT,
+                'search query location',
+                VALUE_DEFAULT,
+                models\evidence_type::LOCATION_EVIDENCE_BANK,
+                true
+            ),
         ]);
     }
 
@@ -197,7 +204,7 @@ class type extends external_api {
      * @param string $string Search query string
      * @return string[] List of evidence types with
      */
-    public static function search(string $string): array {
+    public static function search(string $string, ?int $location = models\evidence_type::LOCATION_EVIDENCE_BANK): array {
         global $PAGE;
 
         advanced_feature::require('evidence');
@@ -208,6 +215,7 @@ class type extends external_api {
         // The front-end component is hardcoded to use label attribute, hence have to remap here.
         $types = evidence_type::repository()
             ->filter_by_active()
+            ->where('location', $location)
             ->where('name', 'ilike', $string)
             ->get()
             ->transform(static function (evidence_type $type) {
@@ -269,6 +277,41 @@ class type extends external_api {
      */
     public static function set_visibility_returns(): ?external_description {
         return null;
+    }
+
+    /**
+     * @return external_function_parameters
+     */
+    public static function get_import_fields_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'type_id' => new external_value(
+                PARAM_INT,
+                'id of the type',
+                VALUE_REQUIRED
+            ),
+        ]);
+    }
+
+    /**
+     * Return the list of customfields that may be added during import.
+     * The first time a type is used to create ROL evidence, we add the default system type fields to ensure all fields required
+     * by the import process are available. These fields are removed from the result list.
+     *
+     * @param int $type_id Evidence type entity ID
+     * @return array List of custom field names that may be used during imported. Names are prepended with 'customfield_'
+     */
+    public static function get_import_fields(int $type_id): array {
+        advanced_feature::require('evidence');
+        return models\evidence_type::load_by_id($type_id)->get_import_fields();
+    }
+
+    /**
+     * @return external_description|null
+     */
+    public static function get_import_fields_returns(): ?external_description {
+        return new \external_multiple_structure(
+            new \external_value(PARAM_TEXT, 'Import field name'),
+        );
     }
 
 }

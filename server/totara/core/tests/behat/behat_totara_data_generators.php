@@ -382,6 +382,10 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'evidence_type_for_behat',
                 'required' => array('name')
             ),
+            'type fields' => array(
+                'datagenerator' => 'evidence_type_fields_for_behat',
+                'required' => array('evidence_type', 'datatype', 'fullname', 'shortname')
+            ),
             'users' => array(
                 'datagenerator' => 'evidence_user_for_behat',
                 'required' => array('username')

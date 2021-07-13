@@ -53,6 +53,7 @@ class type_edit extends type {
             'name' => $type->name,
             'idnumber' => $type->idnumber,
             'description' => $type->description,
+            'location' => $type->location,
             'descriptionformat' => $type->descriptionformat,
             'descriptionfilearea' => new file_area(
                 $this->context,
@@ -67,7 +68,8 @@ class type_edit extends type {
                 $form_data->name,
                 $form_data->idnumber,
                 $form_data->description,
-                $form_data->descriptionformat ?? null
+                $form_data->descriptionformat ?? null,
+                $form_data->location ?? null
             );
 
             $form->update_file_area('description', $this->context, $type->get_id());

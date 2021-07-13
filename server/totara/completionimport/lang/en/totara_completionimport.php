@@ -81,6 +81,7 @@ $string['csvgradeunit_point'] = 'Real';
 $string['csvimportdone'] = 'CSV import completed';
 $string['csvimportfailed'] = 'Failed to import the CSV file';
 $string['csvseparator'] = 'CSV values separated by';
+$string['default'] = 'Default';
 $string['duplicate'] = 'Duplicate';
 $string['duplicateidnumber'] = 'Duplicate ID Number';
 $string['emptyfile'] = 'File is empty : {$a}';
@@ -103,6 +104,11 @@ $string['evidence_shortname_certification'] = 'Completed certification : {$a}';
 $string['evidence_shortname_course'] = 'Completed course : {$a}';
 $string['evidence_idnumber_certification'] = 'Completed certification ID : {$a}';
 $string['evidence_idnumber_course'] = 'Completed course ID : {$a}';
+$string['evidencetype'] = 'Evidence type';
+$string['evidencetype_help'] = 'Evidence type to use when adding Record of Learning evidence. Custom fields defined in the type may be included in the import.
+
+Note that the default customfields defined in the system types will be added to this type on first use during import.';
+$string['evidencetype_customfields_list'] = 'The additional columns below can also be included in the CSV file:';
 $string['fieldarialabel'] = '{$a}';
 $string['fieldcountmismatch'] = 'Field count mismatch';
 $string['fieldtoolarge_certificationidnumber'] = 'Field \'certificationidnumber\' is too long. The maximum length is 100';
@@ -262,6 +268,7 @@ If you are only intending to upload completion records of courses in the system,
 The CSV file should contain the following columns in the first line of the file:
 {$a}
 
+If you are creating evidence with a non-default evidence type, the CSV file may also contain custom field data for the fields defined in the selected Evidence type.
 ';
 $string['uploadfilerequired'] = 'Please select a file to upload';
 $string['uploadsuccess'] = 'Uploaded files successfully';
@@ -293,12 +300,6 @@ $string['evidencedatefield_help'] = 'Any courses or certificates that can\'t be 
 Please choose a date/time evidence custom field to store the completiondate value.
 
 If the CVS file has a column specifying the custom field directly, this value will be used instead.';
-$string['evidencetype'] = 'Default evidence type';
-$string['evidencetype_help'] = 'Any courses or certificates that can\'t be found can be added as evidence in the record of learning.
-
-If you do not want any evidence to be created by this import, select \'Do not create evidence\'.
-
-Otherwise, please choose the default evidence type you wish to use.';
 $string['uploadcoursecustomfieldsintro'] = '
 Additional columns below can also be included in the CSV to allow custom field data to be uploaded for evidence
 

@@ -50,7 +50,8 @@ class type_create extends type {
                 $form_data->name,
                 $form_data->idnumber,
                 $form_data->description,
-                $form_data->descriptionformat ?? null
+                $form_data->descriptionformat ?? null,
+                $form_data->location
             );
 
             $form->update_file_area('description', $this->context, $type->get_id());

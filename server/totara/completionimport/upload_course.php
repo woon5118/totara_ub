@@ -63,6 +63,8 @@ admin_externalpage_setup('totara_completionimport_course_upload');
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading);
 
+$PAGE->requires->js_call_amd('totara_completionimport/select_evidence_type', 'init');
+
 if (($filesource == TCI_SOURCE_EXTERNAL) and empty($CFG->completionimportdir)) {
     // To set an external file on the server, the setting $CFG->completionimportdir must be set in the config file.
     echo $OUTPUT->notification(get_string('sourcefile_noconfig', 'totara_completionimport'), 'notifyproblem');
@@ -131,7 +133,11 @@ if ($data = $courseform->get_data()) {
     if (empty($errors)) {
         // Run adhoc task to process imported data
         $adhoctask = new \totara_completionimport\task\import_course_completions_task();
-        $adhoctask->set_custom_data(['importtime' => $importtime]);
+        $adhoctask->set_custom_data([
+            'importtime' => $importtime,
+            'create_evidence' => $data->create_evidence,
+            'evidence_type_id' => $data->evidencetype ?? 0
+        ]);
 
         \core\task\manager::queue_adhoc_task($adhoctask);
 

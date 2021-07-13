@@ -142,6 +142,32 @@ class totara_evidence_generator extends component_generator_base {
     }
 
     /**
+     * Set some variables and reset the generator.
+     *
+     * NOTE: can be used only once at the start of test.
+     *
+     * @param int $max_evidence_items
+     * @param int $max_evidence_types
+     * @param int $max_evidence_users
+     * @param int $min_evidence_fields
+     * @param int $max_evidence_fields
+     */
+    public function set_min_max(
+        int $max_evidence_items = 200,
+        int $max_evidence_types = 45,
+        int $max_evidence_users = 20,
+        int $min_evidence_fields = 0,
+        int $max_evidence_fields = 6
+    ) {
+        $this->max_evidence_items = $max_evidence_items;
+        $this->max_evidence_types = $max_evidence_types;
+        $this->max_evidence_users = $max_evidence_users;
+        $this->min_evidence_fields = $min_evidence_fields;
+        $this->max_evidence_fields = $max_evidence_fields;
+        $this->reset();
+    }
+
+    /**
      * Call this to change the set_create_files flag to true or false
      *
      * @param bool $create
@@ -625,6 +651,17 @@ class totara_evidence_generator extends component_generator_base {
                 'forceunique' => '0'
             ], $record)
         ))->save();
+    }
+
+    /**
+     * Create evidence type fields for behat
+     *
+     * @param array $record
+     */
+    public function create_evidence_type_fields_for_behat(array $record = []): void {
+        $evidence_type = $this->get_type_from_name($record['evidence_type']);
+        unset($record['evidence_type']);
+        $this->create_evidence_type_fields($evidence_type, [$record], false, []);
     }
 
     /**

@@ -44,11 +44,14 @@ class import_certification_completions_task extends \core\task\adhoc_task {
 
         if (advanced_feature::is_enabled('certifications')) {
             require_once($CFG->dirroot . '/totara/completionimport/lib.php');
+            require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
             // Get customdata for adhoc task
             $customdata = $this->get_custom_data();
             $importname = $customdata->importname;
             $importtime = $customdata->importtime;
+            $create_evidence = $customdata->create_evidence ?? 0;
+            $evidence_type_id = $customdata->evidence_type_id ?? 0;
 
             // Get the users who uploaded certification completion in the given time to notify them after importing.
             $userstonotify = \totara_completionimport\helper::get_list_of_import_users('certification', $importtime);
@@ -59,8 +62,10 @@ class import_certification_completions_task extends \core\task\adhoc_task {
             $numerrors = $DB->count_records('totara_compl_import_cert', ['timecreated' => $importtime, 'importerror' => 1]);
 
             try {
-                // Put into evidence any courses / certifications not found.
-                create_evidence($importname, $importtime);
+                if ($create_evidence) {
+                    // Put into evidence any courses / certifications not found.
+                    create_evidence($importname, $importtime, $evidence_type_id);
+                }
 
                 // Run the specific course enrolment / certification assignment.
                 $functionname = 'import_' . $importname;

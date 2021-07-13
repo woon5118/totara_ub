@@ -28,6 +28,7 @@ use totara_core\phpunit\webservice_utils;
 use totara_evidence\customfield_area\evidence;
 use totara_evidence\entity;
 use totara_evidence\models;
+use totara_evidence\models\evidence_type as evidence_type_model;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/evidence/tests/evidence_testcase.php');
@@ -290,6 +291,50 @@ class totara_evidence_service_type_testcase extends totara_evidence_testcase {
             'Second 2',
         ], array_column($response['data'], 'label'));
     }
+
+    /**
+     * Test the data service method returns value and handles permissions correctly
+     */
+    public function test_service_type_get_import_fields(): void {
+        self::setAdminUser();
+
+        $types = [];
+        for ($i = 1; $i <= 3; $i++) {
+            $type = [
+                'name' => "Test Import Fields $i Name",
+                'description' => "Test Import Fields $i Description",
+                'location' => $i === 1 ? models\evidence_type::LOCATION_RECORD_OF_LEARNING : models\evidence_type::LOCATION_EVIDENCE_BANK,
+            ];
+            $types[$i] = $this->generator()->create_evidence_type($type);
+
+            // Stupid generator creates additional fields if min and max evidence fields are set to defaults!
+            $this->generator()->set_min_max(200,45,20,0,0);
+            for ($j = 1; $j <= 3; $j++) {
+                $this->generator()->create_evidence_field([
+                    'typeid' => $types[$i]->id,
+                    'fullname' => "Field {$i}-{$j}",
+                    'shortname' => "fld{$i}-{$j}",
+                    'sortorder' => $j,
+                ]);
+            }
+        }
+
+        foreach ($types as $idx => $type) {
+            $response = $this->call_webservice_api('totara_evidence_type_import_fields', [
+                'type_id' => $type->id,
+            ]);
+            $this->assert_webservice_success($response);
+
+            $expected = [];
+            for ($j = 1; $j <= 3; $j++) {
+                $expected[] = "customfield_fld{$idx}-{$j}";
+            }
+
+            self::assertEqualsCanonicalizing($expected, $response['data']);
+        }
+    }
+
+
 
     /**
      * Generate multi-language string
