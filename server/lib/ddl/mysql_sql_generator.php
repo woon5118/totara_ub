@@ -1252,14 +1252,14 @@ class mysql_sql_generator extends sql_generator {
                 $sqls[] = "CREATE TABLE ss_t_{$prefix}{$tablename} (LIKE {$prefix}{$tablename})";
                 $sqls[] = "INSERT INTO ss_t_{$prefix}{$tablename} SELECT * FROM {$prefix}{$tablename}";
             }
-            $sqls[] = "DROP TRIGGER IF EXISTS ss_insert_{$prefix}{$tablename}";
-            $sqls[] = "CREATE TRIGGER ss_insert_{$prefix}{$tablename} AFTER INSERT ON {$prefix}{$tablename} FOR EACH ROW
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_i_{$prefix}{$tablename}";
+            $sqls[] = "CREATE TRIGGER ss_i_{$prefix}{$tablename} AFTER INSERT ON {$prefix}{$tablename} FOR EACH ROW
                        UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0";
-            $sqls[] = "DROP TRIGGER IF EXISTS ss_update_{$prefix}{$tablename}";
-            $sqls[] = "CREATE TRIGGER ss_update_{$prefix}{$tablename} AFTER UPDATE ON {$prefix}{$tablename} FOR EACH ROW
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_u_{$prefix}{$tablename}";
+            $sqls[] = "CREATE TRIGGER ss_u_{$prefix}{$tablename} AFTER UPDATE ON {$prefix}{$tablename} FOR EACH ROW
                        UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0";
-            $sqls[] = "DROP TRIGGER IF EXISTS ss_delete_{$prefix}{$tablename}";
-            $sqls[] = "CREATE TRIGGER ss_delete_{$prefix}{$tablename} AFTER DELETE ON {$prefix}{$tablename} FOR EACH ROW
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_d_{$prefix}{$tablename}";
+            $sqls[] = "CREATE TRIGGER ss_d_{$prefix}{$tablename} AFTER DELETE ON {$prefix}{$tablename} FOR EACH ROW
                        UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0";
         }
         $this->mdb->change_database_structure($sqls, null);
@@ -1347,9 +1347,9 @@ class mysql_sql_generator extends sql_generator {
         $sqls = array();
         $rs = $this->mdb->get_recordset_sql("SELECT * FROM ss_tables_{$prefix}");
         foreach ($rs as $info) {
-            $sqls[] = "DROP TRIGGER IF EXISTS ss_insert_{$info->tablename}";
-            $sqls[] = "DROP TRIGGER IF EXISTS ss_update_{$info->tablename}";
-            $sqls[] = "DROP TRIGGER IF EXISTS ss_delete_{$info->tablename}";
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_i_{$info->tablename}";
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_u_{$info->tablename}";
+            $sqls[] = "DROP TRIGGER IF EXISTS ss_d_{$info->tablename}";
             $sqls[] = "DROP TABLE IF EXISTS ss_t_{$info->tablename} CASCADE";
         }
         $rs->close();
