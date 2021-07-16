@@ -200,6 +200,9 @@ echo html_writer::tag('title', 'LoadSCO');
     <?php // Totara: BOF open in popup (simple) option. ?>
     function openContentWindow() {
         cWin = window.top.open("<?php echo $scolaunchurl ?>","scorm_content_<?php echo $scorm->id; ?>");
+        if (cWin && window.top.mod_scorm_monitorForBeaconRequirement) {
+            window.top.mod_scorm_monitorForBeaconRequirement(cWin);
+        }
         monitorContentWindow();
     }
     function monitorContentWindow() {
