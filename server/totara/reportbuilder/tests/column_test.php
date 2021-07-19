@@ -1172,6 +1172,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'facilitator', 'value' => 'description'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'job_assignment'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'tags'));
+            }
+            if (in_array($sourcename, ['course_completion', 'facetoface_sessions', 'facetoface_signin'])) {
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'course'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'course_category'));
             }
