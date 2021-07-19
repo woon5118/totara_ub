@@ -58,7 +58,7 @@ function DoRequest(httpReq, url, param, allowBeaconAPI) {
      * @returns boolean
      */
     var canUseBeaconAPI = function() {
-        return (allowBeaconAPI && navigator && navigator.sendBeacon && FormData);
+        return (allowBeaconAPI && navigator && navigator.sendBeacon);
     };
 
     /**
@@ -90,21 +90,33 @@ function DoRequest(httpReq, url, param, allowBeaconAPI) {
         // I've chosen FormData and FormData.append as they are compatible with our supported browsers:
         //  - https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData
         //  - https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
+        // The data is encoded as JSON rather than directly putting each attribute in FormData. This saves us a lot of
+        // space, which is important as sendBeacon is limited to 64kb.
 
         var vars = param.split('&'),
             i = 0,
             pair,
             key,
             value,
-            formData = new FormData();
+            data = {},
+            formData = new FormData(),
+            // these need to be passed as parameters instead of in the JSON data
+            formParams = ['sesskey', 'id', 'a', 'scoid', 'attempt'];
         for (i = 0; i < vars.length; i++) {
             pair = vars[i].split('=');
             key = decodeURIComponent(pair[0]);
             value = decodeURIComponent(pair[1]);
-            formData.append(key, value);
+            if (formParams.indexOf(key) !== -1) {
+                formData.append(key, value);
+            } else {
+                data[key] = value;
+            }
         }
         // We'll also inform it that we are unloading, potentially useful in the future.
         formData.append('unloading', '1');
+
+        // Pass the JSON-encoded data.
+        formData.append('json_data', JSON.stringify(data));
 
         // We're going to add a token to the URL that will identify this request as going to the beacon API.
         // In the future this would allow our server side scripts to respond differently when the beacon API

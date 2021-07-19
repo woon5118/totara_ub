@@ -26,10 +26,15 @@ require_once($CFG->dirroot.'/mod/scorm/locallib.php');
 ignore_user_abort(true);
 set_time_limit(60 * 5);
 
+// Totara: keep params (+ sesskey) in sync with list in request.js
+
 $id = optional_param('id', '', PARAM_INT);       // Course Module ID, or
 $a = optional_param('a', '', PARAM_INT);         // scorm ID
 $scoid = required_param('scoid', PARAM_INT);  // sco ID
 $attempt = required_param('attempt', PARAM_INT);  // attempt number.
+
+// Totara: allow submitting as JSON
+$json_data = optional_param('json_data', null, PARAM_RAW); // data
 
 if (!empty($id)) {
     if (! $cm = get_coursemodule_from_id('scorm', $id)) {
@@ -72,7 +77,17 @@ if (confirm_sesskey() && (!empty($scoid))) {
         // Preload all current tracking data.
         $trackdata = $DB->get_records('scorm_scoes_track', array('userid' => $USER->id, 'scormid' => $scorm->id, 'scoid' => $scoid,
                                                                  'attempt' => $attempt), '', 'element, id, value, timemodified');
-        foreach (data_submitted() as $element => $value) {
+        // Totara: allow submitting as JSON
+        if ($json_data) {
+            $data = json_decode($json_data, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $message = json_last_error_msg();
+                throw new \coding_exception("Invalid JSON: '{$json_data}'");
+            }
+        } else {
+            $data = data_submitted();
+        }
+        foreach ($data as $element => $value) {
             $element = str_replace('__', '.', $element);
             if (substr($element, 0, 3) == 'cmi') {
                 $netelement = preg_replace('/\.N(\d+)\./', "\.\$1\.", $element);
