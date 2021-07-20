@@ -268,7 +268,7 @@ class totara_hierarchy_competency_lib_testcase extends advanced_testcase {
      * @param array $condition Where conditions to apply when reading from {com_assign_availability}
      * @param array $expected Expected rows
      */
-    private function validate_assign_availability_records(array $condition = [], array $expected) {
+    private function validate_assign_availability_records(array $condition = [], array $expected = []) {
         global $DB;
 
         $rows = $DB->get_records('comp_assign_availability', $condition);
