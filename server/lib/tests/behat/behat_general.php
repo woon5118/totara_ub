@@ -246,6 +246,18 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Close the current window
+     *
+     * @Given /^I close the current window$/
+     */
+    public function close_the_current_window() {
+        \behat_hooks::set_step_readonly(false);
+
+        $this->wait_for_pending_js();
+        $this->getSession()->executeScript('window.close()');
+    }
+
+    /**
      * Accepts the currently displayed alert dialog. This step does not work in all the browsers, consider it experimental.
      * @Given /^I accept the currently displayed dialog$/
      */
