@@ -84,7 +84,12 @@ Y_DOM = {
         // when they should not be, so we must patch YUI to prevent this.
         // YUI never needs to touch ProseMirror content, so we just add a class
         // to prevent the addition of the IDs by YUI.
-        if (node.closest('.no-yui-ids')) {
+        //
+        // Also, not safe to assume polyfills are available on the document, for
+        // example a dynamically constructed iframe is used to facilitate
+        // uploading, and that document has no polyfills or other scripts
+        // executed - so unpolyfilled browsers will throw.
+        if (Element.prototype.closest.call(node, '.no-yui-ids')) {
             return;
         }
 
