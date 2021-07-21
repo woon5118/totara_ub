@@ -28,6 +28,8 @@ use theme_config;
 use totara_engage\entity\engage_bookmark;
 use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
+use totara_engage\interactor\interactor;
+use totara_engage\interactor\interactor_factory;
 use totara_engage\link\builder;
 use totara_engage\query\provider\helper;
 use totara_engage\repository\bookmark_repository;
@@ -89,6 +91,11 @@ abstract class card {
      * @var string
      */
     protected $component;
+
+    /**
+     * @var null|interactor
+     */
+    protected $interactor = null;
 
     /**
      * Preventing the complicated construction.
@@ -157,6 +164,9 @@ abstract class card {
             $card->set_timemodified($record['timemodified']);
         }
 
+        // Set interactor.
+        $card->set_interactor(interactor_factory::create($record['component'], $record));
+
         return $card;
     }
 
@@ -224,6 +234,13 @@ abstract class card {
 
         debugging("Invalid type of parameter \$extra, the property will be set to null", DEBUG_DEVELOPER);
         $this->extra = null;
+    }
+
+    /**
+     * @param interactor $interactor
+     */
+    public function set_interactor(interactor $interactor) {
+        $this->interactor = $interactor;
     }
 
     /**
@@ -536,6 +553,21 @@ abstract class card {
      */
     public function get_total_comments(): int {
         return 0;
+    }
+
+    /**
+     * Get user capabilities for user interacting with this resource.
+     *
+     * @return interactor
+     */
+    public function get_interactor(): interactor {
+        if (empty($this->interactor)) {
+            $this->interactor = interactor_factory::create($this->component, [
+                'access' => $this->access,
+                'userid' => $this->userid,
+            ]);
+        }
+        return $this->interactor;
     }
 
     /**

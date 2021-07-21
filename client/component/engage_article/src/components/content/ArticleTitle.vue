@@ -38,7 +38,7 @@
       />
 
       <BookmarkButton
-        v-if="!owned"
+        v-if="showBookmarkButton"
         :primary="false"
         :circle="true"
         :bookmarked="bookmarked"
@@ -93,6 +93,11 @@ export default {
     owned: {
       type: Boolean,
       required: true,
+    },
+
+    showBookmarkButton: {
+      type: Boolean,
+      default: true,
     },
   },
 

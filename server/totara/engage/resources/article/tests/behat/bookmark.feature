@@ -16,6 +16,7 @@ Feature: Bookmark article
     And the following "users" exist:
       | username | firstname | lastname | email          |
       | user1    | User      | One      | user1@test.com |
+      | user2    | User      | Two      | user2@test.com |
 
     And the following "articles" exist in "engage_article" plugin:
       | name           | username | content       | access | topics  |
@@ -49,3 +50,26 @@ Feature: Bookmark article
     When I click on "Unbookmark" "button" in the ".tui-engageArticleCard" "css_element"
     And I wait for the next second
     Then I should not see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
+
+  Scenario: Owners should not be able to bookmark
+    And I log in as "user1"
+    When I view article "Test Article 1"
+    Then "Bookmark" "button" should not exist in the ".tui-engageArticleTitle__head" "css_element"
+
+  Scenario: Authenticated user should be able to bookmark
+    And I log in as "user2"
+    When I view article "Test Article 1"
+    Then "Bookmark" "button" should exist in the ".tui-engageArticleTitle__head" "css_element"
+
+  Scenario: Guest should not be able to bookmark
+    Given I log in as "admin"
+    And the following "permission overrides" exist:
+      | capability                | permission | role  | contextlevel | reference |
+      | totara/engage:viewlibrary | Allow      | guest | User         | guest     |
+    And I set the following administration settings values:
+      | Guest login button | Show |
+    When I log out
+    And I am on homepage
+    And I click on "#guestlogin input[type=submit]" "css_element"
+    And I view article "Test Article 1"
+    Then "Bookmark" "button" should not exist in the ".tui-engageArticleTitle__head" "css_element"

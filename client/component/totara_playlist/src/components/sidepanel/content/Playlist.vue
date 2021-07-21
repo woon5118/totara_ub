@@ -18,7 +18,10 @@
 
 <template>
   <div class="tui-playlistSidePanelContent">
-    <PlaylistSidePanel :playlist-id="playlistId" />
+    <PlaylistSidePanel
+      :playlist-id="playlistId"
+      :interactor="pageProps.interactor"
+    />
   </div>
 </template>
 

@@ -39,7 +39,7 @@
       </div>
     </template>
     <template v-slot:sidepanel>
-      <SurveySidePanel :resource-id="resourceId" />
+      <SurveySidePanel :resource-id="resourceId" :interactor="interactor" />
     </template>
   </Layout>
 </template>

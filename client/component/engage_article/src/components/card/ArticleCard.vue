@@ -53,7 +53,7 @@
 
     <CardHeader slot="header" class="tui-engageArticleCard__header">
       <BookmarkButton
-        v-show="!owned"
+        v-if="showBookmark"
         slot="first"
         size="300"
         :bookmarked="innerBookmarked"

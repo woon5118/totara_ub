@@ -80,7 +80,7 @@
 
         <div class="tui-playlistSidePanel__setting">
           <PlaylistStarRating
-            v-if="!isPrivate"
+            v-if="interactor.can_rate"
             :owned="playlist.owned"
             :count="playlist.rating.count"
             :rating="playlist.rating.rating"
@@ -94,7 +94,8 @@
             :instance-id="playlistId"
             :share-button-aria-label="shareButtonLabel"
             :shared-by-count="playlist.sharedbycount"
-            :show-like-button="false"
+            :show-like-button="interactor.can_react"
+            :show-share-button="interactor.can_share"
             component-name="totara_playlist"
             class="tui-playlistSidePanel__media"
             @access-update="updateAccess"
@@ -112,6 +113,7 @@
         :instance-id="playlist.id"
         :editor-context-id="playlist.contextid"
         class="tui-playlistSidePanel__commentBox"
+        :interactor="interactor"
       />
     </template>
     <template
@@ -170,6 +172,17 @@ export default {
     playlistId: {
       type: [Number, String],
       required: true,
+    },
+    interactor: {
+      type: Object,
+      default: () => ({
+        user_id: 0,
+        can_bookmark: false,
+        can_comment: false,
+        can_rate: false,
+        can_react: false,
+        can_share: false,
+      }),
     },
   },
 

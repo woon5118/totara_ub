@@ -39,7 +39,7 @@
       </template>
       <template v-slot:bookmark>
         <BookmarkButton
-          v-if="!playlist.owned"
+          v-if="pageProps.interactor.can_bookmark"
           :primary="false"
           :circle="true"
           :bookmarked="bookmarked"

@@ -84,7 +84,8 @@
         :shared-by-count="article.sharedbycount"
         :like-button-aria-label="likeButtonLabel"
         :liked="article.reacted"
-        :show-like-button="!isPrivateResource"
+        :show-like-button="interactor.can_react"
+        :show-share-button="interactor.can_share"
         component-name="engage_article"
         @access-update="updateAccess"
         @access-modal="openModalFromButtonLabel = true"
@@ -104,6 +105,7 @@
         editor-variant="engage_article-comment"
         :instance-id="resourceId"
         :editor-context-id="article.resource.context_id"
+        :interactor="interactor"
       />
     </template>
 
@@ -163,6 +165,16 @@ export default {
     resourceId: {
       type: [Number, String],
       required: true,
+    },
+    interactor: {
+      type: Object,
+      default: () => ({
+        user_id: 0,
+        can_bookmark: false,
+        can_comment: false,
+        can_react: false,
+        can_share: false,
+      }),
     },
   },
 

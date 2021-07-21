@@ -29,7 +29,7 @@
       @removed-like="$emit('update-like-status', false)"
     />
     <Share
-      v-if="accessValue === 'PUBLIC'"
+      v-if="showShareButton"
       :instance-id="instanceId"
       :component="componentName"
       :button-aria-label="shareButtonAriaLabel"
@@ -73,6 +73,10 @@ export default {
       default: '',
     },
     showLikeButton: {
+      type: Boolean,
+      default: true,
+    },
+    showShareButton: {
       type: Boolean,
       default: true,
     },

@@ -88,6 +88,9 @@ query totara_playlist_resources(
         tuicomponent
         props
       }
+      interactor {
+        can_bookmark
+      }
     }
   }
 }

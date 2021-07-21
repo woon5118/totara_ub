@@ -80,6 +80,9 @@ query container_workspace_shared_cards(
         props
       }
       url(source: $source)
+      interactor {
+        can_bookmark
+      }
     }
   }
 }

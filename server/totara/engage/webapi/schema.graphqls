@@ -103,6 +103,7 @@ type totara_engage_card {
     component: param_component
   ): [totara_engage_footnote!]
   url(source: String, search: param_text): String
+  interactor: totara_engage_resource_interactor!
 }
 
 type totara_engage_cards {
@@ -127,6 +128,17 @@ type totara_engage_advanced_features {
   library: Boolean!
   recommenders: Boolean!
   workspaces: Boolean!
+}
+
+"""
+Capabilities of the user interacting with the resource.
+"""
+type totara_engage_resource_interactor {
+  user_id: Int!
+  can_bookmark: Boolean!
+  can_comment: Boolean!
+  can_react: Boolean!
+  can_share: Boolean!
 }
 
 input totara_engage_filter {
@@ -213,6 +225,13 @@ extend type Query {
   have to react to.
   """
   totara_engage_advanced_features: totara_engage_advanced_features!
+
+  """
+  Get the capabilities of the user interacting with the resource.
+  """
+  totara_engage_interactor(
+    resource_id: core_id!
+  ): totara_engage_resource_interactor
 }
 
 extend type Mutation {

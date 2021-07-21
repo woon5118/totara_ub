@@ -22,6 +22,7 @@
  */
 
 use engage_survey\event\survey_viewed;
+use engage_survey\totara_engage\interactor\survey_interactor;
 use engage_survey\totara_engage\resource\survey;
 use totara_core\advanced_feature;
 use totara_engage\access\access_manager;
@@ -78,6 +79,7 @@ if (!$survey->is_available()) {
                 'resource-id' => $id,
                 'back-button' => $back_button,
                 'navigation-buttons' => $navigation_buttons,
+                'interactor' => survey_interactor::create_from_accessible($survey, $USER->id)->to_array(),
             ]
         );
 

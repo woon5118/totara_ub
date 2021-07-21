@@ -34,6 +34,7 @@
           :owned="article.owned"
           :bookmarked="bookmarked"
           :update-able="article.updateable"
+          :show-bookmark-button="interactor.can_bookmark"
           @bookmark="updateBookmark"
         />
         <ArticleContent
@@ -45,7 +46,7 @@
       </div>
     </template>
     <template v-slot:sidepanel>
-      <ArticleSidePanel :resource-id="resourceId" />
+      <ArticleSidePanel :resource-id="resourceId" :interactor="interactor" />
     </template>
   </Layout>
 </template>
@@ -87,6 +88,17 @@ export default {
     navigationButtons: {
       type: Object,
       required: false,
+    },
+
+    interactor: {
+      type: Object,
+      default: () => ({
+        user_id: 0,
+        can_bookmark: false,
+        can_comment: false,
+        can_react: false,
+        can_share: false,
+      }),
     },
   },
 

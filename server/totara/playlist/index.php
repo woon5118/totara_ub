@@ -26,6 +26,7 @@ use totara_playlist\playlist;
 use totara_playlist\event\playlist_viewed;
 use totara_engage\access\access_manager;
 use core\notification;
+use totara_playlist\totara_engage\interactor\playlist_interactor;
 use totara_playlist\totara_engage\link\nav_helper;
 use totara_tui\output\component;
 
@@ -66,6 +67,7 @@ if (!$playlist->is_available()) {
     $event->trigger();
 
     $back_button = nav_helper::build_back_button($playlist->get_userid(), $source);
+    $interactor = playlist_interactor::create_from_accessible($playlist);
 
     if ($library_view) {
         $tui = new component('totara_engage/pages/LibraryView', [
@@ -82,6 +84,7 @@ if (!$playlist->is_available()) {
             'page-props' => [
                 'playlistId' => $playlist->get_id(),
                 'back-button' => $back_button ?? null,
+                'interactor' => $interactor->to_array(),
             ],
         ]);
 
@@ -91,6 +94,7 @@ if (!$playlist->is_available()) {
             [
                 'playlist-id' => $playlist->get_id(),
                 'back-button' => $back_button ?? null,
+                'interactor' => $interactor->to_array(),
             ]
         );
     }

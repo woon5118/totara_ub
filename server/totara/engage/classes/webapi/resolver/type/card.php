@@ -94,6 +94,9 @@ final class card implements type_resolver {
                 $card_image = $source->get_card_image($args['preview_mode'] ?? null, $theme_config);
                 return $card_image ? $card_image->out(false) : null;
 
+            case 'interactor':
+                return $source->get_interactor();
+
             default:
                 $format = null;
                 if (isset($args['format'])) {

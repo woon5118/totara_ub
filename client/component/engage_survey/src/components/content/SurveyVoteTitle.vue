@@ -22,7 +22,7 @@
         {{ title }}
       </h3>
       <BookmarkButton
-        v-show="!owned"
+        v-show="showBookmarkButton"
         :primary="false"
         :circle="true"
         :bookmarked="bookmarked"
@@ -55,6 +55,11 @@ export default {
     owned: {
       type: Boolean,
       required: true,
+    },
+
+    showBookmarkButton: {
+      type: Boolean,
+      default: true,
     },
   },
 };

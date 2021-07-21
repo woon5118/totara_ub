@@ -71,6 +71,11 @@ final class comment_interactor {
      * @return bool
      */
     public function can_reply(): bool {
+        // Block guests from replying.
+        if (isguestuser($this->actor_id)) {
+            return false;
+        }
+
         if ($this->comment->is_soft_deleted()) {
             // Start checking the reason of deleted
             $reason = $this->comment->get_reason_deleted();
@@ -100,6 +105,11 @@ final class comment_interactor {
      * @return bool
      */
     public function can_react(): bool {
+        // Block guests from reacting.
+        if (isguestuser($this->actor_id)) {
+            return false;
+        }
+
         if ($this->comment->is_soft_deleted()) {
             // Start checking the reason of deleted.
             $reason = $this->comment->get_reason_deleted();
@@ -121,6 +131,11 @@ final class comment_interactor {
      * @return bool
      */
     public function can_delete(): bool {
+        // Block guests from deleting.
+        if (isguestuser($this->actor_id)) {
+            return false;
+        }
+
         if ($this->comment->is_soft_deleted()) {
             return false;
         }
@@ -139,6 +154,11 @@ final class comment_interactor {
      * @return bool
      */
     public function can_update(): bool {
+        // Block guests from updating.
+        if (isguestuser($this->actor_id)) {
+            return false;
+        }
+
         if ($this->comment->is_soft_deleted()) {
             return false;
         }

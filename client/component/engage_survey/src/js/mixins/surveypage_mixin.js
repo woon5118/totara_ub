@@ -34,6 +34,17 @@ export default {
       type: Object,
       required: false,
     },
+
+    interactor: {
+      type: Object,
+      default: () => ({
+        user_id: 0,
+        can_bookmark: false,
+        can_comment: false,
+        can_react: false,
+        can_share: false,
+      }),
+    },
   },
 
   apollo: {

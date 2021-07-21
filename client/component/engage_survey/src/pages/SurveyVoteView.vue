@@ -32,6 +32,7 @@
             :title="firstQuestion.value"
             :bookmarked="bookmarked"
             :owned="survey.owned"
+            :show-bookmark-button="interactor.can_bookmark"
             class="tui-engageSurveyVoteView__title"
             @bookmark="updateBookmark"
           />
@@ -42,6 +43,7 @@
             :question-id="firstQuestion.id"
             :resource-id="resourceId"
             :label="firstQuestion.value"
+            :disabled="!interactor.can_react"
           />
           <SurveyResultContent v-else :resource-id="resourceId" />
         </div>
@@ -49,7 +51,7 @@
     </template>
 
     <template v-slot:sidepanel>
-      <SurveySidePanel :resource-id="resourceId" />
+      <SurveySidePanel :resource-id="resourceId" :interactor="interactor" />
     </template>
   </Layout>
 </template>

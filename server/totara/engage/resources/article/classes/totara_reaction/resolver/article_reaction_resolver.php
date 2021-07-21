@@ -22,6 +22,7 @@
  */
 namespace engage_article\totara_reaction\resolver;
 
+use engage_article\totara_engage\interactor\article_interactor;
 use engage_article\totara_engage\resource\article;
 use totara_engage\access\access_manager;
 use totara_reaction\resolver\base_resolver;
@@ -47,7 +48,9 @@ final class article_reaction_resolver extends base_resolver {
 
         $article = article::from_resource_id($resourceid);
 
-        if ($article->is_private()) {
+        // Confirm that the interactor can like this resource.
+        $interactor = article_interactor::create_from_accessible($article, $userid);
+        if (!$interactor->can_react()) {
             return false;
         }
 

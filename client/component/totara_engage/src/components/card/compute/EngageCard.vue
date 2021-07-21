@@ -116,6 +116,9 @@ export default {
         footnotes: card.footnotes,
 
         labelId: this.labelId,
+
+        showBookmark:
+          'interactor' in card ? card.interactor.can_bookmark : false,
       };
     },
 

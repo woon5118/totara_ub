@@ -79,6 +79,9 @@ query totara_engage_contribution_cards(
         props
       }
       url(source: $source, search: $search)
+      interactor {
+        can_bookmark
+      }
     }
   }
 }

@@ -36,7 +36,7 @@
             </h3>
           </section>
           <BookmarkButton
-            v-show="!owned && !editAble"
+            v-if="showBookmark && !editAble"
             size="300"
             :bookmarked="innerBookMarked"
             :primary="false"

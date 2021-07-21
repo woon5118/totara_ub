@@ -75,6 +75,9 @@ query container_workspace_contribution_cards(
         tuicomponent
         props
       }
+      interactor {
+        can_bookmark
+      }
     }
   }
 }

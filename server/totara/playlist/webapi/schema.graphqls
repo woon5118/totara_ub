@@ -34,6 +34,18 @@ type totara_playlist_cursor {
   next: String
 }
 
+"""
+Capabilities of the user interacting with the playlist.
+"""
+type totara_playlist_playlist_interactor {
+  user_id: Int!
+  can_bookmark: Boolean!
+  can_comment: Boolean!
+  can_rate: Boolean!
+  can_react: Boolean!
+  can_share: Boolean!
+}
+
 extend type Query {
   """
   Fetching a single playlist, based on its id.
@@ -114,6 +126,13 @@ extend type Query {
     footnotes: totara_engage_footnotes
     cursor: String
   ): totara_engage_cards!
+
+  """
+  Get the capabilities of the user interacting with the playlist.
+  """
+  totara_playlist_interactor(
+    playlist_id: core_id!
+  ): totara_playlist_playlist_interactor
 }
 
 extend type Mutation {

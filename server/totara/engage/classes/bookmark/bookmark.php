@@ -27,6 +27,7 @@ use totara_engage\access\access_manager;
 use totara_engage\entity\engage_bookmark;
 use totara_engage\event\bookmark_added;
 use totara_engage\event\bookmark_removed;
+use totara_engage\interactor\interactor_factory;
 use totara_engage\repository\bookmark_repository;
 
 class bookmark {
@@ -53,7 +54,7 @@ class bookmark {
     }
 
     /**
-     * @param int $user_id
+     * @param int|null $user_id
      * @return bool
      */
     public function can_bookmark(?int $user_id = null): bool {
@@ -63,8 +64,10 @@ class bookmark {
         }
 
         $resource = provider::create($this->component)->get_item_instance($this->itemid);
-        // Owner can not bookmark own resource.
-        if ($user_id === $resource->get_userid() || $resource->is_private()) {
+
+        // Check if interactor can bookmark this resource.
+        $interactor = interactor_factory::create_from_accessible($resource, $user_id);
+        if (!$interactor->can_bookmark()) {
             return false;
         }
 

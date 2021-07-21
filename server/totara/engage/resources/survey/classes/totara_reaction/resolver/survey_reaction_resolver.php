@@ -23,6 +23,7 @@
 
 namespace engage_survey\totara_reaction\resolver;
 
+use engage_survey\totara_engage\interactor\survey_interactor;
 use engage_survey\totara_engage\resource\survey;
 use totara_engage\access\access_manager;
 use totara_reaction\resolver\base_resolver;
@@ -47,9 +48,12 @@ final class survey_reaction_resolver extends base_resolver {
 
         $survey = survey::from_resource_id($resourceid);
 
-        if ($survey->is_private()) {
+        // Confirm that the interactor can like this resource.
+        $interactor = survey_interactor::create_from_accessible($survey, $userid);
+        if (!$interactor->can_react()) {
             return false;
         }
+
         return access_manager::can_access($survey, $userid);
     }
 

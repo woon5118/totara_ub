@@ -67,7 +67,7 @@
 
     <CardHeader slot="header" class="tui-playlistCard__header">
       <BookmarkButton
-        v-show="!owned"
+        v-if="showBookmark"
         slot="first"
         size="300"
         :bookmarked="innerBookmarked"

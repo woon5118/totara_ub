@@ -84,7 +84,8 @@
             :shared-by-count="survey.sharedbycount"
             :like-button-aria-label="likeButtonLabel"
             :liked="survey.reacted"
-            :show-like-button="!isPrivateResource"
+            :show-like-button="interactor.can_react"
+            :show-share-button="interactor.can_share"
             component-name="engage_survey"
             @access-update="updateAccess"
             @access-modal="openModalFromButtonLabel = true"
@@ -131,6 +132,16 @@ export default {
     resourceId: {
       type: [Number, String],
       required: true,
+    },
+    interactor: {
+      type: Object,
+      default: () => ({
+        user_id: 0,
+        can_bookmark: false,
+        can_comment: false,
+        can_react: false,
+        can_share: false,
+      }),
     },
   },
 
@@ -322,6 +333,9 @@ export default {
 </script>
 <lang-strings>
   {
+    "core": [
+      "delete"
+    ],
     "engage_survey": [
       "deletewarningtitle",
       "deletewarningmsg",

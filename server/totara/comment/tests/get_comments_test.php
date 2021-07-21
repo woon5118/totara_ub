@@ -69,12 +69,9 @@ class totara_comment_get_comments_testcase extends advanced_testcase {
         $cursor = new cursor();
         $cursor->set_limit(comment::ITEMS_PER_PAGE);
 
+        // Comments on page 1.
         $comments = comment_loader::get_paginator(42, 'totara_comment', 'xx_xx', $cursor)->get_items()->all();
         $this->assertCount(comment::ITEMS_PER_PAGE, $comments);
-
-        $cursor->set_page(2);
-        $comments = comment_loader::get_paginator(42, 'totara_comment', 'xx_xx', $cursor);
-        $this->assertCount(($total - comment::ITEMS_PER_PAGE), $comments);
 
         /** @var comment $comment */
         foreach ($comments as $comment) {
@@ -82,6 +79,11 @@ class totara_comment_get_comments_testcase extends advanced_testcase {
             $this->assertEquals('xx_xx', $comment->get_area());
             $this->assertEquals(42, $comment->get_instanceid());
         }
+
+        // Comments on page 2.
+        $cursor->set_page(2);
+        $comments = comment_loader::get_paginator(42, 'totara_comment', 'xx_xx', $cursor)->get_items()->all();
+        $this->assertCount(($total - comment::ITEMS_PER_PAGE), $comments);
     }
 
     /**
@@ -123,6 +125,11 @@ class totara_comment_get_comments_testcase extends advanced_testcase {
             }
         );
 
+        // Log in as different user to the one who commented.
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user();
+        $this->setUser($user);
+
         $variables = [
             'instanceid' => 42,
             'component' => 'totara_comment',
@@ -145,6 +152,46 @@ class totara_comment_get_comments_testcase extends advanced_testcase {
             $this->assertArrayHasKey('user', $comment);
             $this->assertArrayHasKey('content', $comment);
             $this->assertArrayHasKey('timedescription', $comment);
+
+            // Validate interactor.
+            $this->assertArrayHasKey('interactor', $comment);
+            $interactor = $comment['interactor'];
+            $this->assertTrue($interactor['can_delete']);
+            $this->assertTrue($interactor['can_report']);
+            $this->assertTrue($interactor['can_update']);
+            $this->assertTrue($interactor['can_reply']);
+            $this->assertTrue($interactor['can_react']);
+        }
+
+        // Log in as guest.
+        $this->setGuestUser();
+        $this->grant_guest_library_view_permission();
+
+        $ec = execution_context::create('ajax', 'totara_comment_get_comments');
+        $result = graphql::execute_operation($ec, $variables);
+
+        $this->assertEmpty($result->errors);
+        $this->assertNotEmpty($result->data);
+
+        $this->assertArrayHasKey('comments', $result->data);
+
+        $comments = $result->data['comments'];
+        $this->assertCount(comment::ITEMS_PER_PAGE, $comments);
+
+        foreach ($comments as $comment) {
+            $this->assertArrayHasKey('id', $comment);
+            $this->assertArrayHasKey('user', $comment);
+            $this->assertArrayHasKey('content', $comment);
+            $this->assertArrayHasKey('timedescription', $comment);
+
+            // Validate interactor.
+            $this->assertArrayHasKey('interactor', $comment);
+            $interactor = $comment['interactor'];
+            $this->assertFalse($interactor['can_delete']);
+            $this->assertTrue($interactor['can_report']);
+            $this->assertFalse($interactor['can_update']);
+            $this->assertFalse($interactor['can_reply']);
+            $this->assertFalse($interactor['can_react']);
         }
     }
 
@@ -250,5 +297,15 @@ class totara_comment_get_comments_testcase extends advanced_testcase {
         $this->assertNotNull($exception);
         $this->assertInstanceOf(comment_exception::class, $exception);
         $this->assertStringContainsString('Comment access denied', $exception->getMessage());
+    }
+
+    /**
+     * Allow guest to view engage library.
+     */
+    private function grant_guest_library_view_permission(): void {
+        global $DB;
+        $guest_role = $DB->get_record('role', array('shortname' => 'guest'));
+        $context = context_user::instance(guest_user()->id);
+        assign_capability('totara/engage:viewlibrary', CAP_ALLOW, $guest_role->id, $context);
     }
 }

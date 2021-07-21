@@ -135,6 +135,11 @@ export default {
       type: String,
       default: '',
     },
+
+    showBookmark: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   methods: {

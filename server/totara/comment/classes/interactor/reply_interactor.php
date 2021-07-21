@@ -66,6 +66,11 @@ final class reply_interactor {
      * @return bool
      */
     public function can_delete(): bool {
+        // Block guests from deleting.
+        if (isguestuser($this->actor_id)) {
+            return false;
+        }
+
         if ($this->reply->is_soft_deleted()) {
             return false;
         }
@@ -84,6 +89,11 @@ final class reply_interactor {
      * @return bool
      */
     public function can_update(): bool {
+        // Block guests from updating.
+        if (isguestuser($this->actor_id)) {
+            return false;
+        }
+
         if ($this->reply->is_soft_deleted()) {
             return false;
         }
@@ -119,6 +129,11 @@ final class reply_interactor {
      * @return bool
      */
     public function can_react(): bool {
+        // Block guests from reacting.
+        if (isguestuser($this->actor_id)) {
+            return false;
+        }
+
         if ($this->reply->is_soft_deleted()) {
             $reason = $this->reply->get_reason_deleted();
             if (null !== $reason && comment::REASON_DELETED_REPORTED == $reason) {
@@ -146,6 +161,11 @@ final class reply_interactor {
      * @return bool
      */
     public function can_follow_reply(): bool {
+        // Block guests from replying.
+        if (isguestuser($this->actor_id)) {
+            return false;
+        }
+
         if ($this->reply->is_soft_deleted()) {
             $reason = $this->reply->get_reason_deleted();
 

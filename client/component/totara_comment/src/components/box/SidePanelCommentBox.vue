@@ -33,6 +33,7 @@
         variant: editorVariant,
         contextId: editorContextId,
       }"
+      :comment-able="interactor.can_comment"
       class="tui-sidePanelCommentBox__box"
       @update-total-comments="totalComments = $event"
       @update-submitting="submitting = $event"
@@ -75,6 +76,17 @@ export default {
     },
 
     editorContextId: [String, Number],
+
+    interactor: {
+      type: Object,
+      default: () => ({
+        user_id: 0,
+        can_bookmark: false,
+        can_comment: false,
+        can_react: false,
+        can_share: false,
+      }),
+    },
   },
 
   data() {

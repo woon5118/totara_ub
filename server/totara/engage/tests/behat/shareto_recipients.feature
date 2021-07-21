@@ -1,4 +1,4 @@
-@totara @engage @totara_engage
+@totara @engage @totara_engage @javascript
 Feature: Share items to recipients
   Background:
     Given I am on a totara site
@@ -18,8 +18,8 @@ Feature: Share items to recipients
     And the following "articles" exist in "engage_article" plugin:
       | name           | username | content       | access     | topics |
       | Test Article 1 | user1    | Test Filters  | RESTRICTED | Topic1 |
+      | Test Article 2 | user1    | Test Filters  | PUBLIC     | Topic1 |
 
-  @javascript
   Scenario: View list of recipients from people picker
     Given I log in as "admin"
     And I click on "Your Library" in the totara menu
@@ -30,3 +30,21 @@ Feature: Share items to recipients
     And I click on "Expand Tag list" "button" in the ".tui-engageSharedRecipientsSelector" "css_element"
     Then I should see "User three"
     And  I should see "User two"
+
+  Scenario: Authenticated user should be able to share
+    Given I log in as "user2"
+    When I view article "Test Article 2"
+    Then ".tui-shareSetting" "css_element" should exist in the ".tui-mediaSetting" "css_element"
+
+  Scenario: Guest should not be able to share
+    Given I log in as "admin"
+    And the following "permission overrides" exist:
+      | capability                | permission | role  | contextlevel | reference |
+      | totara/engage:viewlibrary | Allow      | guest | User         | guest     |
+    And I set the following administration settings values:
+      | Guest login button | Show |
+    When I log out
+    And I am on homepage
+    And I click on "#guestlogin input[type=submit]" "css_element"
+    And I view article "Test Article 2"
+    Then ".tui-shareSetting" "css_element" should not exist in the ".tui-mediaSetting" "css_element"

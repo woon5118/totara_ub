@@ -56,6 +56,7 @@ describe('engage_survey/components/card/SurveyCard.vue', function() {
           questions: [{ id: 15, value: 1, answertype: 1, options: [10] }],
         }),
         labelId: 'survey-1',
+        showBookmark: true,
       },
     });
   });

@@ -40,7 +40,7 @@
         </template>
         <template v-slot:bookmark>
           <BookmarkButton
-            v-if="!playlist.owned"
+            v-if="interactor.can_bookmark"
             :primary="false"
             :circle="true"
             :bookmarked="bookmarked"
@@ -101,6 +101,7 @@
     <template v-slot:sidepanel>
       <PlaylistSidePanel
         :playlist-id="playlistId"
+        :interactor="interactor"
         @playlist-updated="refetchCards"
       />
     </template>
@@ -144,6 +145,18 @@ export default {
     backButton: {
       type: Object,
       required: false,
+    },
+
+    interactor: {
+      type: Object,
+      default: () => ({
+        user_id: 0,
+        can_bookmark: false,
+        can_comment: false,
+        can_rate: false,
+        can_react: false,
+        can_share: false,
+      }),
     },
   },
 

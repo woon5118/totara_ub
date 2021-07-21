@@ -53,6 +53,7 @@ describe('totara_playlist/components/card/PlaylistCard.vue', () => {
           actions: false,
           images: [],
         }),
+        showBookmark: true,
       },
     });
   });

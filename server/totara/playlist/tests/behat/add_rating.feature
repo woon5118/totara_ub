@@ -40,3 +40,16 @@ Feature: Rate the playliat
     And I rate the playlist 4
     And I click on "Done" "button"
     And I log out
+
+  Scenario: Guest should not be able to rate a playlist
+    Given I log in as "admin"
+    And the following "permission overrides" exist:
+      | capability                | permission | role  | contextlevel | reference |
+      | totara/engage:viewlibrary | Allow      | guest | User         | guest     |
+    And I set the following administration settings values:
+      | Guest login button | Show |
+    When I log out
+    And I am on homepage
+    And I click on "#guestlogin input[type=submit]" "css_element"
+    And I view playlist "Test Playlist 1"
+    Then "Add your rating" "button" should not exist

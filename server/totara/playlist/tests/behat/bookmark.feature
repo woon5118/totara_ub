@@ -33,6 +33,19 @@ Feature: Bookmark playlist
     And I click on "Your Library" in the totara menu
     Then I should see "Test Playlist 2" in the ".tui-playlistNavigation" "css_element"
 
+  Scenario: Guest should not be able to bookmark
+    Given I log in as "admin"
+    And the following "permission overrides" exist:
+      | capability                | permission | role  | contextlevel | reference |
+      | totara/engage:viewlibrary | Allow      | guest | User         | guest     |
+    And I set the following administration settings values:
+      | Guest login button | Show |
+    When I log out
+    And I am on homepage
+    And I click on "#guestlogin input[type=submit]" "css_element"
+    And I view playlist "Test Playlist 2"
+    Then "Bookmark" "button" should not exist in the ".tui-contributionBaseContent__header" "css_element"
+
   Scenario: Test bookmarking a shared playlist
     And I log in as "admin"
     And I click on "Your Library" in the totara menu

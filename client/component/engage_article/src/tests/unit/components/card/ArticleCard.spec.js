@@ -55,6 +55,7 @@ describe('engage_article/components/card/ArticleCard.vue', () => {
         timeCreated: 'Monday 18th, September, 2019',
         rating: 0,
         labelId: 'article-1',
+        showBookmark: true,
       },
     });
   });

@@ -20,6 +20,8 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package engage_article
  */
+
+use engage_article\totara_engage\interactor\article_interactor;
 use engage_article\totara_engage\resource\article;
 use engage_article\event\article_viewed;
 use totara_playlist\totara_engage\link\nav_helper;
@@ -69,6 +71,7 @@ if (!$resource->is_available()) {
             'title' => $resource->get_name(),
             'back-button' => $back_button,
             'navigation-buttons' => $navigation_buttons,
+            'interactor' => article_interactor::create_from_accessible($resource, $USER->id)->to_array(),
         ]
     );
 
