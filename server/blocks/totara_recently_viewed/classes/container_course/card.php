@@ -93,8 +93,7 @@ class card implements base_card {
      * @return moodle_url|null
      */
     public function get_image(bool $tile_view, theme_config $theme_config): ?\moodle_url {
-        $course_image = new course_image($theme_config);
-        return $course_image->get_current_or_default_url();
+        return course_get_image($this->course->get_id());
     }
 
     /**
