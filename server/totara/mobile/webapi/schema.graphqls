@@ -21,6 +21,15 @@ type totara_mobile_system {
   Determines whether the user has permissions to view their own profile or not
   """
   view_own_profile: Boolean!
+  mobile_subplugins: [totara_mobile_subplugin]!
+}
+
+"""
+Some basic information on mobile subplugins
+"""
+type totara_mobile_subplugin {
+  name: String
+  version: String
 }
 
 """

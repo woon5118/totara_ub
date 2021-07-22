@@ -177,6 +177,16 @@ class totara_mobile_webapi_resolver_query_me_testcase extends advanced_testcase 
             $this->assertEquals($system['request_user_consent'], false);
             $this->assertEquals($system['request_user_fields'], false);
             $this->assertEquals($system['password_change_required'], false);
+
+            $value = $system['mobile_subplugins'];
+            $this->assertNotEmpty($value);
+
+            $manager = \core_plugin_manager::instance();
+            $plugins = $manager->get_installed_plugins('mobile');
+            foreach ($value as $plugin) {
+                $name = $plugin['name'];
+                $this->assertSame($plugins[$name], $plugin['version']);
+            }
         } catch (\moodle_exception $ex) {
             $this->fail($ex->getMessage());
         }
@@ -216,6 +226,16 @@ class totara_mobile_webapi_resolver_query_me_testcase extends advanced_testcase 
             $this->assertEquals($system['request_user_fields'], false);
             $this->assertEquals($system['password_change_required'], false);
             $this->assertEquals($system['view_own_profile'], true);
+
+            $value = $system['mobile_subplugins'];
+            $this->assertNotEmpty($value);
+
+            $manager = \core_plugin_manager::instance();
+            $plugins = $manager->get_installed_plugins('mobile');
+            foreach ($value as $plugin) {
+                $name = $plugin['pluginname'];
+                $this->assertSame($plugins[$name], $plugin['version']);
+            }
         } catch (\moodle_exception $ex) {
             $this->fail($ex->getMessage());
         }

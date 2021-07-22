@@ -18,6 +18,11 @@ query totara_mobile_me {
       request_user_fields
       password_change_required
       view_own_profile
+      mobile_subplugins {
+        pluginname: name
+        version
+        __typename
+      }
       __typename
     }
     __typename

@@ -68,6 +68,14 @@ class me implements \core\webapi\query_resolver {
             }
         }
 
+        $plugininfo = [];
+        $manager = \core_plugin_manager::instance();
+        foreach ($manager->get_installed_plugins('mobile') as $plugin => $version) {
+            // Eventually we should check if these are enabled and either return that info or remove the item.
+            // but for now we just need a list of plugins and their version.
+            $plugininfo[] = ['name' => $plugin, 'version' => $version];
+        }
+
         $controller = access_controller::for($USER, null);
         $system = [
             'wwwroot' => $CFG->wwwroot . '/',
@@ -78,6 +86,7 @@ class me implements \core\webapi\query_resolver {
             'request_user_fields' => $userfieldsmissing,
             'password_change_required' => $requirepasswordchange,
             'view_own_profile' => $controller->can_view_profile(),
+            'mobile_subplugins' => $plugininfo,
         ];
 
         return ['user' => $user, 'system' => $system];
