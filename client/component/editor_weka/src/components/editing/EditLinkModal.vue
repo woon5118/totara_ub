@@ -156,6 +156,9 @@ export default {
       }
       this.loading = true;
       const attrs = this.formValue;
+
+      attrs.url = this.fixUrl(attrs.url);
+
       Promise.resolve(this.save(attrs))
         .then(this.close)
         .catch(e => {
@@ -166,6 +169,29 @@ export default {
 
     updateText(text) {
       this.text = text;
+    },
+
+    /**
+     * Try to ensure uris like "wwww.examnple.com" are converted to a well formed url (http://www.example.com),
+     * while preserving links that are most likely purposefully relative (/mod/perform/activity/index.php).
+     *
+     * @param uri {string}
+     */
+    fixUrl(uri) {
+      const purposefulStarts = ['/', '#', 'http://', 'https://'];
+
+      const uriHasPurposefulStart = purposefulStarts.some(purposefulStart =>
+        uri.startsWith(purposefulStart)
+      );
+
+      if (!uriHasPurposefulStart) {
+        // We are using http rather than https because most sites are configured
+        // to automatically upgrade to https if it is available,
+        // however the reverse is not true (https -> http).
+        return `http://${uri}`;
+      }
+
+      return uri;
     },
   },
 };
