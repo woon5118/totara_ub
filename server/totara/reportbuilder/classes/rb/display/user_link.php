@@ -68,7 +68,7 @@ class user_link extends base {
 
         $userid = $extrafields->id;
         if ($isexport || $userid == 0) {
-            return $fullname;
+            return \core_text::entities_to_utf8($fullname);
         }
 
         if (isset($extrafields->deleted)) {

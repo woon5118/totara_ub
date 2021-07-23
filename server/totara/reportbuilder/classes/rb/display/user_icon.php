@@ -67,7 +67,7 @@ class user_icon extends base {
 
         $userid = $extrafields->id;
         if ($isexport || $userid == 0) {
-            return fullname($extrafields);
+            return \core_text::entities_to_utf8(fullname($extrafields));
         }
 
         if (CLI_SCRIPT && !PHPUNIT_TEST) {

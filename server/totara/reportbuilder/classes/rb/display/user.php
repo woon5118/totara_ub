@@ -45,6 +45,13 @@ class user extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         // Extra fields expected are fields from totara_get_all_user_name_fields_join() and totara_get_all_user_name_fields_join()
         $extrafields = self::get_extrafields_row($row, $column);
+
+        $isexport = ($format !== 'html');
+
+        if ($isexport) {
+            return \core_text::entities_to_utf8(fullname($extrafields));
+        }
+
         return fullname($extrafields);
     }
 
