@@ -310,7 +310,7 @@ class type extends external_api {
      */
     public static function get_import_fields_returns(): ?external_description {
         return new \external_multiple_structure(
-            new \external_value(PARAM_TEXT, 'Import field name'),
+            new \external_value(PARAM_TEXT, 'Import field name')
         );
     }
 

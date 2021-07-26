@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 
 use tool_usertours\tour;
 
