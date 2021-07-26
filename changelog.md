@@ -1,3 +1,231 @@
+Release 13.10 (29th July 2021):
+===============================
+
+
+Important:
+
+    TL-31725       Added capabilities to roles based on the staff manager archetype
+
+                   As part of the multitenancy solution introduced In Totara 13.0 we've made
+                   changes to the staff manager role adding missing capabilities. These
+                   capabilities are automatically given during upgrade to Totara 13.0. This
+                   may have GDPR, or other privacy-related implications for the site. After
+                   upgrading to Totara 13 or higher it makes sense to review your roles and
+                   permissions and potentially your site policies to ensure they align with
+                   your current system behaviour.
+
+                   What are these changes
+                    --------------------------
+                    During upgrade the following capabilities are automatically set to
+                   "Allowed" for Staff Managers and any other custom role based on the
+                   staffmanager archetype.
+                    * moodle/user:viewalldetails
+                    * moodle/user:viewhiddendetails
+                    * moodle/site:viewfullnames
+                    * moodle/site:viewuseridentity
+
+                   What this means in practice
+                    -----------------------------
+                    This means that users with the staff manager role (typically users with
+                   direct reports assigned) will be able to see additional information about
+                   the users in the context this role is applied (typically their direct
+                   reports). This information might include
+                    * email (regardless of email visibility set by the user)
+                    * username
+                    * full name
+
+                   Why these changes were made
+                    --------------------------------
+                    These changes were made to ensure consistent visibility of user
+                   information as part of the multitenancy implementation.
+
+                   What should I do about it
+                    --------------------------
+                    When upgrading Totara to version 13 or later, we recommend you to do a
+                   review of your roles and permissions, especially the ones related to the
+                   capabilities listed above. Also, consider updating the site policies to
+                   ensure they align with the system behaviour to avoid any potential GDPR
+                   breach.
+
+Performance improvements:
+
+    TL-30652       Improved the performance of course completion aggregations for the completion_regular_task
+
+                   On large sites, especially those containing courses with multiple
+                   activities, enrolling large numbers of users to these courses can result in
+                   the catch-all task 'core\task\completion_regular_task' taking a very long
+                   time to complete.
+
+                   The purpose of this task is to ensure that all completion information for
+                   all users enrolled in courses is correct and up to date. When users are
+                   enrolled in bulk, or changes are made to courses with a large number of
+                   enrolled users, the task may need to check and process thousands of
+                   completion records.
+
+                   To improve performance and ensure that the task completes in a reasonable
+                   time, this patch not only streamlines the underlying check and processing
+                   steps, but also introduces the processing of completion records in batches.
+                   Only a single batch of completion records that needs to be re-checked and
+                   re-aggregated is processed in a single cron run. The following batch will
+                   be processed during the next cron run, etc.
+
+                   The patch also includes more detailed information on progress.
+
+    TL-31156       Improved performance of displaying seminars with many events
+
+                   Prior to this patch, the performance of the page showing all upcoming and
+                   past events for one seminar did not scale well with increasing number of
+                   events when the enrolment plugin 'Seminar direct enrolment' was activated.
+                   With this patch the performance of this page is significantly improved.
+
+    TL-31210       Improved performance of the \totara_program\task\recurrence_history_task scheduled task
+
+Improvements:
+
+    TL-30285       Allow the uploading of custom evidence data while uploading course or certification completion records
+
+                   It is now possible to include custom field data when importing course and
+                   certification completion evidence records.
+
+                   The format for specifying custom field data is similar to what was used in
+                   earlier versions of Totara. The only difference being that fields available
+                   for import are no longer the same for all evidence types; these are now
+                   determined by the fields defined for the evidence type selected when
+                   starting the upload process.
+
+                   Only evidence types marked as 'Available for completion import' can be used
+                   during the import process.
+
+    TL-31276       Updated URL to Product documentation and improved wording of Help tab in the Microsoft Teams application
+    TL-31368       Added a script to bulk set the 'Assignment creation availability' of competencies
+
+                   Before Totara 13, users were assigned to competencies through learning
+                   plans. Totara 13 introduced competency assignment without the need to
+                   create learning plans. To make this even more configurable, administrators
+                   can now indicate which competencies are assignable and who can assign users
+                   to them. This is done through the 'Assignment creation availability'
+                   attribute of a competency. It can be set to allow users to assign
+                   themselves, assign other users, both or none.
+
+                   Without this script the only way to change the 'Assignment creation
+                   availability' of multiple competencies is to open each competency and
+                   manually change the attribute as needed.
+
+                   The provided script, located in
+                   dev/perform/set_competency_assign_availability, allows administrators to
+                   perform bulk updates of the 'Assignment creation availability' of multiple
+                   competencies. Help on how to run this script can be obtained by calling it
+                   with '--help'.
+
+    TL-31402       Increased the maximum length of course category names to 1333 characters
+    TL-31713       Updated the welcome message that is sent when adding the Totara app to Microsoft Teams for the first time
+
+Bug fixes:
+
+    TL-30068       Fixed popover being cut off from its nearest container's boundaries
+
+                   The display of popovers has, in some situations, been delegated to the root
+                   DOM node to facilitate reliable z-index display, which was suffering from
+                   stacking context conflicts. There are now two modes; 'contained' which
+                   respects a parent container, and 'uncontained' which respects the root DOM
+                   node.
+
+    TL-30290       Changed visibility checks for competencies linked courses within a plan
+
+                   Now the visibility checks for competencies linked courses are being made
+                   based on the person who linked the competency to the plan instead of the
+                   plan's owner. This way we have a consistent behaviour when adding courses
+                   to a user's learning plan.
+
+    TL-30394       Fixed auto-subscribe behaviour for forums that are added to the front page
+
+                   There was an issue where the forum 'Auto subscribe' option would not work
+                   correctly for forums added to the site front page. All newly created users
+                   are now automatically subscribed to front page forums (if the forum setting
+                   is enabled).
+
+    TL-30413       Tui Grid component now handles zero unit GridItems correctly
+
+                   Before this change, GridItems with zero units risked still having gutters
+                   and affecting overall Grid size. Originally we thought zero units shouldn't
+                   be supported, but we've found a couple of use cases now, and so this is now
+                   correctly supported - no console errors are generated by Vue prop
+                   validation failure.
+
+    TL-30421       Role descriptions are now consistently formatted across the site
+    TL-30662       Fixed incorrect site policy check in notifications and messages popover
+    TL-30734       Fixed JSON validation for json editor throwing unnecessary debugging message
+    TL-30908       Fixed an error message appearing when a user accessed a non-joined workspace with a tour enabled
+    TL-31098       Fixed managers being able to do administrative approval in seminars
+
+                   Fixed bug where managers could solely approve seminar signups that required
+                   administrative approval by approving the request twice (for example, first
+                   time via seminar approval form and second time via accepting the task in a
+                   task block).
+
+    TL-31106       Fixed Evidence columns being shown in Learning Plans when Evidence is disabled
+
+                   The learning plan reports no longer include an evidence column by default
+                   if evidence has been disabled for the site.
+
+    TL-31208       Fixed course search functionality to be tenant aware
+    TL-31239       Audio controls are now shown on links to external audio files
+    TL-31241       Fixed reporting of Throwable errors in scheduled tasks
+    TL-31281       Ensured all custom fields are visible in the custom settings of the user profile block
+
+                   Prior to this, if a custom field was empty, it would not be displayed in
+                   the custom settings for the block. This prevented administrators from
+                   including or excluding the field for display.
+
+    TL-31311       Fixed 'Assign competencies' button in competency profile to display only when the user has the necessary capability
+    TL-31312       Fixed hidden categories visible in grid catalogue filter
+    TL-31325       Fixed the rendering of the course self enrolment form when an associated audience is deleted
+
+                   Prior to this fix, an error would occur when an administrator attempts to
+                   view a course's self enrolment configuration form, when the dropdown
+                   setting "Only audience members" had been set to an audience that had been
+                   deleted.
+
+                   With this fix, an administrator can now view the course's self enrolment
+                   configuration form, despite the setting "Only audience members" still using
+                   the deleted audience.
+
+    TL-31365       Fixed bug causing unsharing a resource from a workspace to fail
+    TL-31399       Improved reliability of SCORM packages saving progress with large amounts of data
+    TL-31414       Ensured only tenant users are displayed in user select search
+    TL-31426       Fixed issue with sending scheduled reports if dataroot folder is a symlink
+
+                   If the dataroot folder specified in the config.php is a symlink to another
+                   folder located elsewhere the attachment path wouldn't be resolved
+                   correctly.
+
+    TL-31429       Fixed error when connecting Microsoft account to Microsoft Teams virtual meetings plugin when using nginx
+    TL-31431       Switched the incorrect display of the 'locked' and 'unlocked' icons when protecting a block
+    TL-31433       Changed the json_editor audio node to allow an empty transcript attribute
+    TL-31462       Fixed Weka editor converting external link to internal one when displayed as a card
+    TL-31473       Patched YUI3.17.2 to prevent IE11 JS error in un-polyfilled iframe context
+
+                   A previous patch introduced an ES6 feature which would normally be
+                   available for IE11, however the YUI3 library dynamically creates an iframe
+                   to facilitate file uploading (within Repositories for example) and that
+                   iframe never receives polyfill dependencies. This fix uses the iframe's
+                   parent scope which does have polyfill dependencies.
+
+    TL-31550       Reduced the length of table prefix used in MySQL/MariaDB testing to avoid hitting table name limits
+    TL-31561       Fixed temporary managers not being unassigned when a job assignment is deleted if a manager is also assigned
+    TL-31624       The course administration dock has been hidden when viewing a course in Microsoft Teams
+
+API changes:
+
+    TL-28526       Added GraphQL mutations to mark courses, programs, certifications as viewed
+    TL-31645       Added behat steps to check toolbar options in Weka Editor
+    TL-31661       \page_requirements_manager::js_call_amd() can now be called without specifying the 'function' parameter
+
+Contributions:
+
+    *  John Phoon - Kineo Pacific - TL-31414
+
+
 Release 13.9 (28th June 2021):
 ==============================
 
