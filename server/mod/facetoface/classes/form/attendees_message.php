@@ -173,7 +173,9 @@ class attendees_message extends \moodleform {
         $emailerrors = 0;
         foreach ($recipients as $recipient) {
             $body = $data->body['text'];
-            $bodyplain = html_to_text($body);
+            $format = $data->body['format'];
+            $bodyplain = content_to_text($body, $format);
+            $body = format_text($body, $format);
 
             if (email_to_user($recipient, $facetofaceuser, $data->subject, $bodyplain, $body) === true) {
                 $emailcount += 1;
@@ -194,9 +196,14 @@ class attendees_message extends \moodleform {
                     $managers = \totara_job\job_assignment::get_all_manager_userids($recipient->id);
                 }
                 if (!empty($managers)) {
-                    // Append to message.
-                    $body = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".$data->body['text'];
-                    $bodyplain = html_to_text($body);
+                    if ($format == FORMAT_JSON_EDITOR) {
+                        $bodyplain = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".content_to_text($body, $format);
+                        $body = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".format_text($body, $format);
+                    } else {
+                        // Append to message.
+                        $body = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".$data->body['text'];
+                        $bodyplain = html_to_text($body);
+                    }
 
                     foreach ($managers as $managerid) {
                         $manager = \core_user::get_user($managerid, '*', MUST_EXIST);
@@ -219,13 +226,18 @@ class attendees_message extends \moodleform {
             \mod_facetoface\event\message_sent::create_from_session($seminarevent, $context, 'messageusers')->trigger();
             $returnurl = new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s));
             \core\notification::success($message);
-            redirect($returnurl);
+            if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+                redirect($returnurl);
+            }
+
         }
 
         if ($emailerrors) {
             $baseurl = new \moodle_url('/mod/facetoface/attendees/messageusers.php', array('s' => $s));
             \core\notification::error(get_string('xmessagesfailed', 'facetoface', $emailerrors));
-            redirect($baseurl);
+            if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+                redirect($baseurl);
+            }
         }
     }
 }
