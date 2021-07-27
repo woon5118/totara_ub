@@ -305,7 +305,7 @@ function testing_cli_fix_directory_separator($path) {
         $dirseparator = DIRECTORY_SEPARATOR;
 
         // On windows we need to find what directory separator is used.
-        if ($CFG->ostype = 'WINDOWS') {
+        if ($CFG->ostype == 'WINDOWS') {
             if (!empty($_SERVER['argv'][0])) {
                 if (false === strstr($_SERVER['argv'][0], '\\')) {
                     $dirseparator = '/';
