@@ -581,8 +581,16 @@ final class signup_helper {
             $jobasssignmentid = $signup->get_jobassignmentid();
             $ja = job_assignment::get_with_id($jobasssignmentid, false);
 
-            if (null !== $ja && $ja->managerid) {
-                $managers[] = \core_user::get_user($ja->managerid);
+            if (null !== $ja) {
+                if ($ja->managerid) {
+                    // Add the permanent manager.
+                    $managers[] = \core_user::get_user($ja->managerid);
+                }
+                if ($ja->tempmanagerid) {
+                    // Add the temporary manager. This will make that there are two managers
+                    // for sending notification to.
+                    $managers[] = \core_user::get_user($ja->tempmanagerid);
+                }
             }
         } else {
             $userid = $signup->get_userid();

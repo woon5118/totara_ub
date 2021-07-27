@@ -1,6 +1,11 @@
 This files describes API changes in /mod/facetoface/*,
 information provided here is intended especially for developers.
 
+=== 13.11 ===
+
+* Function facetoface_get_session_managers had changed the behaviour. The function now returns the temporary manager record as well
+  as the permanent manager for the job assignment that is used with the sign up record.
+
 === 13.7 ===
 
 * signup::set_bookedby() now accepts null

@@ -44,6 +44,8 @@ use mod_facetoface\signup\state\requestedrole;
 use mod_facetoface\signup\state\unable_to_attend;
 use mod_facetoface\signup\state\user_cancelled;
 use mod_facetoface\signup\state\waitlisted;
+use totara_job\job_assignment;
+use mod_facetoface\testing\generator;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -548,5 +550,70 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         $signup4 = new signup($signup4->get_id());
         $this->assertInstanceOf(not_set::class, $signup4->get_state());
         $this->assertNull(signup_status::find_current($signup4));
+    }
+
+    /**
+     * @return void
+     */
+    public function test_find_managers_from_signup(): void {
+        // Setup the global settings.
+        set_config("facetoface_selectjobassignmentonsignupglobal", 1);
+        $generator = self::getDataGenerator();
+
+        $user_one = $generator->create_user(["firstname" => "User", "lastname" => "One"]);
+        $user_two = $generator->create_user(["firstname" => "User", "lastname" => "Two"]);
+        $user_three =  $generator->create_user(["firstname" => "User", "lastname" => "Three"]);
+
+        self::setAdminUser();
+        $manager_job_assignment = job_assignment::create_default($user_three->id);
+        $temporary_job_assignment = job_assignment::create_default($user_two->id);
+        $job_assignment = job_assignment::create_default(
+            $user_one->id,
+            [
+                "tempmanagerjaid" => $temporary_job_assignment->id,
+                "tempmanagerexpirydate" => time() + WEEKSECS,
+                "managerjaid" => $manager_job_assignment->id,
+            ]
+        );
+
+        // Reset the user in session.
+        self::setUser(null);
+        // Create a course and enrol user one to the course.
+        $course = $generator->create_course();
+        $generator->enrol_user($user_one->id, $course->id);
+
+        $seminar_record = $generator->create_module(
+            "facetoface",
+            [
+                "course" => $course->id,
+                "approvaltype" => seminar::APPROVAL_MANAGER,
+                "selectjobassignmentonsignup" => true
+            ]
+        );
+
+        /** @var mod_facetoface_generator $seminar_generator */
+        $seminar_generator = $generator->get_plugin_generator("mod_facetoface");
+        $event_id = $seminar_generator->add_session(["facetoface" => $seminar_record->id]);
+
+        $signup = signup::create($user_one->id, $event_id);
+        $signup->set_jobassignmentid($job_assignment->id);
+
+        self::assertTrue(signup_helper::can_signup($signup));
+        $new_signup = signup_helper::signup($signup);
+        self::assertTrue($new_signup->exists());
+
+        $managers = signup_helper::find_managers_from_signup($new_signup);
+        self::assertCount(2, $managers);
+
+        // The first manager will be the permanent manager.
+        $first_manager = reset($managers);
+        self::assertIsObject($first_manager);
+        self::assertObjectHasAttribute("id", $first_manager);
+        self::assertEquals($user_three->id, $first_manager->id);
+
+        $second_manager = end($managers);
+        self::assertIsObject($second_manager);
+        self::assertObjectHasAttribute("id", $second_manager);
+        self::assertEquals($user_two->id, $second_manager->id);
     }
 }
