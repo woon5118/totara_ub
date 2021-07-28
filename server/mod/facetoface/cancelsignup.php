@@ -90,8 +90,19 @@ if ($fromform = $mform->get_data()) { // Form submitted.
             $error = \mod_facetoface\notice_sender::signup_cancellation($signup);
             if (empty($error)) {
                 $minstart = $seminarevent->get_mintimestart();
+                $seminar_id = $seminarevent->get_facetoface();
+
                 if ($minstart) {
-                    $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('cancellationsentmgr', 'facetoface');
+                    $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br');
+                    $managers = signup_helper::find_managers_from_signup($signup);
+
+                    if (!empty($managers) && \mod_facetoface\notice_sender::is_cc_to_manager_when_cancel_signup($seminar_id)) {
+                        // If the sign up user has manager, and the notification is set to cc manager then the message
+                        // notification banner should mention about CC to manager.
+                        $message .= get_string('cancellationsentmgr', 'facetoface');
+                    } else {
+                        $message .= get_string('cancellationsent', 'facetoface');
+                    }
                 } else {
                     $msg = ($CFG->facetoface_notificationdisable ? 'cancellationnotsent' : 'cancellationsent');
                     $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string($msg, 'facetoface');

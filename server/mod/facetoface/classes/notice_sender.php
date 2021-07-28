@@ -22,6 +22,7 @@
  */
 namespace mod_facetoface;
 
+use core\orm\query\builder;
 use \mod_facetoface\signup\state\waitlisted;
 use \mod_facetoface\signup\state\booked;
 use \stdClass;
@@ -278,6 +279,29 @@ class notice_sender {
 
         $icalattachmenttype = (empty($CFG->facetoface_disableicalcancel) && $attachical) ? MDL_F2F_BOTH : MDL_F2F_TEXT;
         return static::send($signup, $params, $icalattachmenttype, MDL_F2F_CANCEL);
+    }
+
+    /**
+     * Checking whether the notification will be cc to manager or not.
+     * This function will only check the flag "ccmanager" in table "ttr_facetoface_notification" to see
+     * whether it is zero or one. True if it is one, otherwise false.
+     *
+     * @param int $seminar_id
+     * @return bool
+     */
+    public static function is_cc_to_manager_when_cancel_signup(int $seminar_id): bool {
+        $db = builder::get_db();
+        $field = $db->get_field(
+            "facetoface_notification",
+            "ccmanager",
+            [
+                "type" => MDL_F2F_NOTIFICATION_AUTO,
+                "conditiontype" => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION,
+                "facetofaceid" => $seminar_id
+            ]
+        );
+
+        return (1 == $field);
     }
 
     /**
