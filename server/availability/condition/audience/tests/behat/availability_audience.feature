@@ -1,4 +1,4 @@
-@availability @availability_audience @totara
+@availability @availability_audience @totara @javascript
 Feature: Adding audience membership activity access restriction
   In order to control student access to activities
   As a teacher
@@ -24,8 +24,6 @@ Feature: Adding audience membership activity access restriction
         | user     | cohort |
         | student1 | aud1   |
 
-
-  @javascript
   Scenario: Test audience condition prevents student access
     # Basic setup.
     Given I log in as "admin"
@@ -66,3 +64,55 @@ Feature: Adding audience membership activity access restriction
 
     Then I should see "Test Page 1" in the "region-main" "region"
     And I should not see "Test Page 2" in the "region-main" "region"
+
+  Scenario: Editing teacher can set audience condition when adding an activity
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+
+    # Add a page.
+    And I add a "Page" to section "1"
+    And I set the following fields to these values:
+      | Name         | Test Page 1      |
+      | Description  | Some description |
+      | Page content | page content     |
+    And I expand all fieldsets
+    And I click on "Add restriction..." "button"
+    And I click on "Audience" "button" in the "Add restriction..." "dialogue"
+    And I click on ".availability-item .availability-eye" "css_element"
+    And I set the field "Member of Audience" to "Audience1"
+    And I press key "13" in the field "Member of Audience"
+    Then I should see "Audience1" in the ".form-autocomplete-selection" "css_element"
+
+    # Verify it was actually saved
+    When I press "Save and display"
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    Then I should see "Audience1" in the ".form-autocomplete-selection" "css_element"
+
+  Scenario: Editing teacher can set audience condition when editing settings of an existing activity
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+
+    # Add a page.
+    And I add a "Page" to section "1"
+    And I set the following fields to these values:
+      | Name         | Test Page 1      |
+      | Description  | Some description |
+      | Page content | page content     |
+    And I press "Save and display"
+
+    # Edit settings for the page activity
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    And I click on "Add restriction..." "button"
+    And I click on "Audience" "button" in the "Add restriction..." "dialogue"
+    And I click on ".availability-item .availability-eye" "css_element"
+    And I set the field "Member of Audience" to "Audience1"
+    And I press key "13" in the field "Member of Audience"
+    Then I should see "Audience1" in the ".form-autocomplete-selection" "css_element"
+
+    # Verify it was actually saved
+    When I press "Save and display"
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    Then I should see "Audience1" in the ".form-autocomplete-selection" "css_element"

@@ -53,14 +53,14 @@ define(['jquery', 'core/config'], function($, mdlcfg) {
                 return;
             }
 
-            function getCourse() {
-                var vars = {}, hash;
+            function getHrefParam(paramName) {
+                var hash;
                 var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
 
                 // Loop through all of the variables searching for course.
                 for(var i = 0; i < hashes.length; i++) {
                     hash = hashes[i].split('=');
-                    if (hash[0] === 'course') {
+                    if (hash[0] === paramName) {
                         return hash[1];
                     }
                 }
@@ -68,8 +68,17 @@ define(['jquery', 'core/config'], function($, mdlcfg) {
                 return null;
             }
 
-            //Get the course param if it's available
+            function getCourse() {
+                return getHrefParam('course');
+            }
+
+            function getCourseModule() {
+                return getHrefParam('update');
+            }
+
+            // Get the course/module params if they are available
             var courseid = getCourse();
+            var coursemoduleid = getCourseModule();
 
             if (_cache[query] === undefined) {
                 _cache[query] = $.ajax({
@@ -77,7 +86,8 @@ define(['jquery', 'core/config'], function($, mdlcfg) {
                     type: 'POST',
                     data: {
                         filter: query,
-                        course: courseid
+                        course: courseid,
+                        coursemodule: coursemoduleid
                     }
                 });
             }

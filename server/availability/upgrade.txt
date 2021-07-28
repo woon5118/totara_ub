@@ -1,6 +1,11 @@
 This files describes API changes in /availability/*.
 The information here is intended only for developers.
 
+=== 13.11 ===
+
+* A modification was made to function getCourse() in condition/audience/amd/src/ajax_handler.js:
+  Extracted URL parameter fetching logic to its own method.
+
 === 13 ===
 
 * The following event observers have been removed; please remove any dependencies:

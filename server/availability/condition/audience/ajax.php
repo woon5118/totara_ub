@@ -28,9 +28,15 @@ require_once(__DIR__ . '/../../../config.php');
 require_login(null, false);
 
 $courseid = optional_param('course', 0, PARAM_INT);
+$coursemoduleid = optional_param('coursemodule', 0, PARAM_INT);
 $filter = optional_param('filter', '', PARAM_TEXT);
 
-// Permissions checks on the system context to make sure we have access to see audiences.
+// Permissions checks on course context if course or module info is passed in, otherwise on system context.
+if (!$courseid && $coursemoduleid) {
+    $cm = get_coursemodule_from_id('', $coursemoduleid);
+    $courseid = $cm->course ?? 0;
+}
+
 if ($courseid) {
     $context = context_course::instance($courseid);
 } else {
