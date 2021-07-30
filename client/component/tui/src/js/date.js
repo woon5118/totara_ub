@@ -248,20 +248,13 @@ export function isIsoBefore(date, baseDate) {
 }
 
 /**
- * Map of strftime specifiers to day, month, or year
+ * Break down of symbols used by php strftime.
+ * Not to be confused with the formats used by DateTime/DateTimeImmutable etc.
+ * @see https://www.php.net/manual/en/function.strftime.php
  */
-const strftime = {
-  a: 'd',
-  A: 'd',
-  d: 'd',
-  e: 'd',
-  b: 'm',
-  B: 'm',
-  h: 'm',
-  m: 'm',
-  y: 'y',
-  Y: 'y',
-};
+const strftimeYearSymbols = ['%y', '%Y'];
+const strftimeMonthSymbols = ['%m', '%h', '%b', '%B'];
+const strftimeDaySymbols = ['%d', '%a', '%A', '%e'];
 
 /**
  * Get date order from strftime-style format string.
@@ -270,20 +263,38 @@ const strftime = {
  * @returns {('y'|'m'|'d')[]} Array of y, m, and d
  */
 export function getDateOrderFromStrftime(format) {
-  const regex = /%[a-zA-Z]/g;
-  const result = [];
-  let match;
-  while ((match = regex.exec(format))) {
-    const specifier = match[0][1];
-    const r = strftime[specifier];
-    if (r) {
-      result.push(r);
+  const formatParts = [
+    strftimeYearSymbols,
+    strftimeMonthSymbols,
+    strftimeDaySymbols,
+  ];
+  const [yearPosition, monthPosition, dayPosition] = formatParts.map(
+    partSymbols => {
+      const symbolPositions = partSymbols.map(symbol => format.indexOf(symbol));
+
+      const foundSymbolPositions = symbolPositions.filter(
+        position => position !== -1
+      ); // Filter missing symbols.
+
+      if (foundSymbolPositions.length === 0) {
+        return -1;
+      }
+
+      return Math.min(...foundSymbolPositions); // Return the position of the first symbol found.
     }
+  );
+
+  const anyMissingParts = [yearPosition, monthPosition, dayPosition].some(
+    position => position === -1
+  );
+  if (anyMissingParts) {
+    return ['y', 'm', 'd']; // Default order.
   }
 
-  if (result.length === 3) {
-    return result;
-  }
+  const order = [];
+  order[yearPosition] = 'y';
+  order[monthPosition] = 'm';
+  order[dayPosition] = 'd';
 
-  return ['y', 'm', 'd'];
+  return order.filter(Boolean); // Normalize the indexes (remove nulls).
 }
