@@ -219,16 +219,17 @@ class core_expanded_users_testcase extends expanded_users_testcase {
         $data = $this->generate_data();
 
         // Combination of all
+        $target_user = $data->user20;
         $expanded_users = (new expanded_users())
             ->set_audience_ids([$data->cohort1->id])
             ->set_organisation_ids([$data->org2->id])
             ->set_position_ids([$data->pos1->id])
-            ->set_user_ids([$data->user18->id, $data->user16->id])
-            ->filter_by_name($data->user16->firstname)
+            ->set_user_ids([$data->user18->id, $target_user->id])
+            ->filter_by_name($target_user->firstname)
             ->fetch_paginated(0);
 
         foreach ($expanded_users as $user) {
-            $this->assertRegExp("/{$data->user16->firstname}/i", $user['firstname']);
+            $this->assertRegExp("/{$target_user->firstname}/i", $user['firstname']);
         }
     }
 
