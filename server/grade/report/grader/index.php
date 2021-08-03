@@ -43,6 +43,16 @@ $toggle_type   = optional_param('toggle_type', 0, PARAM_ALPHANUM);
 $graderreportsifirst  = optional_param('sifirst', null, PARAM_NOTAGS);
 $graderreportsilast   = optional_param('silast', null, PARAM_NOTAGS);
 
+// basic access checks
+if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+    print_error('invalidcourseid');
+}
+require_login($course);
+$context = context_course::instance($course->id);
+
+require_capability('gradereport/grader:view', $context);
+require_capability('moodle/grade:viewall', $context);
+
 // Totara: added ability to redirect user out of this page if the course is not a legacy course.
 $hook = new \gradereport_grader\hook\index_view($courseid);
 $hook->execute();
@@ -56,16 +66,6 @@ if (isset($graderreportsilast)) {
 
 $PAGE->set_url(new moodle_url('/grade/report/grader/index.php', array('id'=>$courseid)));
 $PAGE->requires->yui_module('moodle-gradereport_grader-gradereporttable', 'Y.M.gradereport_grader.init', null, null, true);
-
-// basic access checks
-if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('invalidcourseid');
-}
-require_login($course);
-$context = context_course::instance($course->id);
-
-require_capability('gradereport/grader:view', $context);
-require_capability('moodle/grade:viewall', $context);
 
 // return tracking object
 $gpr = new grade_plugin_return(array('type'=>'report', 'plugin'=>'grader', 'courseid'=>$courseid, 'page'=>$page));
