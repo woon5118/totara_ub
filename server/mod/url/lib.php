@@ -369,8 +369,11 @@ function url_cm_info_dynamic(cm_info $cm) {
     global $CFG, $DB, $SESSION;
 
     // Totara: Add an additional param to the module URL if we are viewing this from within Microsoft teams.
+    if (!isset($cm->url) || !isset($SESSION->theme)) {
+        return;
+    }
     $url = $cm->url;
-    if (isset($SESSION->theme) && $SESSION->theme === 'msteams' && $url->get_param('totara_msteams_confirm_redirect') === null) {
+    if ($SESSION->theme === 'msteams' && $url->get_param('totara_msteams_confirm_redirect') === null) {
         $external_url = $DB->get_field('url', 'externalurl', ['id' => $cm->instance], MUST_EXIST);
         $is_external_url = strpos($external_url, $CFG->wwwroot) === false;
         $url->param('totara_msteams_confirm_redirect', (int) $is_external_url);
