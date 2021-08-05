@@ -196,12 +196,10 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
                 }
             }
 
-            // Unset fields we are not saving since they are empty
-            if (!$saveemptyfields) {
-                foreach ($dbrow as $key => $value) {
-                    if ($value === '') {
-                        $dbrow[$key] = null;
-                    }
+            // Unset non-required fields we are not saving since they are empty
+            foreach ($this->fields as $f) {
+                if (isset($dbrow[$f]) && $dbrow[$f] === '' && !$saveemptyfields && !in_array($f, $this->required_fields)) {
+                    $dbrow[$f] = null;
                 }
             }
 
