@@ -26,6 +26,13 @@
 
 namespace core\message;
 
+use core\entity\user;
+use core\orm\query\builder;
+use stdClass;
+use context_course;
+use moodle_url;
+use core_user;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -50,6 +57,99 @@ class manager {
 
     /** @var string Totara transaction name */
     protected static $trans_name;
+
+    /**
+     * Sending a message that will add the footer for conversation reference to the message.
+     *
+     * @param message|stdClass $message
+     * @param stdClass $savedmessage
+     * @param array $processorlist
+     *
+     * @return int
+     */
+    public static function send_message_to_conversation(
+        $message,
+        stdClass $savedmessage,
+        array $processorlist
+    ): int {
+        // Totara: Adding email tag line for the fullmessagehtml and fullmessage.
+        $emailtagline = self::get_email_tag_line($message);
+
+        // Using fullmessageformat or default to FORMAT_MOODLE.
+        $message_format = FORMAT_MOODLE;
+        if (isset($message->fullmessageformat)) {
+            $message_format = $message->fullmessageformat;
+        }
+
+        if (!empty($message->fullmessagehtml)) {
+            // Cleaning up any bad HTML tags. As clean_text will invoke html purifier.
+            $message->fullmessagehtml = clean_text($message->fullmessagehtml, $message_format);
+            $message->fullmessagehtml .= "<br /><br />---------------------------------------------------------------------<br />" . $emailtagline;
+        }
+
+        if (!empty($message->fullmessage)) {
+            // Cleaning up any bad HTML tags. As clean_text will invoke html purifier.
+            $message->fullmessage = clean_text($message->fullmessage, $message_format);
+            $message->fullmessage .= "\n\n---------------------------------------------------------------------\n" . $emailtagline;
+        }
+
+        if (!empty($message->smallmessage)) {
+            $message->smallmessage = clean_text($message->smallmessage, $message_format);
+        }
+
+        return self::send_message($message, $savedmessage, $processorlist);
+    }
+
+    /**
+     * Returns the email tag line from the event data.
+     *
+     * @param stdClass|\core\message\message $eventdata
+     * @return string
+     */
+    private static function get_email_tag_line($eventdata): string {
+        global $SITE;
+
+        $email_tag_line = "";
+        $lang = null;
+
+        if (isset($eventdata->userfrom) && isset($eventdata->userto)) {
+            $user_from_id = $eventdata->userfrom;
+            $user_to_id = $eventdata->userto;
+
+            if (is_object($eventdata->userfrom)) {
+                $user_from_id = $eventdata->userfrom->id;
+            }
+
+            if (is_object($eventdata->userto)) {
+                $user_to_id = $eventdata->userto->id;
+                $lang = $eventdata->userto->lang ?? null;
+            }
+
+            if (!core_user::is_real_user($user_from_id) || $user_from_id == $user_to_id) {
+                return "";
+            }
+
+            if (empty($lang)) {
+                $db = builder::get_db();
+                $lang = $db->get_field(user::TABLE, "lang", ["id" => $user_to_id], MUST_EXIST);
+            }
+
+            $s = new stdClass();
+            $s->sitename = format_string($SITE->shortname, true, ["context" => context_course::instance(SITEID)]);
+            $s->url = (new moodle_url(
+                "/message/index.php",
+                [
+                    "user" => $user_to_id,
+                    "id" =>  $user_from_id
+                ]
+            ))->out();
+
+            $manager = get_string_manager();
+            $email_tag_line = $manager->get_string("emailtagline", "message", $s, $lang);
+        }
+
+        return $email_tag_line;
+    }
 
     /**
      * Do the message sending.
