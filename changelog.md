@@ -1,3 +1,70 @@
+Release 13.11 (6th August 2021):
+================================
+
+
+Security issues:
+
+    TL-31873       Improved the security of the shibboleth logout functionality
+    TL-31886       Fixed an uncontrolled recursion vulnerability in URL downloader plugin
+
+                   An uncontrolled recursion weakness was fixed in the 'URL downloader'
+                   plugin. This posed a risk of recursion denial of service.
+
+    TL-31893       Bulk user download now correctly sanitises data when exporting to the HTML format
+    TL-31894       Removed firstname argument from emailconfirmation string to prevent a self-registration phishing risk
+    TL-31895       Improved the sanitisation of emails triggered for user to user messages
+
+Bug fixes:
+
+    TL-30988       The @mention selector now disappears completely when there are no results
+    TL-31369       Temporary managers are now correctly notified when a user signs up to a seminar event
+
+                   Prior to this patch, when a user signed up to a seminar event requiring
+                   both the selection of a job assignment, and manager approval and selected a
+                   job assignment referencing an active temporary manager, that temporary
+                   manager would not be correctly notified of the signup.
+
+                   This has been fixed, and the temporary manager will now be correctly
+                   notified at the time of signup.
+
+    TL-31427       Fixed capability check for selecting audience restrictions when editing settings of an existing course activity
+    TL-31467       Seminar messages created using Weka editor are now correctly formatted when being sent
+    TL-31469       Fixed HR import field mapping when the original field name also exists in import CSV
+    TL-31475       Guest users no longer experience an exception when viewing the comments tab for resources
+
+                   This patch refactors capability checks for all Engage interactions
+                   (comments, bookmark, like, share) for resources and playlists to ensure
+                   consistent read-only behaviour for guests.
+
+    TL-31654       Seminar cancellation notifications now correctly inform if a manager was also notified
+    TL-31728       Fixed the 'Recently viewed' block to use a courses custom image when one has been set
+    TL-31757       Ensured user name report builder display classes process html entities correctly for export
+    TL-31902       Fixed error when editing user course completion for course containing URL resource
+
+                   Note this only affects courses that are restored from an older version of
+                   Totara into version 13 or above.
+
+API changes:
+
+    TL-31067       Changed the architecture of the mobile plugin to allow subplugins
+
+                   This will allow for greater extensibility of the back-end of the mobile
+                   app, along with increased ease of customisation for clients interested in
+                   doing so.  The current learning queries have been moved to the first
+                   sub-plugin, class stubs have been left in place in case any thing has been
+                   extended and persisted queries remain the same place pointing to the moved
+                   revolvers to avoid any conflicts with existing customisations.
+
+                   The totara_mobile_me query has also been updated to return version
+                   information on any enabled mobile sub-plugins, for now this is limited to
+                   the current learning plugin but it allows further flexibility going
+                   forwards.
+
+Tui front end framework:
+
+    TL-31560       Improved handling for invalid date formats within the Tui date selector component
+
+
 Release 13.10 (29th July 2021):
 ===============================
 
