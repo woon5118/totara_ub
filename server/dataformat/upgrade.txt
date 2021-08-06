@@ -1,6 +1,10 @@
 This files describes API changes in /dataformat/ download system,
 information provided here is intended especially for developers.
 
+=== 13.11 ===
+* Optional $callback for \download_as_dataformat now receives a second argument to define whether the current
+  format writer supports HTML.
+
 === 10 ===
 
 * In order to allow multiple sheets in an exported file the functions write_header() and write_footer() have

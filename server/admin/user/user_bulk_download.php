@@ -66,7 +66,7 @@ if ($dataformat) {
     $downloadusers = new ArrayObject($SESSION->bulk_users);
     $iterator = $downloadusers->getIterator();
 
-    download_as_dataformat($filename, $dataformat, $fields, $iterator, function($userid) use ($extrafields, $fields) {
+    download_as_dataformat($filename, $dataformat, $fields, $iterator, function($userid, $supports_html) use ($extrafields, $fields) {
         global $DB;
         $row = array();
         if (!$user = $DB->get_record('user', array('id' => $userid))) {
@@ -84,6 +84,8 @@ if ($dataformat) {
             // We only take the text.
             if (is_array($user->$field)) {
                 $userprofiledata[$field] = reset($user->$field);
+            } else if ($supports_html) {
+                $userprofiledata[$field] = s($user->$field);
             } else {
                 $userprofiledata[$field] = $user->$field;
             }

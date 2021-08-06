@@ -66,7 +66,7 @@ function download_as_dataformat($filename, $dataformat, $columns, $iterator, $ca
     $c = 0;
     foreach ($iterator as $row) {
         if ($callback) {
-            $row = $callback($row);
+            $row = $callback($row, $format->supports_html());
         }
         if ($row === null) {
             continue;

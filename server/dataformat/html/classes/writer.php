@@ -121,4 +121,11 @@ table {
     public function close_output() {
         echo "</body></html>";
     }
+
+    /**
+     * @return bool
+     */
+    public function supports_html() {
+        return true;
+    }
 }

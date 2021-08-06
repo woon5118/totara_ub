@@ -137,4 +137,13 @@ abstract class base {
     public function close_output() {
         // Override me if needed.
     }
+
+    /**
+     * Indicate that this format supports/renders HTML
+     *
+     * @return bool
+     */
+    public function supports_html() {
+        return false;
+    }
 }
