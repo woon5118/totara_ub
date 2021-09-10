@@ -13,8 +13,8 @@
             <div class="col-sm">
                 <ul>
                     <li><a href="login/stage_1.php">First login</a></li>
-                    <li><a href="#">Login page</a></li>
-                    <li><a href="#">Sign-up</a></li>
+                    <li><a href="login/login.php">Login page</a></li>
+                    <li><a href="login/singup.php">Sign-up</a></li>
                 </ul>
             </div>
         </div>
