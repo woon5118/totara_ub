@@ -1,23 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<meta charset="UTF-8">
-<title>Holon Learning | Home page</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="assets/css/bootstrap.css">
-<style>
-</style>
-<script src="assets/js/bootstrap.js"></script>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm">
-                <ul>
-                    <li><a href="login/stage_1.php">First login</a></li>
-                    <li><a href="login/login.php">Login page</a></li>
-                    <li><a href="login/singup.php">Sign-up</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+<?php
+include 'config.php';
+// redirect the user to specific link
+!empty($_GET['vyz'])? $mod = $_GET['vyz'] : $mod = 'singup';
+
+$title = 'Home';
+$meta = 'meta';
+$keywords = 'keywords';
+
+// start the outputs temposrisation
+ob_start();
+
+switch($mod){
+    case 'login': include 'view/login.php'; break;
+
+    case 'stage_1': include 'view/stage_1.php'; break;
+
+    case 'stage_2': include 'view/stage_2.php'; break;
+
+    case 'stage_3': include 'view/stage_3.php'; break;
+
+    case 'newfeed': include 'view/newfeed.php'; break;
+
+    case 'mypage': include 'view/mypage.php'; break;
+
+    case 'mylearning': include 'view/mylearning.php'; break;
+
+    default: include 'view/singup.php';
+
+
+} 
+// end of outputs temporisation
+$application = ob_get_clean();
+
+include 'global/head.php';
+
+echo $application;
+
+include 'global/foot.php';
