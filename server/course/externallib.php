@@ -526,13 +526,11 @@ class core_course_external extends external_api {
                 $courseinfo['completionprogressonview'] = $course->completionprogressonview;
                 // End TOTARA.
             }
-
             if ($courseadmin or $course->visible
                     or has_capability('moodle/course:viewhiddencourses', $context)) {
                 $coursesinfo[] = $courseinfo;
             }
         }
-
         return $coursesinfo;
     }
 
@@ -630,7 +628,6 @@ class core_course_external extends external_api {
                 )
         );
     }
-
     /**
      * Returns description of method parameters
      *

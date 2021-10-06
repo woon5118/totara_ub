@@ -427,5 +427,4 @@ if (isloggedin() and !isguestuser()) {
     $loginform->set_error($errormsg);
     echo $OUTPUT->render($loginform);
 }
-
 echo $OUTPUT->footer();
