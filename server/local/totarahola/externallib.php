@@ -420,8 +420,8 @@ class local_totarahola_external extends external_api{
         $competencies = local_totarahola_lib::get_framework_competencies(
                 $params['frameworkid'],
                 $params['sort'],
-                $params['order'],
-        );
+                $params['order']);
+                
         $records = array();
         foreach ($competencies as $competency) {
             array_push($records, $competency);

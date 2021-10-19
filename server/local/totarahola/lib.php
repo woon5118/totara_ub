@@ -69,7 +69,7 @@ class local_totarahola_lib
         }
         $params['visible'] = 1;
         // OK - all set.
-        return $DB->get_records('comp', $params, $sort . ' ' . $order, $fields='*', $skip, $limit);
+        return $DB->get_records('comp', $params, $sort . ' ' . $order, '*', $skip, $limit);
     }
     /**
      * Perform a search based on the provided filters and return list of records.
@@ -95,6 +95,6 @@ class local_totarahola_lib
         $params['frameworkid'] = $frameworkid;
         $params['visible'] = 1;
         // OK - all set.
-        return $DB->get_records('comp', $params, $sort . ' ' . $order, $fields='*');
+        return $DB->get_records('comp', $params, $sort . ' ' . $order, '*');
     }
 }
