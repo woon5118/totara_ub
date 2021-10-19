@@ -10,7 +10,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_totarahola';
-$plugin->version = 2021100602;
+$plugin->version = 2021101801;
 $plugin->requires = 2010021900;
 $plugin->release = '1.0';
 $plugin->maturity = MATURITY_ALPHA;

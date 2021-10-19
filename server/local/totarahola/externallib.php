@@ -10,9 +10,38 @@ defined('MOODLE_INTERNAL') || die;
 
 
 require_once($CFG->libdir."/externallib.php");
+require_once($CFG->dirroot."/local/totarahola/lib.php");
 
 class local_totarahola_external extends external_api{
-
+        /**
+        * Returns a prepared structure to use a context parameters.
+        * @return external_single_structure
+        */
+        protected static function get_context_parameters() {
+                $id = new external_value(
+                PARAM_INT,
+                'Context ID. Either use this value, or level and instanceid.',
+                VALUE_DEFAULT,
+                0
+                );
+                $level = new external_value(
+                PARAM_ALPHA,
+                'Context level. To be used with instanceid.',
+                VALUE_DEFAULT,
+                ''
+                );
+                $instanceid = new external_value(
+                PARAM_INT,
+                'Context instance ID. To be used with level',
+                VALUE_DEFAULT,
+                0
+                );
+                return new external_single_structure(array(
+                'contextid' => $id,
+                'contextlevel' => $level,
+                'instanceid' => $instanceid,
+                ));
+        }
         /**
          * Returns description of method parameters
          * @return external_function_parameters
@@ -23,7 +52,7 @@ class local_totarahola_external extends external_api{
                         array(
                                 //
                         )
-                        );
+                );
         }
         /**
          * Get popular courses
@@ -216,6 +245,305 @@ class local_totarahola_external extends external_api{
                                  0: does not',
                                 VALUE_OPTIONAL),
                         ), 'course'
+                )
+        );
+    }
+    /**
+     * Returns description of get_competency_with_more_courses() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function get_competency_with_more_courses_parameters() {
+        $sort = new external_value(
+            PARAM_TEXT,
+            'Column to sort by.',
+            VALUE_DEFAULT,
+            'fullname'
+        );
+        $order = new external_value(
+            PARAM_TEXT,
+            'Sort direction. Should be either ASC or DESC',
+            VALUE_DEFAULT,
+            'ASC'
+        );
+        $skip = new external_value(
+            PARAM_INT,
+            'Skip this number of records before returning results',
+            VALUE_DEFAULT,
+            0
+        );
+        $limit = new external_value(
+            PARAM_INT,
+            'Return this number of records at most.',
+            VALUE_DEFAULT,
+            0
+        );
+
+        $params = array(
+            'sort' => $sort,
+            'order' => $order,
+            'skip' => $skip,
+            'limit' => $limit
+        );
+        return new external_function_parameters(
+                array(
+                        'filters' => new external_single_structure($params)
+                ));
+    }
+    /**
+     * List the existing competency.
+     *
+     * @param int $sort
+     * @param string $order
+     * @param string $skip
+     * @param int $limit
+     *
+     * @return array
+     * @throws \required_capability_exception
+     * @throws invalid_parameter_exception
+     */
+    public static function get_competency_with_more_courses($filters) {
+        global $DB, $PAGE;
+
+        $params = self::validate_parameters(self::get_competency_with_more_courses_parameters(), array('filters' => $filters));
+        $params = $params['filters'];
+
+        if ($params['order'] !== '' && $params['order'] !== 'ASC' && $params['order'] !== 'DESC') {
+            throw new invalid_parameter_exception('Invalid order param. Must be ASC, DESC or empty.');
+        }        
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('totara/hierarchy:viewcompetencyframeworks', $context);
+        $output = $PAGE->get_renderer('core');
+
+        //retrieve competencies
+        // Totara hola: Added the ability to fetch only courses and excluding non-courses. Note that this part here will return a list of courses including site course records - according to the understanding of PHPUNIT tests related.
+        $results = local_totarahola_lib::get_competency_with_more_courses($params['sort'], $params['order'], $params['skip'], $params['limit']);
+
+        $records = array();
+        foreach ($results as $result) {
+        //     $exporter = new competency_exporter($competency, array('context' => $context));
+        //     $record = $exporter->export($output);
+            array_push($records, $result);
+        }
+        return $records;
+    }
+    /**
+     * Returns description of list_competency_frameworks() result value.
+     *
+     * @return \external_description
+     */
+    public static function get_competency_with_more_courses_returns() {
+        return new external_multiple_structure(
+                new external_single_structure(
+                        array(
+                               'id' => new external_value(PARAM_INT, 'Competency id'),
+                                'shortname' => new external_value(PARAM_TEXT, 'Competency shortname'),
+                                'description' => new external_value(PARAM_RAW, ''),
+                                'idnumber' => new external_value(PARAM_TEXT, 'Competency ID number'),
+                                'frameworkid' => new external_value(PARAM_INT, 'Competency framework id'),
+                                'path' => new external_value(PARAM_TEXT, 'Competency path'),
+                                'parentid' => new external_value(PARAM_INT, 'Parent competency id'),
+                                'visible' => new external_value(PARAM_INT, 'Comptency Visibility'),
+                                'proficiencyexpected' => new external_value(PARAM_INT, 'Proficiency expected'),
+                                'evidencecount' => new external_value(PARAM_INT, ''),
+                                'timecreated' => new external_value(PARAM_INT, ''),
+                                'timemodified' => new external_value(PARAM_INT, ''),
+                                'usermodified' => new external_value(PARAM_INT, ''),
+                                'fullname' => new external_value(PARAM_TEXT, ''),
+                                'depthlevel' => new external_value(PARAM_INT, ''),
+                                'typeid' => new external_value(PARAM_INT, '') 
+                        )
+                )
+        );
+    }
+    /**
+     * Returns description of list_framework_competencies() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function get_framework_competencies_parameters() {
+        $frameworkid = new external_value(
+                PARAM_INT,
+                'Framewok id belong to a competency',
+                VALUE_DEFAULT,
+                ''
+        );
+        $sort = new external_value(
+            PARAM_TEXT,
+            'Column to sort by.',
+            VALUE_DEFAULT,
+            'fullname'
+        );
+        $order = new external_value(
+            PARAM_TEXT,
+            'Sort direction. Should be either ASC or DESC',
+            VALUE_DEFAULT,
+            ''
+        );
+        $params = array(
+            'frameworkid' => $frameworkid,
+            'sort' => $sort,
+            'order' => $order,
+        );
+        return new external_function_parameters(
+                array(
+                        'filters' => new external_single_structure($params)
+                ));
+    }
+    /**
+     * List the existing competency.
+     *
+     * @param array $filters
+     *
+     * @return array
+     * @throws \required_capability_exception
+     * @throws invalid_parameter_exception
+     */
+    public static function get_framework_competencies($filters) {
+        global $DB, $PAGE;
+
+        $params = self::validate_parameters(self::get_framework_competencies_parameters(), array('filters' => $filters));
+        $params = $params['filters'];
+
+        if ($params['order'] !== '' && $params['order'] !== 'ASC' && $params['order'] !== 'DESC') {
+            throw new invalid_parameter_exception('Invalid order param. Must be ASC, DESC or empty.');
+        }
+
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('totara/hierarchy:viewcompetencyframeworks', $context);
+        $output = $PAGE->get_renderer('core');
+
+        //retrieve competencies
+        // Totara hola: Added the ability to fetch only courses and excluding non-courses. Note that this part here will return a list of courses including site course records - according to the understanding of PHPUNIT tests related.
+        $competencies = local_totarahola_lib::get_framework_competencies(
+                $params['frameworkid'],
+                $params['sort'],
+                $params['order'],
+        );
+        $records = array();
+        foreach ($competencies as $competency) {
+            array_push($records, $competency);
+        }
+        return $records;
+    }
+    /**
+     * Returns description of list_competencies() result value.
+     *
+     * @return \external_description
+     */
+    public static function get_framework_competencies_returns() {
+        return new external_multiple_structure(
+                new external_single_structure(
+                        array(
+                        'id' => new external_value(PARAM_INT, 'competency id'),
+                        'shortname' => new external_value(PARAM_TEXT, 'competency short name'),
+                        'description' => new external_value(PARAM_RAW, 'competency description'),
+                        'frameworkid' => new external_value(PARAM_INT, 'framework id belong to a competency'),
+                        'idnumber' => new external_value(PARAM_TEXT, 'competency id number'),
+                        'parentid' => new external_value(PARAM_INT, 'competency parent id'),
+                        'visible' => new external_value(PARAM_INT, 'competency visible'),
+                        'evidencecount' => new external_value(PARAM_INT, 'Evidence count'),
+                        'timemodified' => new external_value(PARAM_INT, 'Date of modification'),
+                        'timecreated' => new external_value(PARAM_INT, 'Date of creation'),
+                        'usermodified' => new external_value(PARAM_INT, 'The id of the creator s competency'),
+                        'fullname' => new external_value(PARAM_TEXT, 'The fullname of the competency'),
+                        'depthlevel' => new external_value(PARAM_INT, 'Depth level of the competency in whole framework'),
+                        'typeid' => new external_value(PARAM_INT, 'Type id of the competency by default is 0'),
+                )
+        ));
+    }
+    /**
+     * Returns description of competency_frameworks() parameters.
+     *
+     * @return \external_function_parameters
+    */
+    public static function get_competency_frameworks_parameters() {
+        $sort = new external_value(
+            PARAM_ALPHANUMEXT,
+            'Column to sort by.',
+            VALUE_DEFAULT,
+            'fullname'
+        );
+        $order = new external_value(
+            PARAM_ALPHA,
+            'Sort direction. Should be either ASC or DESC',
+            VALUE_DEFAULT,
+            ''
+        );
+        $onlyvisible = new external_value(
+            PARAM_INT,
+            'Only visible frameworks will be returned if visible true',
+            VALUE_DEFAULT,
+            1
+        );
+        $params = array(
+            'sort' => $sort,
+            'order' => $order,
+            'onlyvisible' => $onlyvisible,
+        );
+        return new external_function_parameters(
+                array(
+                        'filters' => new external_single_structure($params)
+                ));
+    }
+    /**
+     * List the existing competency frameworks
+     *
+     * @param array $filters
+     *
+     * @return array
+     * @throws \required_capability_exception
+     * @throws invalid_parameter_exception
+     */
+    public static function get_competency_frameworks($filters) {
+        global $DB, $PAGE;
+
+        $params = self::validate_parameters(self::get_competency_frameworks_parameters(), array('filters' => $filters));
+        $params = $params['filters'];
+        # if an exception is thrown in the below code, all DB queries in this code will be rollback.
+        $transaction = $DB->start_delegated_transaction(); 
+
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('totara/hierarchy:viewcompetencyframeworks', $context);
+        $output = $PAGE->get_renderer('core');
+
+        if ($params['order'] !== '' && $params['order'] !== 'ASC' && $params['order'] !== 'DESC') {
+            throw new invalid_parameter_exception('Invalid order param. Must be ASC, DESC or empty.');
+        }
+
+        $results = local_totarahola_lib::get_frameworks($params['sort'],
+                                       $params['order'],
+                                       $params['onlyvisible']);
+        $records = array();
+        foreach ($results as $result) {
+            array_push($records, $result);
+        }
+        $transaction->allow_commit();
+        return $results;
+    }
+    /**
+     * Returns description of list_competency_frameworks() result value.
+     *
+     * @return \external_description
+     */
+    public static function get_competency_frameworks_returns() {
+        return new external_multiple_structure(
+                new external_single_structure(
+                        array(
+                                'id' => new external_value(PARAM_INT, 'id of the framework'),
+                                'shortname' => new external_value(PARAM_TEXT, 'Short name of the framework by default is empty'),
+                                'idnumber' => new external_value(PARAM_TEXT, 'id number of the the framework'),
+                                'description' => new external_value(PARAM_RAW, 'Framework description'),
+                                'sortorder' => new external_value(PARAM_INT, 'Criteria of sorting'),
+                                'visible' => new external_value(PARAM_INT, 'The visibility of framework'),
+                                'timecreated' => new external_value(PARAM_INT, 'Created time'),
+                                'timemodified' => new external_value(PARAM_INT, 'Last time of modification'),
+                                'usermodified' => new external_value(PARAM_INT, 'Creator user id'),
+                                'fullname' => new external_value(PARAM_TEXT, 'Framework fullname'),
+                        )
                 )
         );
     }
