@@ -83,7 +83,7 @@ class local_totarahola_external extends external_api{
                 
                 $id = new external_value(
                 PARAM_INT,
-                'Id course to want to retrieve',
+                'Id course to want to retrieve'
                 );
                 return new external_function_parameters(
                         array('filters' => new external_single_structure(
