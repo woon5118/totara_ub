@@ -784,7 +784,7 @@ class local_totarahola_external extends external_api{
                 
                 $id = new external_value(
                 PARAM_INT,
-                'Competency ID',
+                'Competency ID'
                 );
                 return new external_function_parameters(
                         array('filter' => new external_single_structure(
@@ -839,7 +839,7 @@ class local_totarahola_external extends external_api{
                                 'timemodified' => new external_value(PARAM_INT, 'Date of modification'),
                                 'timecreated' => new external_value(PARAM_INT, 'Date of creation'),
                                 'usermodified' => new external_value(PARAM_INT, 'The id of the creator s course'),
-                                'fullname' => new external_value(PARAM_TEXT, 'The fullname of the course'),
+                                'fullname' => new external_value(PARAM_TEXT, 'The fullname of the course')
                         )   
                 ));
         }
@@ -913,7 +913,7 @@ class local_totarahola_external extends external_api{
                                 'id' => new external_value(PARAM_INT, 'user id'),
                                 'username' => new external_value(PARAM_TEXT, 'username'),
                                 'firstname' => new external_value(PARAM_TEXT, 'firstname'),
-                                'lastname' => new external_value(PARAM_TEXT, 'lastname'),
+                                'lastname' => new external_value(PARAM_TEXT, 'lastname')
                                 )
                         )
                 );
@@ -927,11 +927,11 @@ class local_totarahola_external extends external_api{
                 
                 $userid = new external_value(
                         PARAM_INT,
-                        'Id competency to want to retrieve',
+                        'Id competency to want to retrieve'
                 );
                 $name = new external_value(
                         PARAM_TEXT,
-                        'learning plan name',
+                        'learning plan name'
                 );
                 $description = new external_value(
                         PARAM_RAW,
@@ -941,11 +941,11 @@ class local_totarahola_external extends external_api{
                 );
                 $startdate = new external_value(
                         PARAM_INT,
-                        'learning plan start date',
+                        'learning plan start date'
                 );
                 $enddate = new external_value(
                         PARAM_INT,
-                        'learning plan end date',
+                        'learning plan end date'
                 );
                 $courses = new external_value(
                         PARAM_TEXT,
@@ -959,7 +959,7 @@ class local_totarahola_external extends external_api{
                                         'name' => $name,
                                         'description' => $description,
                                         'startdate' => $startdate,
-                                        'enddate' => $enddate,
+                                        'enddate' => $enddate
                                         )
                                 ),
                                 'courses' => new external_single_structure(
@@ -1003,7 +1003,7 @@ class local_totarahola_external extends external_api{
                         $playload['userid'], 
                         $playload['desciption'],
                         $playload['startdate'],
-                        $playload['enddate'],
+                        $playload['enddate']
                 );
                 $object_return = array();
 
@@ -1052,7 +1052,7 @@ class local_totarahola_external extends external_api{
                 );
                 return new external_function_parameters(
                         array('filter' => new external_single_structure(
-                                array('userid' => $userid)),
+                                array('userid' => $userid))
                              
                 ));
         }
