@@ -1048,7 +1048,7 @@ class local_totarahola_external extends external_api{
                 
                 $userid = new external_value(
                         PARAM_INT,
-                        'user id',
+                        'user id'
                 );
                 return new external_function_parameters(
                         array('filter' => new external_single_structure(
