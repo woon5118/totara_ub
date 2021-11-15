@@ -252,4 +252,20 @@ class local_totarahola_lib
 
         return $learning_plan;
     }
+    public static function delete_learning_plan($userid, $planid)
+    {
+        global $DB;
+        $conditions = array();
+        $conditions['id'] = $planid;
+        $conditions['userid'] = $userid;
+
+        try{
+            
+            $DB->delete_records('dp_plan', $conditions);
+        } catch(Exception $e){
+
+            throw new invalid_parameter_exception('Sort column was invalid');
+        }
+        return true;
+    }
 }

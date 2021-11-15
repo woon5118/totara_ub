@@ -105,4 +105,20 @@ $functions = array(
         'ajax' => true, 
         'services' => array(LOCAL_TOTARAHOLA_SERVICES),
     ),
+    'local_totarahola_delete_learning_plan' => array(
+        'classname' => 'local_totarahola_external',
+        'methodname' => 'delete_learning_plan',
+        'description' => 'Delete a learning plan',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(LOCAL_TOTARAHOLA_SERVICES)
+    ),
+    'local_totarahola_get_users_learning_plan' => array(
+        'classname' => 'local_totarahola_external',
+        'methodname' => 'get_users_learning_plan',
+        'description' => 'List all approved learning plan',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(LOCAL_TOTARAHOLA_SERVICES)
+    )
 );

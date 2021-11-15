@@ -1097,4 +1097,111 @@ class local_totarahola_external extends external_api{
                         )
                 );
         }
+        /**
+         * Retuns description of deletee_learning_plan() parameters
+         * 
+         * @return external_function_parameters
+         */
+        public static function delete_learning_plan_parameters()
+        {
+                $userid = new external_value(
+                        PARAM_INT,
+                        'User ID'
+                );
+                $planid = new external_value(
+                        PARAM_INT,
+                        'Learning plan ID'
+                );
+
+                return new external_function_parameters(
+                        array('filter' => new external_single_structure(
+                                array('userid'=> $userid, 'planid' => $planid)))
+                        );
+
+        }
+        public static function delete_learning_plan($filter)
+        {
+                global $DB, $PAGE;
+
+                $params = self::validate_parameters(self::delete_learning_plan_parameters(), array('filter' => $filter));
+                $params = $params['filter'];
+                // # if an exception is thrown in the below code, all DB queries in this code will be rollback.
+                $transaction = $DB->start_delegated_transaction(); 
+
+                $context = context_system::instance();
+                self::validate_context($context);
+                require_capability('totara/plan:accessanyplan', $context);
+                $output = $PAGE->get_renderer('core');
+                try{
+                        $DB->delete_records('dp_plan', array('id' => $params['planid'],  'userid' => $params['userid']));
+
+                } catch(Exception $e){
+            
+                        throw new invalid_parameter_exception('Sort column was invalid');
+                }
+                $object_return = array();
+                $object_return['status'] = 200;
+                $object_return['message'] = 'success';
+                $transaction->allow_commit();
+                return $object_return;
+        }
+        public static function delete_learning_plan_returns()
+        {
+                return new external_single_structure(
+                        array(
+                                'status' => new external_value(PARAM_INT, 'Response status'),
+                                'message' => new external_value(PARAM_TEXT, 'Response message')
+                        )
+                        );
+        }
+        /**
+         * 
+         */
+        public static function get_users_learning_plan_parameters()
+        {
+                return new external_function_parameters(
+                        array()
+                );
+        }
+        public static function get_users_learning_plan()
+        {
+                global $DB, $PAGE;
+
+                # if an exception is thrown in the below code, all DB queries in this code will be rollback.
+                $transaction = $DB->start_delegated_transaction(); 
+
+                $context = context_system::instance();
+                self::validate_context($context);
+                require_capability('totara/plan:accessanyplan', $context);
+                $output = $PAGE->get_renderer('core');
+
+                $results = $DB->get_records_sql(
+                        'SELECT DISTINCT lp.id as id, lp.name as name, lp.description as description, lp.startdate as startdate, 
+                                lp.enddate as enddate
+                        FROM "ttr_dp_plan" lp 
+                        JOIN "ttr_user" u ON u.id = lp.userid
+                        WHERE (lp.status = 50)'
+                    );
+                $records = array();
+                foreach($results as $result)
+                {
+                        array_push($records, $result);
+                }
+                $transaction->allow_commit();
+                return $records;
+        }
+        public static function get_users_learning_plan_returns()
+        {
+                return new external_multiple_structure(
+                        new external_single_structure(
+                                array(
+                                'id' => new external_value(PARAM_INT, 'learning plan id'),
+                                'name' => new external_value(PARAM_TEXT, 'learning plan name'),
+                                'description' => new external_value(PARAM_RAW, 'learning plan description'),
+                                'startdate' => new external_value(PARAM_INT, 'learning plan Start date'),
+                                'enddate' => new external_value(PARAM_INT, 'learning plan End date')
+                                )
+                        )
+                );
+        }
 }
