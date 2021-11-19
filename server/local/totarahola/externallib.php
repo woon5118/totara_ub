@@ -931,7 +931,9 @@ class local_totarahola_external extends external_api{
                 );
                 $name = new external_value(
                         PARAM_TEXT,
-                        'learning plan name'
+                        'learning plan name',
+                        VALUE_DEFAULT,
+                    ''
                 );
                 $description = new external_value(
                         PARAM_RAW,
@@ -1007,14 +1009,19 @@ class local_totarahola_external extends external_api{
                 );
                 $object_return = array();
 
-                $courses = explode(',', $courses);
+                $ids = explode(',', $courses['ids']);
+                $courses = array();
                 try{
-                        for($i = 0; $i < count($courses); $i++)
+                        for($i = 0; $i < count($ids); $i++)
                         {
-                                $course = new object();
+                                $course = new stdClass();
                                 $course->planid = $id;
-                                $course->courseid = $courses[0];
-                                $DB->insert_record('dp_plan_course_assign', $course, false, false);
+                                $course->courseid = (int)$ids[$i];
+                                $course->approved = 50;
+                                $course->manual = 1;
+                                $courseid = $DB->insert_record('dp_plan_course_assign', $course, true, false);
+                                $course->id = $courseid;
+                                array_push($courses, $course);
                         }
                         $object_return['status'] = 201;
                         $object_return['message'] = "learning plan added successful";
@@ -1025,7 +1032,6 @@ class local_totarahola_external extends external_api{
                 }
                 $transaction->allow_commit();
                 return $object_return;
-                // return array();
         }
         /**
          * Returns description of method result value
@@ -1112,7 +1118,6 @@ class local_totarahola_external extends external_api{
                         PARAM_INT,
                         'Learning plan ID'
                 );
-
                 return new external_function_parameters(
                         array('filter' => new external_single_structure(
                                 array('userid'=> $userid, 'planid' => $planid)))
@@ -1154,9 +1159,10 @@ class local_totarahola_external extends external_api{
                         )
                         );
         }
-        /**
-         * 
-         */
+
+    /**
+     * @return external_function_parameters
+     */
         public static function get_users_learning_plan_parameters()
         {
                 return new external_function_parameters(
@@ -1204,4 +1210,63 @@ class local_totarahola_external extends external_api{
                         )
                 );
         }
+    public static function get_lp_courses_parameters() {
+
+        $lpid = new external_value(
+            PARAM_INT,
+            'learning plan id'
+        );
+        return new external_function_parameters(
+            array('filter' => new external_single_structure(
+                array('lpid' => $lpid))
+            ));
+    }
+    public static function get_lp_courses($filter)
+    {
+        global $DB, $PAGE;
+
+        $params = self::validate_parameters(self::get_lp_courses_parameters(), array('filter' => $filter));
+        $params = $params['filter'];
+        # if an exception is thrown in the below code, all DB queries in this code will be rollback.
+        $transaction = $DB->start_delegated_transaction();
+
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('totara/plan:accessanyplan', $context);
+        $output = $PAGE->get_renderer('core');
+
+        $results = $DB->get_records_sql(
+            'SELECT c.id as id, c.planid as plan, c.courseid as course, c.priority as priority,
+                c.duedate as duedate, c.approved as approved, c.reasonfordecision as reasonfordecision,
+                c.completionstatus as completionstatus, c.grade as grade
+                        FROM "ttr_dp_plan_course_assign" c
+                        JOIN "ttr_dp_plan" lp ON lp.id = c.planid
+                        WHERE (lp.id = '.$params['lpid'].')'
+        );
+        $records = array();
+        foreach($results as $result)
+        {
+            array_push($records, $result);
+        }
+        $transaction->allow_commit();
+        return $records;
+    }
+    public static function get_lp_courses_returns()
+    {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'id' => new external_value(PARAM_INT, 'ID course assigned'),
+                    'plan' => new external_value(PARAM_INT, 'assigned id learning plan'),
+                    'course' => new external_value(PARAM_INT, 'assigned id course'),
+                    'priority' => new external_value(PARAM_INT, 'assigned course priority'),
+                    'duedate' => new external_value(PARAM_INT, 'assigned duedate'),
+                    'approved' => new external_value(PARAM_INT, 'assigned course approved'),
+                    'reasonfordecision' => new external_value(PARAM_RAW, 'assigned course reason for decision'),
+                    'completionstatus' => new external_value(PARAM_INT, 'assigned course completion status'),
+                    'grade' => new external_value(PARAM_INT, 'assigned course grade'),
+                )
+            )
+        );
+    }
 }

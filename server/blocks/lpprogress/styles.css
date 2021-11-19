@@ -1,0 +1,71 @@
+.block_lpprogress {
+    color: #000;
+    background-color: #f44336;
+    background-repeat: no-repeat;
+}
+
+.block_lpprogress .final {
+    display: inline;
+    vertical-align: super;
+    margin-left: 0.7em;
+}
+
+.block_lpprogress #progressbar li {
+    list-style-type: none;
+}
+
+.block_lpprogress #progressbar li a {
+    margin-left: 1em;
+    vertical-align: -15%;
+}
+
+.block_lpprogress #progressbar .step0:before {
+    content: "";
+    background-color: #999da0;
+    position: absolute;
+    left: 0.55em;
+}
+
+.block_lpprogress #progressbar li:before {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    display: inline-block;
+    font-size: 20px;
+    background: #fff;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+.block_lpprogress #progressbar li:after {
+    content: '';
+    width: 4px;
+    height: 2em;
+    background: #bdbdbd;
+    display: block;
+    margin-left: -0.5em;
+}
+
+.block_lpprogress #progressbar li:last-child:before {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    margin-left: -0.25em;
+}
+
+.block_lpprogress #progressbar li:last-child:after {
+    height: 0;
+}
+
+.block_lpprogress #progressbar li.active:after {
+    background: #c6e4c0;
+}
+
+.block_lpprogress #progressbar li.active:before {
+    background: #17a23f;
+    font-family: fontawesome;
+}
+#block-region-side-pre .block_lpprogress .col-3 {
+  flex: unset;
+  max-width: 100% ;
+}

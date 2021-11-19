@@ -16,17 +16,17 @@ class local_totarahola_lib
      *
      * Requires totara/hierarchie:viewcompetencyframeworks capability at the system context.
      *
-     * @param int $id The column to sort on 
+     * @param int $courseid The column to sort on
      * @return array of competency_framework
      */
-    public static function get_course($idcourse) {
+    public static function get_course($courseid) {
         global $DB;
 
         $params = array();
         $validcolumns = array('id', 'shortname', 'description', 'idnumber', 'frameworkid',
             'parentid', 'visible', 'evidencecount', 'timecreated', 'fullname', 'depthlevel', 'typeid');
 
-        $params['id'] = $idcourse;
+        $params['id'] = $courseid;
         // OK - all set.
         return $DB->get_record('course', $params, $fields='*');
     }
@@ -38,21 +38,21 @@ class local_totarahola_lib
      * @param int $id The column to sort on 
      * @return array of course_section
      */
-    public static function get_course_sections($idcourse) {
+    public static function get_course_sections($courseid) {
         global $DB;
 
         $params = array();
         $validcolumns = array('id', 'shortname', 'description', 'idnumber', 'frameworkid',
             'parentid', 'visible', 'evidencecount', 'timecreated', 'fullname', 'depthlevel', 'typeid');
 
-        $params['course'] = $idcourse;
+        $params['course'] = $courseid;
         // OK - all set.
         return $DB->get_records('course_sections', $params, $fields='*');
     }
     /**
      * Perform a search based on the provided filters and return list of records.
      *
-     * Requires moodle/competency:competencyview capability at the system context.
+     * Requires moodle/competency: competencyview capability at the system context.
      *
      * @param string $sort The column to sort on
      * @param string $order ('ASC' or 'DESC')
@@ -231,9 +231,8 @@ class local_totarahola_lib
         $learning_plan->startdate = $startdate;
         $learning_plan->enddate = $enddate;
         $learning_plan->status = $status['approved'];
-        $learning_plan->createdby = $userid;
 
-        $lp = $DB->insert_record('dp_plan', $learning_plan, $returnid = true, $bulk = false);
+        $lp = $DB->insert_record('dp_plan', $learning_plan, true, false);
 
         return $lp;
     }
