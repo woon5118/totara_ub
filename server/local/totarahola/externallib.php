@@ -1269,4 +1269,56 @@ class local_totarahola_external extends external_api{
             )
         );
     }
+    /**
+     *
+     * @return external_function_parameters
+     *
+     */
+    public static function user_is_enrol_parameters()
+    {
+        $userid = new external_value(
+            PARAM_INT,
+            'User ID'
+        );
+        $courseid = new external_value(
+            PARAM_INT,
+            'Course ID'
+        );
+        return new external_function_parameters(
+            array('userid' => $userid,
+                'courseid' => $courseid
+            )
+        );
+    }
+    public static function user_is_enrol($userid, $courseid)
+    {
+        global $DB, $PAGE;
+
+        $params = self::validate_parameters(self::user_is_enrol_parameters(), array('userid' => $userid, 'courseid' => $courseid));
+        # if an exception is thrown in the below code, all DB queries in this code will be rollback.
+        $transaction = $DB->start_delegated_transaction();
+
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('totara/plan:accessanyplan', $context);
+        $output = $PAGE->get_renderer('core');
+
+        $params['status'] = 0;
+        $result = $DB->get_record_sql(
+            'SELECT COUNT(*) as nbr
+                        FROM "ttr_user_enrolments" u
+                        JOIN "ttr_enrol" e ON e.id = u.enrolid
+                        WHERE (u.userid = :userid AND e.courseid = :courseid AND u.status = :status)', $params
+        );
+        if($result->nbr == 1)
+            return array('enrol' => 1);
+
+        return array('enrol' => 0);
+    }
+    public static  function user_is_enrol_returns()
+    {
+        return new external_single_structure(
+            array('enrol' => new external_value(PARAM_INT, 'User is enrolled or not'))
+        );
+    }
 }

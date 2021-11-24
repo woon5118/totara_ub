@@ -122,4 +122,12 @@ $functions = array(
         'ajax' => true,
         'services' => array(TOTARA_HOLA_SERVICES)
     ),
+    'local_totarahola_user_is_enrol' => array(
+        'classname' => 'local_totarahola_external',
+        'methodname' => 'user_is_enrol',
+        'description' => 'Verify if user is enrol in a course',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(TOTARA_HOLA_SERVICES)
+    ),
 );
