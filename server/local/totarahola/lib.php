@@ -107,7 +107,15 @@ class local_totarahola_lib
         }
         $params['visible'] = 1;
         // OK - all set.
-        return $DB->get_records('comp', $params, $sort . ' ' . $order, '*', $skip, $limit);
+        return $DB->get_records_sql(
+            'SELECT c.id as id, c.shortname as shortname, c.description as description, c.idnumber as idnumber, 
+       c.frameworkid as frameworkid, f.fullname as frameworkfullname, c.path as path, c.parentid as parentid, c.visible as visible, 
+       c.proficiencyexpected as proficiencyexpected, c.evidencecount as evidencecount, c.timecreated as timecreated, 
+       c.timemodified as timemodified, c.usermodified as usermodified, c.fullname as fullname, c.depthlevel as depthlevel, 
+       c.typeid as typeid, (SELECT COUNT(*) FROM "ttr_comp_criteria" cc WHERE cc.competencyid = c.id) as course,
+       (SELECT COUNT(*) FROM "ttr_comp_relations" r WHERE r.id1 = c.id OR r.id2 = c.id) as related
+        FROM "ttr_comp" c
+        JOIN "ttr_comp_framework" f ON c.frameworkid = f.id');
     }
     /**
      * Perform a search based on the provided filters and return list of records.
@@ -162,14 +170,14 @@ class local_totarahola_lib
      * @param int $id The column to sort on 
      * @return array of competency_framework
      */
-    public static function get_competency_criteria($idcomp) {
+    public static function get_competency_criteria($competencyid) {
         global $DB;
 
         $params = array();
         $validcolumns = array('id', 'shortname', 'description', 'idnumber', 'frameworkid',
             'parentid', 'visible', 'evidencecount', 'timecreated', 'fullname', 'depthlevel', 'typeid');
 
-        $params['id'] = $idcompetency;
+        $params['id'] = $competencyid;
         // OK - all set.
         $courses = $DB->get_records_sql(
             'SELECT c.id as id, c.category as category, c.fullname as fullname, c.shortname as shortname, 
@@ -177,7 +185,7 @@ class local_totarahola_lib
                     cc.usermodified as usermodified, c.visible as visible, c.timecreated as timecreated, c.timemodified as timemodified
             FROM "ttr_course" c 
             JOIN "ttr_comp_criteria" cc ON c.id = cc.iteminstance 
-            WHERE (cc.competencyid = :idcomp) AND (visible = 1)', ['idcomp' => $idcomp]
+            WHERE (cc.competencyid = :idcomp) AND (visible = 1)', ['idcomp' => $competencyid]
         );
 
         return $courses;

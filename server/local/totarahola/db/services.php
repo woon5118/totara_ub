@@ -130,4 +130,12 @@ $functions = array(
         'ajax' => true,
         'services' => array(TOTARA_HOLA_SERVICES)
     ),
+    'local_totarahola_get_module_instance' => array(
+        'classname' => 'local_totarahola_external',
+        'methodname' => 'get_module_instance',
+        'description' => 'Return module instance of given id',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(TOTARA_HOLA_SERVICES)
+    )
 );

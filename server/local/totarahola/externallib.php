@@ -504,6 +504,7 @@ class local_totarahola_external extends external_api{
                                         'description' => new external_value(PARAM_RAW, ''),
                                         'idnumber' => new external_value(PARAM_TEXT, 'Competency ID number'),
                                         'frameworkid' => new external_value(PARAM_INT, 'Competency framework id'),
+                                        'frameworkfullname' => new external_value(PARAM_TEXT, 'Framework comptency fullname'),
                                         'path' => new external_value(PARAM_TEXT, 'Competency path'),
                                         'parentid' => new external_value(PARAM_INT, 'Parent competency id'),
                                         'visible' => new external_value(PARAM_INT, 'Comptency Visibility'),
@@ -514,7 +515,9 @@ class local_totarahola_external extends external_api{
                                         'usermodified' => new external_value(PARAM_INT, ''),
                                         'fullname' => new external_value(PARAM_TEXT, ''),
                                         'depthlevel' => new external_value(PARAM_INT, ''),
-                                        'typeid' => new external_value(PARAM_INT, '') 
+                                        'typeid' => new external_value(PARAM_INT, ''),
+                                        'course' => new external_value(PARAM_INT, 'Number of competency criteria'),
+                                        'related' => new external_value(PARAM_INT, 'Related competency')
                                 )
                         )
                 );
@@ -1319,6 +1322,46 @@ class local_totarahola_external extends external_api{
     {
         return new external_single_structure(
             array('enrol' => new external_value(PARAM_INT, 'User is enrolled or not'))
+        );
+    }
+    public static function get_module_instance_parameters()
+    {
+        $module = new external_value(
+            PARAM_TEXT,
+            'Module name'
+        );
+        $instance = new external_value(
+            PARAM_INT,
+            'Module instance ID'
+        );
+        return new external_function_parameters(
+            array('module' => $module, 'instance' => $instance)
+        );
+    }
+    public static function get_module_instance($module, $instance)
+    {
+        global $DB, $PAGE;
+        $params = self::validate_parameters(self::get_module_instance_parameters(), array('module' => $module, 'instance' => $instance));
+        # if an exception is thrown in the below code, all DB queries in this code will be rollback.
+        $transaction = $DB->start_delegated_transaction();
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('totara/plan:accessanyplan', $context);
+        $output = $PAGE->get_renderer('core');
+
+        $table = $params['module'];
+        $conditions = array('id' => $params['instance']);
+
+        $results = $DB->get_record($table, $conditions, $fields='*');
+        $transaction->allow_commit();
+
+        return array('module' => serialize($results));
+    }
+    public static function get_module_instance_returns()
+    {
+        // force the api to return text format of instance
+        return new external_single_structure(
+            array('module' => new external_value(PARAM_RAW, 'Module instance'))
         );
     }
 }
